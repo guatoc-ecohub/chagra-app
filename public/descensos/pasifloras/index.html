@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — de la espaldera a la flor de la pasiflora, con el abejorro carpintero</title>
+<meta name="description" content="Una sola toma, sin cortes: de una espaldera de maracuyá, granadilla o gulupa a la flor, al abejorro carpintero que la poliniza, al grano de polen y al óvulo, y de vuelta hasta el fruto y la finca. Por qué cuidar los abejorros y la madera donde anidan, y cómo manejar la secadera y la roña. Cifras con fuente; tamaños aproximados; glosario, lectura en voz alta y un repaso para jugar.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(20,15,10,.7); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#f2c14e; --acento-tinta:#ffd97a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#140f0b;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#140f0b;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#1f2d17}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#26381c;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#26381c;margin-top:1em;font-weight:600}
+#titulo h1,#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(246,244,232,.95),0 0 16px rgba(246,244,232,.85)}
+
+#titulo{background:rgba(246,244,232,.96);border-radius:16px;padding:12px 16px 14px}
+
+/* La finca: altitud desde la URL, la ubicación o a mano */
+#ubicacion{position:fixed;z-index:5;right:var(--gut);top:var(--ubic-top,220px);width:min(24rem,calc(100vw - 2*var(--gut)));background:rgba(246,242,226,.96);color:#2a2213;border:1px solid #8a7348;border-radius:14px;padding:8px 14px;font-size:1rem;box-shadow:0 6px 22px rgba(20,14,6,.25);transition:opacity .3s ease}
+#ubicacion summary{cursor:pointer;font-weight:650;line-height:1.4;min-height:32px;display:flex;align-items:center}
+#ubicacion p{margin:.5em 0;line-height:1.4}
+#ubicacion input{font:inherit;width:8em;min-height:44px;border:1px solid #8a7348;border-radius:8px;padding:6px;background:#fff;color:#2a2213}
+#ubicacion button{font:inherit;background:#4a3a1c;color:#fff;border-radius:9px;padding:8px 12px;min-height:44px;border:0;cursor:pointer;margin:2px 4px 2px 0}
+#ubicacion label{display:block;margin:6px 0}
+#ubicacion.oculto{opacity:0;pointer-events:none}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(242,193,78,.3)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:var(--acento);color:#2a1d05;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(18,13,8,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(20,15,10,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(44,34,24,.85);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:var(--acento);color:#2a1d05;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#f7cf6a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:42%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:2px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:5px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+#riel.callado button span{opacity:0 !important}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#1a1510;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(10,7,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#1a1510;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#241d15;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(242,193,78,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{grid-column:1 / -1;margin-top:4px;padding-top:4px}
+  #medidor .nota{display:none}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px;max-height:52vh;overflow:auto}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .btn{padding:10px 9px;font-size:.95rem}
+  #bSonido .lbl{display:none}
+  #riel{left:auto;right:4px;top:52%}
+  #riel button span{display:none}
+  #ubicacion{left:var(--gut);right:var(--gut);width:auto;padding:4px 12px}
+  #ubicacion[open]{max-height:56vh;overflow:auto}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 7px} }
+@media (prefers-reduced-motion:reduce){
+#ubicacion .especies button{background:#efe6cc;color:#2a2213;border:1px solid #8a7348}
+#ubicacion .especies button[aria-pressed="true"]{background:#4a3a1c;color:#fff}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo desde una espaldera de pasifloras hasta la flor, el abejorro carpintero, el grano de polen y el óvulo, y de vuelta hasta el fruto y la finca" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p id="subtitulo">De la espaldera a la flor de la pasiflora, al abejorro carpintero que la poliniza, y de vuelta hasta el fruto.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<details id="ubicacion">
+  <summary id="origenPiso" aria-live="polite">Altitud de ejemplo</summary>
+  <p id="detallePiso">La altitud de su finca cambia qué pasiflora se ve: maracuyá, granadilla o gulupa. Nada de esto se guarda ni se envía.</p>
+  <form id="alturaManual"><label>Altitud de su finca, en metros <input id="alturaFinca" type="number" min="0" max="6000" step="any" required></label><button type="submit">Usar esta altitud</button></form>
+  <p><button id="usarUbicacion" type="button">Usar mi ubicación</button></p>
+  <p class="especies" role="group" aria-label="O escoja la pasiflora">O escoja: <button type="button" data-esp="maracuya">Maracuyá</button><button type="button" data-esp="granadilla">Granadilla</button><button type="button" data-esp="gulupa">Gulupa</button></p>
+  <p id="estadoUbicacion" role="status"></p>
+</details>
+
+<aside id="medidor" aria-label="Medidor de tamaño">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">3,20 m</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 3 200 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/9 · La espaldera</span><span id="vMomento">flor abierta</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 9</div>
+  <h2 id="fTit">La espaldera</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el zumbido"><span aria-hidden="true">♪</span><span class="lbl"> Sonido: <span class="est">no</span></span></button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>: dan el orden de tamaño de lo que se ve, no una medición. El estigma, el pistilo cortado, el óvulo y la semilla están <b>simplificados</b>, y sus colores son <b>de dibujo</b>. El abejorro es un dibujo del género <i>Xylocopa</i>, no el retrato de una especie. Las dos mitades de fruto del final son una <b>comparación dibujada</b>: muestran lo que dicen las fuentes (más polen, más semillas y más jugo), no la foto de un fruto medido. Palabras como «columna», «bolsita» o «puertica» son <b>comparaciones</b>; el texto lo dice cada vez. Las cifras de cuaje vienen de ensayos en granjas de investigación de Caldas: en otra finca y otro año pueden ser distintas.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>Arias-Suárez JC, Ocampo-Pérez JA, Urrea-Gómez R (2014).</b> <em>La polinización natural en el maracuyá (Passiflora edulis f. flavicarpa Degener) como un servicio reproductivo y ecosistémico.</em> Agronomía Mesoamericana 25(1): 73–83. doi:10.15517/am.v25i1.14200 — Palestina (Caldas), 1 050 m, 48 accesiones: flores que visitó el abejorro <i>Xylocopa</i>, 88 % de frutos; polinización a mano, 60 %; autopolinización, 3 %. Frutos de 203 g con abejorro y 187,5 g a mano. La flor abrió entre las 11:30 a. m. y la 1:00 p. m.; unas ocho visitas por flor. Los abejorros anidan en los postes de madera del cultivo o en troncos cercanos. Cita a otros autores: con 7,2 visitas o más por flor se pasa del 80 % (Da Silva 1999); en Brasil, poner postes con nidos subió los frutos de 3,2 a 25 % (Camillo 1996); en Colombia anidan en madera en descomposición; quitar los herbicidas alrededor bastaría para favorecerlos (Calle 2010). Esas obras citadas no se leyeron.</li>
+      <li id="f2"><b>Arias Suárez JC, Ocampo Pérez J, Urrea Gómez R (2016).</b> <em>Sistemas de polinización en granadilla (Passiflora ligularis Juss.) como base para estudios genéticos y de conservación.</em> Acta Agronómica 65(2): 197–203. doi:10.15446/acag.v65n2.49278 — Manizales, 2 340 m, 42 accesiones. Tabla 1: polinización natural por <i>Xylocopa</i>, 59,0 % de frutos en promedio; cruzada a mano, 70,3 %; flor embolsada sin ayuda, 34,3 %. La flor abre entre las 3:00 y las 5:00 de la mañana y duró hasta 36 horas; las labores de protección no deben hacerse en las primeras horas de la mañana. La abeja de miel visitaba mucho pero no polinizaba por su tamaño y le quitaba polen a las anteras. Las anteras quedan debajo del estigma. La granadilla es autofértil. El resumen dice «70 %» para la polinización con insectos; aquí se usa el promedio de la tabla.</li>
+      <li id="f3"><b>Rendón JS, Ocampo J, Urrea R (2013).</b> <em>Estudio sobre polinización y biología floral en Passiflora edulis f. edulis Sims, como base para el premejoramiento genético.</em> Acta Agronómica 62(3): 232–241. revistas.unal.edu.co/index.php/acta_agronomica/article/view/32202 — Manizales, 2 340 m, 32 accesiones de gulupa: el 80 % de las flores abre entre las 6:00 y las 8:00 a. m.; flores sin ayuda, 28 % de frutos; con insectos (<i>Xylocopa</i>), 39 %, muy variable por la lluvia; cruzada a mano, 68 %; autopolinización a mano, 82 %; geitonogamia, 86 %. Lluvias de 9 mm o más en el día de la flor bajaron la polinización. Frutos de 151 a 157 semillas. Recomienda dar sitios de nido, como postes de madera roja y liviana.</li>
+      <li id="f4"><b>Pinilla-Gallego MS, Nates-Parra G (2015).</b> <em>Diversidad de visitantes y aproximación al uso de nidos trampa para Xylocopa (Hymenoptera: Apidae) en una zona productora de pasifloras en Colombia.</em> Actualidades Biológicas 37(103): 143–153. doi:10.17533/udea.acbi.v37n103a03 — Buenavista (Boyacá): las <i>Xylocopa</i> son abejas grandes, solitarias, oscuras, que hacen el nido en madera muerta. Nidos naturales en troncos de aliso muerto, postes de cerca, un tronco caído de aguacate y vigas de techo. Nidos trampa de bambú: 6 nidos (3 %) en el maracuyá y ninguno en granadilla ni gulupa; en troncos perforados, ninguno. Cita a <i>X. frontalis</i> y <i>X. lachnea</i> como polinizadores principales de la gulupa y la granadilla en Boyacá.</li>
+      <li id="f5"><b>Gutiérrez-Chacón C, Fornoff F, Ospina-Torres R, Klein AM (2018).</b> <em>Pollination of granadilla (Passiflora ligularis) benefits from large wild insects.</em> Journal of Economic Entomology 111: 1526–1534. doi:10.1093/jee/toy133 — <b>solo se leyó el resumen</b>: en los Andes de Colombia, 12 especies de abejas visitaron la granadilla; la abeja de miel fue la más frecuente, pero las grandes (<i>Xylocopa lachnea</i>, <i>Epicharis rustica</i>) tocaron más estigmas y anteras; sin polinizadores bajaron los frutos y su peso; el déficit de polinización bajaba con más abejas grandes.</li>
+      <li id="f6"><b>Ocampo Pérez JA, Morillo Coronado Y, Espinal Aguilar FJ, Moreno Cabrera I (2022).</b> <em>Tecnología para el cultivo del maracuyá en Colombia.</em> AGROSAVIA y Universidad Nacional de Colombia. ISBN 978-958-505-075-4. hdl.handle.net/20.500.12324/38215 — partes de la flor (cinco pétalos y cinco sépalos; corona de filamentos de 35 a 45 mm, púrpura en la base y blanca en la punta; androginóforo; cinco estambres; tres estilos con sus estigmas; ovario súpero) y tres tipos de flor según la curva del estilo; flor que abre entre las 12:00 y la 1:00 p. m. y dura unas seis horas; autoincompatible entre 95 y 97 %; polen pesado y pegajoso con las anteras debajo de los estigmas; <i>X. frontalis</i> y <i>X. suspecta</i>, los más eficaces; la abeja de miel poliniza poco y puede sacar mucho polen; nidos en árboles muertos y postes, dejar madera al inicio de cada surco; insecticidas en las primeras horas de la mañana; polinizar a mano si el cuaje baja del 30 %; fecundación de 4 a 5 horas después de polinizar; fruto de 55 a 60 días; más semillas, más jugo y frutos más grandes; semilla de 6 a 8 mm; altitud hasta 1 500 m, óptima de 200 a 1 000 m. Secadera (<i>Fusarium solani</i> f. sp. <i>passiflorae</i>) y roña (<i>Cladosporium cladosporioides</i>): causas, condiciones y manejo, págs. 74–81 y 84. El manual trae también fungicidas químicos; esta pieza enseña solo lo preventivo y lo biológico.</li>
+      <li id="f7"><b>AGROSAVIA (2020).</b> <em>Regiones productoras de granadilla, gulupa y maracuyá en Colombia</em>, cap. I de <em>Caracterización sanitaria de los cultivos de granadilla, gulupa y maracuyá en Colombia, con especial referencia a la secadera causada por Fusarium solani f. sp. passiflorae.</em> hdl.handle.net/20.500.12324/39683 — granadilla entre 1 000 y 2 300 m; gulupa entre 1 500 y 2 700 m; maracuyá por lo general por debajo de 1 200 m.</li>
+      <li id="f8"><b>AGROSAVIA (2020).</b> <em>Principales problemas fitosanitarios de pasifloras cultivadas en Colombia</em>, cap. II del mismo libro. hdl.handle.net/20.500.12324/39684 — la secadera está en la mayoría de las zonas productoras y la favorecen la humedad junto a la base del tallo y las heridas; la roña está registrada en maracuyá y otras pasifloras.</li>
+      <li id="f9"><b>Melgarejo LM, editora (2015).</b> <em>Granadilla (Passiflora ligularis Juss): caracterización ecofisiológica del cultivo.</em> Universidad Nacional de Colombia y CEPASS. ISBN 978-958-775-396-7 — cap. 2: la flor abre y cierra en 24 horas; el fruto cuajado se ve a los 2 días, llega a su tamaño máximo hacia el día 42 y madura del todo hacia el día 92 después de abrir la flor. El arilo, según el trabajo de Ishihata (1965) en maracuyá que el libro cita: una telita al abrir la flor, una bolsita hacia el día 10, pulpa jugosa hacia el día 25 y completo hacia el día 75. Cap. 7 (BPA): emparrado a unos 2 m; recomienda de 1 700 a 2 100 m; manejo de la secadera (semilla sana, viveros registrados, sin encharcamientos, <i>Trichoderma</i>, no herir el cuello, desinfectar la herramienta). El repositorio de AGROSAVIA fecha la obra en 2010; el libro impreso dice 2015.</li>
+      <li id="f10"><b>Franco G, Cartagena JR, Correa G (2014).</b> <em>Análisis de crecimiento del fruto de gulupa (Passiflora edulis Sims) en las condiciones ecológicas del bosque húmedo montano bajo de Colombia.</em> Revista U.D.C.A Actualidad &amp; Divulgación Científica 17(2): 391–400. doi:10.31910/rudca.v17.n2.2014.242 — cosechar entre los 85 y los 90 días después de la plena floración.</li>
+      <li id="f11"><b>Ángel-García C, Robledo-Buriticá J, Castaño-Zapata J (2018).</b> <em>Comparación de métodos de inoculación de Fusarium solani f. sp. passiflorae en plántulas de maracuyá.</em> Revista U.D.C.A Actualidad &amp; Divulgación Científica 21(1): 23–31. doi:10.31910/rudca.v21.n1.2018.659 — la secadera puede causar pérdidas de entre 90 y 100 % en cultivos comerciales en Colombia (así lo dice su resumen, sin dar la medición).</li>
+      <li id="f12"><b>Delgado-Méndez CG, Castaño-Zapata J, Villegas-Estrada B (2013).</b> <em>Caracterización del agente causante de la roña del maracuyá en Colombia.</em> Revista de la Academia Colombiana de Ciencias 37(143): 215–227. doi:10.18257/raccefyn.5 — el hongo <i>Cladosporium cladosporioides</i> causa la roña del maracuyá en Colombia.</li>
+      <li id="f13"><b>ICA (2021).</b> <em>Resolución 092101 del 2 de marzo de 2021.</em> ica.gov.co — suspende el registro de los productos con fipronil cuyos usos incluyan aguacate, café, cítricos o pasifloras; el fipronil es sistémico y llega al néctar y al polen.</li>
+      <li id="f14"><b>Auer W, Heigl H (2021).</b> <em>Passiflora quadrangularis.</em> PalDat, base de datos palinológica, paldat.org/pub/Passiflora_quadrangularis/305414 — grano de polen hidratado de 51 a 100 µm, redondo, con superficie en red y tres surcos unidos. Es la badea, del mismo género, no una de las tres de este viaje.</li>
+      <li id="f15"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §32.2 «Pollination and Fertilization». OpenStax (CC BY 4.0), openstax.org/books/biology-2e/pages/32-2-pollination-and-fertilization — el tubo polínico crece por el estilo y entra al óvulo por el micrópilo; de las dos células del polen, una fecunda la ovocélula y la otra forma el endospermo con los dos núcleos del centro; el óvulo maduro se vuelve semilla.</li>
+      <li id="f16"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §4.1 «Studying Cells». OpenStax (CC BY 4.0) — una micra (µm) es la millonésima parte de un metro.</li>
+      <li id="f17"><b>Salazar-González C, Yela-Caicedo O, Gómez-Espinoza B (2022).</b> <em>Molecular characterization of Fusarium spp. associated vascular wilt in passion fruit (Passiflora ligularis Juss).</em> Revista de Ciencias Agrícolas 39(2): 33–46. doi:10.22267/rcia.223902.180 — en granadilla de Nariño, la marchitez la causaba <i>Fusarium oxysporum</i> f. sp. <i>passiflorae</i>.</li>
+    </ol>
+    <p class="aviso"><b>Cuentas hechas con esas cifras.</b> Granos de polen en fila en un milímetro: 1 000 µm ÷ 100 µm = 10 y 1 000 µm ÷ 51 µm ≈ 20 [14]. «Casi nueve de cada diez flores»: 88 % [1]. «Tres de cada cien»: 3 % [1]. La línea «En su regla» del medidor divide un milímetro entre el ancho de la vista, que es aproximado. Las franjas de altitud se cruzan [7]: donde caben dos pasifloras, esta pieza muestra una y nombra la otra.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso de las pasifloras — una sola toma: la espaldera, la
+   flor con su abejorro carpintero, el grano de polen, el óvulo,
+   y de vuelta arriba hasta la semilla, el fruto y la finca.
+   Cada escala vive dentro de otra (portal). La cámara se mueve
+   por un parámetro p que solo mueve el usuario.
+   El motor (cámara, medidor, tarjetas, voz, palabras, fuentes,
+   repaso) es el del Descenso del café, por la vía del de las abejas.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'); const texB = document.createElement('canvas');
+let texOK = false;
+let RELOJ = 0; // segundos, solo para el aleteo y el viento; con movimiento reducido no corre
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const TAU = Math.PI * 2;
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = h[0] === '#' ? hex(h) : h.match(/\d+/g).map(Number); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function h1(n){ const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+
+/* Voronoi por recorte de semiplanos, con cubetas para vecinos (del café) */
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath(); }
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function blob(c, x, y, rx, ry, col, a){ const g = c.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry)); g.addColorStop(0, rgba(col, a)); g.addColorStop(0.65, rgba(col, a*0.5)); g.addColorStop(1, rgba(col, 0)); c.save(); c.translate(x, y); c.scale(1, ry/rx); c.translate(-x, -y); c.fillStyle = g; c.beginPath(); c.arc(x, y, rx, 0, TAU); c.fill(); c.restore(); }
+const fondo = (c, v, col) => { c.fillStyle = col; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2); };
+const TINTA = '#2b2119';
+function rinon(c, rx, ry){ c.beginPath(); c.moveTo(0, -ry*0.6); c.bezierCurveTo(rx*0.35, -ry*1.15, rx*1.05, -ry*0.95, rx, 0); c.bezierCurveTo(rx*0.98, ry*0.9, rx*0.45, ry*1.05, 0, ry*0.95); c.bezierCurveTo(-rx*0.45, ry*1.05, -rx*0.98, ry*0.9, -rx, 0); c.bezierCurveTo(-rx*1.05, -ry*0.95, -rx*0.35, -ry*1.15, 0, -ry*0.6); c.closePath(); }
+
+/* ============================================================
+   LAS TRES PASIFLORAS. Los colores son de dibujo.
+   Franjas de altitud de los cultivos en Colombia [7]: maracuyá por
+   lo general por debajo de 1 200 m; granadilla de 1 000 a 2 300 m;
+   gulupa de 1 500 a 2 700 m. Donde se cruzan, se muestra una.
+   ============================================================ */
+const ESPS = {
+  maracuya: { k:'maracuya', n:'maracuyá', N:'Maracuyá', el:'el maracuyá', del:'del maracuyá', tutor:'espaldera', hoja:'triloba', flor:1,
+    petalo:['#fbfaf2', '#e3e8cf'], sepalo:['#f4f6e8', '#8fb35c'], bractea:'#6f9a3e',
+    corona:{ base:'#4a1150', medio:'#86358d', punta:'#fbf6f2', bandas:false, ondas:1 },
+    fruto:{ piel:['#f7da52', '#e6aa1d', '#9e6c0c'], motas:'rgba(255,255,226,.6)', meso:'#f6edd6', mesoG:0.08, arilo:'#f1a227', ariloB:'#fbd060', rugosa:0, rx:1.06 } },
+  granadilla: { k:'granadilla', n:'granadilla', N:'Granadilla', el:'la granadilla', del:'de la granadilla', tutor:'emparrado', hoja:'corazon', flor:1,
+    petalo:['#f6eef2', '#dccdd5'], sepalo:['#eef1e3', '#88a862'], bractea:'#79a14a',
+    corona:{ base:'#541760', medio:'#f1ecf4', punta:'#7b3389', bandas:true, ondas:0 },
+    fruto:{ piel:['#f8b742', '#e88d1d', '#a2580c'], motas:'rgba(255,250,236,.85)', meso:'#fbf7ec', mesoG:0.13, arilo:'#c9cdbf', ariloB:'#eceee4', rugosa:0, rx:1.02 } },
+  gulupa: { k:'gulupa', n:'gulupa', N:'Gulupa', el:'la gulupa', del:'de la gulupa', tutor:'espaldera', hoja:'triloba', flor:0.88,
+    petalo:['#fbfaf5', '#e4e7d4'], sepalo:['#f5f6ea', '#86a95a'], bractea:'#668f3a',
+    corona:{ base:'#3c0d44', medio:'#702179', punta:'#f7f1f7', bandas:false, ondas:1 },
+    fruto:{ piel:['#7a3570', '#521a4b', '#2a0c27'], motas:'rgba(235,205,235,.35)', meso:'#f2e8d6', mesoG:0.07, arilo:'#efa02a', ariloB:'#f8c454', rugosa:1, rx:1.0 } },
+};
+
+/* ============================================================
+   LA FINCA: altitud por la URL (?alt=&municipio=&lat=&lon=),
+   por la ubicación del aparato o a mano; o la pasiflora a mano.
+   ============================================================ */
+const numero = (v, min, max) => v !== null && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+let altura = numero(qs.get('alt'), 0, 6000);
+let origenAlt = altura === null ? '' : 'Altitud de la app';
+const municipio = (qs.get('municipio') || '').trim().slice(0, 60);
+let espManual = ESPS[qs.get('especie')] ? qs.get('especie') : null;
+function espDePiso(){
+  if (espManual) return espManual;
+  if (altura === null || altura <= 1200) return 'maracuya';
+  if (altura <= 2300) return 'granadilla';
+  return 'gulupa';
+}
+let ESP = ESPS[espDePiso()];
+/* qué otras pasifloras caben a esta altura, según las franjas de [7] */
+function tambien(){
+  if (altura === null) return [];
+  const o = [];
+  if (altura < 1200 && ESP.k !== 'maracuya') o.push('maracuya');
+  if (altura >= 1000 && altura <= 2300 && ESP.k !== 'granadilla') o.push('granadilla');
+  if (altura >= 1500 && altura <= 2700 && ESP.k !== 'gulupa') o.push('gulupa');
+  return o;
+}
+
+/* ============================================================
+   EL ABEJORRO CARPINTERO (Xylocopa): grande, negro, peludo [4].
+   Dibujo de la casa en tinta; no es el retrato de una especie.
+   ============================================================ */
+const POLV = [...Array(70)].map((_, i) => [h1(i*3.7) - 0.5, h1(i*5.3 + 2) - 0.5, h1(i*7.1 + 1)]);
+/* visto de arriba: cuerpo a lo largo de +x (cabeza en +x), largo ~1 */
+function xyloArriba(c, x, y, s, rot, polen, px){
+  c.save(); c.translate(x, y); c.rotate(rot); c.scale(s, s);
+  const lw = Math.max((px || 0.002)/s, 0.008);
+  // patas: cortas, gruesas y peludas; las de adelante hacia la cabeza, las de atrás hacia la cola
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const [x0, a1, l1, a2, l2] of [[0.17, 0.55, 0.15, 0.1, 0.13], [0.09, 1.35, 0.17, 0.75, 0.15], [0.0, 2.25, 0.2, 2.75, 0.2]]) for (const sg of [-1, 1]){
+    const ya = sg*0.1, xb = x0 + Math.cos(a1)*l1, yb = ya + sg*Math.sin(a1)*l1, xc = xb + Math.cos(a2)*l2, yc = yb + sg*Math.sin(a2)*l2;
+    c.strokeStyle = '#0d0907'; c.lineWidth = 0.055; c.beginPath(); c.moveTo(x0, ya); c.lineTo(xb, yb); c.stroke();
+    c.lineWidth = 0.04; c.beginPath(); c.moveTo(xb, yb); c.lineTo(xc, yc); c.stroke();
+    c.strokeStyle = 'rgba(80,70,60,.6)'; c.lineWidth = lw; for (let k = 1; k < 5; k++){ const u = k/5, hx = lerp(xb, xc, u), hy = lerp(yb, yc, u); c.beginPath(); c.moveTo(hx, hy); c.lineTo(hx - 0.02, hy + sg*0.025); c.stroke(); } }
+  // abdomen: ancho y negro, con brillo azul violeta y sus anillos
+  const ga = c.createRadialGradient(-0.24, -0.08, 0.02, -0.27, 0, 0.32); ga.addColorStop(0, '#52577a'); ga.addColorStop(0.3, '#20202c'); ga.addColorStop(1, '#060508');
+  c.fillStyle = ga; c.beginPath(); c.ellipse(-0.28, 0, 0.3, 0.215, 0, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(140,135,190,.3)'; c.lineWidth = lw*1.2; for (const bx of [-0.1, -0.2, -0.31, -0.42]){ const k = Math.sqrt(Math.max(0, 1 - ((bx + 0.28)/0.3)**2)); c.beginPath(); c.moveTo(bx + 0.03, -0.2*k); c.quadraticCurveTo(bx - 0.03, 0, bx + 0.03, 0.2*k); c.stroke(); }
+  c.fillStyle = 'rgba(200,210,255,.3)'; c.beginPath(); c.ellipse(-0.25, -0.1, 0.16, 0.035, -0.06, 0, TAU); c.fill();
+  // alas plegadas: angostas, ahumadas y transparentes; el abdomen se ve a través
+  for (const sg of [-1, 1]){ c.save(); c.translate(0.04, sg*0.06); c.rotate(Math.PI - sg*0.12);
+    const gw = c.createLinearGradient(0, 0, 0.46, 0); gw.addColorStop(0, 'rgba(70,55,60,.6)'); gw.addColorStop(0.6, 'rgba(90,80,130,.35)'); gw.addColorStop(1, 'rgba(60,110,120,.3)');
+    c.fillStyle = gw; c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(0.12, -sg*0.06, 0.38, -sg*0.065, 0.46, -sg*0.02); c.quadraticCurveTo(0.48, sg*0.02, 0.42, sg*0.03); c.bezierCurveTo(0.3, sg*0.04, 0.1, sg*0.03, 0, 0); c.fill();
+    c.strokeStyle = 'rgba(30,20,25,.55)'; c.lineWidth = lw; c.stroke();
+    c.strokeStyle = 'rgba(190,170,230,.3)'; c.beginPath(); c.moveTo(0.05, -sg*0.01); c.quadraticCurveTo(0.25, -sg*0.04, 0.44, -sg*0.015); c.moveTo(0.12, 0); c.lineTo(0.3, sg*0.02); c.stroke(); c.restore(); }
+  // tórax: redondo, de pelo corto y denso
+  const gt = c.createRadialGradient(0.07, -0.06, 0.01, 0.1, 0, 0.17); gt.addColorStop(0, '#463c33'); gt.addColorStop(0.6, '#17110d'); gt.addColorStop(1, '#070504');
+  c.fillStyle = gt; c.beginPath(); c.arc(0.1, 0, 0.16, 0, TAU); c.fill();
+  c.lineWidth = lw*0.9; for (let i = 0; i < 70; i++){ const a = h1(i*2.3)*TAU, r0 = 0.155*Math.sqrt(h1(i*4.1)); const xx = 0.1 + Math.cos(a)*r0, yy = Math.sin(a)*r0; c.strokeStyle = i % 4 ? 'rgba(70,60,52,.7)' : 'rgba(130,115,100,.6)'; c.beginPath(); c.moveTo(xx, yy); c.lineTo(xx - 0.025, yy + Math.sin(a)*0.012); c.stroke(); }
+  if (polen > 0){ for (const [u, v, k] of POLV){ if (k > polen) continue; const xx = 0.1 + u*0.26, yy = v*0.26; if (Math.hypot(xx - 0.1, yy) > 0.14) continue; c.fillStyle = k < 0.5 ? '#f3c63c' : '#ffe27e'; c.beginPath(); c.arc(xx, yy, 0.011, 0, TAU); c.fill(); } }
+  // cabeza ancha, ojos y antenas acodadas
+  c.fillStyle = '#0e0a08'; c.beginPath(); c.ellipse(0.32, 0, 0.085, 0.13, 0, 0, TAU); c.fill();
+  c.fillStyle = '#2e2b36'; for (const sg of [-1, 1]){ c.beginPath(); c.ellipse(0.33, sg*0.09, 0.05, 0.032, sg*0.35, 0, TAU); c.fill(); c.fillStyle = 'rgba(255,255,255,.25)'; c.beginPath(); c.arc(0.34, sg*0.085, 0.01, 0, TAU); c.fill(); c.fillStyle = '#2e2b36'; }
+  c.strokeStyle = '#0e0a08'; c.lineWidth = 0.022; for (const sg of [-1, 1]){ c.beginPath(); c.moveTo(0.39, sg*0.03); c.lineTo(0.47, sg*0.05); c.lineTo(0.52, sg*0.12); c.stroke(); }
+  c.restore();
+}
+/* de lado, en vuelo: cuerpo a lo largo de +x, cabeza en +x */
+function xyloLado(c, x, y, s, rot, espejo){
+  c.save(); c.translate(x, y); c.rotate(rot); c.scale(espejo ? -s : s, s);
+  const bat = RM ? 0.3 : Math.sin(RELOJ*55);
+  c.strokeStyle = '#120d0a'; c.lineCap = 'round'; c.lineWidth = 0.035;
+  for (const [a, b, cc, d] of [[0.18, 0.1, 0.24, 0.3], [0.08, 0.12, 0.06, 0.32], [-0.04, 0.12, -0.12, 0.3]]){ c.beginPath(); c.moveTo(a, b); c.quadraticCurveTo(cc, d*0.8, cc + 0.03, d); c.stroke(); }
+  const ala = (ox, a, al, L) => { c.save(); c.translate(ox, -0.1); c.rotate(a); c.fillStyle = `rgba(60,50,80,${al})`; c.beginPath(); c.ellipse(-L*0.5, 0, L*0.5, 0.07, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(130,140,190,.35)'; c.lineWidth = 0.01; c.stroke(); c.restore(); };
+  ala(0.05, -0.5 + bat*0.55, 0.35, 0.5);
+  const ga = c.createLinearGradient(0, -0.2, 0, 0.2); ga.addColorStop(0, '#3c3f57'); ga.addColorStop(0.4, '#15141c'); ga.addColorStop(1, '#050405');
+  c.fillStyle = ga; c.beginPath(); c.ellipse(-0.27, 0.02, 0.29, 0.19, -0.08, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(180,190,255,.25)'; c.beginPath(); c.ellipse(-0.3, -0.1, 0.17, 0.035, -0.1, 0, TAU); c.fill();
+  c.fillStyle = '#16110d'; c.beginPath(); c.arc(0.12, -0.01, 0.15, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(95,85,72,.6)'; c.lineWidth = 0.01; for (let i = 0; i < 26; i++){ const a = h1(i*3.3)*TAU; c.beginPath(); c.moveTo(0.12 + Math.cos(a)*0.13, -0.01 + Math.sin(a)*0.13); c.lineTo(0.12 + Math.cos(a)*0.165, -0.01 + Math.sin(a)*0.165); c.stroke(); }
+  c.fillStyle = '#0d0a08'; c.beginPath(); c.ellipse(0.33, 0.0, 0.085, 0.11, 0.15, 0, TAU); c.fill();
+  c.fillStyle = '#2f2c38'; c.beginPath(); c.ellipse(0.34, -0.03, 0.04, 0.06, 0.2, 0, TAU); c.fill();
+  c.strokeStyle = '#0d0a08'; c.lineWidth = 0.02; c.beginPath(); c.moveTo(0.38, -0.08); c.quadraticCurveTo(0.45, -0.18, 0.52, -0.2); c.stroke();
+  ala(0.08, -0.75 + bat*0.65, 0.45, 0.56);
+  c.restore();
+}
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   0 espaldera · 1 flor · 2 estigma sobre el abejorro
+   3 superficie del estigma · 4 pistilo en corte · 5 óvulo
+   6 la semilla con su arilo · 7 los frutos cortados · 8 la finca
+   ============================================================ */
+const HF3 = 0.85;
+const F = [3.2, 0.14, 0.03, 4e-4, 0, 0, 0.03, 0.26, 3.2];
+F[4] = F[3]*HF3*0.97;
+const S45 = 2.2;                    // el óvulo, dentro del ovario cortado
+F[5] = F[4]*S45;
+const OV = 0.62;                    // el óvulo ocupa esta fracción de su cuadro (nivel 5)
+const S56 = 0.44;                   // la semilla madura, dentro de su arilo (nivel 6)
+const G0 = F[5]/(F[6]*S56);         // tamaño del óvulo en la flor / tamaño de la semilla madura
+const PORTAL = [];
+PORTAL[0] = { c:1, x: 0.05, y:-0.075, s: F[1]/F[0] };
+PORTAL[1] = { c:2, x: 0.07, y: 0.065, s: F[2]/F[1] };
+PORTAL[2] = { c:3, x: 0.0, y:-0.03, s: F[3]/F[2] };
+PORTAL[4] = { c:5, x:-3.9, y: 33.6, s: S45 };
+PORTAL[6] = { c:5, x: 0.0, y: 0.0, s: S56 };
+PORTAL[7] = { c:6, x: 0, y: 0, s: F[6]/F[7] };    // se fija a una semilla del fruto lleno (abajo)
+PORTAL[8] = { c:7, x: 0.17, y: 0.212, s: F[7]/F[8] };
+
+/* ============================================================
+   GUION DE CÁMARA
+   hold: se queda en un nivel · in: entra al hijo por su portal
+   out: sale del hijo al padre, mientras pasan los días
+   ============================================================ */
+const FIN8 = () => PORT ? { f: 1, cx: -0.07, cy: 0.23 } : { f: 1, cx: 0, cy: 0.05 };
+const SEGS = [
+  { k:'hold', L:0, f0:1, f1:0.86, cy0:'p0', cy1:'p0', st:0, w:1.1 },
+  { k:'in',   L:0, w:1.3, e:'in' },
+  { k:'hold', L:1, f0:1, f1:0.9, st:1, w:1.4 },
+  { k:'in',   L:1, w:1.2, e:'both' },
+  { k:'hold', L:2, f0:1, f1:0.88, st:2, w:1.3 },
+  { k:'in',   L:2, w:1.3, e:'both' },
+  { k:'hold', L:3, f0:1, f1:HF3, st:3, w:1.4 },
+  { k:'tilt', w:1.6 },
+  { k:'hold', L:4, f0:1, f1:48, cx1:-1.5, cy1:24, st:4, w:2.6 },
+  { k:'in',   L:4, w:1.5, e:'both' },
+  { k:'hold', L:5, f0:1, f1:1.1, st:5, w:2.0 },
+  { k:'out',  L:6, w:1.6, e:'both' },
+  { k:'hold', L:6, f0:1, f1:1.5, cx1:0.05, cy1:0.02, st:6, w:2.0 },
+  { k:'out',  L:7, w:1.5, e:'both' },
+  { k:'hold', L:7, f0:'p7f0', f1:'p7f1', cx0:'p7x', cy0:'p7y', cx1:'p7x', cy1:'p7y', st:7, w:2.2 },
+  { k:'out',  L:8, w:1.7, e:'both' },
+  { k:'hold', L:8, f0:0.5, cx0:0.06, cy0:0.15, f1:'fin', st:8, w:2.4 },
+];
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc;
+const EST = SEGS.filter(s => s.k === 'hold').map(s => ({ a: s.a, b: s.b, st: s.st, L: s.L, seg: s }));
+const NEST = EST.length;
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const easeF = { '':u=>u, 'in':u=>2*u*u-u*u*u, 'out':u=>{const v=1-u; return 1-(2*v*v-v*v*v);}, 'both':u=>u*u*(3-2*u) };
+const cyP = v => v === 'p0' ? (PORT ? 0.0 : 0.05) : v === 'p7x' ? (PORT ? 0 : -0.14) : v === 'p7y' ? (PORT ? 0.17 : 0.07) : v === 'p7f0' ? (PORT ? 1.6 : 1) : v === 'p7f1' ? (PORT ? 1.7 : 1.12) : (v || 0);
+function holdFin(s){
+  if (s.f1 === 'fin'){ const q = FIN8(); return { f: q.f, cx: q.cx, cy: q.cy }; }
+  return { f: cyP(s.f1), cx: cyP(s.cx1), cy: cyP(s.cy1) };
+}
+function camHold(s, u){
+  const fin = holdFin(s), e = sstep(0, 1, u);
+  return { k:'lvl', L:s.L, cx: lerp(cyP(s.cx0), fin.cx, e), cy: lerp(cyP(s.cy0), fin.cy, e), f: cyP(s.f0) * Math.pow(fin.f/cyP(s.f0), u), seg:s, u };
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let i = SEGS.length - 1; for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ i = j; break; } }
+  const s = SEGS[i];
+  const u = clamp((p - s.a) / s.w, 0, 1);
+  if (s.k === 'hold') return camHold(s, u);
+  if (s.k === 'tilt') return { k:'tilt', t:u, seg:s, u };
+  const uu = easeF[s.e](u);
+  if (s.k === 'in'){
+    const P = PORTAL[s.L], ini = holdFin(SEGS[i-1]);
+    const f = ini.f * Math.pow(P.s / ini.f, uu);
+    const k = (ini.f - f) / (ini.f - P.s);
+    return { k:'lvl', L:s.L, cx: lerp(ini.cx, P.x, k), cy: lerp(ini.cy, P.y, k), f, seg:s, u };
+  }
+  const P = PORTAL[s.L], hijo = holdFin(SEGS[i-1]), sig = SEGS[i+1];
+  const g6 = s.L === 6 ? G0 : 1;
+  const cre = s.L === 6 ? lerp(G0, 1, uu) : 1; // el óvulo crece hasta ser semilla mientras nos alejamos
+  const f0r = P.s * g6 * hijo.f;
+  const sf0 = cyP(sig.f0); const f = f0r * Math.pow(sf0 / f0r, uu);
+  const x0 = P.x + hijo.cx * P.s * g6, y0 = P.y + hijo.cy * P.s * g6;
+  const k = (f - f0r) / (sf0 - f0r);
+  return { k:'lvl', L:s.L, cx: lerp(x0, cyP(sig.cx0), k), cy: lerp(y0, cyP(sig.cy0), k), f, seg:s, u, cre };
+}
+function anchoVista(cam){
+  const r = W / S;
+  if (cam.k === 'lvl') return F[cam.L] * cam.f * r;
+  const a = F[3]*HF3, b = F[4]; return Math.exp(lerp(Math.log(a), Math.log(b), cam.t)) * r;
+}
+
+/* ---------- el estado del cuento, derivado solo de p ---------- */
+const segDe = st => EST[st].seg;
+function estado(p){
+  const e = {};
+  const h3 = segDe(3), h4 = segDe(4), h5 = segDe(5), h6 = segDe(6), o6 = SEGS[SEGS.indexOf(h6) - 1];
+  e.tubo3 = sstep(h3.a + 0.1, h3.b - 0.15, p);      // el grano echa el tubo
+  e.tubo4 = sstep(h4.a + 0.05, h4.b - 0.35, p);
+  { const q = camHold(h4, clamp((p - h4.a)/h4.w, 0, 1)); e.tuboY = p < h4.a ? -0.25 : p > h4.b ? 99 : q.cy + 0.18*q.f; } // la punta del tubo va delante de la cámara
+  e.fec = sstep(h5.a + 0.05, h5.b - 0.15, p);       // fecundación
+  e.madura = sstep(o6.a, o6.b, p);                   // el óvulo se vuelve semilla
+  e.arilo = lerp(0.25, 1, sstep(o6.a + 0.3, h6.b - 0.3, p)); // el arilo se llena de jugo
+  return e;
+}
+let E = estado(0);
+function momento(p){
+  const o6 = SEGS[SEGS.indexOf(segDe(6)) - 1];
+  if (p < segDe(3).a - 0.2) return 'flor abierta';
+  if (p < o6.a) return 'horas después';
+  if (p < segDe(7).a - 0.3) return 'pasan los días';
+  return 'fruto maduro';
+}
+
+/* ============================================================
+   NIVEL 1 · LA FLOR  (1 unidad = 14 cm), de frente. Su dibujo se
+   usa también, reducido, en la espaldera. Centro en el origen.
+   La parte de adentro (anteras, estilos, estigmas, abejorro) está
+   fija: de ella sale el nivel 2.
+   ============================================================ */
+const s12 = PORTAL[1].s;
+const A2a1 = (x, y) => [PORTAL[1].x + x*s12, PORTAL[1].y + y*s12];   // del nivel 2 al 1
+const ESTIG2 = { x: 0, y: -0.03, rx: 0.12, ry: 0.075 };              // el estigma elegido, en el nivel 2
+const TORAX2 = { x: 0.05, y: 0.18, r: 0.135 };                       // el tórax del abejorro, en el nivel 2
+const ANT2 = { x: 0.112, y: -0.089 };                                // la antera vecina, en el nivel 2
+const FLOR = (() => {
+  const r = rng(101);
+  const e1 = A2a1(ESTIG2.x, ESTIG2.y), a1 = A2a1(ANT2.x, ANT2.y), t1 = A2a1(TORAX2.x, TORAX2.y);
+  const aE = Math.atan2(e1[1], e1[0]), rE = Math.hypot(e1[0], e1[1]);
+  const aA = Math.atan2(a1[1], a1[0]), rA = Math.hypot(a1[0], a1[1]);
+  const estig = [0, 1, 2].map(i => ({ a: aE + i*TAU/3, r: rE }));
+  const anteras = [0, 1, 2, 3, 4].map(i => ({ a: aA + i*TAU/5, r: rA }));
+  const sepalos = [0, 1, 2, 3, 4].map(i => ({ a: -Math.PI/2 + i*TAU/5 + (r() - .5)*0.08, L: 0.29 + r()*0.015, w: 0.085 }));
+  const petalos = [0, 1, 2, 3, 4].map(i => ({ a: -Math.PI/2 + (i + 0.5)*TAU/5 + (r() - .5)*0.08, L: 0.265 + r()*0.015, w: 0.07 }));
+  const bracteas = [0, 1, 2].map(i => ({ a: Math.PI/2 + 0.6 + i*TAU/3, L: 0.2, w: 0.12 }));
+  // la corona: dos series de filamentos largos y ondulados (polilíneas de 10 puntos)
+  const fil = [];
+  for (let serie = 0; serie < 2; serie++){ const n = serie ? 64 : 58;
+    for (let i = 0; i < n; i++){ const a = (i + (serie ? 0.5 : 0))/n*TAU + (r() - .5)*0.05, L = (serie ? 0.215 : 0.2) + (r() - .5)*0.03, ond = 0.006 + r()*0.006, fase = r()*TAU;
+      const pts = []; for (let k = 0; k <= 9; k++){ const u = k/9, rr = 0.062 + L*u; const w = Math.sin(u*14 + fase)*ond*sstep(0.45, 1, u); pts.push([Math.cos(a)*rr - Math.sin(a)*w, Math.sin(a)*rr + Math.cos(a)*w]); }
+      fil.push({ a, L, pts, serie, t: r() }); } }
+  fil.sort((p, q) => p.serie - q.serie);
+  const corta = []; for (let i = 0; i < 120; i++) corta.push(i/120*TAU + (r() - .5)*0.03);
+  const motas = []; for (let i = 0; i < 26; i++){ const a = r()*TAU, d = r()*0.026; motas.push([Math.cos(a)*d, Math.sin(a)*d]); }
+  // el abejorro, de espaldas, con la cabeza hacia el centro de la flor
+  const rot = Math.atan2(-t1[1], -t1[0]); const sB = 0.19;
+  const bee = { x: t1[0] - Math.cos(rot)*0.12*sB, y: t1[1] - Math.sin(rot)*0.12*sB, rot, s: sB };
+  return { estig, anteras, sepalos, petalos, bracteas, fil, corta, motas, bee };
+})();
+function hojaFlor(c, L, w, col0, col1){ // sépalo, pétalo o bráctea a lo largo de +x
+  c.beginPath(); c.moveTo(0.03, 0);
+  c.bezierCurveTo(0.06, -w*0.7, L*0.7, -w*0.85, L*0.96, -w*0.25); c.quadraticCurveTo(L*1.02, 0, L*0.96, w*0.25);
+  c.bezierCurveTo(L*0.7, w*0.85, 0.06, w*0.7, 0.03, 0); c.closePath();
+  const g = c.createLinearGradient(0, 0, L, 0); g.addColorStop(0, col1); g.addColorStop(0.35, col0); g.addColorStop(1, col0); c.fillStyle = g; c.fill();
+}
+function flor(c, det, px, conAbejorro, esc){
+  const Z = ESP.corona, k = ESP.flor*(esc || 1);
+  // brácteas verdes, detrás
+  for (const b of FLOR.bracteas){ c.save(); c.rotate(b.a); c.scale(k, k); hojaFlor(c, b.L, b.w, ESP.bractea, mix(ESP.bractea, '#2f4a1c', 0.4)); if (det > 0.4){ c.strokeStyle = 'rgba(30,50,15,.4)'; c.lineWidth = Math.max(px/k, 0.002); c.stroke(); c.beginPath(); c.moveTo(0.04, 0); c.lineTo(b.L*0.9, 0); c.stroke(); } c.restore(); }
+  if (det > 0.3){ c.fillStyle = 'rgba(25,30,12,.22)'; c.beginPath(); c.arc(0.01, 0.016, 0.3*k, 0, TAU); c.fill(); }
+  // sépalos: blancos por dentro, verdes en el borde y la punta
+  for (const s of FLOR.sepalos){ c.save(); c.rotate(s.a); c.scale(k, k);
+    hojaFlor(c, s.L*1.02, s.w*1.08, ESP.sepalo[1], mix(ESP.sepalo[1], '#3b5a22', 0.5));
+    hojaFlor(c, s.L*0.93, s.w*0.86, ESP.sepalo[0], mix(ESP.sepalo[0], ESP.sepalo[1], 0.35));
+    if (det > 0.4){ c.strokeStyle = 'rgba(120,140,90,.35)'; c.lineWidth = Math.max(px/k, 0.0015); c.beginPath(); c.moveTo(0.05, 0); c.lineTo(s.L*0.9, 0); c.stroke(); }
+    c.restore(); }
+  for (const s of FLOR.petalos){ c.save(); c.rotate(s.a); c.scale(k, k); hojaFlor(c, s.L, s.w, ESP.petalo[0], ESP.petalo[1]);
+    if (det > 0.4){ c.strokeStyle = 'rgba(150,140,140,.25)'; c.lineWidth = Math.max(px/k, 0.0012); for (const d of [-0.3, 0, 0.3]){ c.beginPath(); c.moveTo(0.06, 0); c.quadraticCurveTo(s.L*0.5, d*s.w*0.6, s.L*0.92, d*s.w*0.4); c.stroke(); } }
+    c.restore(); }
+  // la corona de filamentos: base púrpura, punta blanca (en granadilla, a franjas)
+  c.save(); c.scale(k, k); c.lineCap = 'round'; c.lineJoin = 'round';
+  const lw = Math.max(px/k*0.9, det > 0.4 ? 0.0055 : 0.009);
+  const tramos = Z.bandas ? [[0, 2, Z.base], [2, 3, Z.medio], [3, 4, Z.punta], [4, 5, Z.medio], [5, 6, Z.punta], [6, 7, Z.medio], [7, 9, Z.punta]] : [[0, 3, Z.base], [3, 5, Z.medio], [5, 9, Z.punta]];
+  for (const serie of [0, 1]){
+    for (const [i0, i1, col] of tramos){ c.beginPath();
+      for (const f of FLOR.fil){ if (f.serie !== serie) continue; c.moveTo(f.pts[i0][0], f.pts[i0][1]); for (let i = i0 + 1; i <= i1; i++) c.lineTo(f.pts[i][0], f.pts[i][1]); }
+      c.strokeStyle = serie ? col : mix(col, '#3a1a40', 0.22); c.lineWidth = lw; c.stroke(); } }
+  if (det > 0.5){ c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = lw*0.35; c.beginPath(); for (const f of FLOR.fil){ if (!f.serie || f.t > 0.5) continue; c.moveTo(f.pts[5][0] - 0.001, f.pts[5][1] - 0.001); for (let i = 6; i <= 9; i++) c.lineTo(f.pts[i][0] - 0.001, f.pts[i][1] - 0.001); } c.stroke(); }
+  // serie corta de adentro y el anillo del néctar
+  c.strokeStyle = Z.base; c.lineWidth = Math.max(px/k, 0.004); c.beginPath(); for (const a of FLOR.corta){ c.moveTo(Math.cos(a)*0.047, Math.sin(a)*0.047); c.lineTo(Math.cos(a)*0.062, Math.sin(a)*0.062); } c.stroke();
+  if (det > 0.4){ c.strokeStyle = mix(Z.medio === '#f1ecf4' ? Z.punta : Z.medio, '#ffffff', 0.4); c.lineWidth = Math.max(px/k, 0.0018); c.beginPath(); for (const a of FLOR.corta){ c.moveTo(Math.cos(a)*0.056, Math.sin(a)*0.056); c.lineTo(Math.cos(a)*0.062, Math.sin(a)*0.062); } c.stroke(); }
+  const gn = c.createRadialGradient(0, 0, 0.02, 0, 0, 0.05); gn.addColorStop(0, '#2b0b2e'); gn.addColorStop(1, mix(Z.base, '#000000', 0.25)); c.fillStyle = gn; c.beginPath(); c.arc(0, 0, 0.047, 0, TAU); c.fill();
+  c.restore();
+  // el abejorro que entra a tomar néctar: queda debajo de anteras y estigmas
+  if (conAbejorro){ const B = FLOR.bee; xyloArriba(c, B.x, B.y, B.s, B.rot, 1, px); }
+  // androginóforo: la columna que sostiene estambres y pistilo, vista desde arriba
+  const gA = c.createRadialGradient(-0.008, -0.01, 0.003, 0, 0, 0.03); gA.addColorStop(0, '#d4e6a0'); gA.addColorStop(1, '#6f9440'); c.fillStyle = gA; c.beginPath(); c.arc(0, 0, 0.028, 0, TAU); c.fill();
+  if (det > 0.4){ c.fillStyle = 'rgba(110,30,100,.55)'; for (const [x, y] of FLOR.motas){ c.beginPath(); c.arc(x, y, 0.0022, 0, TAU); c.fill(); } }
+  // cinco estambres con su antera, que cuelga
+  for (const A of FLOR.anteras){ const ca = Math.cos(A.a), sa = Math.sin(A.a);
+    c.strokeStyle = '#8fb257'; c.lineWidth = Math.max(px, 0.007); c.lineCap = 'round'; c.beginPath(); c.moveTo(ca*0.016, sa*0.016); c.quadraticCurveTo(ca*A.r*0.6 + sa*0.006, sa*A.r*0.6 - ca*0.006, ca*A.r, sa*A.r); c.stroke();
+    c.save(); c.translate(ca*A.r, sa*A.r); c.rotate(A.a + Math.PI/2);
+    const gl = c.createLinearGradient(0, -0.016, 0, 0.016); gl.addColorStop(0, '#ffe68a'); gl.addColorStop(0.5, '#f2c53a'); gl.addColorStop(1, '#c4901c'); c.fillStyle = gl;
+    c.beginPath(); c.ellipse(0, 0, 0.036, 0.014, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(130,90,15,.6)'; c.lineWidth = Math.max(px, 0.0012); c.stroke();
+    if (det > 0.5){ c.fillStyle = 'rgba(255,236,140,.9)'; for (let i = 0; i < 14; i++){ c.beginPath(); c.arc((h1(A.a*7 + i) - 0.5)*0.064, (h1(A.a*3 + i*1.3) - 0.5)*0.022, 0.0022, 0, TAU); c.fill(); } }
+    c.restore(); }
+  // ovario y tres estilos con su estigma
+  const go = c.createRadialGradient(-0.006, -0.008, 0.002, 0, 0, 0.022); go.addColorStop(0, '#e2efb4'); go.addColorStop(1, '#7da447'); c.fillStyle = go; c.beginPath(); c.ellipse(0, 0, 0.02, 0.019, 0, 0, TAU); c.fill();
+  for (const Q of FLOR.estig){ const ca = Math.cos(Q.a), sa = Math.sin(Q.a);
+    c.strokeStyle = '#7fa04a'; c.lineWidth = Math.max(px, 0.0075); c.beginPath(); c.moveTo(ca*0.01, sa*0.01); c.quadraticCurveTo(ca*Q.r*0.55 - sa*0.008, sa*Q.r*0.55 + ca*0.008, ca*Q.r, sa*Q.r); c.stroke();
+    if (det > 0.5){ c.fillStyle = 'rgba(120,40,110,.5)'; for (let i = 1; i < 6; i++){ const u = i/6; c.beginPath(); c.arc(ca*Q.r*u - sa*0.006*Math.sin(u*3), sa*Q.r*u + ca*0.006*Math.sin(u*3), 0.0016, 0, TAU); c.fill(); } }
+    c.save(); c.translate(ca*Q.r, sa*Q.r); c.rotate(Q.a + Math.PI/2);
+    const ge = c.createRadialGradient(-0.005, -0.004, 0.001, 0, 0, 0.02); ge.addColorStop(0, '#f6f8d6'); ge.addColorStop(0.6, '#c9d98a'); ge.addColorStop(1, '#88a352'); c.fillStyle = ge;
+    rinon(c, ESTIG2.rx*s12, ESTIG2.ry*s12); c.fill(); c.strokeStyle = 'rgba(80,100,40,.55)'; c.lineWidth = Math.max(px, 0.001); c.stroke();
+    c.restore(); }
+  // granos de polen sobre el estigma elegido
+  if (det > 0.6){ c.fillStyle = '#f0c23a'; for (const G of GR3){ const x = PORTAL[1].x + (PORTAL[2].x + G.x*PORTAL[2].s)*s12, y = PORTAL[1].y + (PORTAL[2].y + G.y*PORTAL[2].s)*s12; c.beginPath(); c.arc(x, y, Math.max(px*0.6, G.R*PORTAL[2].s*s12), 0, TAU); c.fill(); } }
+}
+
+/* ============================================================
+   NIVEL 0 y 8 · LA ESPALDERA  (1 unidad = 3,2 m)
+   Suelo en y = 0,27; alambre de arriba en y = -0,2.
+   A la izquierda, una mata con secadera; a la derecha, madera
+   muerta con nidos del abejorro y la caja con los frutos.
+   ============================================================ */
+const SUELO = 0.27, ALAMBRE = -0.2, ALAMBRE2 = -0.02;
+const SECA = { x: -0.19, x0: -0.4, x1: -0.08 };     // la mata enferma
+const CUELLO = { x: 0.0 };                           // la mata sana
+const TRONCO = { x0: 0.17, x1: 0.44, y: 0.245, r: 0.022, huecos: [0.2, 0.27, 0.36] };
+const POSTES = [-0.78, -0.12, 0.42, 0.98];
+const HOJA = {
+  triloba: (() => { const p = new Path2D(); p.moveTo(0, 0); p.bezierCurveTo(-0.25, -0.05, -0.55, -0.35, -0.45, -0.62); p.quadraticCurveTo(-0.3, -0.55, -0.16, -0.5); p.bezierCurveTo(-0.2, -0.8, -0.05, -1.0, 0, -1.02); p.bezierCurveTo(0.05, -1.0, 0.2, -0.8, 0.16, -0.5); p.quadraticCurveTo(0.3, -0.55, 0.45, -0.62); p.bezierCurveTo(0.55, -0.35, 0.25, -0.05, 0, 0); p.closePath(); return p; })(),
+  corazon: (() => { const p = new Path2D(); p.moveTo(0, -0.12); p.bezierCurveTo(-0.15, -0.02, -0.5, -0.15, -0.46, -0.48); p.bezierCurveTo(-0.42, -0.8, -0.15, -0.98, 0, -1.04); p.bezierCurveTo(0.15, -0.98, 0.42, -0.8, 0.46, -0.48); p.bezierCurveTo(0.5, -0.15, 0.15, -0.02, 0, -0.12); p.closePath(); return p; })(),
+  vena: (() => { const p = new Path2D(); p.moveTo(0, 0); p.lineTo(0, -0.95); p.moveTo(0, -0.12); p.lineTo(-0.38, -0.55); p.moveTo(0, -0.12); p.lineTo(0.38, -0.55); return p; })(),
+};
+const FINCA = (() => {
+  const r = rng(7);
+  const hojas = [];
+  const emp = () => ESP.tutor === 'emparrado';
+  // tres capas: fondo oscuro, medio y frente; la masa cuelga del alambre
+  for (let capa = 0; capa < 3; capa++){ const n = [260, 300, 230][capa];
+    for (let i = 0; i < n; i++){ const x = -0.62 + r()*1.24; const u = Math.pow(r(), capa === 2 ? 1.3 : 1);
+      hojas.push({ x, u, capa, rot: (r() - 0.5)*1.2, s: (0.03 + r()*0.022)*(capa === 2 ? 1.12 : 1), t: r(), fase: r()*TAU }); } }
+  const flores = [[-0.31, -0.11], [-0.04, -0.14], [0.2, -0.03], [0.3, -0.13], [0.48, -0.08], [-0.5, -0.05], [0.12, -0.17]].map(([x, y], i) => ({ x, y, rot: r()*TAU, sq: 0.45 + r()*0.5 }));
+  const frutos = [[-0.02, -0.005, 1], [0.24, 0.035, 1], [0.36, -0.04, 0.4], [-0.45, 0.02, 1], [-0.27, 0.01, 0.6], [0.14, -0.035, 2]].map(([x, y, m]) => ({ x, y, m }));
+  const pasto = []; for (let i = 0; i < 260; i++) pasto.push([-0.7 + r()*1.4, SUELO + r()*0.09, 0.012 + r()*0.02, (r() - 0.5)*0.6]);
+  const cerros = [0, 1, 2].map(k => { const pts = []; for (let i = 0; i <= 60; i++){ const x = -0.9 + i/60*1.8; pts.push([x, 0.02 + k*0.04 - 0.06*Math.sin(x*3.1 + k*2) - 0.03*Math.sin(x*7.3 + k) - 0.012*Math.sin(x*17 + k*5)]); } return pts; });
+  const bosque = []; for (let i = 0; i < 140; i++){ const k = Math.floor(r()*3), x = -0.9 + r()*1.8; bosque.push({ k, x, r: 0.012 + r()*0.02, t: r() }); }
+  return { hojas, flores, frutos, pasto, cerros, bosque, emp };
+})();
+function yCerro(k, x){ const p = FINCA.cerros[k]; const i = clamp(Math.floor((x + 0.9)/1.8*60), 0, 59); const u = (x + 0.9)/1.8*60 - i; return lerp(p[i][1], p[i+1][1], clamp(u, 0, 1)); }
+function frutoEntero(c, x, y, R, m, px, rona){ // fruto colgado; m: 0 verde · 1 maduro · 2 con roña
+  const Fz = ESP.fruto, rx = R*Fz.rx;
+  c.strokeStyle = '#4f6b2a'; c.lineWidth = Math.max(px, R*0.1); c.beginPath(); c.moveTo(x, y - R*2.2); c.quadraticCurveTo(x + R*0.3, y - R*1.4, x, y - R); c.stroke();
+  const mad = m === 0 ? 0 : 1;
+  const g = c.createRadialGradient(x - rx*0.35, y - R*0.4, R*0.1, x, y, R*1.1);
+  g.addColorStop(0, mix('#c8dc86', Fz.piel[0], mad)); g.addColorStop(0.6, mix('#87ad48', Fz.piel[1], mad)); g.addColorStop(1, mix('#4d6e25', Fz.piel[2], mad));
+  c.fillStyle = g; c.beginPath(); c.ellipse(x, y, rx, R, 0, 0, TAU); c.fill();
+  if (R/px > 6){ c.fillStyle = mad ? Fz.motas : 'rgba(240,255,220,.4)'; for (let i = 0; i < 16; i++){ const a = h1(x*91 + i)*TAU, d = Math.sqrt(h1(y*37 + i*1.7))*0.85; c.beginPath(); c.arc(x + Math.cos(a)*d*rx, y + Math.sin(a)*d*R, R*0.035, 0, TAU); c.fill(); } }
+  if (Fz.rugosa && mad && R/px > 8){ c.strokeStyle = 'rgba(20,0,20,.35)'; c.lineWidth = Math.max(px, R*0.025); for (let i = 0; i < 5; i++){ c.beginPath(); const a0 = h1(i*5.1 + x)*TAU; c.arc(x, y, R*(0.4 + i*0.1), a0, a0 + 0.8); c.stroke(); } }
+  if (m === 2){ for (let i = 0; i < 9; i++){ const a = h1(i*2.7 + 1)*TAU, d = 0.25 + h1(i*1.9)*0.55; const xx = x + Math.cos(a)*d*rx*0.9, yy = y + Math.sin(a)*d*R*0.9, rr = R*(0.07 + h1(i*4.4)*0.08);
+    c.fillStyle = 'rgba(150,110,70,.9)'; c.beginPath(); c.ellipse(xx, yy, rr*1.2, rr, a, 0, TAU); c.fill(); c.fillStyle = 'rgba(210,180,130,.75)'; c.beginPath(); c.arc(xx - rr*0.2, yy - rr*0.2, rr*0.5, 0, TAU); c.fill(); } }
+  c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(x - rx*0.35, y - R*0.45, rx*0.25, R*0.13, -0.5, 0, TAU); c.fill();
+}
+function hojaEn(c, H, x, y, s, rot, col, px, vena){
+  c.setTransform(...TR.m); c.translate(x, y); c.rotate(rot); c.scale(s, s);
+  c.fillStyle = col; c.fill(H);
+  if (vena && s/px > 9){ c.strokeStyle = 'rgba(230,245,200,.28)'; c.lineWidth = px/s; c.stroke(HOJA.vena); }
+}
+const TR = { m: [1, 0, 0, 1, 0, 0] };
+function dibujaFinca(c, env){
+  const v = env.view, px = env.px, emp = FINCA.emp();
+  const tt = RM ? 0 : RELOJ;
+  // cielo y cerros, en lámina: verdes que se azulan con la distancia
+  const gs = c.createLinearGradient(0, v[1], 0, 0.12); gs.addColorStop(0, '#b9d7dc'); gs.addColorStop(1, '#eef1df'); c.fillStyle = gs; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  const colC = ['#9fb7a6', '#7d9c74', '#5f8550'];
+  for (let k = 0; k < 3; k++){ c.beginPath(); c.moveTo(-0.95, 1); for (const [x, y] of FINCA.cerros[k]) c.lineTo(x, y); c.lineTo(0.95, 1); c.closePath(); c.fillStyle = colC[k]; c.fill();
+    for (const b of FINCA.bosque){ if (b.k !== k) continue; const y = yCerro(k, b.x); c.fillStyle = mix(colC[k], '#1f3a1c', 0.25 + b.t*0.2); c.beginPath(); c.arc(b.x, y + b.r*0.4, b.r*(1 - k*0.15), 0, TAU); c.fill(); } }
+  // potrero y surcos lejanos
+  const gp = c.createLinearGradient(0, 0.1, 0, SUELO); gp.addColorStop(0, '#7fa35a'); gp.addColorStop(1, '#5d8a3e'); c.fillStyle = gp; c.fillRect(-1, 0.11, 2, 0.4);
+  for (const [y, k] of [[0.125, 0.5], [0.15, 0.68]]){ c.fillStyle = mix('#3e6a2c', '#7fa35a', 1 - k); c.fillRect(-1, y - 0.012*k, 2, 0.014*k); c.fillStyle = 'rgba(90,70,45,.6)'; for (let x = -0.95; x < 1; x += 0.13*k) c.fillRect(x, y - 0.03*k, 0.004*k, 0.035*k); }
+  // suelo, plateo y zanja
+  const gsu = c.createLinearGradient(0, SUELO - 0.02, 0, SUELO + 0.2); gsu.addColorStop(0, '#7a6042'); gsu.addColorStop(1, '#4e3b28'); c.fillStyle = gsu; c.fillRect(-1, SUELO - 0.012, 2, 0.6);
+  for (const xc of [SECA.x, CUELLO.x]){ c.fillStyle = 'rgba(60,40,22,.55)'; c.beginPath(); c.ellipse(xc, SUELO + 0.006, 0.07, 0.014, 0, 0, TAU); c.fill(); c.fillStyle = 'rgba(150,120,70,.5)'; c.beginPath(); c.ellipse(xc, SUELO + 0.004, 0.065, 0.011, 0, 0, TAU); c.fill(); c.fillStyle = '#5a4128'; c.beginPath(); c.ellipse(xc, SUELO + 0.004, 0.018, 0.005, 0, 0, TAU); c.fill(); }
+  c.fillStyle = '#3d2c1c'; c.beginPath(); c.moveTo(-1, 0.318); for (let x = -1; x <= 1; x += 0.05) c.lineTo(x, 0.318 + 0.003*Math.sin(x*20)); c.lineTo(1, 0.334); c.lineTo(-1, 0.334); c.fill();
+  c.fillStyle = 'rgba(140,170,190,.5)'; c.fillRect(-1, 0.322, 2, 0.006);
+  for (const [x, y, l, a] of FINCA.pasto){ if (x < v[0] - 0.05 || x > v[2] + 0.05) continue; c.strokeStyle = 'rgba(95,140,55,.85)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + a*l*0.4, y - l*0.6, x + a*l, y - l); c.stroke(); }
+  // postes de madera y alambres (o el emparrado, arriba)
+  for (const x of POSTES){ const gw = c.createLinearGradient(x - 0.012, 0, x + 0.012, 0); gw.addColorStop(0, '#5e4630'); gw.addColorStop(0.5, '#8b6d4c'); gw.addColorStop(1, '#4a3622'); c.fillStyle = gw; c.fillRect(x - 0.011, ALAMBRE - 0.035, 0.022, SUELO - ALAMBRE + 0.04);
+    if (0.022/px > 6){ c.strokeStyle = 'rgba(40,28,15,.4)'; c.lineWidth = px; for (const d of [-0.005, 0.002, 0.006]){ c.beginPath(); c.moveTo(x + d, ALAMBRE - 0.03); c.lineTo(x + d*1.3, SUELO); c.stroke(); } } }
+  c.strokeStyle = 'rgba(70,70,70,.75)'; c.lineWidth = Math.max(px, 0.0025);
+  if (emp){ for (const d of [-0.01, 0.0, 0.01]){ c.beginPath(); c.moveTo(-1, ALAMBRE - 0.03 + d); c.lineTo(1, ALAMBRE - 0.03 + d); c.stroke(); } for (let x = -1; x < 1; x += 0.06){ c.beginPath(); c.moveTo(x, ALAMBRE - 0.04); c.lineTo(x + 0.03, ALAMBRE - 0.02); c.stroke(); } }
+  else for (const y of [ALAMBRE, ALAMBRE2]){ c.beginPath(); c.moveTo(-1, y); c.lineTo(1, y); c.stroke(); }
+  // tallos que suben del cuello al alambre
+  for (const [xc, enf] of [[SECA.x, 1], [CUELLO.x, 0]]){ c.strokeStyle = enf ? '#6f5a36' : '#5f6f32'; c.lineWidth = Math.max(px, 0.007); c.beginPath(); c.moveTo(xc, SUELO); c.bezierCurveTo(xc + 0.02, 0.1, xc - 0.02, -0.05, xc + 0.01, ALAMBRE); c.stroke();
+    if (enf){ c.fillStyle = '#5b3a20'; c.beginPath(); c.ellipse(xc, SUELO - 0.012, 0.006, 0.014, 0, 0, TAU); c.fill(); c.fillStyle = 'rgba(160,60,40,.7)'; c.beginPath(); c.ellipse(xc + 0.002, SUELO - 0.014, 0.003, 0.008, 0, 0, TAU); c.fill(); } }
+  // la madera muerta con los nidos del abejorro
+  { const T0 = TRONCO; const gt = c.createLinearGradient(0, T0.y - T0.r, 0, T0.y + T0.r); gt.addColorStop(0, '#a99a84'); gt.addColorStop(0.5, '#7c6c58'); gt.addColorStop(1, '#4a3e31');
+    c.fillStyle = gt; c.beginPath(); c.moveTo(T0.x0, T0.y - T0.r); c.lineTo(T0.x1, T0.y - T0.r*0.85); c.quadraticCurveTo(T0.x1 + 0.012, T0.y, T0.x1, T0.y + T0.r*0.9); c.lineTo(T0.x0, T0.y + T0.r); c.closePath(); c.fill();
+    c.fillStyle = '#c9b89a'; c.beginPath(); c.ellipse(T0.x0, T0.y, T0.r*0.45, T0.r, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(90,70,50,.6)'; c.lineWidth = px; for (const k of [0.3, 0.6]){ c.beginPath(); c.ellipse(T0.x0, T0.y, T0.r*0.45*k, T0.r*k, 0, 0, TAU); c.stroke(); }
+    c.strokeStyle = 'rgba(50,40,30,.45)'; c.lineWidth = Math.max(px, 0.0015); for (const d of [-0.012, -0.004, 0.006, 0.014]){ c.beginPath(); c.moveTo(T0.x0 + 0.01, T0.y + d); c.lineTo(T0.x1 - 0.01, T0.y + d*0.9); c.stroke(); }
+    for (const hx of T0.huecos){ c.fillStyle = '#17110b'; c.beginPath(); c.arc(hx, T0.y - 0.004, 0.0045, 0, TAU); c.fill(); c.strokeStyle = 'rgba(220,200,160,.5)'; c.lineWidth = Math.max(px, 0.001); c.stroke(); }
+    c.fillStyle = 'rgba(110,150,60,.8)'; for (let i = 0; i < 12; i++){ c.beginPath(); c.ellipse(T0.x0 + 0.02 + h1(i*3)*0.24, T0.y - T0.r*0.9, 0.008, 0.003, h1(i)*0.6, 0, TAU); c.fill(); } }
+  // la caja de la cosecha, con los dos frutos cortados encima (nivel 7, en pequeño)
+  { const P = PORTAL[8]; const cx0 = P.x, top = P.y + 0.012;
+    c.fillStyle = '#9a7650'; c.fillRect(cx0 - 0.055, top, 0.11, SUELO - top + 0.004); c.strokeStyle = 'rgba(60,40,20,.7)'; c.lineWidth = Math.max(px, 0.0015); for (let k = 0; k < 4; k++){ const y = top + 0.006 + k*0.013; c.beginPath(); c.moveTo(cx0 - 0.055, y); c.lineTo(cx0 + 0.055, y); c.stroke(); }
+    c.save(); c.translate(P.x, P.y); c.scale(P.s, P.s); c.beginPath(); c.rect(-0.66, -0.2, 1.32, 0.4); c.clip(); tabla(c, px/P.s, [-0.66, -0.2, 0.66, 0.2], 0); for (const q of FR7) mitad(c, q, px/P.s, 0.3); c.restore(); }
+  // el follaje: una masa que cuelga del alambre
+  const yTop = emp ? ALAMBRE - 0.075 : ALAMBRE - 0.055, alto = emp ? 0.13 : 0.24;
+  TR.m = c.getTransform ? [c.getTransform().a, c.getTransform().b, c.getTransform().c, c.getTransform().d, c.getTransform().e, c.getTransform().f] : TR.m;
+  const verdes = [['#25401f', '#2f4d24', '#38592a'], ['#3e6b2c', '#4b7a33', '#558539'], ['#5f9440', '#6ea64a', '#7cb354']];
+  const verdesSeca = [['#4a4a22', '#5a5326', '#62582a'], ['#8a7a32', '#9a8636', '#a8903c'], ['#b39a45', '#c2a24c', '#9c7c3a']];
+  const Hh = HOJA[ESP.hoja];
+  c.save();
+  for (const h of FINCA.hojas){
+    const seca = h.x > SECA.x0 && h.x < SECA.x1 ? sstep(SECA.x0, SECA.x0 + 0.06, h.x)*(1 - sstep(SECA.x1 - 0.06, SECA.x1, h.x)) : 0;
+    if (seca > 0.5 && h.t < 0.45) continue;
+    const y = yTop + h.u*alto*(1 - 0.35*seca) + (h.capa === 0 ? 0.01 : 0) + seca*0.03;
+    if (h.x < v[0] - 0.06 || h.x > v[2] + 0.06 || y < v[1] - 0.06 || y > v[3] + 0.06) continue;
+    const sway = Math.sin(tt*1.3 + h.fase)*0.04;
+    const pal = seca > 0.5 ? verdesSeca[h.capa] : verdes[h.capa];
+    hojaEn(c, Hh, h.x, y, h.s, Math.PI + h.rot + sway + seca*0.6, pal[Math.floor(h.t*3)], px, h.capa === 2);
+  }
+  c.restore();
+  // zarcillos
+  c.strokeStyle = 'rgba(110,150,60,.8)'; c.lineWidth = Math.max(px, 0.0015);
+  for (let i = 0; i < 14; i++){ const x = -0.55 + i*0.08 + h1(i)*0.03, y = yTop + 0.02 + h1(i*7)*0.1; if (x < v[0] || x > v[2]) continue; c.beginPath(); for (let k = 0; k <= 20; k++){ const u = k/20, rr = 0.012*(1 - u*0.7); c.lineTo(x + Math.cos(u*12)*rr, y + u*0.03 + Math.sin(u*12)*rr); } c.stroke(); }
+  // frutos colgando
+  for (const q of FINCA.frutos){ if (q.x < v[0] - 0.05 || q.x > v[2] + 0.05) continue; frutoEntero(c, q.x, q.y + (emp ? -0.02 : 0), 0.0135, q.m, px); }
+  // flores; la elegida, de frente y con su abejorro
+  for (const q of FINCA.flores){ if (q.x < v[0] - 0.05 || q.x > v[2] + 0.05 || q.y < v[1] - 0.05 || q.y > v[3] + 0.05) continue; c.save(); c.translate(q.x, q.y); c.rotate(q.rot); c.scale(PORTAL[0].s, PORTAL[0].s*q.sq); flor(c, 0.2, px/PORTAL[0].s, false); c.restore(); }
+  { const P = PORTAL[0]; const ppu = 1/px; if (P.s*ppu < 0.92*S){ c.save(); c.translate(P.x, P.y); c.scale(P.s, P.s); flor(c, sstep(0.05*S, 0.4*S, P.s*ppu), px/P.s, true); c.restore(); } }
+  // abejorros en vuelo: uno hacia las flores, otro entrando al nido
+  const bx = 0.14 + (RM ? 0 : Math.sin(tt*0.9)*0.012), by = -0.12 + (RM ? 0 : Math.sin(tt*1.7)*0.006);
+  xyloLado(c, bx, by, 0.028, -0.2, true);
+  xyloLado(c, TRONCO.huecos[1] - 0.02, TRONCO.y - 0.035 + (RM ? 0 : Math.sin(tt*2.3)*0.003), 0.02, 0.35, false);
+  // luz de la tarde
+  const gl = c.createLinearGradient(-0.6, -0.3, 0.6, 0.3); gl.addColorStop(0, 'rgba(255,245,215,.12)'); gl.addColorStop(1, 'rgba(30,40,10,.08)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+}
+
+/* ---------- nivel 1: la flor y su fondo ---------- */
+const BOKEH = (() => { const r = rng(21), a = []; for (let i = 0; i < 30; i++){ const q = r(); a.push({ x: -1 + r()*2, y: -1 + r()*2, r: 0.08 + r()*0.2, col: q < 0.6 ? '#4f7a32' : q < 0.85 ? '#86ad55' : '#e9e2c8', a: 0.25 + r()*0.35 }); } return a; })();
+function dibujaFlor(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createRadialGradient(0.1, -0.1, 0.05, 0, 0, 1.0); g.addColorStop(0, '#4c6d33'); g.addColorStop(1, '#1d2d16'); c.fillStyle = g; c.fillRect(v[0] - 0.5, v[1] - 0.5, v[2] - v[0] + 1, v[3] - v[1] + 1);
+  for (const b of BOKEH) blob(c, b.x, b.y, b.r, b.r, b.col, b.a);
+  // hojas fuera de foco detrás, y el alambre
+  const Hh = HOJA[ESP.hoja]; c.save();
+  for (const [x, y, s, a, col] of [[-0.42, -0.25, 0.32, 2.6, '#2f5124'], [0.46, 0.3, 0.36, -0.6, '#335a26'], [0.4, -0.36, 0.26, 2.2, '#406c2d'], [-0.38, 0.34, 0.3, 0.4, '#2b4a20']]){ c.save(); c.translate(x, y); c.rotate(a); c.scale(s, s); c.globalAlpha = 0.75; c.fillStyle = col; c.fill(Hh); c.restore(); }
+  c.restore(); c.globalAlpha = 1;
+  c.strokeStyle = 'rgba(80,80,80,.55)'; c.lineWidth = 0.01; c.beginPath(); c.moveTo(-1, -0.42); c.lineTo(1, -0.34); c.stroke();
+  // pedúnculo
+  c.strokeStyle = '#557a30'; c.lineWidth = 0.02; c.beginPath(); c.moveTo(0.02, 0.05); c.quadraticCurveTo(0.05, -0.2, 0.0, -0.4); c.stroke();
+  flor(c, 1, px, true);
+  const gv = c.createRadialGradient(0, 0, 0.25, 0, 0, 0.75); gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(10,15,5,.25)'); c.fillStyle = gv; c.fillRect(v[0] - 0.5, v[1] - 0.5, v[2] - v[0] + 1, v[3] - v[1] + 1);
+}
+
+/* ============================================================
+   NIVEL 2 · EL ESTIGMA SOBRE LA ESPALDA DEL ABEJORRO (1 u = 3 cm)
+   ============================================================ */
+const CEN2 = [-PORTAL[1].x/s12, -PORTAL[1].y/s12];   // el centro de la flor, en este nivel
+const PELOS2 = (() => { const r = rng(33), o = [], atras = FLOR.bee.rot + Math.PI; for (let i = 0; i < 2600; i++){ const a = r()*TAU, d = Math.sqrt(r())*TORAX2.r*0.99; const b = lerp(atras, a, 0.35 + 0.5*d/TORAX2.r) + (r() - 0.5)*0.7; o.push([TORAX2.x + Math.cos(a)*d, TORAX2.y + Math.sin(a)*d, b, (0.006 + r()*0.008)*(1 - 0.4*d/TORAX2.r), r()]); } return o; })();
+const POLEN2 = (() => { const r = rng(35), o = []; for (let i = 0; i < 110; i++){ const a = -Math.PI/2 + (r() - 0.5)*2.2, d = Math.sqrt(r())*TORAX2.r*0.85; o.push([TORAX2.x + Math.cos(a)*d*1.1, TORAX2.y + Math.sin(a)*d, 0.0018 + r()*0.0009]); } for (let i = 0; i < 70; i++){ const a = r()*TAU, d = Math.sqrt(r()); o.push([ESTIG2.x + Math.cos(a)*d*ESTIG2.rx*0.8, ESTIG2.y + Math.sin(a)*d*ESTIG2.ry*0.8, 0.0014 + r()*0.0008]); } return o; })();
+function dibujaCentro(c, env){
+  const v = env.view, px = env.px, Z = ESP.corona;
+  // fondo: la corona fuera de foco, en rayos desde el centro de la flor
+  const g = c.createRadialGradient(CEN2[0], CEN2[1], 0.1, CEN2[0], CEN2[1], 1.6); g.addColorStop(0, '#2a0f2c'); g.addColorStop(0.4, mix(Z.base, '#2a1030', 0.3)); g.addColorStop(1, '#3b2c38'); c.fillStyle = g; c.fillRect(v[0] - 0.5, v[1] - 0.5, v[2] - v[0] + 1, v[3] - v[1] + 1);
+  c.save(); c.globalAlpha = 0.5; c.lineCap = 'round';
+  for (let i = 0; i < 40; i++){ const a = i/40*TAU + 0.05*Math.sin(i*3); const r0 = 0.3, r1 = 1.4 + 0.2*h1(i);
+    const gl = c.createLinearGradient(CEN2[0] + Math.cos(a)*r0, CEN2[1] + Math.sin(a)*r0, CEN2[0] + Math.cos(a)*r1, CEN2[1] + Math.sin(a)*r1); gl.addColorStop(0, Z.base); gl.addColorStop(0.5, Z.medio); gl.addColorStop(1, Z.punta);
+    c.strokeStyle = gl; c.lineWidth = 0.05; c.beginPath(); c.moveTo(CEN2[0] + Math.cos(a)*r0, CEN2[1] + Math.sin(a)*r0); c.lineTo(CEN2[0] + Math.cos(a)*r1, CEN2[1] + Math.sin(a)*r1); c.stroke(); }
+  c.restore();
+  blob(c, CEN2[0], CEN2[1], 0.22, 0.22, '#9cc06a', 0.6);
+  // el abejorro, el mismo del nivel 1, y su tórax de cerca: pelo negro con polen pegado
+  const B = FLOR.bee; c.save(); c.translate(-PORTAL[1].x/s12, -PORTAL[1].y/s12); c.scale(1/s12, 1/s12); xyloArriba(c, B.x, B.y, B.s, B.rot, 0, px*s12); c.restore();
+  const T2 = TORAX2;
+  const gt = c.createRadialGradient(T2.x - 0.05, T2.y - 0.06, 0.01, T2.x, T2.y, T2.r*1.05); gt.addColorStop(0, '#4a3f35'); gt.addColorStop(0.55, '#1a130e'); gt.addColorStop(1, '#060403'); c.fillStyle = gt; c.beginPath(); c.arc(T2.x, T2.y, T2.r, 0, TAU); c.fill();
+  c.lineCap = 'round'; c.lineWidth = Math.max(px, 0.0016);
+  for (const [x, y, a, l, k] of PELOS2){ const lit = clamp(0.7 - ((x - T2.x) + (y - T2.y))*5, 0, 1); c.strokeStyle = k < 0.15 ? `rgba(150,130,110,${0.4 + lit*0.4})` : `rgba(${Math.round(30 + lit*50)},${Math.round(25 + lit*40)},${Math.round(20 + lit*32)},.85)`; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*l, y + Math.sin(a)*l); c.stroke(); }
+  const gb = c.createRadialGradient(T2.x, T2.y, T2.r*0.7, T2.x, T2.y, T2.r*1.02); gb.addColorStop(0, 'rgba(0,0,0,0)'); gb.addColorStop(1, 'rgba(0,0,0,.55)'); c.fillStyle = gb; c.beginPath(); c.arc(T2.x, T2.y, T2.r*1.02, 0, TAU); c.fill();
+  for (const [x, y, rr] of POLEN2){ if (Math.hypot(x - T2.x, y - T2.y) > T2.r*0.95) continue; const g = c.createRadialGradient(x - rr*0.3, y - rr*0.3, 0, x, y, rr); g.addColorStop(0, '#fff0a6'); g.addColorStop(1, '#d9a426'); c.fillStyle = g; c.beginPath(); c.arc(x, y, Math.max(px*0.7, rr), 0, TAU); c.fill(); }
+  // la antera vecina, cargada de polen
+  c.save(); c.translate(ANT2.x, ANT2.y); const aA = FLOR.anteras[0].a + Math.PI/2; c.rotate(aA);
+  c.strokeStyle = '#8fb257'; c.lineWidth = 0.035; c.beginPath(); c.moveTo(0, 0); c.lineTo(-0.02, -0.5); c.stroke();
+  const gl = c.createLinearGradient(0, -0.07, 0, 0.07); gl.addColorStop(0, '#ffe999'); gl.addColorStop(0.5, '#f1c33a'); gl.addColorStop(1, '#b8841a'); c.fillStyle = gl; c.beginPath(); c.ellipse(0, 0, 0.168, 0.065, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(120,80,10,.6)'; c.lineWidth = Math.max(px, 0.003); c.stroke();
+  c.strokeStyle = 'rgba(150,100,20,.5)'; c.beginPath(); c.moveTo(-0.15, 0.004); c.lineTo(0.15, -0.004); c.stroke();
+  c.fillStyle = '#ffe38a'; for (let i = 0; i < 160; i++){ c.beginPath(); c.arc((h1(i*1.7) - 0.5)*0.31, (h1(i*2.3) - 0.5)*0.11, Math.max(px*0.7, 0.0018), 0, TAU); c.fill(); }
+  c.restore();
+  // el estilo y el estigma, que roza la espalda
+  const ae = FLOR.estig[0].a;
+  c.strokeStyle = '#7d9f48'; c.lineWidth = 0.04; c.beginPath(); c.moveTo(CEN2[0] + Math.cos(ae)*0.05, CEN2[1] + Math.sin(ae)*0.05); c.quadraticCurveTo(CEN2[0]*0.5 - 0.04, CEN2[1]*0.5 + 0.03, ESTIG2.x - Math.cos(ae)*0.1, ESTIG2.y - Math.sin(ae)*0.1); c.stroke();
+  c.fillStyle = 'rgba(115,35,105,.55)'; for (let i = 1; i < 14; i++){ const u = i/14; const x = lerp(CEN2[0] + Math.cos(ae)*0.05, ESTIG2.x - Math.cos(ae)*0.1, u) + 0.008*Math.sin(i*2.1), y = lerp(CEN2[1] + Math.sin(ae)*0.05, ESTIG2.y - Math.sin(ae)*0.1, u) + 0.01*Math.sin(u*Math.PI); c.beginPath(); c.arc(x, y, 0.006, 0, TAU); c.fill(); }
+  c.save(); c.translate(ESTIG2.x, ESTIG2.y); c.rotate(ae + Math.PI/2);
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.save(); c.translate(0.008, 0.02); rinon(c, ESTIG2.rx, ESTIG2.ry); c.fill(); c.restore();
+  const ge = c.createRadialGradient(-0.03, -0.03, 0.005, 0, 0, ESTIG2.rx); ge.addColorStop(0, '#f8fbe0'); ge.addColorStop(0.55, '#cfdc8e'); ge.addColorStop(1, '#7e9a48'); c.fillStyle = ge; rinon(c, ESTIG2.rx, ESTIG2.ry); c.fill();
+  c.strokeStyle = 'rgba(80,100,40,.7)'; c.lineWidth = Math.max(px, 0.0025); c.stroke();
+  // la superficie: papilas húmedas, que se ven como granitos brillantes
+  c.save(); rinon(c, ESTIG2.rx, ESTIG2.ry); c.clip();
+  for (let i = 0; i < 260; i++){ const xx = (h1(i*3.1) - 0.5)*ESTIG2.rx*2.1, yy = (h1(i*5.7) - 0.5)*ESTIG2.ry*2.1; const lit = clamp(0.6 - (xx + yy)*4, 0, 1);
+    c.fillStyle = `rgba(255,255,235,${0.15 + lit*0.35})`; c.beginPath(); c.arc(xx, yy, 0.0045, 0, TAU); c.fill(); c.fillStyle = 'rgba(70,90,30,.18)'; c.beginPath(); c.arc(xx + 0.002, yy + 0.003, 0.0045, 0, TAU); c.fill(); }
+  c.fillStyle = 'rgba(120,40,110,.35)'; c.beginPath(); c.ellipse(0, ESTIG2.ry*0.75, ESTIG2.rx*0.25, ESTIG2.ry*0.25, 0, 0, TAU); c.fill();
+  c.restore(); c.restore();
+  for (const [x, y, rr] of POLEN2){ if (Math.hypot((x - ESTIG2.x)/ESTIG2.rx, (y - ESTIG2.y)/ESTIG2.ry) > 0.8) continue; c.fillStyle = '#f0c23a'; c.beginPath(); c.arc(x, y, Math.max(px*0.6, rr), 0, TAU); c.fill(); }
+  // los granos que veremos de cerca (nivel 3), en su sitio
+  for (const G of GR3){ const x = PORTAL[2].x + G.x*PORTAL[2].s, y = PORTAL[2].y + G.y*PORTAL[2].s; c.fillStyle = '#f3c83e'; c.beginPath(); c.arc(x, y, Math.max(px*0.6, G.R*PORTAL[2].s), 0, TAU); c.fill(); }
+}
+
+/* ============================================================
+   NIVEL 3 · EL ESTIGMA Y EL GRANO DE POLEN  (1 unidad = 400 µm)
+   El grano de las pasifloras es grande, con la superficie en red
+   y tres surcos unidos [14].
+   ============================================================ */
+const GR3 = [{ x: 0.02, y: -0.03, a: 0.5, R: 0.085, main: true }, { x: -0.25, y: 0.2, a: 2.1, R: 0.08 }, { x: 0.27, y: 0.15, a: 1.2, R: 0.082 }, { x: -0.18, y: -0.27, a: 3.0, R: 0.078 }];
+const RED = (() => { const r = rng(41); const sites = jitterSites(r, [-1.1, -1.1, 1.1, 1.1], 0.2, 0.8); return voronoi(sites, [-1.2, -1.2, 1.2, 1.2], 0.2).filter(q => Math.hypot(q.c[0], q.c[1]) < 1.15).map(q => shrink(q.p, q.c, 0.78)); })();
+function granoPolen(c, x, y, R, a, px, det){
+  c.save(); c.translate(x, y); c.rotate(a);
+  const g = c.createRadialGradient(-R*0.35, -R*0.35, R*0.1, 0, 0, R*1.1); g.addColorStop(0, '#fff3b8'); g.addColorStop(0.5, '#f2cd52'); g.addColorStop(1, '#b9861b');
+  c.fillStyle = g; c.beginPath(); c.arc(0, 0, R, 0, TAU); c.fill();
+  if (det && R/px > 12){ c.save(); c.beginPath(); c.arc(0, 0, R, 0, TAU); c.clip();
+    // la red: celdas hundidas, muros claros; más chicas hacia el borde (curvatura)
+    c.scale(R, R); c.lineWidth = Math.max(px/R, 0.03);
+    for (const p of RED){ const cx = p.reduce((s, q) => s + q[0], 0)/p.length, cy = p.reduce((s, q) => s + q[1], 0)/p.length; const d = Math.hypot(cx, cy); if (d > 1.05) continue;
+      const k = Math.sqrt(Math.max(0.05, 1 - d*d)); c.beginPath(); roundPoly(c, p.map(q => [q[0]*(0.55 + 0.45*k), q[1]*(0.55 + 0.45*k)]));
+      c.fillStyle = `rgba(150,100,20,${0.18 + (1 - k)*0.25})`; c.fill(); c.strokeStyle = 'rgba(255,240,180,.45)'; c.stroke(); }
+    // tres surcos que se unen en el polo
+    c.strokeStyle = 'rgba(120,75,10,.65)'; c.lineWidth = 0.09;
+    for (let i = 0; i < 3; i++){ const b = i*TAU/3; c.beginPath(); c.moveTo(Math.cos(b)*0.05, Math.sin(b)*0.05); c.quadraticCurveTo(Math.cos(b + 0.5)*0.6, Math.sin(b + 0.5)*0.6, Math.cos(b + 0.9)*0.98, Math.sin(b + 0.9)*0.98); c.stroke(); }
+    const gb = c.createRadialGradient(0, 0, 0.6, 0, 0, 1.05); gb.addColorStop(0, 'rgba(110,70,10,0)'); gb.addColorStop(1, 'rgba(110,70,10,.45)'); c.fillStyle = gb; c.fillRect(-1, -1, 2, 2);
+    c.fillStyle = 'rgba(255,252,225,.55)'; c.beginPath(); c.ellipse(-0.38, -0.42, 0.24, 0.14, -0.6, 0, TAU); c.fill();
+    c.restore(); }
+  c.strokeStyle = 'rgba(120,80,15,.6)'; c.lineWidth = Math.max(px, R*0.04); c.beginPath(); c.arc(0, 0, R, 0, TAU); c.stroke();
+  c.restore();
+}
+const ESTIG = (() => {
+  const r = rng(61);
+  const sites = jitterSites(r, [-0.7, -0.7, 0.7, 0.7], 0.055, 0.9);
+  const cel = voronoi(sites, [-0.75, -0.75, 0.75, 0.75], 0.055).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.96), t: r() }));
+  const tubo = []; for (let i = 0; i <= 40; i++){ const u = i/40; tubo.push([0.02 + 0.05*Math.sin(u*2.4) + u*0.03, -0.03 + 0.1 + u*0.14 + 0.02*Math.sin(u*6)]); }
+  return { cel, tubo };
+})();
+function trazoParcial(c, pts, g){ const n = Math.max(1, Math.floor(g*(pts.length - 1))); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i <= n; i++) c.lineTo(pts[i][0], pts[i][1]); return pts[n]; }
+function dibujaEstigma(c, env){
+  const v = env.view, px = env.px;
+  fondo(c, v, '#9cb066');
+  for (const q of ESTIG.cel){ if (!inView(q.bb, v, 0.03)) continue;
+    const lit = clamp(0.6 - (q.c[0] + q.c[1])*0.6, 0, 1);
+    c.beginPath(); roundPoly(c, q.sh); const gq = c.createRadialGradient(q.c[0] - 0.012, q.c[1] - 0.014, 0.003, q.c[0], q.c[1], 0.04);
+    gq.addColorStop(0, mix('#f4f8dc', '#ffffff', lit)); gq.addColorStop(0.55, mix('#cfdc96', '#e2ebb4', lit*q.t)); gq.addColorStop(1, mix('#8ea456', '#a4b868', lit)); c.fillStyle = gq; c.fill();
+    if (q.t < 0.12){ c.fillStyle = 'rgba(130,50,120,.25)'; c.fill(); }
+    if (lit > 0.3){ c.fillStyle = `rgba(255,255,255,${(lit - 0.3)*0.7})`; c.beginPath(); c.ellipse(q.c[0] - 0.01, q.c[1] - 0.013, 0.008, 0.0045, -0.6, 0, TAU); c.fill(); } }
+  const gw = c.createRadialGradient(-0.15, -0.2, 0, -0.15, -0.2, 0.9); gw.addColorStop(0, 'rgba(235,250,255,.2)'); gw.addColorStop(1, 'rgba(235,250,255,0)'); c.fillStyle = gw; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  const g3 = E.tubo3;
+  if (g3 > 0.01){ c.lineCap = 'round'; c.lineJoin = 'round';
+    c.strokeStyle = 'rgba(70,60,10,.35)'; c.lineWidth = 0.038; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    const tip = ESTIG.tubo[Math.max(1, Math.floor(g3*(ESTIG.tubo.length - 1)))];
+    const gt = c.createLinearGradient(ESTIG.tubo[0][0], ESTIG.tubo[0][1], tip[0], tip[1]); gt.addColorStop(0, '#f6e7a8'); gt.addColorStop(1, g3 > 0.7 ? 'rgba(200,190,120,.35)' : '#efe1a0');
+    c.strokeStyle = gt; c.lineWidth = 0.026; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    c.strokeStyle = 'rgba(255,255,240,.6)'; c.lineWidth = 0.007; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    if (g3 > 0.7){ c.fillStyle = `rgba(60,55,20,${(g3 - 0.7)*1.6})`; c.beginPath(); c.arc(tip[0], tip[1], 0.022, 0, TAU); c.fill(); } }
+  for (const G of GR3){ c.fillStyle = 'rgba(40,50,10,.3)'; c.beginPath(); c.ellipse(G.x + 0.012, G.y + 0.02, G.R, G.R*0.8, 0, 0, TAU); c.fill(); granoPolen(c, G.x, G.y, G.R, G.a, px, true); }
+}
+
+/* ============================================================
+   NIVEL 4 · EL PISTILO CORTADO  (1 unidad ≈ 330 µm)
+   Arriba, la cabeza del estigma (y≈-0,3); el estilo baja hasta
+   y≈30; abajo, el ovario con muchos óvulos pegados a la pared.
+   ============================================================ */
+const PIS = (() => {
+  const r = rng(71);
+  const Po = PORTAL[4];
+  const cab = { y: 2.5, rx: 7, ry: 2.8 }, est = 1.6, ov = { y: 39, rx: 8, ry: 9.5 }, cav = { rx: 6.4, ry: 7.8 };
+  const elip = (y, cy, rx, ry) => { const t = (y - cy)/ry; return Math.abs(t) < 1 ? rx*Math.sqrt(1 - t*t) : 0; };
+  const perfil = y => Math.max(y < 2.5 ? elip(y, cab.y, cab.rx, cab.ry) : y < 8 ? lerp(cab.rx*0.6, est, sstep(2.5, 8, y)) : 0, y > 2.5 && y < 39 ? est + 0.05*Math.sin(y*0.7) : 0, elip(y, ov.y, ov.rx, ov.ry));
+  const huecoX = y => elip(y, ov.y, cav.rx, cav.ry);
+  const sites = []; for (let y = -0.45; y < 2.4; y += 0.065){ const w = Math.min(perfil(Math.max(y, -0.3)), 3.2) + 0.1; for (let x = -w; x < w; x += 0.07) sites.push([x + (r()-.5)*0.045, y + (r()-.5)*0.045]); }
+  const cel = voronoi(sites, [-3.4, -0.5, 3.4, 2.5], 0.07).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.88), t: r() }));
+  const papilas = []; for (let x = -3.2; x <= 3.2; x += 0.058) papilas.push([x + (r()-.5)*0.01, 0.028 + r()*0.012]);
+  const micro = [Po.x, Po.y - 0.42*OV*S45];
+  const ctrl = [[0.02, -0.4], [0.0, 3], [0.1, 15], [-0.2, 27], [-1.4, 30.6], [-3.4, 31.6], micro];
+  const camino = []; for (let i = 0; i <= 260; i++){ const u = i/260*(ctrl.length - 1), k = Math.min(ctrl.length - 2, Math.floor(u)), f = u - k; const a = ctrl[k], b = ctrl[k + 1]; const ff = sstep(0, 1, f); camino.push([lerp(a[0], b[0], ff) + (u < 1 ? 0.03*Math.sin(u*40)*(1 - u) : 0), lerp(a[1], b[1], f)]); }
+  const ovulos = [];
+  for (const sg of [-1, 1]) for (let j = 0; j < 7; j++){ const y = 32.6 + j*1.95 + (sg > 0 ? 0.9 : 0); const hx = huecoX(y); if (hx < 1.2) continue; ovulos.push({ x: sg*(hx - 0.75), y, rot: sg*(0.9 + 0.25*Math.sin(j)), sg }); }
+  ovulos.push({ x: Po.x, y: Po.y, rot: 0, sg: -1, eleg: true });
+  for (let j = 0; j < 5; j++) ovulos.push({ x: (j - 2)*1.6 + 0.4*Math.sin(j*5), y: 44.8 + 0.6*Math.sin(j*2), rot: Math.PI + 0.3*Math.sin(j*3), sg: 0 });
+  return { cab, ov, cav, perfil, huecoX, cel, papilas, camino, ovulos, micro };
+})();
+function tuboHasta(){ const C = PIS.camino; let i = 1; while (i < C.length - 1 && C[i][1] < E.tuboY) i++; return i/(C.length - 1); }
+function contornoPistilo(c){
+  const n = 220, y0 = -0.3, y1 = PIS.ov.y + PIS.ov.ry;
+  c.beginPath();
+  for (let i = 0; i <= n; i++){ const y = lerp(y0, y1, i/n); c.lineTo(PIS.perfil(y), y); }
+  for (let i = n; i >= 0; i--){ const y = lerp(y0, y1, i/n); c.lineTo(-PIS.perfil(y), y); }
+  c.closePath();
+}
+function dibujaCorte(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createLinearGradient(0, -2, 0, 50); g.addColorStop(0, '#3a2f3a'); g.addColorStop(1, '#1c1820'); c.fillStyle = g; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  c.save(); contornoPistilo(c); const gp = c.createLinearGradient(-8, 0, 8, 0); gp.addColorStop(0, '#9bb35c'); gp.addColorStop(0.5, '#dfe7a8'); gp.addColorStop(1, '#93ab55'); c.fillStyle = gp; c.fill(); c.clip();
+  // células de arriba, que se ven solo de cerca
+  const aC = 1 - sstep(0.004, 0.012, px);
+  if (aC > 0){ c.globalAlpha = aC; for (const q of PIS.cel){ if (!inView(q.bb, v, 0.05)) continue; c.beginPath(); roundPoly(c, q.sh); c.fillStyle = mix('#cfdc94', '#eff3c4', q.t*0.7); c.fill(); c.strokeStyle = 'rgba(110,125,55,.5)'; c.lineWidth = Math.max(px, 0.006); c.stroke(); } c.globalAlpha = 1; }
+  // a media distancia: células largas en hileras; de muy lejos, una trama
+  { const cw = 0.16, ch = 0.55, nx = (v[2] - v[0])/cw, ny = (v[3] - v[1])/ch, aM = sstep(0.0025, 0.006, px)*(1 - sstep(0.03, 0.05, px));
+    if (aM > 0 && nx*ny < 4000){ c.globalAlpha = aM; c.lineWidth = Math.max(px, 0.008);
+      for (let j = Math.floor(Math.max(v[1], 2.2)/ch); j*ch < Math.min(v[3], 49); j++){ const off = (j % 2)*cw*0.5;
+        for (let i = Math.floor(v[0]/cw) - 1; i*cw < v[2] + cw; i++){ const x = i*cw + off, y = j*ch, t = h1(i*7.1 + j*13.3); c.beginPath(); c.roundRect ? c.roundRect(x + 0.012, y + 0.02, cw - 0.024, ch - 0.04, 0.05) : c.rect(x + 0.012, y + 0.02, cw - 0.024, ch - 0.04); c.fillStyle = mix('#cbd78e', '#eef2c6', t*0.8); c.fill(); c.strokeStyle = 'rgba(105,120,50,.45)'; c.stroke(); } }
+      c.globalAlpha = 1; } }
+  const paso = Math.max(0.12, px*7), aT = sstep(0.03, 0.05, px);
+  if (aT > 0){ c.globalAlpha = 0.35*aT; c.strokeStyle = '#7f9548'; c.lineWidth = px;
+    for (let x = Math.floor(v[0]/paso)*paso; x < v[2]; x += paso){ c.beginPath(); c.moveTo(x, Math.max(v[1], 2)); c.lineTo(x*(1 + 0.02), Math.min(v[3], 50)); c.stroke(); } c.globalAlpha = 1; }
+  // el tejido que guía al tubo, por el centro del estilo
+  c.strokeStyle = 'rgba(250,246,205,.35)'; c.lineWidth = 0.9; c.lineCap = 'round'; c.beginPath(); c.moveTo(0, 2); c.lineTo(0.05, 29); c.stroke();
+  // la cavidad del ovario
+  const O = PIS.ov; const gc = c.createRadialGradient(0, O.y - 2, 1, 0, O.y, PIS.cav.ry); gc.addColorStop(0, '#5a6630'); gc.addColorStop(1, '#3a4220'); c.fillStyle = gc; c.beginPath(); c.ellipse(0, O.y, PIS.cav.rx, PIS.cav.ry, 0, 0, TAU); c.fill();
+  c.restore();
+  c.strokeStyle = '#6f7f36'; c.lineWidth = Math.max(px*1.5, 0.012); contornoPistilo(c); c.stroke();
+  // papilas del estigma (el mismo borde que se vio desde arriba)
+  if (px < 0.05) for (const [x, h] of PIS.papilas){ if (x < v[0] - 0.1 || x > v[2] + 0.1) continue; c.fillStyle = '#f2f6d2'; c.beginPath(); c.ellipse(x, -0.3 - h*0.5, 0.027, h + 0.01, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(110,125,60,.6)'; c.lineWidth = Math.max(px, 0.004); c.stroke(); }
+  // óvulos, pegados a la pared por su cordón; el elegido en su portal
+  for (const q of PIS.ovulos){ if (q.x < v[0] - 2 || q.x > v[2] + 2 || q.y < v[1] - 2 || q.y > v[3] + 2) continue;
+    c.save(); c.translate(q.x, q.y); c.rotate(q.rot); c.scale(S45, S45);
+    if (!q.eleg){ c.strokeStyle = '#a9b46a'; c.lineWidth = 0.09; c.beginPath(); c.moveTo(0, 0.4*OV); c.lineTo(0, 0.85); c.stroke(); }
+    ovulo(c, px/S45, px < 0.08 ? 0.3 : 0, 0, 0); c.restore(); }
+  // el tubo que baja
+  const g4 = tuboHasta();
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(255,230,140,.18)'; c.lineWidth = Math.max(px*14, 0.12); trazoParcial(c, PIS.camino, g4); c.stroke();
+  c.strokeStyle = 'rgba(70,50,10,.45)'; c.lineWidth = Math.max(px*5, 0.05); trazoParcial(c, PIS.camino, g4); c.stroke();
+  c.strokeStyle = '#f7e6a2'; c.lineWidth = Math.max(px*3, 0.032); const tip = trazoParcial(c, PIS.camino, g4); c.stroke();
+  c.fillStyle = '#fff6cc'; c.beginPath(); c.arc(tip[0], tip[1], Math.max(px*3, 0.03), 0, TAU); c.fill();
+  if (g4 > 0.1){ const k = Math.max(1, Math.floor(g4*(PIS.camino.length - 1)) - 2); const q = PIS.camino[k]; c.fillStyle = '#e0891d'; for (const d of [-1, 1]){ c.beginPath(); c.arc(q[0] + d*Math.max(px*1.6, 0.012), q[1], Math.max(px*1.5, 0.011), 0, TAU); c.fill(); } }
+  granoPolen(c, 0.02, -0.4, 0.085*0.4/0.33*0.97, 0.5, px, true);
+}
+
+/* ============================================================
+   NIVEL 5 · EL ÓVULO  (1 unidad ≈ 730 µm) — y, al subir, la semilla
+   (dibujo general de un óvulo de planta con flor [15], simplificado)
+   ============================================================ */
+function ovulo(c, px, det, fec, madura){ c.save(); c.scale(OV, OV); ovuloDentro(c, px/OV, det, fec, madura); c.restore(); }
+function ovuloDentro(c, px, det, fec, madura){
+  const cy = 0.1, lw = Math.max(px, 0.004);
+  c.strokeStyle = mix('#b8b56c', '#9c7a3e', madura); c.lineWidth = 0.09; c.lineCap = 'round'; c.beginPath(); c.moveTo(0.02, cy + 0.46); c.quadraticCurveTo(0.08, cy + 0.62, 0.02, cy + 0.8); c.stroke();
+  const g1 = c.createRadialGradient(-0.12, cy - 0.14, 0.05, 0, cy, 0.52); g1.addColorStop(0, mix('#e3e0a6', '#d8c08a', madura)); g1.addColorStop(1, mix('#a7a45c', '#8c6c38', madura));
+  c.fillStyle = g1; c.beginPath(); c.ellipse(0, cy, 0.42, 0.5, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(90,85,35,.45)'; c.lineWidth = lw; c.stroke();
+  const g2 = c.createRadialGradient(-0.1, cy - 0.1, 0.04, 0, cy + 0.01, 0.44); g2.addColorStop(0, mix('#eeebbe', '#ecdcb0', madura)); g2.addColorStop(1, mix('#c3c07c', '#bfa06a', madura));
+  c.fillStyle = g2; c.beginPath(); c.ellipse(0, cy + 0.01, 0.35, 0.43, 0, 0, TAU); c.fill(); c.stroke();
+  if (det > 0.5){ c.strokeStyle = 'rgba(120,115,55,.18)'; c.lineWidth = lw; for (let i = 0; i < 36; i++){ const a = i/36*TAU; c.beginPath(); c.moveTo(Math.cos(a)*0.35, cy + 0.01 + Math.sin(a)*0.43); c.lineTo(Math.cos(a)*0.42, cy + Math.sin(a)*0.5); c.stroke(); } }
+  const g3 = c.createRadialGradient(0, cy - 0.05, 0.02, 0, cy + 0.03, 0.36); g3.addColorStop(0, mix('#fbf8de', '#f8efd2', madura)); g3.addColorStop(1, mix('#dedba6', '#e6d4a4', madura));
+  c.fillStyle = g3; c.beginPath(); c.ellipse(0, cy + 0.03, 0.27, 0.36, 0, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(70,75,30,.85)'; c.beginPath(); c.moveTo(-0.03, -0.42); c.quadraticCurveTo(0, -0.37, 0.03, -0.42); c.lineTo(0.012, -0.3); c.lineTo(-0.012, -0.3); c.closePath(); c.fill();
+  const sac = { x: 0, y: 0.02, rx: 0.1 + madura*0.14, ry: 0.3 + madura*0.02 };
+  const gs = c.createRadialGradient(0, -0.05, 0.02, 0, 0.02, 0.32); gs.addColorStop(0, '#fffdf0'); gs.addColorStop(1, mix('#f5ecc6', '#f7e8bc', madura));
+  c.fillStyle = gs; c.beginPath(); c.ellipse(sac.x, sac.y, sac.rx, sac.ry, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(160,150,90,.5)'; c.lineWidth = lw; c.stroke();
+  if (madura > 0.02){
+    c.save(); c.beginPath(); c.ellipse(sac.x, sac.y, sac.rx, sac.ry, 0, 0, TAU); c.clip(); c.globalAlpha = madura;
+    for (let i = 0; i < 90; i++){ const x = (h1(i*1.7) - 0.5)*0.5, y = (h1(i*2.9) - 0.5)*0.66; c.fillStyle = i % 3 ? '#f7ecc4' : '#efdfac'; c.beginPath(); c.arc(x, y, 0.026, 0, TAU); c.fill(); c.strokeStyle = 'rgba(180,150,80,.3)'; c.lineWidth = lw; c.stroke(); }
+    const ge = c.createRadialGradient(-0.02, -0.14, 0.01, 0, -0.1, 0.16); ge.addColorStop(0, '#f4f8d0'); ge.addColorStop(1, '#bfd07a');
+    c.fillStyle = ge; c.beginPath(); c.ellipse(0, -0.06, 0.05 + madura*0.06, 0.1 + madura*0.12, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(110,130,50,.6)'; c.stroke();
+    c.restore(); c.globalAlpha = 1; }
+  if (madura >= 0.999) return;
+  c.globalAlpha = 1 - madura;
+  for (const s of [-1, 1]){ c.save(); c.translate(s*0.036, -0.23); c.rotate(-s*0.18);
+    const gy = c.createLinearGradient(0, -0.06, 0, 0.05); gy.addColorStop(0, '#efe0b0'); gy.addColorStop(1, '#f7efd6'); c.fillStyle = gy;
+    c.beginPath(); c.moveTo(0, -0.065); c.quadraticCurveTo(0.036, -0.01, 0.022, 0.04); c.quadraticCurveTo(0, 0.058, -0.022, 0.04); c.quadraticCurveTo(-0.036, -0.01, 0, -0.065); c.fill();
+    c.strokeStyle = 'rgba(150,120,70,.45)'; c.lineWidth = lw; c.stroke();
+    c.fillStyle = 'rgba(160,120,60,.55)'; c.beginPath(); c.arc(0, 0.012, 0.009, 0, TAU); c.fill(); c.restore(); }
+  const zig = sstep(0.62, 0.8, fec);
+  c.save(); c.translate(0, -0.16);
+  const go = c.createRadialGradient(-0.01, 0.0, 0.005, 0, 0.01, 0.07); go.addColorStop(0, mix('#fbe8cf', '#ffe1a0', zig)); go.addColorStop(1, mix('#eccfae', '#f5c46a', zig));
+  c.fillStyle = go; c.beginPath(); c.moveTo(0, -0.05); c.bezierCurveTo(0.045, -0.04, 0.06, 0.03, 0.03, 0.06); c.quadraticCurveTo(0, 0.075, -0.03, 0.06); c.bezierCurveTo(-0.06, 0.03, -0.045, -0.04, 0, -0.05); c.fill();
+  c.strokeStyle = 'rgba(160,110,60,.55)'; c.lineWidth = lw; c.stroke();
+  c.fillStyle = mix('#c08a52', '#e0891d', zig); c.beginPath(); c.arc(0, 0.028, 0.015 + zig*0.005, 0, TAU); c.fill();
+  if (zig > 0){ const gz = c.createRadialGradient(0, 0.02, 0, 0, 0.02, 0.11); gz.addColorStop(0, `rgba(255,205,90,${0.45*zig})`); gz.addColorStop(1, 'rgba(255,205,90,0)'); c.fillStyle = gz; c.beginPath(); c.arc(0, 0.02, 0.11, 0, TAU); c.fill(); }
+  c.restore();
+  const endo = sstep(0.62, 0.85, fec);
+  c.fillStyle = mix('#c29a62', '#e0a232', endo); for (const s of [-1, 1]){ c.beginPath(); c.arc(s*0.02*(1 - endo), 0.03, 0.017, 0, TAU); c.fill(); }
+  if (endo > 0){ const gz = c.createRadialGradient(0, 0.03, 0, 0, 0.03, 0.1); gz.addColorStop(0, `rgba(255,205,90,${0.4*endo})`); gz.addColorStop(1, 'rgba(255,205,90,0)'); c.fillStyle = gz; c.beginPath(); c.arc(0, 0.03, 0.1, 0, TAU); c.fill(); }
+  for (const [x, y] of [[-0.03, 0.27], [0.03, 0.27], [0, 0.295]]){ c.fillStyle = '#ece3c2'; c.beginPath(); c.arc(x, y, 0.022, 0, TAU); c.fill(); c.strokeStyle = 'rgba(150,130,80,.4)'; c.lineWidth = lw; c.stroke(); }
+  c.globalAlpha = 1;
+}
+function dibujaOvulo(c, env){
+  const px = env.px, v = env.view;
+  const g = c.createRadialGradient(0, 0.06, 0.1, 0, 0.06, 0.9); g.addColorStop(0, '#5d6a30'); g.addColorStop(1, '#2c3418'); c.fillStyle = g; c.fillRect(v[0] - 0.2, v[1] - 0.2, v[2] - v[0] + 0.4, v[3] - v[1] + 0.4);
+  // óvulos vecinos, en la pared del ovario, fuera de foco
+  for (const [x, y, rr] of [[-0.62, 0.55, 0.26], [0.7, 0.05, 0.24], [0.6, 0.75, 0.22], [-0.72, -0.25, 0.22]]) blob(c, x, y, rr, rr*1.2, '#d6d49a', 0.35);
+  c.strokeStyle = 'rgba(170,180,100,.6)'; c.lineWidth = 0.05; c.beginPath(); c.moveTo(-1.2, 0.55); c.quadraticCurveTo(-0.5, 0.6, 0.02*OV, 0.8*OV + 0.06); c.stroke();
+  const fec = E.fec;
+  ovulo(c, px, 1, fec, E.madura);
+  c.save(); c.scale(OV, OV);
+  const llega = sstep(0, 0.3, fec);
+  c.globalAlpha = 1 - E.madura;
+  const tubo = [[0.01, -1.4], [0.006, -0.7], [0, -0.42], [0.008, -0.33], [0.026, -0.27]];
+  const n = 3 + llega*1.999;
+  const trazo = () => { c.beginPath(); c.moveTo(tubo[0][0], tubo[0][1]); for (let i = 1; i <= Math.floor(n); i++) c.lineTo(tubo[i][0], tubo[i][1]); const f = n - Math.floor(n); if (f > 0 && Math.floor(n) < 4){ const a = tubo[Math.floor(n)], b = tubo[Math.floor(n) + 1]; c.lineTo(lerp(a[0], b[0], f), lerp(a[1], b[1], f)); } };
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(70,50,10,.3)'; c.lineWidth = 0.034; trazo(); c.stroke();
+  c.strokeStyle = '#f5e4a0'; c.lineWidth = 0.022; trazo(); c.stroke();
+  c.strokeStyle = 'rgba(255,255,240,.6)'; c.lineWidth = 0.006; trazo(); c.stroke();
+  const suelta = sstep(0.3, 0.42, fec), viaja = sstep(0.42, 0.66, fec), une = sstep(0.62, 0.72, fec);
+  if (une < 1){ const base = llega < 1 ? [0.004, -0.6 + 0.3*llega] : [0.02, -0.28];
+    const s1 = [lerp(base[0] - 0.004, 0, viaja), lerp(base[1], -0.13, viaja)], s2 = [lerp(base[0] + 0.006, 0.0, viaja), lerp(base[1] + 0.012, 0.03, viaja)];
+    c.globalAlpha = (1 - une)*(1 - E.madura);
+    for (const q of (suelta > 0 ? [s1, s2] : [[base[0] - 0.004, base[1]], [base[0] + 0.006, base[1] + 0.012]])){
+      const gz = c.createRadialGradient(q[0], q[1], 0, q[0], q[1], 0.03); gz.addColorStop(0, 'rgba(255,170,60,.55)'); gz.addColorStop(1, 'rgba(255,170,60,0)'); c.fillStyle = gz; c.beginPath(); c.arc(q[0], q[1], 0.03, 0, TAU); c.fill();
+      c.fillStyle = '#d8801c'; c.beginPath(); c.ellipse(q[0], q[1], 0.009, 0.013, 0.2, 0, TAU); c.fill(); } }
+  c.globalAlpha = 1; c.restore();
+}
+
+/* ============================================================
+   NIVEL 6 · LA SEMILLA EN SU ARILO  (1 unidad = 3 cm)
+   El arilo es la bolsita de jugo que envuelve cada semilla [9];
+   la semilla se ve cortada. Arriba, la pared del fruto.
+   ============================================================ */
+const ARI = { rx: 0.2, ry: 0.23 };
+const VEC6 = (() => { const r = rng(83), o = []; for (let i = 0; i < 16; i++){ const a = i/16*TAU + r()*0.3, d = 0.44 + r()*0.5; o.push({ x: Math.cos(a)*d*1.2, y: Math.sin(a)*d + 0.1, s: 0.85 + r()*0.3, rot: r()*TAU, t: r() }); } return o; })();
+function arilo(c, x, y, k, rot, px, foco, cre){
+  const Fz = ESP.fruto; c.save(); c.translate(x, y); c.rotate(rot); c.scale(k, k);
+  const g = c.createRadialGradient(-0.06, -0.08, 0.01, 0, 0, ARI.ry*1.05); g.addColorStop(0, rgba(Fz.ariloB, 0.95)); g.addColorStop(0.7, rgba(Fz.arilo, 0.85)); g.addColorStop(1, rgba(mix(Fz.arilo, '#3a2010', 0.35), 0.8));
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, ARI.rx, ARI.ry, 0, 0, TAU); c.fill();
+  if (foco){ c.strokeStyle = 'rgba(255,255,240,.45)'; c.lineWidth = Math.max(px/k, 0.004); c.stroke();
+    c.save(); c.beginPath(); c.ellipse(0, 0, ARI.rx, ARI.ry, 0, 0, TAU); c.clip(); c.strokeStyle = 'rgba(255,240,200,.18)'; c.lineWidth = Math.max(px/k, 0.003); for (let i = 0; i < 26; i++){ const a = h1(i*1.3)*TAU, d = h1(i*2.1)*0.2; c.beginPath(); c.arc(Math.cos(a)*d, Math.sin(a)*d, 0.03 + h1(i)*0.02, 0, TAU); c.stroke(); } c.restore();
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.ellipse(-0.08, -0.11, 0.06, 0.025, -0.6, 0, TAU); c.fill(); }
+  // la semilla oscura adentro (vista entera en los vecinos)
+  if (cre === undefined){ c.fillStyle = 'rgba(30,20,12,.92)'; c.beginPath(); c.ellipse(0, 0.01, 0.09, 0.12, 0, 0, TAU); c.fill(); c.fillStyle = 'rgba(255,255,255,.12)'; c.beginPath(); c.ellipse(-0.03, -0.04, 0.03, 0.05, -0.4, 0, TAU); c.fill(); }
+  c.restore();
+}
+function dibujaSemilla(c, env){
+  const v = env.view, px = env.px, Fz = ESP.fruto;
+  const cre = env.cre !== undefined ? env.cre : 1;
+  fondo(c, v, mix(Fz.arilo, '#2c1a0c', 0.55));
+  // la pared del fruto, arriba a la izquierda: corteza y parte blanca
+  c.save(); c.fillStyle = Fz.piel[1]; c.beginPath(); c.arc(-1.9, -2.1, 2.2, 0, TAU); c.fill(); c.fillStyle = Fz.meso; c.beginPath(); c.arc(-1.9, -2.1, 2.2 - 0.04 - Fz.mesoG*2, 0, TAU); c.fill(); c.restore();
+  for (const q of VEC6){ if (q.x < v[0] - 0.4 || q.x > v[2] + 0.4 || q.y < v[1] - 0.4 || q.y > v[3] + 0.4) continue; arilo(c, q.x, q.y, q.s*lerp(0.5, 1, E.arilo), q.rot, px, q.t < 0.5); }
+  blob(c, 0, 0, 0.9, 0.9, '#000000', 0.18);
+  // el cordón que la une a la pared
+  c.strokeStyle = '#d9cfa6'; c.lineWidth = 0.03*cre + 0.006; c.beginPath(); c.moveTo(0, -0.13*cre - 0.02); c.quadraticCurveTo(-0.2, -0.45, -0.42, -0.6); c.stroke();
+  // el arilo de esta semilla, que se llena de jugo con los días
+  const a = E.arilo*lerp(0.55, 1, sstep(G0, 1, cre));
+  arilo(c, 0, 0, a, 0, px, true, cre);
+  // la semilla: la cubierta oscura con hoyitos y, cortada, lo de adentro (el óvulo que maduró)
+  const P = PORTAL[6], sE = P.s*cre;
+  c.save(); c.translate(P.x, P.y); c.scale(sE, sE); c.scale(OV, OV);
+  const gt = c.createRadialGradient(-0.1, 0, 0.1, 0, 0.1, 0.6); gt.addColorStop(0, '#4a3324'); gt.addColorStop(1, '#1a110b'); c.globalAlpha = sstep(0.2, 0.9, E.madura);
+  c.fillStyle = gt; c.beginPath(); c.ellipse(0, 0.1, 0.5, 0.58, 0, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(0,0,0,.45)'; for (let i = 0; i < 46; i++){ const an = i/46*TAU; c.beginPath(); c.arc(Math.cos(an)*0.46, 0.1 + Math.sin(an)*0.54, 0.018, 0, TAU); c.fill(); }
+  c.globalAlpha = 1; c.restore();
+  c.save(); c.translate(P.x, P.y); c.scale(sE, sE); ovulo(c, px/sE, 1, 1, E.madura); c.restore();
+}
+
+/* ============================================================
+   NIVEL 7 · DOS FRUTOS CORTADOS  (1 unidad = 26 cm)
+   Comparación dibujada: el de la izquierda recibió mucho polen
+   (muchas semillas, mucho jugo); el de la derecha, poco [1, 6].
+   ============================================================ */
+const FR7 = [{ x: -0.2, y: 0.0, R: 0.154, lleno: 1 }, { x: 0.2, y: 0.015, R: 0.132, lleno: 0 }];
+const ARIL7 = q => { const n = q.lleno ? 46 : 46, o = [], GA = Math.PI*(3 - Math.sqrt(5)); for (let i = 0; i < n; i++){ const rr = Math.sqrt((i + 0.6)/n)*0.7, a = i*GA; o.push({ x: Math.cos(a)*rr, y: Math.sin(a)*rr*0.95, rot: a + 0.4, vivo: q.lleno ? true : h1(i*3.3) < 0.24, k: 0.92 + h1(i*1.1)*0.16 }); } return o; };
+FR7.forEach(q => q.ar = ARIL7(q));
+const ELEG7 = (() => { const q = FR7[0]; let b = null, d = 1e9; for (const a of q.ar){ const dd = (a.x - 0.32)**2 + (a.y - 0.12)**2; if (dd < d){ d = dd; b = a; } } b.eleg = true; return b; })();
+PORTAL[7].x = FR7[0].x + ELEG7.x*FR7[0].R; PORTAL[7].y = FR7[0].y + ELEG7.y*FR7[0].R; PORTAL[7].rot = 0; ELEG7.rot = 0;
+function tabla(c, px, v, m){
+  m = m === undefined ? 0.2 : m;
+  const g = c.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, '#b4875a'); g.addColorStop(1, '#8a6239'); c.fillStyle = g; c.fillRect(v[0] - m, v[1] - m, v[2] - v[0] + 2*m, v[3] - v[1] + 2*m);
+  if (0.01/px > 1){ c.strokeStyle = 'rgba(70,45,20,.25)'; c.lineWidth = Math.max(px, 0.002); for (let i = -12; i < 12; i++){ const y = i*0.09; c.beginPath(); for (let x = -1.8; x <= 1.8; x += 0.1) c.lineTo(x, y + 0.012*Math.sin(x*4 + i)); c.stroke(); } }
+}
+function mitad(c, q, px, det){
+  const Fz = ESP.fruto, R = q.R*(q.lleno ? 1 : 0.95);
+  c.save(); c.translate(q.x, q.y);
+  c.fillStyle = 'rgba(40,20,5,.35)'; c.beginPath(); c.ellipse(0.012, 0.02, R*Fz.rx*1.02, R*1.02, 0, 0, TAU); c.fill();
+  c.fillStyle = Fz.piel[1]; c.beginPath(); c.ellipse(0, 0, R*Fz.rx, R, 0, 0, TAU); c.fill();
+  c.fillStyle = Fz.piel[0]; c.beginPath(); c.ellipse(-R*0.01, -R*0.01, R*Fz.rx*0.985, R*0.985, 0, 0, TAU); c.fill();
+  const rm = 1 - 0.035 - Fz.mesoG; c.fillStyle = Fz.meso; c.beginPath(); c.ellipse(0, 0, R*Fz.rx*(1 - 0.035), R*(1 - 0.035), 0, 0, TAU); c.fill();
+  // la cavidad: llena de arilos, o casi vacía
+  const gc = c.createRadialGradient(0, 0, R*0.1, 0, 0, R*rm); gc.addColorStop(0, q.lleno ? mix(Fz.arilo, '#5a3010', 0.25) : '#e8dcc0'); gc.addColorStop(1, q.lleno ? mix(Fz.arilo, '#3a2008', 0.45) : '#d7c7a2');
+  c.fillStyle = gc; c.beginPath(); c.ellipse(0, 0, R*Fz.rx*rm, R*rm, 0, 0, TAU); c.fill();
+  const kA = 0.15/ARI.rx; // radio del arilo = 0,15 R
+  for (const a of q.ar){
+    if (!a.vivo){ if (det > 0.2){ c.strokeStyle = 'rgba(160,140,100,.5)'; c.lineWidth = Math.max(px, R*0.008); c.beginPath(); c.ellipse(a.x*R*Fz.rx, a.y*R, R*0.05, R*0.03, a.rot, 0, TAU); c.stroke(); } continue; }
+    const s = R*kA*a.k*(a.eleg ? 1 : 1);
+    if (a.eleg){ const P = PORTAL[7]; arilo(c, P.x - q.x, P.y - q.y, q.R*kA, 0, px, det > 0.5); }
+    else arilo(c, a.x*R*Fz.rx, a.y*R, s, a.rot, px, false);
+  }
+  // la pulpa: una gelatina brillante que une los arilos
+  if (q.lleno){ const gj = c.createRadialGradient(-R*0.3, -R*0.35, R*0.05, 0, 0, R*rm); gj.addColorStop(0, 'rgba(255,245,200,.28)'); gj.addColorStop(0.5, rgba(Fz.ariloB, 0.12)); gj.addColorStop(1, 'rgba(60,30,5,.18)'); c.fillStyle = gj; c.beginPath(); c.ellipse(0, 0, R*Fz.rx*rm, R*rm, 0, 0, TAU); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.22)'; for (let i = 0; i < 14; i++){ const a = h1(i*2.9)*TAU, d = Math.sqrt(h1(i*4.7))*0.6; c.beginPath(); c.ellipse(Math.cos(a)*d*R, Math.sin(a)*d*R, R*0.03, R*0.012, a, 0, TAU); c.fill(); } }
+  c.strokeStyle = 'rgba(80,50,20,.35)'; c.lineWidth = Math.max(px, R*0.01); c.beginPath(); c.ellipse(0, 0, R*Fz.rx*rm, R*rm, 0, 0, TAU); c.stroke();
+  c.restore();
+}
+function dibujaFrutos(c, env){
+  const v = env.view, px = env.px;
+  tabla(c, px, v);
+  // hojas sobre la tabla y un fruto entero de fondo
+  const Hh = HOJA[ESP.hoja];
+  for (const [x, y, s, a, col] of [[-0.6, -0.2, 0.22, 2.4, '#4d7d33'], [0.55, 0.22, 0.24, -0.8, '#3f6c2b'], [0.62, -0.25, 0.16, 2.9, '#5a8c3a']]){ c.save(); c.translate(x, y); c.rotate(a); c.scale(s, s); c.fillStyle = col; c.fill(Hh); c.strokeStyle = 'rgba(220,240,190,.35)'; c.lineWidth = px/s; c.stroke(HOJA.vena); c.restore(); }
+  frutoEntero(c, 0.03, -0.24, 0.07, 1, px);
+  for (const q of FR7) mitad(c, q, px, 1);
+  if (env.f < 2.2){ const ax = PORT ? 0.0 : 0.5, ay = PORT ? 0.3 : -0.1; xyloLado(c, ax, ay, 0.12, 0.15, true); }
+}
+
+/* ============================================================
+   REGISTRO DE NIVELES Y RENDER
+   ============================================================ */
+const LV = [dibujaFinca, dibujaFlor, dibujaCentro, dibujaEstigma, dibujaCorte, dibujaOvulo, dibujaSemilla, dibujaFrutos, dibujaFinca];
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu, extra){
+  const hw = W/2/ppu, hh = H/2/ppu;
+  return Object.assign({ L, cx, cy, f, ppu, px: 1/ppu, view: [cx - hw, cy - hh, cx + hw, cy + hh] }, extra || {});
+}
+function pintaNivel(c, L, cx, cy, f, cre){
+  const ppu = S / f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(W/2 - cx*ppu), DPR*(H/2 - cy*ppu));
+  LV[L](c, envPara(L, cx, cy, f, ppu, { cre }));
+  const P = PORTAL[L];
+  if (!P) return;
+  const sE = P.s * (L === 6 && cre !== undefined ? cre : 1);
+  const pp = sE * ppu;
+  const a = sstep(0.28*S, 0.92*S, pp);
+  if (a <= 0) return;
+  const ppu2 = ppu * sE;
+  const ox = W/2 + (P.x - cx)*ppu, oy = H/2 + (P.y - cy)*ppu;
+  const rot = P.rot || 0;
+  const dx = (cx - P.x), dy = (cy - P.y);
+  const cx2 = (Math.cos(-rot)*dx - Math.sin(-rot)*dy) / sE, cy2 = (Math.sin(-rot)*dx + Math.cos(-rot)*dy) / sE, f2 = f / sE;
+  const rDisco = pp*lerp(0.22, 0.85, a) + pp*0.16;
+  const lejos = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy));
+  const cerca = Math.hypot(clamp(ox, 0, W) - ox, clamp(oy, 0, H) - oy);
+  if (cerca > rDisco) return;
+  const cubre = a >= 0.999 && pp*0.85 >= lejos;
+  const dst = cubre ? c : bctx;
+  if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+  dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*ox, DPR*oy);
+  if (rot){ dst.rotate(rot); }
+  // el hijo se dibuja en su propio marco: la vista se calcula sin girar (la rotación es pequeña y local)
+  LV[P.c](dst, envPara(P.c, cx2, cy2, f2, ppu2));
+  if (cubre) return;
+  bctx.setTransform(1,0,0,1,0,0);
+  bctx.globalCompositeOperation = 'destination-in';
+  const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+  const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+  gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+  bctx.globalCompositeOperation = 'source-over';
+  c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+}
+function prepTexturasGiro(){
+  for (const t of [texA, texB]){ t.width = cv.width; t.height = cv.height; }
+  const guarda = E; E = estado(segDe(3).b); pintaNivel(texA.getContext('2d'), 3, 0, 0, HF3);
+  E = estado(segDe(4).a); pintaNivel(texB.getContext('2d'), 4, 0, 0, 1); E = guarda;
+  for (const tx of [texA, texB]){ const k = document.createElement('canvas'); k.width = tx.width; k.height = tx.height; k.getContext('2d').drawImage(tx, 0, 0);
+    const x = tx.getContext('2d'); x.setTransform(1, 0, 0, -1, 0, tx.height); x.drawImage(k, 0, 0); x.setTransform(1, 0, 0, 1, 0, 0); }
+  texOK = true;
+}
+/* el giro de 90°: el estigma visto desde arriba se tumba y se levanta el corte (del café) */
+function pintaGiro(cFinal, t){
+  if (!texOK) prepTexturasGiro();
+  const c = bctx;
+  const th = (t*t*(3 - 2*t)) * Math.PI/2;
+  const Wd = cv.width, Hd = cv.height, h = H, Dp = 1.8*Math.max(W, H);
+  c.setTransform(1,0,0,1,0,0); c.fillStyle = '#262a14'; c.fillRect(0, 0, Wd, Hd);
+  const ct = Math.cos(th), st = Math.sin(th);
+  const proy = (y, zp) => { const yr = y*ct - zp*st, zr = y*st + zp*ct + h/2; const k = Dp/(Dp + zr); return [H/2 + yr*k, k]; };
+  const paso = Math.max(2, Math.round(DPR*1.5));
+  if (th < Math.PI/2 - 0.001){
+    for (let j = 0; j < Hd; j += paso){ const y0 = j/DPR - h/2, y1 = (j + paso)/DPR - h/2;
+      const [s0, k0] = proy(y0, -h/2), [s1] = proy(y1, -h/2); if (s1 - s0 <= 0) continue;
+      const ww = W*Math.max(1, k0); c.drawImage(texA, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+    const [ya] = proy(-h/2, -h/2), [yb] = proy(h/2, -h/2); c.fillStyle = `rgba(20,24,8,${0.55*st})`; c.fillRect(0, ya*DPR, Wd, (yb - ya)*DPR);
+  }
+  for (let j = 0; j < Hd; j += paso){ const z0 = (Hd - j)/DPR, z1 = (Hd - j - paso)/DPR;
+    const [s0, k0] = proy(-h/2, z0 - h/2), [s1] = proy(-h/2, z1 - h/2); if (s1 - s0 <= 0) continue;
+    const ww = W*Math.max(1, k0); c.drawImage(texB, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+  const [yc] = proy(-h/2, h/2), [yd] = proy(-h/2, -h/2); c.fillStyle = `rgba(16,20,6,${0.6*ct})`; c.fillRect(0, yc*DPR, Wd, (yd - yc)*DPR);
+  c.strokeStyle = `rgba(243,243,207,${0.25 + 0.5*Math.sin(th*2)})`; c.lineWidth = 2*DPR; c.beginPath(); c.moveTo(0, yd*DPR); c.lineTo(Wd, yd*DPR); c.stroke();
+  cFinal.setTransform(1, 0, 0, -1, 0, Hd); cFinal.drawImage(buf, 0, 0); cFinal.setTransform(1, 0, 0, 1, 0, 0);
+}
+function render(pp){
+  E = estado(pp);
+  const cam = camAt(pp);
+  if (cam.k === 'tilt') pintaGiro(ctx, cam.t);
+  else pintaNivel(ctx, cam.L, cam.cx, cam.cy, cam.f, cam.cre);
+  ctx.setTransform(1,0,0,1,0,0);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(12,8,4,.28)'); ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.k === 'lvl'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+const animado = cam => cam.k === 'lvl' && (cam.L === 0 || cam.L === 7 || cam.L === 8);
+
+/* ============================================================
+   TEXTOS  [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   Lo que cambia con la pasiflora vive en DICE.
+   ============================================================ */
+const fmtM = n => Math.round(n).toLocaleString('es-CO').replace(/\./g, ' ');
+const DICE = {
+  maracuya: {
+    tutor: ['Este es un cultivo de maracuyá en [[espaldera|espaldera]].', 'El manual del maracuyá describe la espaldera sencilla: deja entrar más luz y aire{6}.'],
+    hora: 'después del mediodía, entre las 12 y la 1{6}',
+    abre: ['La flor del maracuyá abre después del mediodía, entre las 12 y la 1{6}.', 'Queda abierta unas seis horas{6}.', 'En esas horas tiene que llegar el polen de otra planta.'],
+    xylo: 'Los más eficaces son abejorros negros, como Xylocopa frontalis y X. suspecta{6}.',
+    compat: ['El maracuyá casi no cuaja con su propio polen: es [[autoincompatible|autoincompatible]] entre 95 y 97 %{6}.', 'Necesita polen de otra planta, y el que lo trae es el abejorro{6}.'],
+    fruto: ['Del maracuyá polinizado al fruto maduro pasan de 55 a 60 días{6}.'],
+    fumigar: ['Si tiene que aplicar un insecticida, el manual del maracuyá pide hacerlo en las primeras horas de la mañana{6}.', 'La flor abre después del mediodía{6}: a esa hora el abejorro debe encontrar la flor limpia.'],
+    mano: { k:'hacer', s:['Si de cada 100 flores cuajan menos de 30, el manual recomienda polinizar a mano{6}.', 'Pase los dedos por las anteras de varias flores y luego, en redondo, por los estigmas de flores de otra planta{6}.'], nota:'Ayuda, pero no reemplaza al abejorro: en el ensayo de Caldas, la mano dio menos fruto que él{1}.' },
+  },
+  granadilla: {
+    tutor: ['Este es un cultivo de granadilla en [[emparrado|emparrado]].', 'Es el tutorado más usado en granadilla: un techo de alambre a unos 2 metros del suelo{9}.'],
+    hora: 'de madrugada, entre las 3 y las 5{2}',
+    abre: ['La flor de la granadilla abre de madrugada, entre las 3 y las 5{2}.', 'En ese estudio, a 2 340 metros, duró abierta hasta 36 horas{2}.'],
+    xylo: 'Los que más tocan anteras y estigmas son abejas grandes, como el abejorro Xylocopa lachnea{5}.',
+    compat: ['La granadilla sí cuaja algo con su propio polen: es [[autofertil|autofértil]]{2}.', 'Pero cuaja más cuando la visita el abejorro{2}.'],
+    fruto: ['En granadilla, el fruto cuajado se ve a los 2 días; llega a su tamaño mayor hacia el día 42 y madura hacia el día 92{9}.'],
+    fumigar: ['En granadilla, las labores de protección no deben hacerse en las primeras horas de la mañana, cuando más trabajan los polinizadores{2}.'],
+    mano: { k:'pensar', s:['En granadilla, la polinización cruzada a mano dio 70 de cada 100, y el abejorro, 59{2}.', 'Pero la mano es trabajo de cada flor, cada día. ¿Cuánto vale tener abejorros en la finca?'] },
+  },
+  gulupa: {
+    tutor: ['Este es un cultivo de gulupa en [[espaldera|espaldera]].', 'Aquí se dibuja en espaldera: las fuentes de esta pieza no comparan tutorados para la gulupa.'],
+    hora: 'temprano, entre las 6 y las 8 de la mañana{3}',
+    abre: ['La flor de la gulupa abre temprano: el 80 % abre entre las 6 y las 8 de la mañana{3}.', 'Las lluvias fuertes de ese día bajan la polinización{3}.'],
+    xylo: 'En Boyacá, sus polinizadores principales son los abejorros Xylocopa frontalis y X. lachnea{4}.',
+    compat: ['La gulupa también es [[autofertil|autofértil]]{3}.', 'Aun así, los insectos llevan su polen de planta en planta{3}.'],
+    fruto: ['La gulupa se cosecha entre los 85 y los 90 días después de la plena floración{10}.'],
+    fumigar: ['La flor de la gulupa abre de 6 a 8 de la mañana{3}.', 'Estas fuentes no dan una hora para aplicar en gulupa: lo prudente es no hacerlo con la flor abierta.'],
+    mano: { k:'pensar', s:['En gulupa, la polinización cruzada a mano dio 68 de cada 100, y los insectos, 39{3}.', 'Pero la mano es trabajo de cada flor, cada día. ¿Cuánto vale tener abejorros en la finca?'] },
+  },
+};
+function enPiso(){ // qué pasifloras se cultivan a esta altura, por las franjas de [7]
+  const o = [];
+  if (altura < 1200) o.push('el maracuyá');
+  if (altura >= 1000 && altura <= 2300) o.push('la granadilla');
+  if (altura >= 1500 && altura <= 2700) o.push('la gulupa');
+  return o;
+}
+const yLista = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+function paginaFinca(){
+  const franjas = 'En Colombia, el maracuyá se cultiva por lo general por debajo de 1 200 metros; la granadilla, entre 1 000 y 2 300; la gulupa, entre 1 500 y 2 700{7}.';
+  if (altura === null) return { k:'finca', s:['Si abre este recorrido desde Chagra, o escribe la altitud de su finca en el recuadro de arriba, esta página le dice qué pasiflora se da a su altura.', franjas], nota: espManual ? `Usted escogió ${ESP.el}.` : 'Aquí, de ejemplo, se ve el maracuyá.' };
+  const s = [`Su finca está a unos ${fmtM(altura)} metros.`];
+  const o = enPiso();
+  if (o.length) s.push(`A esa altura se cultivan en Colombia ${yLista(o)}{7}.`);
+  else if (altura > 2700) s.push('Por encima de 2 700 metros, esa fuente no registra cultivos de estas tres{7}.');
+  if (espManual) s.push(`Usted escogió ver ${ESP.el}.`);
+  else s.push(`Por eso, en este viaje, se ve ${ESP.el}.`);
+  if (ESP.k === 'maracuya') s.push('Para el maracuyá, la franja mejor va de 200 a 1 000 metros{6}.');
+  if (ESP.k === 'granadilla') s.push('Para la granadilla, un manual recomienda de 1 700 a 2 100 metros{9}.');
+  return { k:'finca', s, nota:'Son franjas de cultivos, no un límite exacto.' };
+}
+function construyeEstaciones(){
+  const D = DICE[ESP.k];
+  const cifrasMar = { k:'cifras', s:['En el maracuyá, en Caldas, a 1 050 metros{1}:', 'las flores que visitó el abejorro dieron fruto 88 de cada 100{1};', 'las polinizadas a mano, 60{1};', 'y las que quedaron sin visita, apenas 3{1}.'] };
+  const cifrasAlt = { k:'cifras', s:['En granadilla, en Caldas, a 2 340 metros: 59 de cada 100 con abejorro, 70 a mano y 34 sin visita{2}.', 'En gulupa, a la misma altura: 39 con insectos, 68 a mano y 28 sin visita{3}.'], nota:'En gulupa la cifra con insectos varió mucho con la lluvia{3}.' };
+  return [
+    { t: ESP.tutor === 'emparrado' ? 'El emparrado' : 'La espaldera', c: ESP.tutor === 'emparrado' ? 'El emparrado' : 'La espaldera', L:0, pags:[
+      { s:[D.tutor[0], 'Vamos a entrar en una flor, detrás de un [[abejorro|abejorro carpintero]].', 'Bajaremos hasta donde se hace la semilla y volveremos a subir hasta el fruto.'], nota:'Maracuyá, granadilla y gulupa son del mismo género, Passiflora{7}: sus flores se parecen.' },
+      { s:[D.tutor[1], 'Mire abajo, a la derecha: un tronco muerto con huequitos.', 'Ahí hace su nido el abejorro carpintero: en madera muerta{4}. Al final volvemos aquí.'] },
+      { s:['El recuadro de arriba dice cuánto mide de ancho lo que usted ve.', 'La última línea lo compara con un milímetro de su regla.'] },
+      paginaFinca(),
+      { k:'hacer', s:[`En ${ESP.el}, la flor abre ${D.hora}.`, 'A esa hora, párese diez minutos frente a su cultivo.', '¿Cuántos abejorros negros y grandes cuenta?'] } ] },
+    { t:'La flor', c:'La flor', L:1, pags:[
+      { s:['Esta es una flor de pasiflora, de frente.', 'Tiene cinco pétalos, cinco sépalos y una [[corona|corona]] de hilos de colores{6}.', 'En el centro, una columna, el [[androginoforo|androginóforo]], sostiene cinco [[antera|anteras]] con polen y tres [[estigma|estigmas]]{6}.'], nota:'«Columna» es una comparación.' },
+      { k:'cuando', s: D.abre },
+      { s:['El abejorro llega atraído por el color, el olor y el néctar{6}.', 'Por su tamaño, al entrar une las anteras con los estigmas{6}.', D.xylo] },
+      { s:['La [[abejamiel|abeja de miel]] también visita la flor{5}.', 'Pero es chica para esta flor: poliniza poco y puede llevarse mucho polen de las anteras{6,2}.'] },
+      { k:'pensar', s:['Si en su finca no hubiera abejorros, ¿quién llevaría el polen de una flor a otra?'] } ] },
+    { t:'La espalda del abejorro', c:'El abejorro', L:2, pags:[
+      { s:['Estamos sobre la espalda del abejorro, cubierta de pelos.', 'Arriba, una antera; en el centro, un estigma que roza la espalda.'] },
+      { s:['El polen de las pasifloras es pesado y pegajoso{6}.', 'Las anteras quedan debajo de los estigmas{6}: la polinización depende de los insectos{6}.'] },
+      { s: D.compat },
+      { s:['En una misma mata hay flores con el estilo muy curvo, a medio curvar o derecho{6}.', 'Esa curva influye en la polinización{6}.'] } ] },
+    { t:'Un grano de polen', c:'El polen', L:3, pags:[
+      { s:['Este es un grano de polen sobre el estigma, la punta del pistilo{15}.', 'Las bolitas verdes de abajo son las celditas del estigma.'], nota:'«Bolitas» es una comparación.' },
+      { k:'tam', s:['En la badea, una pasiflora pariente, el grano mide de 51 a 100 [[micra|micras]]{14}.', 'Una micra es la milésima parte de un milímetro{16}.', 'En un milímetro caben de 10 a 20 granos en fila.'], nota:'La medida es de la badea: esa base no la trae para estas tres.' },
+      { s:['Su superficie es como una red, con tres surcos que se unen{14}.', 'El grano echa un tubo: el [[tubo|tubo polínico]]{15}.', 'El tubo se mete en el estigma y baja{15}.'], nota:'«Red» es una comparación.' } ] },
+    { t:'El tubo baja', c:'El tubo', L:4, pags:[
+      { s:['Ahora vemos el pistilo cortado de lado, como una tajada.', 'El tubo baja por el cuello del pistilo, el [[estilo|estilo]], hacia el [[ovario|ovario]]{15}.'], nota:'«Tajada» y «cuello» son comparaciones.' },
+      { s:['Por dentro del tubo viajan dos células del polen{15}.', 'Abajo, en el ovario, esperan muchos [[ovulo|óvulos]]: un fruto de gulupa trae de 151 a 157 semillas{3}, y cada semilla sale de un óvulo{15}.'] },
+      { s:['A cada óvulo tiene que llegar un tubo, y cada tubo sale de un grano de polen{15}.', 'Por eso una flor necesita mucho polen, no uno solo.'] },
+      { s:['Al llegar, el tubo entra al óvulo por una puertica: el [[micropilo|micrópilo]]{15}.'], nota:'«Puertica» es una comparación.' } ] },
+    { t:'El óvulo', c:'El óvulo', L:5, pags:[
+      { s:['Dentro del óvulo espera la [[ovocelula|ovocélula]]{15}.', 'Una de las células del polen se une con ella: eso es la [[fecundacion|fecundación]]{15}.'] },
+      { s:['La otra célula del polen se une con dos núcleos del centro{15}.', 'De ahí sale el [[endospermo|endospermo]], la reserva de la semilla{15}.'] },
+      { k:'cuando', s:['En el maracuyá, la fecundación ocurre de 4 a 5 horas después de la polinización{6}.'] },
+      { s:['El óvulo fecundado se vuelve semilla{15}.'] } ] },
+    { t:'La semilla y su jugo', c:'La semilla', L:6, pags:[
+      { s:['Volvimos a subir, y pasaron los días.', 'Esta es una semilla, cortada, dentro del fruto.', 'La envuelve una bolsita de jugo, el [[arilo|arilo]]: eso es la pulpa que uno se come{9}.'], nota:'«Bolsita» es una comparación.' },
+      { k:'cuando', s:['En el maracuyá, el arilo es una telita cuando abre la flor{9}.', 'Hacia el día 10 ya es una bolsita; hacia el 25 tiene pulpa jugosa; hacia el 75 está completo{9}.'], nota:'Es un estudio de 1965 en maracuyá, citado en el libro de la granadilla.' },
+      { k:'tam', s:['La semilla del maracuyá mide de 6 a 8 milímetros de largo{6}.', 'Su cubierta es dura, con muchos hoyitos{6}.'] },
+      { s:['Cada semilla salió de un óvulo fecundado{15}.', 'Más óvulos fecundados dan más semillas, más jugo y frutos más grandes{6}.'] } ] },
+    { t:'El fruto', c:'El fruto', L:7, pags:[
+      { s:['Aquí hay dos mitades de fruto, dibujadas para comparar.', 'La de la izquierda recibió mucho polen: muchas semillas, mucho jugo{6}.', 'La de la derecha recibió poco: pocas semillas, casi vacía.'], nota:'Es una comparación dibujada, no la foto de un fruto medido.' },
+      ESP.k === 'maracuya' ? cifrasMar : cifrasAlt,
+      ESP.k === 'maracuya' ? cifrasAlt : cifrasMar,
+      { k:'cifras', s:['En el ensayo del maracuyá, los frutos que polinizó el abejorro pesaron 203 gramos en promedio, y los de la mano, 187,5{1}.'] },
+      { k:'cuando', s: D.fruto },
+      D.mano ] },
+    { t:'De vuelta a la finca', c:'La finca', L:8, pags:[
+      { s:['Volvimos a la ' + (ESP.tutor === 'emparrado' ? 'finca.' : 'espaldera.'), 'Aquí está lo que cuida la cosecha: el abejorro, el cuello de la mata y el fruto.'] },
+      { k:'hacer', s:['El abejorro carpintero hace el nido en madera muerta{4}.', 'En Boyacá los encontraron en troncos de aliso muerto, postes de cerca, un tronco caído y vigas de techo{4}.', 'El manual del maracuyá recomienda dejar madera al inicio de cada surco{6}.'], nota:'No queme ni saque todos los palos secos del borde del cultivo.' },
+      { k:'cuidado', s:['¿Y los nidos hechos a mano?', 'En Boyacá probaron tubos de bambú: de cada 200, en el maracuyá se usaron 6, y en granadilla y gulupa, ninguno{4}.', 'Cuidar la madera que ya hay es más seguro que esperar que usen un nido nuevo.'] },
+      { k:'cifras', s:['En Brasil, poner postes con nidos subió el fruto del maracuyá de 3 a 25 de cada 100 flores{1}.'], nota:'Es un estudio de 1996 citado en la fuente 1; no se leyó el original.' },
+      { k:'cuidado', s: D.fumigar.concat(['El fipronil es un insecticida que se mete en la planta y llega al néctar y al polen{13}.', 'En 2021 el ICA suspendió su registro para pasifloras{13}.']) },
+      { k:'pensar', s:['Un estudio citado en la fuente 1 dice que dejar de usar herbicidas alrededor del cultivo bastaría para favorecer al abejorro{1}.', '¿Qué florece al borde de su cultivo?'] },
+      { s:['Mire la mata de la izquierda: tiene [[secadera|secadera]].', 'Es un hongo del suelo, Fusarium, que entra por heridas en el cuello de la mata o por las raíces{6}.', 'Tapa los vasos del tallo: la mata se marchita y muere{6}.', 'Está en la mayoría de las zonas productoras del país, y la favorece la humedad junto a la base del tallo{8}.'], nota:'Un estudio dice que puede causar pérdidas del 90 al 100 % en cultivos comerciales{11}.' },
+      { k:'hacer', s:['Siembre plántulas de viveros con registro del ICA{6}.', 'Haga zanjas para que no se encharque, sobre todo alrededor del cuello{6}.', 'No hiera el cuello al desyerbar, y desinfecte la herramienta{6,9}.', 'Use solo materia orgánica bien compostada{6}.'] },
+      { k:'hacer', s:['Si una mata se enferma, sáquela del lote y no vuelva a sembrar en ese sitio en por lo menos seis meses{6}.', 'El hongo [[trichoderma|Trichoderma]], aplicado al sembrar, ayuda a prevenirla{6,9}.', 'Hay [[portainjerto|patrones]] de cholupa que resisten al Fusarium{6}.'] },
+      { s:['Mire el fruto con manchas como verrugas: eso es la [[rona|roña]]{6}.', 'La causa el hongo Cladosporium cladosporioides{12}.', 'En el maracuyá ataca más con calor de más de 30 grados, lluvias y aire muy húmedo{6}.'] },
+      { k:'hacer', s:['En época de lluvias revise los frutos: si más de 5 de cada 100 tienen roña, actúe{6}.', 'Pode lo enfermo y deje entrar el aire: surcos a 3 metros o más{6}.', 'Recoja los frutos con roña y entiérrelos{6}.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>` } ] },
+  ];
+}
+let ESTACIONES = construyeEstaciones();
+const PASO = { t:'Pasan los días', c:'Subida', pags:[{ s:['Subimos otra vez, despacio.', 'Mientras tanto pasan los días: el óvulo se vuelve semilla{15} y a su alrededor crece la bolsita de jugo{9}.'] }] };
+
+const GLOS = [
+  ['espaldera', 'Espaldera', 'Tutorado de postes con alambres, donde trepa la mata. En maracuyá deja entrar más luz y aire{6}.'],
+  ['emparrado', 'Emparrado', 'Tutorado en forma de techo de alambre, a unos 2 metros del suelo. Es el más usado en granadilla{9}.'],
+  ['abejorro', 'Abejorro carpintero', 'Abeja grande, solitaria y oscura del género <i>Xylocopa</i>, que hace el nido en madera muerta{4}. Es el polinizador más eficaz de las pasifloras{6,4}.'],
+  ['abejamiel', 'Abeja de miel', '<i>Apis mellifera</i>. En granadilla fue la visitante más frecuente{5}, pero es chica para su flor: poliniza poco y puede sacar mucho polen{6}.'],
+  ['corona', 'Corona', 'Los hilos de colores alrededor del centro de la flor. En maracuyá miden de 35 a 45 mm, púrpura en la base y blancos en la punta{6}.'],
+  ['androginoforo', 'Androginóforo', 'La columna del centro de la flor que sostiene los estambres y el pistilo{6}.'],
+  ['antera', 'Antera', 'La punta del estambre, donde está el polen. La flor de maracuyá tiene cinco{6}.'],
+  ['estigma', 'Estigma', 'La punta del pistilo, donde cae el polen{15}. La flor de maracuyá tiene tres{6}.'],
+  ['estilo', 'Estilo', 'El cuello del pistilo. Por dentro de él baja el tubo polínico{15}.'],
+  ['autoincompatible', 'Autoincompatible', 'Planta que casi no forma fruto con su propio polen y necesita el de otra planta. El maracuyá lo es entre 95 y 97 %{6}.'],
+  ['autofertil', 'Autofértil', 'Planta que puede formar algo de fruto con su propio polen, como la granadilla{2} y la gulupa{3}.'],
+  ['micra', 'Micra (µm)', 'La milésima parte de un milímetro{16}.'],
+  ['tubo', 'Tubo polínico', 'El tubo que echa el grano de polen. Baja por el estilo y lleva dos células del polen hasta el óvulo{15}.'],
+  ['ovario', 'Ovario', 'La parte de abajo del pistilo, donde están los óvulos{15}.'],
+  ['ovulo', 'Óvulo', 'Lo que espera dentro del ovario. Fecundado, se vuelve semilla{15}.'],
+  ['micropilo', 'Micrópilo', 'La puertica del óvulo por donde entra el tubo polínico{15}.'],
+  ['ovocelula', 'Ovocélula', 'La célula del óvulo que se une con una célula del polen{15}.'],
+  ['fecundacion', 'Fecundación', 'Cuando una célula del polen se une con la ovocélula. La otra célula del polen forma el endospermo{15}.'],
+  ['endospermo', 'Endospermo', 'La reserva de comida de la semilla{15}.'],
+  ['arilo', 'Arilo', 'La bolsita de jugo que envuelve cada semilla de las pasifloras: es la pulpa que uno se come{9}.'],
+  ['secadera', 'Secadera', 'Enfermedad de las pasifloras causada por el hongo del suelo <i>Fusarium solani</i> f. sp. <i>passiflorae</i>. Entra por heridas del cuello o por las raíces y tapa los vasos del tallo{6}. Está en la mayoría de las zonas productoras{8}. En granadilla de Nariño se halló también <i>Fusarium oxysporum</i>{17}.'],
+  ['rona', 'Roña', 'Enfermedad del fruto y la hoja causada por el hongo <i>Cladosporium cladosporioides</i>{12}: manchas pardas como verrugas que bajan el precio de la fruta{6}.'],
+  ['trichoderma', 'Trichoderma', 'Hongo que ayuda a prevenir la secadera; se aplica en el vivero o al trasplantar{6}.'],
+  ['portainjerto', 'Patrón o portainjerto', 'La planta de abajo de un injerto, que pone las raíces. La cholupa (<i>Passiflora maliformis</i>) se usa porque resiste al <i>Fusarium solani</i>{6}.'],
+];
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '').replace(/<[^>]+>/g, ''); }
+
+const riel = $('riel');
+function pintaRiel(){ riel.innerHTML = ''; ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); }); ultEst = -1; }
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuándo?', cifras:'Las cifras', cuidado:'Con cuidado', finca:'Su finca' };
+const cabDe = P => P.cab || (P.k ? CAB[P.k] : '');
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (cabDe(P)) h += `<p class="cab-pag">${cabDe(P)}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' || P.k === 'finca' || P.k === 'cuidado' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length){ voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => { i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz(); };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (cabDe(P) ? ' ' + cabDe(P) + '.' : ''), turno, sigue);
+  else if (cabDe(P)) di(cabDe(P) + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #f2c14e'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click', () => abreRepaso());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } } }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'µm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){
+  if (x < 10) return '×' + fmt3(x);
+  const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2);
+  return '×' + miles(Math.round(r));
+}
+function fmtRegla(m){
+  const mm = m * 1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1 / mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / q) * q; }
+  return `caben ${miles(r)} en 1 mm`;
+}
+let anchoInicial = 0;
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial / ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+  let st = 0; for (let i = 0; i < NEST; i++){ if (p >= EST[i].a - 0.4) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const enSubida = cam.k === 'lvl' && cam.seg.k === 'out' && cam.seg.L === 6;
+  const cap = vis ? 'e' + st : enSubida ? 's' : '';
+  $('vEstacion').textContent = `${st+1}/${NEST} · ${e.c}`;
+  const mo = momento(p); if ($('vMomento').textContent !== mo) $('vMomento').textContent = mo;
+  const nota = p > EST[2].a - 0.3 ? 'Tamaños aproximados. Colores de dibujo.' : 'Tamaños aproximados.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else {
+      estAct = cap === 's' ? PASO : e; pagAct = 0;
+      $('fNum').textContent = cap === 's' ? 'De paso, entre el óvulo y la semilla' : `Estación ${st+1} de ${NEST}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = cap === 's' ? 'De paso: pasan los días' : `Estación ${st+1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  const op = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.opacity = op; $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  $('ubicacion').classList.toggle('oculto', p > 0.3);
+  riel.classList.toggle('callado', p < 0.65);
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+function etqEstacion(st){
+  if (st === 0){ const P = PORTAL[0]; return [['Esta flor', P.x - 0.01, P.y + 0.01], ['Abejorro carpintero', 0.14, -0.12], ['Madera muerta', 0.3, TRONCO.y], [ESP.tutor === 'emparrado' ? 'Emparrado' : 'Espaldera', -0.12, ALAMBRE - 0.03], ['Fruto', FINCA.frutos[0].x, FINCA.frutos[0].y]]; }
+  if (st === 1){ const A = FLOR.anteras[3], Q = FLOR.estig[2], t = A2a1(TORAX2.x, TORAX2.y), fl = FLOR.fil[20];
+    return [['Antera', Math.cos(A.a)*A.r, Math.sin(A.a)*A.r], ['Estigma', Math.cos(Q.a)*Q.r, Math.sin(Q.a)*Q.r], ['Corona', fl.pts[7][0]*ESP.flor, fl.pts[7][1]*ESP.flor], ['Abejorro', t[0] + 0.03, t[1] + 0.03], ['Pétalo', Math.cos(FLOR.petalos[3].a)*0.22*ESP.flor, Math.sin(FLOR.petalos[3].a)*0.22*ESP.flor]]; }
+  if (st === 2){ return [['Estigma', ESTIG2.x - 0.05, ESTIG2.y], ['Antera', ANT2.x + 0.1, ANT2.y - 0.02], ['Polen en la espalda', TORAX2.x + 0.05, TORAX2.y + 0.06], ['Estilo', lerp(CEN2[0], ESTIG2.x, 0.55), lerp(CEN2[1], ESTIG2.y, 0.55) - 0.02]]; }
+  if (st === 3){ const tip = ESTIG.tubo[Math.max(1, Math.floor(E.tubo3*(ESTIG.tubo.length - 1)))]; return [['Grano de polen', 0.02, -0.03], E.tubo3 > 0.3 ? ['Tubo', tip[0], tip[1]] : null, ['Estigma', -0.4, 0.38]]; }
+  if (st === 4){ const g4 = tuboHasta(); const tip = PIS.camino[Math.max(1, Math.floor(g4*(PIS.camino.length - 1)))]; return [['Tubo', tip[0], tip[1]], ['Estilo', 1.6, 17], ['Ovario', 7.4, 41], ['Óvulo', PORTAL[4].x - 0.4, PORTAL[4].y + 0.6], ['Estigma', 4.5, 1.2]]; }
+  if (st === 5){ return [['Ovocélula', 0.03*OV, -0.15*OV], ['Micrópilo', 0, -0.4*OV], ['Núcleos del centro', 0.02*OV, 0.03*OV], ['Tubo', 0.006*OV, -0.62*OV], ['Óvulo', 0.4*OV, 0.2*OV]]; }
+  if (st === 6){ return [['Semilla', 0.05, 0.05], ['Arilo: el jugo', 0.16, -0.1], ['Pared del fruto', -0.42, -0.55]]; }
+  if (st === 7){ return [['Mucho polen', FR7[0].x - 0.05, FR7[0].y - 0.12], ['Poco polen', FR7[1].x + 0.05, FR7[1].y - 0.1], ['Semilla con su arilo', PORTAL[7].x, PORTAL[7].y]]; }
+  if (st === 8){ const fr = FINCA.frutos[5]; return [['Secadera', SECA.x - 0.05, -0.05], ['Cuello', CUELLO.x, SUELO - 0.012], ['Nidos en la madera', TRONCO.huecos[0], TRONCO.y - 0.004], ['Fruto con roña', fr.x, fr.y], ['Zanja', -0.06, 0.322], ['Cosecha', PORTAL[8].x, PORTAL[8].y]]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(18,13,8,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(18,13,8,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  if (cam.k === 'lvl' && cap && cap[0] === 'e' && cam.L === EST[st].L && !(PORT && p < 0.5)) lista = etqEstacion(st);
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const Ee = nodoEtq(i);
+    if (!it){ Ee.el.style.opacity = 0; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (Ee.txt !== txt){ Ee.txt = txt; Ee.el.textContent = txt; Ee.w = Ee.el.offsetWidth; Ee.h = Ee.el.offsetHeight; }
+    const w = Ee.w || 80, h = Ee.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break; } }
+    const op = ok ? 1 : 0;
+    Ee.el.style.opacity = op; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = op;
+    if (!ok) continue;
+    Ee.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const Ln of [Ee.ln, Ee.halo]){ Ln.setAttribute('x1', ax.toFixed(1)); Ln.setAttribute('y1', ay.toFixed(1)); Ln.setAttribute('x2', lx.toFixed(1)); Ln.setAttribute('y2', ly.toFixed(1)); }
+    Ee.pt.setAttribute('cx', ax.toFixed(1)); Ee.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+function construyePreg(){ return [
+  { q:'¿Dónde recibe la flor el polen?', ops:[{ m:2, n:'El estigma' }, { m:0, n:'La espaldera' }, { m:7, n:'El fruto' }], ok:0, si:'Eso es: en el estigma, la punta del pistilo, que roza la espalda del abejorro.', no:'Esa no. Busque la parte que toca la espalda del abejorro.' },
+  { q:'¿Dónde hace su nido el abejorro carpintero?', ops:[{ t:'En madera muerta' }, { t:'En la tierra' }, { t:'En las hojas' }], ok:0, si:'Eso es: en troncos secos, postes viejos y vigas. Por eso se cuida la madera muerta.', no:'Esa no. Acuérdese del tronco con huequitos.' },
+  { q:'¿Qué es cada semilla del fruto?', ops:[{ t:'Un grano de polen' }, { t:'Un óvulo fecundado' }, { t:'Un huevo de insecto' }], ok:1, si:'Eso es: cada semilla fue un óvulo, y a cada óvulo le llegó su tubo de polen.', no:'Esa no. Piense en lo que había dentro del ovario.' },
+  { q:'¿Por qué un fruto sale con poco jugo?', ops:[{ t:'Le sobró sol' }, { t:'Le faltó cal' }, { t:'Le llegó poco polen' }], ok:2, si:'Eso es: pocas semillas fecundadas, pocos arilos, poco jugo.', no:'Mire otra vez las dos mitades de fruto.' },
+  { q:'¿Por dónde entra la secadera a la mata?', ops:[{ t:'Por las flores' }, { t:'Por heridas en el cuello y las raíces' }, { t:'Por el fruto' }], ok:1, si:'Eso es: por eso no se hiere el cuello al desyerbar y no se deja encharcar.', no:'Esa no. Busque abajo, donde la mata entra al suelo.' },
+  ESP.k === 'maracuya'
+    ? { q:'Si tiene que fumigar el maracuyá, ¿a qué hora?', ops:[{ t:'Temprano en la mañana' }, { t:'Después del mediodía' }, { t:'A cualquier hora' }], ok:0, si:'Eso es: la flor abre después del mediodía, que es la hora del abejorro.', no:'Esa no. ¿A qué hora abre la flor del maracuyá?' }
+    : { q:`¿Cuándo no se debe fumigar ${ESP.el}?`, ops:[{ t:'Con la flor abierta, en la mañana' }, { t:'Por la tarde' }, { t:'Nunca importa' }], ok:0, si:'Eso es: la flor abre temprano y a esas horas trabajan los polinizadores.', no:'Esa no. ¿A qué hora abre su flor?' },
+]; }
+let PREG = construyePreg();
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, bw: buf.width, bh: buf.height, E };
+  W = H = S = lado; DPR = 1; PORT = false; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  const pp = i === 5 ? segDe(5).b - 0.1 : i === 0 ? 0.3 : estP(i); E = estado(pp); const cam = camAt(pp);
+  try { pintaNivel(x, cam.L, cam.cx, cam.cy, cam.f, cam.cre); } finally { ({ W, H, S, DPR, PORT, E } = g); buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó de la flor hasta el óvulo, y subió hasta el fruto.</p><p>La próxima vez que vea un abejorro negro en su cultivo, mire dónde vive.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver a la espaldera</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80) / 3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function paradas(){ const o6 = SEGS[SEGS.indexOf(segDe(6)) - 1]; const out = []; for (let i = 0; i < NEST; i++){ out.push(estP(i)); if (i === 5) out.push(o6.a + 0.5*o6.w); } return out; }
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un zumbido sintetizado, que se apaga al bajar al óvulo
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+function rotuloSon(){ bSon.querySelector('.est').textContent = audio && audio.on ? 'sí' : 'no'; bSon.setAttribute('aria-pressed', String(!!(audio && audio.on))); bSon.setAttribute('aria-label', audio && audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el zumbido'); }
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'bandpass'; filtro.Q.value = 1.2; filtro.frequency.value = 600; filtro.connect(master);
+      const lfo = ac.createOscillator(); lfo.frequency.value = 5.5; const lg = ac.createGain(); lg.gain.value = 9; lfo.connect(lg); lfo.start();
+      const oscs = [[132, 'sawtooth', 0.3], [133.2, 'sawtooth', 0.25], [66, 'triangle', 0.35]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; lg.connect(o.frequency); const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.07 : 0, t, 0.25);
+    rotuloSon();
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){
+  if (!audio || !audio.on) return; const t = audio.ac.currentTime;
+  const cerca = cam.k === 'lvl' && (cam.L <= 2 || cam.L >= 7) ? 1 : 0.25;
+  audio.master.gain.setTargetAtTime(0.07*cerca, t, 0.4);
+  audio.filtro.frequency.setTargetAtTime(cerca > 0.5 ? 600 : 260, t, 0.4);
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false;
+  anchoInicial = F[0] * (W / S);
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom);
+  document.documentElement.style.setProperty('--ubic-top', (mb + 10) + 'px');
+  const ub = $('ubicacion'), abierto = ub.open; ub.open = false; const ubb = Math.round(ub.getBoundingClientRect().bottom); ub.open = abierto;
+  tt.style.top = W <= 640 ? (ubb + 10) + 'px' : '';
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   LA FINCA: interfaz de altitud
+   ============================================================ */
+function mostrarOrigen(){
+  const sum = altura === null ? (espManual ? `Escogida: ${ESP.n} · toque para cambiar` : 'Altitud de ejemplo · toque para poner la suya') : `${origenAlt} · ${fmtM(altura)} m${municipio ? ' · ' + municipio : ''} · ${ESP.n}`;
+  $('origenPiso').textContent = sum;
+  $('alturaFinca').value = altura === null ? '' : altura;
+  const o = altura === null ? [] : enPiso();
+  $('detallePiso').textContent = altura === null ? 'La altitud de su finca cambia qué pasiflora se ve: maracuyá, granadilla o gulupa. Nada de esto se guarda ni se envía.'
+    : o.length ? `A esa altura se cultivan ${yLista(o)}. Se ve ${ESP.el}${espManual ? ', que usted escogió' : ''}.` : `Por encima de 2 700 m no hay cultivos registrados de estas tres. Se ve ${ESP.el}.`;
+  $('subtitulo').textContent = `${ESP.tutor === 'emparrado' ? 'Del emparrado' : 'De la espaldera'} a la flor ${ESP.del}, al abejorro carpintero que la poliniza, y de vuelta hasta el fruto.`;
+  for (const b of document.querySelectorAll('#ubicacion [data-esp]')) b.setAttribute('aria-pressed', String(b.dataset.esp === ESP.k));
+}
+function rehacer(){
+  ESP = ESPS[espDePiso()];
+  ESTACIONES = construyeEstaciones(); PREG = construyePreg(); pintaRiel(); mini = {}; texOK = false;
+  ultCap = ''; sucio = true; mostrarOrigen();
+}
+function cambiarAltura(alt, fuente){ altura = alt; origenAlt = fuente; espManual = null; rehacer(); }
+for (const b of document.querySelectorAll('#ubicacion [data-esp]')) b.addEventListener('click', () => { espManual = b.dataset.esp; rehacer(); $('ubicacion').open = false; });
+$('alturaManual').addEventListener('submit', e => { e.preventDefault(); const alt = numero($('alturaFinca').value, 0, 6000); if (alt !== null){ cambiarAltura(alt, 'Altitud que usted dio'); $('ubicacion').open = false; } });
+$('usarUbicacion').addEventListener('click', () => {
+  const estado = $('estadoUbicacion');
+  if (!navigator.geolocation){ estado.textContent = 'Este navegador no ofrece ubicación. Escriba la altitud de su finca.'; return; }
+  estado.textContent = 'Esperando su permiso de ubicación…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const alt = numero(pos.coords.altitude, 0, 6000);
+    if (alt === null){ estado.textContent = 'El aparato dio coordenadas sin altitud. Escriba los metros de su finca.'; return; }
+    cambiarAltura(alt, 'Altitud del aparato (aproximada)'); estado.textContent = 'La altitud del aparato puede ser distinta de la de la finca.'; $('ubicacion').open = false;
+  }, err => { estado.textContent = err.code === 1 ? 'Permiso de ubicación no concedido. Escriba la altitud de su finca.' : 'No se pudo obtener la ubicación. Escriba la altitud de su finca.'; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+});
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (!RM && !congelado) RELOJ += dt;
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 90) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i); if (rmHacia === null){ rmHacia = meta; p = meta; } if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; } }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (!RM && !congelado && animado(camAt(p))) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      cam = render(rmDesde); bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); bctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = buf.width; copia.height = buf.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      cam = render(rmHacia);
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render(p);
+    actualizaUI(cam); sonido(cam);
+    sucio = RM && rmT < 1;
+  }
+  requestAnimationFrame(cuadro);
+}
+let congelado = qs.has('quieto');
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+pintaRiel();
+redim();
+mostrarOrigen();
+if (altura === null){
+  const lat = numero(qs.get('lat'), -90, 90), lon = numero(qs.get('lon'), -180, 180);
+  if (lat !== null && lon !== null) $('estadoUbicacion').textContent = 'La app entregó coordenadas sin altitud. Escriba los metros de su finca.';
+  else if (qs.has('alt')) $('estadoUbicacion').textContent = 'La altitud de la dirección no es válida. Escriba los metros de su finca.';
+  if (qs.has('lat') || qs.has('alt')) $('ubicacion').open = true;
+}
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el FPS; no altera nada) */
+window.__descenso = {
+  T, SEGS, EST, estP, camAt, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  congelar(v){ congelado = !!v; sucio = true; },
+  get altura(){ return altura; }, get especie(){ return ESP.k; }, especie_(k){ espManual = ESPS[k] ? k : null; rehacer(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, PASO, GLOS, PREG }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

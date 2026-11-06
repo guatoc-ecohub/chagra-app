@@ -1,0 +1,242 @@
+import React, { useState } from 'react';
+import { X, Check, Pencil, AlertTriangle, Loader2 } from 'lucide-react';
+import { describeComplexIngestOperation } from '../services/agentComplexIngest';
+
+/**
+ * Gate humano de las tools con escritura (actionExecutor).
+ *
+ * BUG-01 (hard-test David/Cata 2026-08-31, P1): este modal vive SIEMPRE montado
+ * (renderiza null cuando está cerrado), así que `useState(parameters)` solo
+ * capturaba los parámetros del primer render ({}). Al aprobar enviaba ese
+ * borrador rancio → el executor ejecutaba la tool con {} → la herramienta de
+ * registro NO persistía nada mientras el agente hablaba de registrar.
+ *
+ * El contrato ahora es: el caller (AgentScreen) pasa `key={gateId}` con un id
+ * único por acción, así React REMONTA este componente por cada gate y el
+ * borrador arranca siempre con los parámetros de ESA acción. Si vas a abrir
+ * este modal desde otra pantalla, pasale también un key que cambie por acción.
+ */
+/**
+ * @param {object} props
+ * @param {boolean} [props.isOpen] cerrado el modal renderiza null.
+ * @param {string} [props.toolName]
+ * @param {string} [props.description]
+ * @param {object} [props.parameters] parámetros de ESTA acción (el borrador
+ *        arranca de acá en cada remount por key).
+ * @param {string|null} [props.intent]
+ * @param {string|null} [props.llm_response]
+ * @param {(parameters: object) => Promise<void>|void} props.onApprove
+ * @param {() => Promise<void>|void} props.onReject
+ * @param {(parameters: object) => Promise<void>|void} props.onEdit
+ */
+export default function ActionConfirmModal({
+  isOpen,
+  toolName,
+  description,
+  parameters,
+  intent,
+  llm_response,
+  onApprove,
+  onReject,
+  onEdit,
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedParams, setEditedParams] = useState(parameters);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const loteOptions = Array.isArray(parameters?._loteOptions) ? parameters._loteOptions : [];
+  const isHarvest = toolName === 'crear_log' && parameters?.log_type === 'log--harvest';
+
+  if (!isOpen) return null;
+
+  const handleApprove = async () => {
+    setIsProcessing(true);
+    await onApprove(editedParams);
+    setIsProcessing(false);
+  };
+
+  const handleReject = async () => {
+    setIsProcessing(true);
+    await onReject();
+    setIsProcessing(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setIsProcessing(true);
+    await onEdit(editedParams);
+    setIsProcessing(false);
+  };
+
+  const toolLabels = {
+    crear_log: 'Crear registro',
+    actualizar_planta: 'Actualizar planta',
+    agendar_riego: 'Programar riego',
+    query_corpus_dr034: 'Buscar en corpus',
+    registrar_ingesta_compleja: 'Confirmar registro de campo',
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop decorativo: el cierre accesible es el botón X (con teclado). */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleReject} aria-hidden="true" />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Confirmar acción del agente"
+        className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/20 rounded-lg">
+              <AlertTriangle size={20} className="text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-100">
+                {toolLabels[toolName] || toolName}
+              </h3>
+              <p className="text-xs text-slate-400">Confirmar antes de ejecutar</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleReject}
+            aria-label="Cerrar y rechazar la acción"
+            className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200"
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          {intent && (
+            <div className="bg-slate-800/50 rounded-lg p-3">
+              <p className="text-xs text-slate-400 mb-1">Tu solicitud:</p>
+              <p className="text-sm text-slate-200">{intent}</p>
+            </div>
+          )}
+
+          <div>
+            <p className="text-xs text-slate-400 mb-2">Descripción de la IA:</p>
+            <p className="text-sm text-slate-300">{description}</p>
+          </div>
+
+          {isHarvest && loteOptions.length > 0 && (
+            <label className="flex flex-col gap-2">
+              <span className="text-xs font-bold text-slate-300">Lote de la cosecha</span>
+              <select
+                aria-label="Lote de la cosecha"
+                value={editedParams?.location_asset_id || ''}
+                onChange={(event) => setEditedParams((prev) => ({ ...prev, location_asset_id: event.target.value }))}
+                disabled={isProcessing}
+                className="px-3 py-2 min-h-[44px] bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200"
+              >
+                <option value="">Elija un lote o deje sin asociar</option>
+                {loteOptions.map((lote) => <option key={lote.id} value={lote.id}>{lote.name}</option>)}
+              </select>
+              {parameters?._loteHint && <span className="text-xs text-slate-400">{parameters._loteHint}</span>}
+            </label>
+          )}
+
+          <div>
+            <p className="text-xs text-slate-400 mb-2">
+              Parámetros {isEditing ? '(editando)' : ''}:
+            </p>
+            {toolName === 'registrar_ingesta_compleja' && Array.isArray(parameters?.plan?.operations) ? (
+              /* BUG-02: el plan multi-entidad se lee como lista de operaciones,
+                 no como volcado JSON crudo. Solo presentación: aprobar/editar
+                 siguen enviando el objeto de parámetros completo e intacto. */
+              <ul className="text-sm text-slate-300 list-disc list-inside space-y-1">
+                {parameters.plan.operations.map((operation, index) => (
+                  <li key={`${operation?.kind}-${index}`}>{describeComplexIngestOperation(operation)}</li>
+                ))}
+              </ul>
+            ) : isEditing ? (
+              <div className="space-y-2">
+                {Object.entries(editedParams).filter(([key]) => !key.startsWith('_')).map(([key, value]) => (
+                  <div key={key} className="flex flex-col">
+                    <label htmlFor={`action-param-${key}`} className="text-xs text-slate-500 mb-1">{key}</label>
+                    <input
+                      id={`action-param-${key}`}
+                      type={typeof value === 'number' ? 'number' : 'text'}
+                      value={value || ''}
+                      onChange={(e) =>
+                        setEditedParams((prev) => ({
+                          ...prev,
+                          [key]: typeof value === 'number' ? parseFloat(e.target.value) || 0 : e.target.value,
+                        }))
+                      }
+                      className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <pre className="text-xs text-slate-300 bg-slate-800 p-3 rounded-lg overflow-x-auto">
+                {JSON.stringify(Object.fromEntries(Object.entries(parameters || {}).filter(([key]) => !key.startsWith('_'))), null, 2)}
+              </pre>
+            )}
+          </div>
+
+          {llm_response && (
+            <div className="bg-slate-800/30 rounded-lg p-3">
+              <p className="text-xs text-slate-400 mb-1">Respuesta de la IA:</p>
+              <p className="text-xs text-slate-500 line-clamp-3">{llm_response}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 px-6 py-4 border-t border-slate-800 bg-slate-950/50">
+          {isEditing ? (
+            <>
+              <button
+                onClick={() => setIsEditing(false)}
+                disabled={isProcessing}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-sm bg-slate-800 text-slate-400 hover:bg-slate-700 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={isProcessing}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-sm bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                Guardar y ejecutar
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleReject}
+                disabled={isProcessing}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-sm bg-red-900/30 text-red-400 hover:bg-red-800/50 disabled:opacity-50"
+              >
+                Rechazar
+              </button>
+              <button
+                onClick={handleEdit}
+                disabled={isProcessing}
+                className="py-3 px-4 rounded-xl font-medium text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-50 flex items-center gap-2"
+              >
+                <Pencil size={16} />
+                Editar
+              </button>
+              <button
+                onClick={handleApprove}
+                disabled={isProcessing}
+                className="flex-1 py-3 px-4 rounded-xl font-medium text-sm bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                Aprobar
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

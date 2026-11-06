@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — del banco de forraje a la proteína que come el animal</title>
+<meta name="description" content="Un descenso ilustrado por el banco de forraje (botón de oro, nacedero, morera): la mata, el corte y el rebrote, la hoja, la célula y la proteína que llega a la vaca, la cabra y el cuy. Cifras por piso térmico con fuente, glosario, lectura en voz alta y repaso.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(16,18,12,.72); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a; --oro:#f2c94c; --duda:#f1d27f;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#10140c;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#10140c;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:125px;z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#16301c}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;text-shadow:0 0 18px rgba(240,246,238,.95),0 0 4px rgba(240,246,238,.9)}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1d3a22;max-width:28rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1d3a22;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(240,246,240,.95),0 0 14px rgba(240,246,240,.8)}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .tiempo{margin-top:6px;padding-top:6px;border-top:1px solid var(--vidrio-borde);font-family:var(--sans);font-size:1rem;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+#medidor .tiempo .rot{color:var(--tinta-2)}
+#medidor .tiempo b{font-family:var(--mono);font-weight:600;font-size:1.05rem;color:var(--duda);white-space:nowrap}
+#medidor .tiempo b.corre{color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .cab-pag.ojo{color:var(--oro)}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+/* El selector de especie: la misma mata, de botón de oro, de nacedero o de morera */
+#frase .manejo{display:flex;gap:6px;flex-wrap:wrap;margin:.2em 0 .5em}
+#frase .manejo .bc{min-height:40px;padding:6px 12px;white-space:normal;text-align:left}
+#frase .manejo .bc[aria-pressed="true"]{background:#e9dcc0;color:#1d140c;border-color:transparent;font-weight:600}
+#frase .efecto{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);margin:.1em 0 .5em}
+#frase .tabla{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:1rem;margin:.3em 0 .4em;color:var(--tinta)}
+#frase .tabla td{padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.1);vertical-align:baseline}
+#frase .tabla td.n{font-family:var(--mono);text-align:right;white-space:nowrap;color:var(--acento-tinta)}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(16,18,10,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(16,18,12,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(40,46,30,.85);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button.tiempo i{border-radius:2px}
+#riel button.sube i{border-style:dashed}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+#riel.callado button span{opacity:0!important}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#151a10;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(6,8,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#151a10;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg h3{font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--acento-tinta);margin:1.2em 0 .2em}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+#fuentes a{color:var(--acento-tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#20271a;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* La ubicación: el piso de la finca */
+#ubicacion{position:fixed;z-index:5;left:16px;top:16px;width:min(26rem,calc(100vw - 32px));background:rgba(240,246,232,.96);color:#19351d;border:1px solid #678052;border-radius:14px;padding:10px 14px;font-size:1rem;box-shadow:0 4px 20px #10201022}
+#ubicacion summary{cursor:pointer;font-weight:650;line-height:1.4;min-height:28px}
+#ubicacion p{margin:.5em 0;line-height:1.4}
+#ubicacion select,#ubicacion input{font:inherit;max-width:100%;min-height:44px;border:1px solid #678052;border-radius:8px;padding:6px;background:#fff;color:#19351d}
+#ubicacion button{background:#294c2b;color:#fff;border-radius:9px;padding:8px 12px;min-height:44px;border:0;cursor:pointer}
+#ubicacion label{display:block;margin:6px 0}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);top:var(--med-top,64px);bottom:auto;min-width:0;padding:6px 12px 6px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .tiempo{grid-column:1 / -1;justify-content:flex-start;gap:8px;margin-top:4px;padding-top:4px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px;max-height:46vh;overflow:auto}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .btn{padding:10px 10px;font-size:.95rem}
+  #bSonido .lbl{display:none}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+  #ubicacion[open]{max-height:52vh;overflow:auto}
+}
+@media (max-width:640px){
+  #medidor .nota{display:none}
+  .btn{padding:10px 8px}
+  #ubicacion{padding:6px 12px}
+}
+@media (max-width:370px){ .btn{padding:10px 6px;font-size:.9rem} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+body[data-piso="limite"] #lienzo,body[data-piso="limite"] #etiquetas,body[data-piso="limite"] #riel,body[data-piso="limite"] #frase,body[data-piso="limite"] #controles,body[data-piso="limite"] #medidor{visibility:hidden}
+body[data-piso="limite"] #titulo .pista{display:none}
+body[data-piso="limite"]{background:linear-gradient(#bdcfbb,#e1e9d6)}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso ilustrado desde un banco de forraje hasta la proteína de la hoja, y de vuelta al animal que la come" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<details id="ubicacion">
+ <summary id="origenPiso" aria-live="polite">Piso de ejemplo · Frío</summary>
+ <p id="detallePiso">Elija un piso o use su ubicación. La altitud orienta; el clima y el suelo de su finca también cuentan.</p>
+ <label>Piso de ejemplo <select id="selectorPiso"><option value="calido">Cálido</option><option value="templado">Templado</option><option value="frio">Frío</option><option value="limite">Límite con el páramo</option></select></label>
+ <p>Puede usar la ubicación de este dispositivo para orientar el piso térmico. No se guarda ni se envía.</p>
+ <button id="usarUbicacion" type="button">Usar mi ubicación</button>
+ <p id="estadoUbicacion" role="status"></p>
+ <form id="alturaManual"><label>Altitud de su finca (m) <input id="alturaFinca" type="number" min="0" max="6000" step="any" required></label><button type="submit">Usar esta altitud</button></form>
+</details>
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p id="subtitulo">Del banco de forraje a la hoja, y de la hoja a la proteína que come su vaca, su cabra o su cuy.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar ↓»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño y de tiempo">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">16,0 m</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 16 000 mm</b></div>
+  <div class="tiempo"><span class="rot">Tiempo:</span><b id="vTiempo">día 60 tras el corte</b></div>
+  <div class="estacion"><span id="vEstacion">1/8 · El banco</span><span id="vLuz">la finca</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 8</div>
+  <h2 id="fTit">El banco de forraje</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón"><span aria-hidden="true">♪ </span><span class="lbl">Sonido: </span><span class="est">no</span></button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Las cifras vienen de ensayos y fichas con su sitio y su fecha: no son una promesa para su finca. El piso se orienta por la altitud; la especie que se da bien la confirma su suelo, su lluvia y la asistencia técnica. Los tamaños del medidor y el ritmo del rebrote del dibujo son <b>aproximados</b>; los colores de la célula y del cloroplasto son <b>de dibujo</b>.</p>
+    <ol id="listaFuentes"></ol>
+    <p class="aviso" id="cuentas"></p>
+    <p class="aviso">La tabla detallada, con lo que se leyó de cada documento y lo que no se pudo verificar, está en <a href="#listaFuentes" data-f>FUENTES.md</a>.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso del banco de forraje — de la mata a la hoja, de la hoja
+   a la proteína, y de vuelta al animal que la come.
+   El motor (cámara por portales, medidor, tarjetas, voz, palabras,
+   fuentes, repaso) es el del Descenso del café, con el reloj y la
+   ubicación del Descenso del silvopastoreo.
+   La cámara la mueve solo quien mira: scroll, dedo, teclado o «Bajar».
+   [[clave|texto]] = palabra del glosario · {n,m} = fuentes numeradas
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+
+/* ---------- FUENTES: cada cifra de la pieza cita una de estas, por su número ---------- */
+const FUENTES = [
+ /* 1 */ ['IGAC · Pisos térmicos', 'Tabla 1, p. 4: cálido 0–1.000 m, templado 1.000–2.000 m, frío 2.000–3.000 m. En los límites esta pieza elige el piso de arriba. La altura orienta; no delimita el páramo.', 'https://www.igac.gov.co/sites/default/files/listadomaestro/in-agr-pc05-01_v1_actualizacion_de_areas_homogeneas_de_tierras.pdf'],
+ /* 2 */ ['Tropical Forages · Tithonia diversifolia (botón de oro)', 'Ficha técnica: hasta 2.300 m; mejor entre 15 y 31 °C; proteína cruda 14–28 % de la materia seca; estaca de 20–40 cm enterrada 10–20 cm; 0,75–2 m entre matas; usar a 1–1,5 m de alto; hojas de 7–33 × 7–22 cm con 3 o 5 lóbulos; apetecida a medias; maleza invasora en algunos países; hasta 900 000 semillas por m² al año.', 'https://tropicalforages.info/text/entities/tithonia_diversifolia.htm'],
+ /* 3 */ ['Tropical Forages · Trichanthera gigantea (nacedero)', 'Ficha técnica: nativo de Colombia; rinde mejor cerca de 30 °C de promedio; no aguanta heladas; estacas de 20 cm con 2 yemas (92 % prendieron); 0,5–1 m entre matas; hojas de unos 26 × 14 cm; cistolitos en la cara de arriba; corte y acarreo; cerca viva de 9,2 t de hoja fresca por km al año; con 30 t de estiércol por ha, 9 t de materia seca, contra 5 con 15 t (Vietnam); aceptado tras acostumbrarse.', 'https://tropicalforages.info/text/entities/trichanthera_gigantea.htm'],
+ /* 4 */ ['Rosales M. (1997). Trichanthera gigantea: a review. Livestock Research for Rural Development 9(4)', 'CIPAV. De 0 a 2.000 m; junto a quebradas y nacimientos; hoja con 15–22 % de proteína cruda, casi toda verdadera, y mucho calcio por los cistolitos; primer corte a los 8–10 meses, luego cada 2–4 meses; unas 60 t de follaje fresco por ha al año (10 t de materia seca, 2 t de proteína); corte ideal a 1 m (17 t por corte, contra 8 t a 0,6 m).', 'https://www.lrrd.org/lrrd9/4/mauro942.htm'],
+ /* 5 */ ['Guatusmal-Gelpud C. y otros (2020). Producción y calidad de Tithonia diversifolia y Sambucus nigra en trópico altoandino colombiano. Agronomía Mesoamericana 31(1): 193–208. doi:10.15517/am.v31i1.36677', 'AGROSAVIA, C.I. Obonuco (Pasto), 2.905 m y 12,8 °C (en la discusión dice 2.750 m). Hojas y tallos tiernos: a 60 días 26,73 % de proteína y 15,6 t de materia seca por ha al año; a 80 días 21,37 % y 30,6 t. Cortar a 10 o 50 cm no cambió el rendimiento; a 50 cm hubo más vigor. Sauco: 26,25 % a 60 días. Compara con un concentrado de 18 % de proteína.', 'https://doi.org/10.15517/am.v31i1.36677'],
+ /* 6 */ ['Gallego-Castro L.A., Mahecha L., Angulo J. (2016). Calidad nutricional de Tithonia diversifolia bajo tres sistemas de siembra en el trópico alto. Agronomía Mesoamericana 28(1): 213. doi:10.15517/am.v28i1.21671', 'Guarne (Antioquia), 2.453 m. Planta entera a 56 días del corte: 12,8–14,1 % de proteína cruda, sin diferencia entre estaca y semilla.', 'https://doi.org/10.15517/am.v28i1.21671'],
+ /* 7 */ ['Boschini C.F. (2002). Nutritional quality of mulberry cultivated for ruminant feeding. En: Sánchez M.D. (ed.), Mulberry for animal production. FAO, Animal Production and Health Paper 147', 'Universidad de Costa Rica, 1.542 m. Hoja: 23,5 % de proteína y 32,8 % de fibra (FDN); tallo: 8,8 % de proteína y 63,6 % de fibra. Cortes cada 56, 84 o 112 días, a 30 o 60 cm.', 'https://www.fao.org/4/x9895e/x9895e0g.htm'],
+ /* 8 */ ['Benavides J.E. y otros (2002). Supplementation of grazing dairy cattle with mulberry in Costa Rica. FAO, Animal Production and Health Paper 147', 'Seis vacas Holstein en pastoreo, 1.471 m. Con 100/0, 63/35 y 35/65 de concentrado/morera: 14,2, 13,2 y 13,8 kg de leche al día, sin diferencia significativa. Costo del concentrado: 135 983 frente a 40 561 colones (1995).', 'https://www.fao.org/4/x9895e/x9895e0f.htm'],
+ /* 9 */ ['Uribe Trujillo F. (2002). Mulberry for rearing dairy heifers. FAO, Animal Production and Health Paper 147', 'Valle del Cauca. Estacas de 15–20 cm de tallo de más de 3 meses; 25 000–32 000 matas por ha; cortes cada 75–90 días a 20–40 cm, cada vez 1 cm más arriba; no tolera encharcamiento; 50 t de hoja fresca por ha al año; hoja con 20 % de materia seca y 15,8 % de proteína. Terneras con 50 % del concentrado (16 % de proteína) cambiado por morera: 0,406 kg al día, igual que sin cambio.', 'https://www.fao.org/4/x9895e/x9895e0j.htm'],
+ /* 10 */ ['Sánchez M.D. (2002). World distribution and utilization of mulberry and its potential for animal feeding. FAO, Animal Production and Health Paper 147', 'La hoja de morera tiene una calidad equivalente a la de los concentrados de grano; recomendada para cuyes y conejos; cosecha hoja por hoja en fincas pequeñas.', 'https://www.fao.org/4/x9895e/x9895e02.htm'],
+ /* 11 */ ['Feedipedia · Morera (Morus alba). INRAE, CIRAD, AFZ y FAO', 'Parte aérea fresca: 30,2 % de materia seca; 19,1 % de proteína cruda (11,5–26,4). Hojas alternas, base acorazonada, dentadas, enteras o con 3–5 lóbulos. Se cultiva entre 18 y 30 °C; sufre con la sequía.', 'https://www.feedipedia.org/node/123'],
+ /* 12 */ ['Feedipedia · Botón de oro (Tithonia diversifolia). Heuzé V. y otros (2016)', 'Parte aérea fresca: 19,8 % de materia seca; 21,2 % de proteína cruda (11,7–27,5). Los tallos, menos de 10 %. Cabras con botón de oro solo: menor retención de nitrógeno; hace falta complementar.', 'https://www.feedipedia.org/node/15645'],
+ /* 13 */ ['Feedipedia · Nacedero (Trichanthera gigantea). Heuzé V. y otros (2017)', 'Parte aérea fresca: 17,5 % de materia seca; 17,9 % de proteína cruda (12,0–21,7).', 'https://www.feedipedia.org/node/7270'],
+ /* 14 */ ['Cueva J.V.M. y otros (2019). Evaluación del botón de oro (Tithonia diversifolia) en la alimentación de cuyes. Idesia 37(4): 5–9. doi:10.4067/s0718-34292019000400005', '80 cuyes de engorde: con 100 % de concentrado ganaron 9,55 g al día; con 25 % de botón de oro, 8,93. Conclusión: alternativa en no más del 25 % de la dieta.', 'https://doi.org/10.4067/s0718-34292019000400005'],
+ /* 15 */ ['Elizondo-Salazar J.A. Calidad y consumo de morera, ramio y sorgo negro forrajero en cabras. Agronomía Mesoamericana 15(2): 209. doi:10.15517/am.v15i2.11915', 'Cabras con solo morera picada (90 días de rebrote) cubrieron su proteína de mantenimiento y les alcanzó para ganar más de 50 g al día.', 'https://doi.org/10.15517/am.v15i2.11915'],
+ /* 16 */ ['Ribeiro R.S. y otros (2016). Tithonia diversifolia as a supplementary feed for dairy cows. PLOS ONE 11: e0165751. doi:10.1371/journal.pone.0165751', 'Botón de oro fresco en 15,4 % de la dieta, en lugar de parte de la caña y del concentrado: sin cambio en consumo ni en leche.', 'https://doi.org/10.1371/journal.pone.0165751'],
+ /* 17 */ ['Rivera J.E. y otros (2022). Effect of Tithonia diversifolia intake on in vivo methane emission and milk production in dual-purpose cows in the Colombian Amazonian piedmont. Translational Animal Science 6: txac139. doi:10.1093/tas/txac139', 'Piedemonte amazónico colombiano: 15 % de botón de oro en una dieta de pasto aumentó la leche en la época de lluvias moderadas y bajó el metano.', 'https://doi.org/10.1093/tas/txac139'],
+ /* 18 */ ['Angulo Arizala J. y otros (2021). Producción, calidad de leche y análisis económico de vacas Holstein suplementadas con ensilaje de botón de oro o ensilaje de maíz. Biotecnología en el Sector Agropecuario y Agroindustrial 20(1): 27–40. doi:10.18684/rbsaa.v20.n1.2022.1535', 'Trópico alto: con ensilaje de botón de oro, más leche y menor costo por litro que con ensilaje de maíz.', 'https://doi.org/10.18684/rbsaa.v20.n1.2022.1535'],
+ /* 19 */ ['Clark M.A., Douglas M., Choi J. (2018). Biology 2e, §8.1. OpenStax', 'El cloroplasto: dos membranas, tilacoides apilados (granos) y el estroma alrededor; estroma no es estoma.', 'https://openstax.org/books/biology-2e/pages/8-1-overview-of-photosynthesis'],
+ /* 20 */ ['Clark M.A., Douglas M., Choi J. (2018). Biology 2e, §8.3. OpenStax', 'En el estroma, la enzima RuBisCO une el CO₂ a una molécula orgánica.', 'https://openstax.org/books/biology-2e/pages/8-3-using-light-energy-to-make-organic-molecules'],
+ /* 21 */ ['Feller U., Anders I., Mae T. (2008). Rubiscolytics: fate of Rubisco after its enzymatic function in a cell is terminated. Journal of Experimental Botany 59: 1615–1624. doi:10.1093/jxb/erm242', 'La Rubisco es la proteína que predomina en las partes que hacen fotosíntesis, y la más abundante de la Tierra.', 'https://doi.org/10.1093/jxb/erm242'],
+ /* 22 */ ['Bar-On Y.M., Milo R. (2019). The global mass and average rate of rubisco. PNAS 116: 4738–4743. doi:10.1073/pnas.1816654116', 'La Rubisco es cerca del 3 % de la masa de las hojas del planeta (peso seco).', 'https://doi.org/10.1073/pnas.1816654116'],
+ /* 23 */ ['Clark M.A., Douglas M., Choi J. (2018). Biology 2e, §34.1. OpenStax', 'Rumiantes como la vaca y la cabra: estómago de cuatro partes; rumen y retículo con microbios que digieren la fibra.', 'https://openstax.org/books/biology-2e/pages/34-1-digestive-systems'],
+ /* 24 */ ['Bach A., Calsamiglia S., Stern M. (2005). Nitrogen metabolism in the rumen. Journal of Dairy Science 88: E9–E21. doi:10.3168/jds.S0022-0302(05)73133-7', 'La proteína del alimento la degradan los microbios del rumen, que con ese nitrógeno fabrican proteína microbiana.', 'https://doi.org/10.3168/jds.S0022-0302(05)73133-7'],
+ /* 25 */ ['Boschini-Figueroa C. (2005). Nutrientes digeribles, energía neta y fracciones proteicas de la morera aprovechables en vacas lecheras. Agronomía Mesoamericana 17(2): 141. doi:10.15517/am.v17i2.5154', 'En 48 horas en el rumen se degradó del 80 al 90 % de la proteína de la morera, según la edad del rebrote (70 a 112 días).', 'https://doi.org/10.15517/am.v17i2.5154'],
+ /* 26 */ ['Franz R. y otros (2011). Intake, selection, digesta retention, digestion and gut fill of two coprophageous species, rabbits and guinea pigs, on a hay-only diet. Journal of Animal Physiology and Animal Nutrition 95: 564–570. doi:10.1111/j.1439-0396.2010.01084.x', 'El cuy (Cavia porcellus) es coprófago: un mecanismo del colon separa la materia bacteriana que el animal vuelve a comer.', 'https://doi.org/10.1111/j.1439-0396.2010.01084.x'],
+ /* 27 */ ['Clark M.A., Douglas M., Choi J. (2018). Biology 2e, §30.4. OpenStax', 'Empalizada de células en columna, esponjoso con aire que comunica con los estomas; las dos capas con muchos cloroplastos; las venas traen agua y sacan lo que la hoja fabrica.', 'https://openstax.org/books/biology-2e/pages/30-4-leaves'],
+ /* 28 */ ['Mauricio R.M. y otros (2014). Tithonia diversifolia for ruminant nutrition. Tropical Grasslands–Forrajes Tropicales 2: 82–84. doi:10.17138/tgft(2)82-84', 'El botón de oro crece en suelos de poca fertilidad y absorbe fósforo que otras forrajeras no alcanzan; sube la proteína de la dieta a bajo costo.', 'https://doi.org/10.17138/tgft(2)82-84'],
+ /* 29 */ ['Hirakawa H. (2001). Coprophagy in leporids and other mammalian herbivores. Mammal Review 31: 61–80. doi:10.1046/j.1365-2907.2001.00079.x', 'Los herbívoros pequeños que fermentan en el ciego vuelven a comer heces blandas, ricas en vitaminas y proteína de microbios.', 'https://doi.org/10.1046/j.1365-2907.2001.00079.x'],
+];
+
+/* ---------- LAS ESPECIES: formas para el dibujo y datos con fuente ---------- */
+const ESP = {
+ boton: { nom:'botón de oro', cient:'Tithonia diversifolia', corte:0.5, alto:1.45, hoja:0.2, opuestas:false,
+   verde:['#2b5222','#41712f','#5b8f40','#7aa955'], lamina:['#3f7a2e','#5a9142','#77aa58'],
+   forma:'Hojas con 3 o 5 lóbulos y borde dentado; flores amarillas, como girasoles pequeños{2}.',
+   siembra:['Se siembra por [[estaca|estaca]]: un tallo de 20 a 40 cm, enterrado de 10 a 20 cm, como la yuca{2}.', 'Entre mata y mata, de 0,75 a 2 m{2}.'],
+   ojo:['En algunos países es maleza invasora{2}.', 'Una mata madura puede soltar hasta 900 000 semillas por metro cuadrado al año{2}.', 'Córtela antes de que eche semilla y no la deje salir del banco.'],
+   corteTxt:'a 50 cm del suelo{5}', tam:'Su hoja mide de 7 a 33 cm de largo y de 7 a 22 cm de ancho{2}.' },
+ nacedero: { nom:'nacedero', cient:'Trichanthera gigantea', corte:1.0, alto:1.75, hoja:0.26, opuestas:true,
+   verde:['#1f4422','#2f6030','#447d3e','#5e9a4e'], lamina:['#2e6a34','#468649','#62a05c'],
+   forma:'Hojas ovaladas, angostas en las dos puntas, y ramas de nudos marcados{3}.',
+   siembra:['Se siembra por [[estaca|estaca]] de 20 cm con al menos dos yemas, de la base de tallos jóvenes: prendieron 92 de cada 100{3}.', 'A los 50 días va al campo, de 0,5 a 1 m entre matas{3}.'],
+   ojo:['No aguanta heladas{3}.', 'Pide suelo que drene bien, aunque tolera suelos ácidos{3}.'],
+   corteTxt:'a 1 m del suelo, la altura ideal{4}', tam:'Su hoja mide unos 26 cm de largo por 14 de ancho{3}.' },
+ morera: { nom:'morera', cient:'Morus alba', corte:0.3, alto:1.5, hoja:0.15, opuestas:false,
+   verde:['#36622a','#517f38','#6e9c48','#8fbb60'], lamina:['#5f9a3e','#7db255','#9cc770'],
+   forma:'Hojas de base acorazonada y borde dentado, enteras o con 3 a 5 lóbulos, a veces en la misma mata{11}.',
+   siembra:['Se siembra por [[estaca|estaca]] de 15 a 20 cm, de tallo maduro de más de 3 meses{9}.', 'Se enraíza en eras y se trasplanta: de 25 000 a 32 000 matas por hectárea{9}.'],
+   ojo:['No tolera el encharcamiento{9}.', 'Sufre con la sequía{11}.'],
+   corteTxt:'a 30 cm del suelo{7}', tam:'Mire en el recuadro cuánto mide de ancho lo que ve: la hoja de morera es más chica que la del nacedero.' },
+};
+
+/* ---------- LOS PISOS: qué se propone en cada uno, y con qué respaldo ---------- */
+const PISOS = {
+ calido: { nombre:'Cálido', esp:['nacedero', 'boton', 'morera'], filas:['morera', 'nacedero', 'boton'], ojo:'cálido',
+   aqui:['El nacedero es nativo de Colombia y rinde mejor con calor: cerca de 30 °C de promedio{3}.', 'El botón de oro crece mejor entre 15 y 31 °C{2}.', 'La morera se cultiva donde los días están entre 18 y 30 °C{11}.'],
+   vaca:['En el piedemonte amazónico, vacas de doble propósito con 15 % de botón de oro en su dieta de pasto dieron más leche en la época de lluvias moderadas{17}.', 'Y soltaron menos metano{17}.'],
+   cuenta:['Una hectárea de nacedero da unas 60 toneladas de follaje fresco al año: unas 10 de [[ms|materia seca]] y 2 de proteína{4}.', 'Cien metros cuadrados darían unos 20 kg de proteína al año.', 'Es la proteína de unos 110 kg de un [[concentrado|concentrado]] de 18 %{5}.'],
+   cuentaNota:'Cuenta hecha con esas cifras: 2 t × 100 m² ÷ 10 000 m² = 20 kg; 20 ÷ 0,18 ≈ 110 kg. No cuenta la energía, que el concentrado también trae.' },
+ templado: { nombre:'Templado', esp:['morera', 'boton', 'nacedero'], filas:['morera', 'nacedero', 'boton'], ojo:'templado',
+   aqui:['La morera se ensayó como forraje a 1.471 y a 1.542 m, en Costa Rica{8,7}.', 'En Colombia llegó a las zonas cafeteras de Caldas, Risaralda y Cauca{9}.', 'El nacedero se ha encontrado de 0 a 2.000 m{4}, y el botón de oro hasta 2.300 m{2}.'],
+   vaca:['En Costa Rica, a 1.471 m, vacas Holstein en pastoreo cambiaron 65 % del concentrado por morera{8}.', 'Dieron 13,8 kg de leche al día, contra 14,2 con solo concentrado: la diferencia no fue significativa{8}.', 'Y el gasto en concentrado bajó de 135 983 a 40 561 colones{8}.'],
+   cuenta:['En el Valle del Cauca, la morera cortada cada 90 días dio 50 toneladas de hoja fresca por hectárea al año{9}.', 'Con 20 % de [[ms|materia seca]] y 15,8 % de proteína, 100 m² darían unos 16 kg de proteína al año{9}.', 'Es la proteína de unos 100 kg de un [[concentrado|concentrado]] de 16 %{9}.'],
+   cuentaNota:'Cuenta hecha con esas cifras: 50 t × 0,20 × 0,158 ≈ 1,6 t por hectárea; en 100 m², 16 kg; 16 ÷ 0,16 = 100 kg. No cuenta la energía.' },
+ frio: { nombre:'Frío', esp:['boton'], filas:['sauco', 'boton', 'boton'], ojo:'frío',
+   aqui:['A 2.905 m, en Obonuco (Pasto), AGROSAVIA cortó botón de oro cada 60 y cada 80 días{5}.', 'En el mismo ensayo evaluó el sauco, que aquí se ve atrás{5}.', 'El nacedero no aguanta heladas{3} y la morera no tiene aquí un ensayo en frío: por eso no se proponen.'],
+   vaca:['En trópico alto, vacas Holstein con ensilaje de botón de oro dieron más leche que con ensilaje de maíz{18}.', 'Y el litro les salió más barato{18}.'],
+   cuenta:['Cien metros cuadrados de botón de oro, cortado cada 60 días como en Obonuco, darían unos 156 kg de [[ms|materia seca]] al año{5}.', 'Con 26,7 % de proteína, son unos 42 kg de proteína{5}.', 'Es la proteína de unos 230 kg de un [[concentrado|concentrado]] de 18 %{5}.'],
+   cuentaNota:'Cuenta hecha con esas cifras: 15,6 t × 100 m² ÷ 10 000 m² = 156 kg; × 0,267 ≈ 42 kg; 42 ÷ 0,18 ≈ 230 kg. No cuenta la energía.' },
+};
+/* en el límite con el páramo no se propone banco: la pantalla se oculta (ver estilos), y por dentro se usa el perfil frío solo para no romper el motor */
+PISOS.limite = { ...PISOS.frio, nombre:'Límite con el páramo' };
+
+/* ---------- el piso: por la URL de la app (?alt=&municipio=&lat=&lon=), por el dispositivo o a mano ---------- */
+const normaliza = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const numero = (v, min, max) => v !== null && v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const altURL = numero(qs.get('alt'), 0, 6000);
+const muniURL = (qs.get('municipio') || '').replace(/[^\p{L}\p{N} .'-]/gu, '').trim().slice(0, 40);
+const pisoDe = alt => alt < 1000 ? 'calido' : alt < 2000 ? 'templado' : alt < 3000 ? 'frio' : 'limite';
+let piso = altURL === null ? (PISOS[qs.get('piso')] ? qs.get('piso') : 'frio') : pisoDe(altURL);
+let perfil = PISOS[piso];
+let altura = altURL, origen = altURL === null ? 'Piso de ejemplo' : 'Ubicación de la app';
+let esp = perfil.esp.includes(qs.get('esp')) ? qs.get('esp') : (perfil.esp[0] || 'boton');
+const semilla = numero(qs.get('semilla'), 0, 4294967295) ?? 20260930;
+
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false, CX = 0, CY = 0;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'), texB = document.createElement('canvas'); let texOK = false;
+
+/* ---------- utilidades (las del café, el suelo y el silvopastoreo) ---------- */
+function rng(seed){ let a = (seed + semilla) >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function mixh(a, b, t){ const A = hex(a), B = hex(b); return '#' + [0,1,2].map(i => Math.round(lerp(A[i], B[i], t)).toString(16).padStart(2, '0')).join(''); }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath(); }
+function suave(c, pts){ c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length - 1; i++){ const mx = (pts[i][0]+pts[i+1][0])/2, my = (pts[i][1]+pts[i+1][1])/2; c.quadraticCurveTo(pts[i][0], pts[i][1], mx, my); } const z = pts[pts.length-1]; c.lineTo(z[0], z[1]); }
+function cinta(c, pts, ancho){
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++){ const a = pts[Math.max(0,i-1)], b = pts[Math.min(n-1,i+1)]; let tx = b[0]-a[0], ty = b[1]-a[1]; const l = Math.hypot(tx,ty) || 1e-9; tx /= l; ty /= l; const w = ancho(i/(n-1)) / 2; L.push([pts[i][0] - ty*w, pts[i][1] + tx*w]); R.push([pts[i][0] + ty*w, pts[i][1] - tx*w]); }
+  c.moveTo(L[0][0], L[0][1]); for (let i = 1; i < n; i++) c.lineTo(L[i][0], L[i][1]); for (let i = n-1; i >= 0; i--) c.lineTo(R[i][0], R[i][1]); c.closePath();
+}
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const Lc = grid.get(key(i0+di, j0+dj)); if (!Lc) continue;
+      for (const m of Lc){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+const rot = (x, y, a) => [x*Math.cos(a) - y*Math.sin(a), x*Math.sin(a) + y*Math.cos(a)];
+
+/* ============================================================
+   NIVELES (F = ancho del cuadro de cada nivel, en metros)
+   0 la finca · 1 la mata · 2 la hoja · 3 la cara de la hoja
+   — giro: de la cara al canto —
+   4 la hoja por dentro · 5 un cloroplasto
+   Los niveles 4 y 5 viven en su propio mundo: se llega a ellos girando.
+   ============================================================ */
+const LV = [
+  { F: 16,     par: -1, nom: 'finca' },
+  { F: 2.6,    par: 0,  nom: 'mata',  k: 2.4 },
+  { F: 0.3,    par: 1,  nom: 'hoja',  k: 3.0 },
+  { F: 0.008,  par: 2,  nom: 'cara',  k: 2.2 },
+  { F: 4.12e-4, par: -1, nom: 'canto' },
+  { F: 1e-5,   par: 4,  nom: 'cloroplasto', k: 1.8 },
+];
+const KIDS = [[1], [2], [3], [], [5], []];
+LV[0].O = [0, 0]; LV[4].O = [0, 0];
+function fijaPortal(L, x, y){ const l = LV[L], P = LV[l.par]; l.x = x; l.y = y; l.s = l.F / P.F; l.O = [P.O[0] + P.F*x, P.O[1] + P.F*y]; }
+
+/* el tiempo: días desde el último corte de la mata elegida. Lo mueve el scroll en la estación 3. */
+let TAU = 60;
+const DIAS = 90;
+/* cómo se alarga el rebrote: forma de ejemplo (rápido al comienzo, más lento después), no una medición */
+const creceDe = t => t <= 0 ? 0 : (1 - Math.exp(-t/32)) / (1 - Math.exp(-DIAS/32));
+
+/* ============================================================
+   NIVEL 0 · LA FINCA (metros; y crece hacia abajo; el suelo en y ≈ 0)
+   De izquierda a derecha: el nacimiento de agua, el banco de forraje, el abono,
+   la cabra en su bastidor y, bajo el techo, la cuyera y el comedero de la vaca.
+   ============================================================ */
+const M0 = LV[0].F;
+const gF = x => 0.1*Math.sin(x*0.23 + 0.4) + 0.05*Math.sin(x*0.71 + 1.1);
+const XB = -1.4;                                            // la mata elegida, al frente del banco
+const ALTO1 = 0.8;                                         // el portal de la mata queda 0,8 m sobre su base
+fijaPortal(1, XB/M0, (gF(XB) - ALTO1)/M0);
+const GALPON = { x0: 3.9, x1: 9.0, alto: 2.55 };
+const COMEDERO = { x0: 5.25, x1: 6.85, y0: -0.62, y1: -0.3 };
+const CUYERA = { x0: 4.1, x1: 5.05, y0: -1.02, y1: -0.46 };
+const ABONO = { x: 2.45, r: 0.7 };
+const AGUA = { x: -6.2, r: 0.9 };
+const VACA_X = 8.0, CABRA_X = 3.05;
+
+let fondoN = null, fondoB = null;
+const CIELOS = {
+  calido: { cielo: ['#6ea9d6', '#a8cfe8', '#e6ecd8'], montes: ['#a8bfc8', '#8eab9c', '#6c925f'], amp: [0.12, 0.08, 0.05], loma: ['#a7b86e', '#7b9645'] },
+  templado: { cielo: ['#6aa4d4', '#a6cfe6', '#e3ecdc'], montes: ['#9fb8c6', '#7ea38f', '#5c8a52'], amp: [0.22, 0.16, 0.09], loma: ['#8fb062', '#5f8a3c'] },
+  frio: { cielo: ['#8fb0c8', '#c3d5de', '#e6ebe5'], montes: ['#9fb0bd', '#8899a0', '#6f876a'], amp: [0.3, 0.2, 0.1], loma: ['#8ea76a', '#647f46'] },
+  limite: { cielo: ['#8fb0c8', '#c3d5de', '#e6ebe5'], montes: ['#9fb0bd', '#8899a0', '#6f876a'], amp: [0.3, 0.2, 0.1], loma: ['#8ea76a', '#647f46'] },
+};
+const SOL = [0.38, -0.6];
+function pintaFondo(c){
+  const P = CIELOS[piso];
+  const g = c.createLinearGradient(0, -0.9, 0, 0.05); g.addColorStop(0, P.cielo[0]); g.addColorStop(0.5, P.cielo[1]); g.addColorStop(1, P.cielo[2]);
+  c.fillStyle = g; c.fillRect(-1, -1, 2, 2);
+  const gs = c.createRadialGradient(SOL[0], SOL[1], 0, SOL[0], SOL[1], 0.7); gs.addColorStop(0, 'rgba(255,252,236,.95)'); gs.addColorStop(0.06, 'rgba(255,248,222,.7)'); gs.addColorStop(0.3, 'rgba(255,244,214,.16)'); gs.addColorStop(1, 'rgba(255,244,214,0)');
+  c.fillStyle = gs; c.fillRect(-1, -1, 2, 2);
+  c.fillStyle = '#fffdf2'; c.beginPath(); c.arc(SOL[0], SOL[1], 0.02, 0, 7); c.fill();
+  const rn = rng(5);
+  for (let i = 0; i < 8; i++){ const x = -0.95 + rn()*1.9, y = -0.62 + rn()*0.3, w = 0.07 + rn()*0.13;
+    for (let k = 0; k < 9; k++){ const gx = x + (k - 4)*w*0.17 + (rn()-.5)*w*0.1, gy = y - Math.sin(k/8*Math.PI)*w*0.26, rr = w*(0.22 + rn()*0.16);
+      const gc = c.createRadialGradient(gx - rr*0.2, gy - rr*0.3, 0, gx, gy, rr); gc.addColorStop(0, 'rgba(255,255,255,.78)'); gc.addColorStop(0.6, 'rgba(246,248,250,.42)'); gc.addColorStop(1, 'rgba(240,244,248,0)'); c.fillStyle = gc; c.fillRect(gx - rr, gy - rr, 2*rr, 2*rr); } }
+  P.montes.forEach((col, k) => { const r = rng(9 + k*8); c.fillStyle = col; c.beginPath(); c.moveTo(-1, 0.4);
+    const base = -0.02 + k*0.014, amp = P.amp[k];
+    for (let x = -1; x <= 1.01; x += 0.01){ const y = base - amp*(0.5 + 0.5*Math.sin(x*(2.1 + k*1.7) + 3 + k))*(0.55 + 0.45*Math.sin(x*8.3 + k*2)) - (r()-.5)*0.004*(3-k); c.lineTo(x, y); }
+    c.lineTo(1, 0.4); c.closePath(); c.fill();
+    if (k === 2){ const rr = rng(44); for (let i = 0; i < 90; i++){ const x = -1 + rr()*2, y = base - 0.01 + rr()*0.04; c.fillStyle = rr() < 0.5 ? 'rgba(150,180,100,.35)' : 'rgba(70,104,56,.4)'; c.beginPath(); c.ellipse(x, y, 0.01 + rr()*0.025, 0.003 + rr()*0.004, 0, 0, 7); c.fill(); } } });
+  if (piso === 'frio'){ const gm = c.createLinearGradient(0, -0.2, 0, 0.02); gm.addColorStop(0, 'rgba(236,242,244,0)'); gm.addColorStop(0.7, 'rgba(236,242,244,.5)'); gm.addColorStop(1, 'rgba(236,242,244,.2)'); c.fillStyle = gm; c.fillRect(-1, -0.2, 2, 0.22); }
+  const gz = c.createLinearGradient(0, -0.1, 0, 0.02); gz.addColorStop(0, 'rgba(236,242,236,0)'); gz.addColorStop(1, 'rgba(236,242,236,.5)'); c.fillStyle = gz; c.fillRect(-1, -0.1, 2, 0.13);
+  const gl = c.createLinearGradient(0, 0.004, 0, 0.06); gl.addColorStop(0, P.loma[0]); gl.addColorStop(1, P.loma[1]); c.fillStyle = gl; c.beginPath(); c.moveTo(-1, 0.012); for (let x = -1; x <= 1.01; x += 0.04) c.lineTo(x, 0.01 + 0.004*Math.sin(x*7)); c.lineTo(1, 0.4); c.lineTo(-1, 0.4); c.closePath(); c.fill();
+  // fincas vecinas a lo lejos: árboles sueltos y cercas vivas, en masa
+  const ra = rng(12);
+  for (let fila = 0; fila < 3; fila++){ const y0 = 0.013 + fila*0.011, sc = 0.35 + fila*0.3, al = 0.4 + fila*0.2;
+    for (let x = -1; x < 1; x += 0.03 + ra()*0.08){ if (ra() < 0.35) continue; const R = 0.012*sc*(0.8 + ra()*0.6), h = 0.022*sc*(0.8 + ra()*0.4);
+      c.fillStyle = `rgba(${52 + fila*8},${86 + fila*10},${48},${al})`; c.beginPath(); c.ellipse(x, y0 - h*0.75, R, R*0.5, 0, 0, 7); c.fill();
+      c.fillStyle = `rgba(${96 + fila*8},${128 + fila*8},${70},${al*0.8})`; c.beginPath(); c.ellipse(x + R*0.2, y0 - h*0.82, R*0.7, R*0.28, 0, 0, 7); c.fill(); } }
+}
+function prepFondo(){
+  const res = Math.min(2600, Math.max(700, Math.round(S*DPR*1.3)));
+  const c1 = document.createElement('canvas'); c1.width = c1.height = res; const x1 = c1.getContext('2d');
+  x1.setTransform(res/2, 0, 0, res/2, res/2, res/2); pintaFondo(x1); fondoN = c1;
+  const rb = Math.max(220, Math.round(res/4)); const c2 = document.createElement('canvas'); c2.width = c2.height = rb; const x2 = c2.getContext('2d');
+  if ('filter' in x2){ x2.filter = `blur(${Math.max(2, rb/110)}px)`; x2.drawImage(c1, 0, 0, rb, rb); x2.filter = 'none'; } else x2.drawImage(c1, 0, 0, rb, rb);
+  fondoB = c2; fondoMata = null; fondoHoja = null;
+}
+
+/* ---------- las matas del banco, vistas de lejos: masa de follaje sobre tallos cortados ---------- */
+const VERDE_SAUCO = ['#22401f', '#335a2a', '#487238', '#628c48'];
+/* el banco se corta por tandas: cada tramo lleva su edad de rebrote (días), de ejemplo */
+const EDADES = [80, 18, 55, 35, 70, 8, 62];
+function verdeDe(sp){ return sp === 'sauco' ? VERDE_SAUCO : ESP[sp].verde; }
+function corteDe(sp){ return sp === 'sauco' ? 0.5 : ESP[sp].corte; }
+function altoDe(sp){ return sp === 'sauco' ? 1.45 : ESP[sp].alto; }
+const FILA_DY = [-0.95, -0.48, 0], FILA_SC = [0.84, 0.92, 1];
+function armaFila(k){
+  const sp = perfil.filas[k]; if (!sp) return null;
+  const r = rng(300 + k*17 + piso.length*3), sc = FILA_SC[k], dy = FILA_DY[k];
+  const O = { sp, tallos: new Path2D(), tocones: new Path2D(), masa: [0, 1, 2, 3].map(() => new Path2D()), flores: new Path2D(), sombra: new Path2D() };
+  const x0 = -5.0 + (k === 1 ? 0.35 : 0), x1 = 1.75;
+  for (let x = x0; x < x1; x += (0.78 + r()*0.2)*sc){
+    if (k === 2 && Math.abs(x - XB) < 0.55){ r(); continue; }           // ahí va la mata elegida
+    const edad = EDADES[Math.floor((x + 6)/1.15) % EDADES.length], g = creceDe(edad);
+    const y = gF(x) + dy, hc = corteDe(sp)*sc, h = (hc + (altoDe(sp) - hc)*g)*sc;
+    for (let t = 0; t < 4; t++){ const tx = x + (t - 1.5)*0.07*sc + (r()-.5)*0.03; O.tocones.moveTo(tx, y); O.tocones.lineTo(tx + (t - 1.5)*0.04*sc, y - hc); }
+    O.sombra.moveTo(x + 0.55*sc, y); O.sombra.ellipse(x, y, 0.55*sc, 0.07*sc, 0, 0, 7);
+    if (g < 0.05) continue;
+    const cx = x, cy = y - hc - (h - hc)*0.55, rx = (0.22 + 0.38*g)*sc, ry = (h - hc)*0.55 + 0.05, n = Math.round(10 + 34*g);
+    for (let t = 0; t < 4; t++){ const tx = x + (t - 1.5)*0.07*sc; O.tallos.moveTo(tx + (t - 1.5)*0.04*sc, y - hc); O.tallos.quadraticCurveTo(tx + (t - 1.5)*0.1*sc, y - hc - (h - hc)*0.4, tx + (t - 1.5)*0.16*sc, y - h*0.92); }
+    for (let i = 0; i < n; i++){ const a = r()*6.283, d = Math.sqrt(r()); const px = cx + Math.cos(a)*rx*d, py = cy + Math.sin(a)*ry*d; const R = (0.06 + r()*0.08)*sc*(0.6 + 0.4*g);
+      const luz = clamp(0.5 - Math.sin(a)*d*0.45 + Math.cos(a)*d*0.18 + (r() - 0.5)*0.35, 0, 0.999);
+      const M = O.masa[Math.floor(luz*4)]; M.moveTo(px + R, py); M.ellipse(px, py, R, R*0.7, r()*3, 0, 7); }
+    if (sp === 'boton' && edad >= 70){ for (let i = 0; i < 3; i++){ const fx = cx + (r()-.5)*rx*1.4, fy = cy - ry*(0.7 + r()*0.3); O.flores.moveTo(fx + 0.045*sc, fy); O.flores.arc(fx, fy, 0.045*sc, 0, 7); } }
+  }
+  return O;
+}
+let FILAS = [];
+function armaFilas(){ FILAS = [0, 1, 2].map(armaFila); }
+function pintaFila(c, k, px){
+  const O = FILAS[k]; if (!O) return;
+  const lejos = (2 - k)*0.12, V = verdeDe(O.sp), t = col => mix(col, '#a9b8a6', lejos);
+  c.fillStyle = 'rgba(20,28,12,.28)'; c.fill(O.sombra);
+  c.lineCap = 'round'; c.strokeStyle = t('#6a5a46'); c.lineWidth = Math.max(px, 0.03); c.stroke(O.tocones);
+  c.strokeStyle = rgba(O.sp === 'boton' ? '#5f7a3a' : '#5a5a3a', 0.55); c.lineWidth = Math.max(px*0.8, 0.014); c.stroke(O.tallos);
+  for (let i = 0; i < 4; i++){ c.fillStyle = t(V[i]); c.fill(O.masa[i]); }
+  c.fillStyle = t('#f2c230'); c.fill(O.flores);
+}
+
+/* ---------- la mata elegida: la MISMA geometría en la finca (de lejos) y en la mata (de cerca) ---------- */
+/* metros desde la base de la mata (y hacia abajo). Depende de la especie y de los días desde el corte. */
+const CACHE_MATA = new Map();
+function armaMata(sp, tau){
+  const dia = Math.round(clamp(tau, 0, DIAS)), key = sp + '|' + dia;
+  let M = CACHE_MATA.get(key); if (M) return M;
+  if (CACHE_MATA.size > 400) CACHE_MATA.clear();
+  const E = ESP[sp], g = creceDe(dia), r = rng(700 + sp.length*31);
+  const nT = sp === 'nacedero' ? 3 : sp === 'morera' ? 5 : 4;
+  M = { tocones: [], brotes: [], hojas: [], flores: [], hc: E.corte, g };
+  for (let t = 0; t < nT; t++){
+    const u = nT === 1 ? 0 : t/(nT - 1) - 0.5, bx = u*0.16 + (r()-.5)*0.03, tx = bx + u*0.22 + (r()-.5)*0.04, ty = -E.corte*(0.92 + r()*0.12);
+    const w = (sp === 'nacedero' ? 0.034 : 0.026)*(0.85 + r()*0.3);
+    M.tocones.push({ pts: [[bx, 0.01], [lerp(bx, tx, 0.5) + (r()-.5)*0.02, ty*0.5], [tx, ty]], w });
+    const nb = sp === 'nacedero' ? 2 : 3;
+    for (let b = 0; b < nb; b++){
+      const ub = (b - (nb - 1)/2)/(nb), a0 = -Math.PI/2 + u*0.9 + ub*1.0 + (r()-.5)*0.25;
+      const L = (E.alto - E.corte)*g*(0.78 + r()*0.32)*(1 - Math.abs(ub)*0.2);
+      if (L < 0.01){ r(); r(); continue; }
+      const pts = []; let px = tx, py = ty, a = a0; const n = 10;
+      const cae = (r() - 0.5)*0.3 + u*0.25;
+      for (let s = 0; s <= n; s++){ pts.push([px, py]); a += cae*0.06 + (r()-.5)*0.05; px += Math.cos(a)*L/n; py += Math.sin(a)*L/n; }
+      const brote = { pts, w: (sp === 'nacedero' ? 0.016 : 0.011)*(0.6 + 0.4*g) };
+      M.brotes.push(brote);
+      // las hojas en sus nudos: alternas (botón de oro, morera) u opuestas (nacedero), más chicas hacia la punta
+      const nn = Math.max(1, Math.round(2 + 9*g*(L/(E.alto - E.corte + 1e-6))));
+      for (let k = 1; k <= nn; k++){
+        const f = k/(nn + 0.4), i = Math.min(n - 1, Math.round(f*n)), p = pts[i], q = pts[Math.min(n, i + 1)];
+        const ta = Math.atan2(q[1] - p[1], q[0] - p[0]);
+        const edadNudo = (1 - f)*dia, tam = E.hoja*(0.35 + 0.65*sstep(0, 26, edadNudo))*(0.85 + r()*0.3);
+        const lados = E.opuestas ? [-1, 1] : [(k % 2) ? 1 : -1];
+        for (const lado of lados){ const aa = ta + lado*(1.0 + r()*0.35); const caida = 0.35*Math.cos(aa) > 0 ? 0.25 : -0.25;
+          M.hojas.push({ x: p[0], y: p[1], a: aa + caida*0.6, L: tam, lob: r(), z: r(), luz: r() }); }
+      }
+      if (sp === 'boton' && dia >= 70 && r() < 0.45 + (dia - 70)/40){ const z = pts[n]; M.flores.push({ x: z[0], y: z[1] - 0.05, a: a0, r: 0.032*(0.7 + 0.3*sstep(70, 90, dia)) }); }
+    }
+  }
+  M.hojas.sort((a, b) => a.z - b.z);
+  CACHE_MATA.set(key, M); return M;
+}
+/* la hoja elegida (portal del nivel 2): fija para las tres especies, al lado del sol */
+const CH = { x: 0.4, y: -0.24 - ALTO1*0, a: -0.42 };      // en metros del nivel 1 (origen = portal; la base de la mata está en y = +0,8)
+fijaPortal(2, CH.x/LV[1].F, CH.y/LV[1].F);
+
+/* ---------- la hoja de cada especie: un solo trazo, de pecíolo a punta sobre +x, largo 1 ---------- */
+const CONTORNOS = {};
+function dentado(pts, dientes, alto){ // agrega dientes al borde (borde dentado/aserrado)
+  const out = [];
+  for (let i = 0; i < pts.length - 1; i++){ const a = pts[i], b = pts[i + 1], n = Math.max(1, Math.round(Math.hypot(b[0]-a[0], b[1]-a[1])*dientes));
+    for (let k = 0; k < n; k++){ const t0 = k/n, t1 = (k + 0.6)/n; const x0 = lerp(a[0], b[0], t0), y0 = lerp(a[1], b[1], t0), x1 = lerp(a[0], b[0], t1), y1 = lerp(a[1], b[1], t1);
+      const nx = -(b[1]-a[1]), ny = b[0]-a[0], nl = Math.hypot(nx, ny) || 1; out.push([x0, y0]); out.push([x1 + nx/nl*alto, y1 + ny/nl*alto]); } }
+  out.push(pts[pts.length - 1]); return out;
+}
+function suaviza(pts){ const out = [pts[0]]; for (let i = 1; i < pts.length - 1; i++){ const a = pts[i - 1], b = pts[i], c = pts[i + 1]; out.push([lerp(a[0], b[0], 0.7), lerp(a[1], b[1], 0.7)], b, [lerp(b[0], c[0], 0.3), lerp(b[1], c[1], 0.3)]); } out.push(pts[pts.length - 1]);
+  const r = [out[0]]; for (let i = 1; i < out.length - 1; i++) r.push([(out[i - 1][0] + 2*out[i][0] + out[i + 1][0])/4, (out[i - 1][1] + 2*out[i][1] + out[i + 1][1])/4]); r.push(out[out.length - 1]); return r; }
+function contorno(sp, lob){
+  const k = sp + (lob > 0.55 ? 'L' : 'S'); if (CONTORNOS[k]) return CONTORNOS[k];
+  let lado;
+  if (sp === 'boton'){ // deltada a pentagonal, de 3 lóbulos (5 en las grandes), nervadura palmeada
+    lado = lob > 0.55 ? [[0, 0.025], [0.04, 0.1], [0.1, 0.22], [0.16, 0.34], [0.22, 0.27], [0.3, 0.36], [0.4, 0.45], [0.47, 0.3], [0.52, 0.2], [0.64, 0.21], [0.8, 0.12], [1, 0]]
+                     : [[0, 0.025], [0.05, 0.12], [0.16, 0.28], [0.32, 0.42], [0.42, 0.44], [0.47, 0.3], [0.52, 0.2], [0.65, 0.2], [0.82, 0.11], [1, 0]];
+    lado = dentado(suaviza(lado), 70, 0.0065);
+  } else if (sp === 'nacedero'){ // ovada a oblonga, angosta en los dos extremos, borde entero
+    lado = []; for (let i = 0; i <= 24; i++){ const u = i/24; lado.push([u, 0.27*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.86)), 0.95)*(1 - 0.12*u)]); }
+  } else { // morera: base acorazonada, dentada; a veces con lóbulos
+    lado = lob > 0.55 ? [[0.03, 0], [-0.02, 0.08], [0.0, 0.2], [0.1, 0.33], [0.24, 0.4], [0.36, 0.36], [0.4, 0.22], [0.48, 0.3], [0.6, 0.31], [0.78, 0.2], [1, 0]]
+                      : [[0.03, 0], [-0.03, 0.09], [-0.01, 0.22], [0.1, 0.34], [0.28, 0.41], [0.48, 0.38], [0.66, 0.29], [0.84, 0.15], [1, 0]];
+    lado = dentado(suaviza(lado), 64, 0.008);
+  }
+  const izq = lado.slice().reverse().map(([u, v]) => [u, -v]);
+  return (CONTORNOS[k] = lado.concat(izq));
+}
+const NERVIOS = { boton: [[0.62, 0.08], [0.34, 0.42], [0.18, 0.31]], morera: [[0.55, 0.0], [0.3, 0.38], [0.14, 0.32]] };
+function hojaSp(c, sp, L, lob, px, det, luz){
+  const pts = contorno(sp, lob), E = ESP[sp];
+  c.save(); c.scale(L, L);
+  const pxl = px/L;
+  // pecíolo
+  c.strokeStyle = sp === 'nacedero' ? '#45703a' : '#6c8c45'; c.lineWidth = Math.max(pxl, 0.03); c.lineCap = 'round';
+  c.beginPath(); c.moveTo(sp === 'boton' ? -0.22 : -0.12, 0.01); c.lineTo(0.02, 0); c.stroke();
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); c.closePath();
+  const g = c.createLinearGradient(0, -0.4, 0.8, 0.4); const ll = luz === undefined ? 0.5 : luz;
+  g.addColorStop(0, mix(E.lamina[0], E.lamina[1], ll)); g.addColorStop(0.6, mix(E.lamina[1], E.lamina[2], ll)); g.addColorStop(1, mix(E.lamina[0], E.lamina[2], ll*0.8));
+  c.fillStyle = g; c.fill();
+  if (det > 0.2){
+    c.save(); c.clip();
+    // luz que atraviesa la lámina
+    const gl = c.createRadialGradient(0.7, -0.3, 0, 0.7, -0.3, 0.9); gl.addColorStop(0, `rgba(240,246,214,${det > 0.8 ? 0.35 : 0.12})`); gl.addColorStop(1, 'rgba(240,246,214,0)'); c.fillStyle = gl; c.fillRect(-0.1, -0.6, 1.2, 1.2);
+    if (teselaAreolas && det > 0.6 && pxl < 0.0012){ const pat = c.createPattern(teselaAreolas, 'repeat'); const tam = 0.05; pat.setTransform && pat.setTransform(new DOMMatrix([tam/256, 0, 0, tam/256, 0, 0])); c.globalAlpha = clamp((0.0012 - pxl)/0.0008, 0, 0.55); c.fillStyle = pat; c.fillRect(-0.1, -0.6, 1.2, 1.2); c.globalAlpha = 1; }
+    c.strokeStyle = `rgba(222,236,190,${det > 0.8 ? 0.6 : 0.32})`; c.lineCap = 'round';
+    if (sp === 'nacedero'){ // nervadura pinnada: nervios que se arquean hacia la punta
+      for (let i = 1; i <= 9; i++){ const u = 0.08 + i*0.09; if (u > 0.9) break; const w = 0.27*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.86)), 0.95);
+        for (const s of [-1, 1]){ c.lineWidth = Math.max(pxl, 0.009*(1 - u*0.4)); c.beginPath(); c.moveTo(u, 0); c.quadraticCurveTo(u + 0.06, s*w*0.55, u + 0.1, s*w*0.88); c.stroke(); } }
+    } else { // nervadura palmeada: tres a cinco nervios desde la base
+      const N = NERVIOS[sp];
+      for (const [tx, ty] of N) for (const s of [-1, 1]){ if (ty === 0 && s < 0) continue; c.lineWidth = Math.max(pxl, 0.01); c.beginPath(); c.moveTo(0.02, 0); c.quadraticCurveTo(tx*0.45, s*ty*0.2, tx, s*ty*0.88); c.stroke(); }
+      c.lineWidth = Math.max(pxl, 0.004);
+      for (let q = 1; q <= 4; q++){ const u = 0.2 + q*0.15; for (const s of [-1, 1]){ c.beginPath(); c.moveTo(u, 0); c.quadraticCurveTo(u + 0.04, s*0.04, u + 0.07, s*0.1*(1 - u*0.55)); c.stroke(); } }
+      for (const [tx, ty] of N){ if (ty < 0.2) continue; for (const s of [-1, 1]) for (const u of [0.45, 0.7]){ const bx = lerp(0.02, tx, u), by = s*ty*0.88*u; c.beginPath(); c.moveTo(bx, by); c.quadraticCurveTo(bx + 0.04, by + s*0.02, bx + 0.08, by + s*0.03); c.stroke(); } }
+    }
+    if (sp === 'nacedero' && det > 0.6 && pxl < 0.0015){ // cistolitos: rayitas cortas en la cara de arriba {3}
+      const rr = rng(808); c.strokeStyle = `rgba(236,244,226,${clamp((0.0015 - pxl)/0.001, 0, 0.55)})`; c.lineWidth = Math.max(pxl*0.8, 0.0012); c.beginPath();
+      for (let i = 0; i < 900; i++){ const u = rr(), v = (rr() - 0.5)*0.5, a = rr()*3.1, l = 0.006 + rr()*0.006; c.moveTo(u - Math.cos(a)*l, v - Math.sin(a)*l); c.lineTo(u + Math.cos(a)*l, v + Math.sin(a)*l); } c.stroke(); }
+    c.restore();
+  }
+  // nervio central en relieve
+  if (luz < 0.5){ c.save(); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); c.closePath(); c.fillStyle = `rgba(8,26,8,${(0.5 - luz)*0.7})`; c.fill(); c.restore(); }   // las hojas de adentro, en sombra
+  c.strokeStyle = `rgba(230,240,206,${det > 0.8 ? 0.85 : 0.4})`; c.lineWidth = Math.max(pxl, 0.016); c.lineCap = 'round'; c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(0.5, 0.006, 0.96, 0); c.stroke();
+  if (det > 0.2){ c.strokeStyle = 'rgba(255,255,240,.45)'; c.lineWidth = Math.max(pxl, 0.005); c.beginPath(); c.moveTo(0.03, -0.004); c.quadraticCurveTo(0.5, -0.002, 0.93, -0.003); c.stroke(); }
+  // borde: un filo un poco más oscuro que da volumen
+  c.strokeStyle = 'rgba(20,46,18,.35)'; c.lineWidth = Math.max(pxl*0.8, 0.004); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); c.closePath(); c.stroke();
+  c.restore();
+}
+/* la flor del botón de oro: un capítulo de lígulas amarillas alrededor de un disco {2} */
+function capitulo(c, x, y, R, a, px){
+  c.save(); c.translate(x, y); c.rotate(a + Math.PI/2);
+  c.fillStyle = '#e8b51e';
+  for (let i = 0; i < 11; i++){ const t = i/11*6.283; c.save(); c.rotate(t); c.beginPath(); c.ellipse(R*0.95, 0, R*0.7, R*0.2, 0, 0, 7); c.fill(); c.restore(); }
+  c.fillStyle = '#f6cf3a'; for (let i = 0; i < 11; i++){ const t = (i + 0.5)/11*6.283; c.save(); c.rotate(t); c.beginPath(); c.ellipse(R*0.85, 0, R*0.6, R*0.15, 0, 0, 7); c.fill(); c.restore(); }
+  const g = c.createRadialGradient(-R*0.15, -R*0.15, 0, 0, 0, R*0.45); g.addColorStop(0, '#d79a2a'); g.addColorStop(1, '#8a5a16'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, R*0.42, 0, 7); c.fill();
+  c.restore();
+}
+/* pinta la mata elegida con su base en (bx, by). det: 0 de lejos, 1 de cerca */
+function pintaMata(c, bx, by, sp, tau, px, det){
+  const M = armaMata(sp, tau);
+  c.save(); c.translate(bx, by); c.lineCap = 'round'; c.lineJoin = 'round';
+  c.fillStyle = 'rgba(20,28,12,.32)'; c.beginPath(); c.ellipse(0.02, 0.01, 0.55, 0.06, 0, 0, 7); c.fill();
+  // los tocones: leña vieja del corte anterior
+  for (const T of M.tocones){ const g = c.createLinearGradient(-0.05, 0, 0.05, 0); g.addColorStop(0, '#5a4a36'); g.addColorStop(0.6, '#8a7656'); g.addColorStop(1, '#5e4c38');
+    c.fillStyle = g; c.beginPath(); cinta(c, T.pts, t => T.w*lerp(1.15, 0.9, t)); c.fill();
+    const z = T.pts[2]; c.fillStyle = '#d8c7a0'; c.beginPath(); c.ellipse(z[0], z[1], T.w*0.55, T.w*0.22, 0.15, 0, 7); c.fill();
+    if (det > 0.5){ c.strokeStyle = 'rgba(120,96,64,.7)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.ellipse(z[0], z[1], T.w*0.3, T.w*0.11, 0.15, 0, 7); c.stroke(); } }
+  // los rebrotes
+  for (const B of M.brotes){ c.strokeStyle = sp === 'morera' ? '#7d7a4a' : sp === 'nacedero' ? '#4f7a3a' : '#6f8f3e'; c.lineWidth = Math.max(px, B.w); c.beginPath(); suave(c, B.pts); c.stroke();
+    if (sp === 'nacedero' && det > 0.5){ c.fillStyle = '#4a6a34'; for (let i = 2; i < B.pts.length; i += 2){ const p = B.pts[i]; c.beginPath(); c.arc(p[0], p[1], B.w*0.9, 0, 7); c.fill(); } } }   // nudos marcados {3}
+  const E = ESP[sp];
+  for (const h of M.hojas){ c.save(); c.translate(h.x, h.y); c.rotate(h.a);
+    const luz = clamp(0.05 + h.luz*0.45 + h.z*0.35 - (h.y + E.alto*0.5)*0.15, 0, 1);
+    if (det < 0.35){ c.fillStyle = mix(E.verde[0], E.verde[2], luz); c.beginPath(); const p = contorno(sp, h.lob); c.scale(h.L, h.L); c.moveTo(p[0][0], p[0][1]); for (const q of p) c.lineTo(q[0], q[1]); c.closePath(); c.fill(); }
+    else hojaSp(c, sp, h.L, h.lob, px, det*0.6, luz);
+    c.restore(); }
+  for (const f of M.flores){ c.strokeStyle = '#6f8f3e'; c.lineWidth = Math.max(px, 0.006); c.beginPath(); c.moveTo(f.x, f.y + 0.06); c.lineTo(f.x, f.y); c.stroke(); capitulo(c, f.x, f.y, f.r, f.a, px); }
+  c.restore();
+}
+
+/* ---------- el galpón: techo de zinc, la cuyera y el comedero ---------- */
+function pintaGalpon(c, px){
+  const G = GALPON, yb = x => gF(x);
+  // piso de tierra apisonada bajo el techo
+  c.fillStyle = '#6b5a44'; c.beginPath(); c.moveTo(G.x0, yb(G.x0) + 0.02); for (let x = G.x0; x <= G.x1; x += 0.25) c.lineTo(x, yb(x) - 0.01); c.lineTo(G.x1, yb(G.x1) + 0.06); c.lineTo(G.x0, yb(G.x0) + 0.06); c.closePath(); c.fill();
+  // la pared de atrás: tablas
+  const top = x => -G.alto + (x - G.x0)*0.08;
+  c.fillStyle = '#5a4532'; c.beginPath(); c.moveTo(G.x0, yb(G.x0)); c.lineTo(G.x0, top(G.x0) + 0.1); c.lineTo(G.x1 - 0.6, top(G.x1 - 0.6) + 0.1); c.lineTo(G.x1 - 0.6, yb(G.x1 - 0.6)); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(30,20,12,.45)'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); for (let x = G.x0 + 0.22; x < G.x1 - 0.6; x += 0.22){ c.moveTo(x, yb(x)); c.lineTo(x, top(x) + 0.1); } c.stroke();
+  const gw = c.createLinearGradient(0, -G.alto, 0, 0); gw.addColorStop(0, 'rgba(10,8,4,.55)'); gw.addColorStop(1, 'rgba(10,8,4,.15)'); c.fillStyle = gw; c.fillRect(G.x0, -G.alto, G.x1 - G.x0 - 0.6, G.alto + 0.1);
+  // postes
+  for (const x of [G.x0 + 0.08, (G.x0 + G.x1)/2, G.x1 - 0.08]){ c.fillStyle = '#6e5639'; c.fillRect(x - 0.06, top(x), 0.12, yb(x) - top(x)); c.fillStyle = 'rgba(255,240,210,.18)'; c.fillRect(x - 0.06, top(x), 0.03, yb(x) - top(x)); }
+}
+function pintaTecho(c, px){
+  const G = GALPON, top = x => -G.alto + (x - G.x0)*0.08;
+  const x0 = G.x0 - 0.35, x1 = G.x1 + 0.4;
+  const g = c.createLinearGradient(0, top(x0) - 0.15, 0, top(x0) + 0.15); g.addColorStop(0, '#b8c0c4'); g.addColorStop(1, '#7c8488');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, top(x0) - 0.14); c.lineTo(x1, top(x1) - 0.14); c.lineTo(x1, top(x1) + 0.04); c.lineTo(x0, top(x0) + 0.04); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(60,66,70,.55)'; c.lineWidth = Math.max(px, 0.01); c.beginPath(); for (let x = x0 + 0.1; x < x1; x += 0.1){ c.moveTo(x, top(x) - 0.14); c.lineTo(x, top(x) + 0.04); } c.stroke();
+  c.fillStyle = 'rgba(160,110,70,.35)'; for (const [a, b] of [[x0 + 0.6, x0 + 1.1], [x1 - 1.4, x1 - 1.1]]) c.fillRect(a, top(a) - 0.14, b - a, 0.18);   // óxido
+  c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.moveTo(x0, top(x0) + 0.04); c.lineTo(x1, top(x1) + 0.04); c.lineTo(x1, top(x1) + 0.16); c.lineTo(x0, top(x0) + 0.16); c.closePath(); c.fill();
+}
+const PICADO = (() => { const r = rng(91), out = []; for (let i = 0; i < 80; i++) out.push([lerp(COMEDERO.x0 + 0.08, COMEDERO.x1 - 0.08, r()), COMEDERO.y0 - r()*0.12, 0.03 + r()*0.04, r()*3, r()]); return out; })();
+function pintaComedero(c, px){
+  const C = COMEDERO;
+  c.fillStyle = '#7a5c3c'; c.fillRect(C.x0 + 0.06, C.y1, 0.08, -C.y1 + gF(C.x0)); c.fillRect(C.x1 - 0.14, C.y1, 0.08, -C.y1 + gF(C.x1));
+  // el forraje picado, encima del borde
+  const V = ESP[esp].verde;
+  for (const [x, y, L, a, t] of PICADO){ c.fillStyle = V[Math.floor(t*4)]; c.beginPath(); c.ellipse(x, y, L, L*0.42, a, 0, 7); c.fill(); }
+  const g = c.createLinearGradient(0, C.y0, 0, C.y1); g.addColorStop(0, '#9a7650'); g.addColorStop(1, '#6a4e32');
+  c.fillStyle = g; c.beginPath(); c.moveTo(C.x0, C.y0); c.lineTo(C.x1, C.y0); c.lineTo(C.x1 - 0.05, C.y1); c.lineTo(C.x0 + 0.05, C.y1); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(40,26,14,.5)'; c.lineWidth = Math.max(px, 0.01); c.beginPath(); c.moveTo(C.x0 + 0.03, C.y0 + 0.16); c.lineTo(C.x1 - 0.03, C.y0 + 0.16); c.stroke();
+}
+const CUYES = [{ x: 4.32, col: ['#8a5530', '#f2ead8'], d: 1 }, { x: 4.6, col: ['#f0e8d6', '#b07a44'], d: -1 }, { x: 4.88, col: ['#5a3a22', '#e8dcc4'], d: 1 }];
+function cuy(c, x, y, d, col, px){
+  c.save(); c.translate(x, y); c.scale(d, 1);
+  c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(0, 0.005, 0.14, 0.018, 0, 0, 7); c.fill();
+  const g = c.createLinearGradient(0, -0.13, 0, 0); g.addColorStop(0, mixh(col[0], '#ffffff', 0.15)); g.addColorStop(1, mixh(col[0], '#000000', 0.25));
+  c.fillStyle = g; c.beginPath(); c.moveTo(-0.13, -0.01); c.bezierCurveTo(-0.15, -0.1, -0.06, -0.13, 0.02, -0.12); c.bezierCurveTo(0.09, -0.12, 0.14, -0.08, 0.145, -0.04); c.bezierCurveTo(0.15, -0.01, 0.12, 0, 0.08, 0); c.lineTo(-0.1, 0); c.closePath(); c.fill();
+  c.fillStyle = col[1]; c.beginPath(); c.ellipse(-0.05, -0.07, 0.05, 0.035, 0.3, 0, 7); c.fill();
+  c.fillStyle = mixh(col[0], '#000000', 0.3); c.beginPath(); c.ellipse(0.07, -0.115, 0.022, 0.016, -0.5, 0, 7); c.fill();       // la oreja
+  c.fillStyle = '#16110c'; c.beginPath(); c.arc(0.105, -0.075, 0.009, 0, 7); c.fill();
+  c.restore();
+}
+function pintaCuyera(c, px){
+  const K = CUYERA;
+  c.fillStyle = '#6d5236'; for (const x of [K.x0 + 0.05, K.x1 - 0.1]) c.fillRect(x, K.y1, 0.06, gF(x) - K.y1);
+  c.fillStyle = '#3d2c1c'; c.fillRect(K.x0, K.y0, K.x1 - K.x0, K.y1 - K.y0);
+  // pasto y hojas en el piso de la cuyera
+  const V = ESP[esp].verde, r = rng(55); for (let i = 0; i < 26; i++){ c.fillStyle = V[Math.floor(r()*4)]; c.beginPath(); c.ellipse(lerp(K.x0 + 0.06, K.x1 - 0.06, r()), K.y1 - 0.03 - r()*0.04, 0.035, 0.012, r()*3, 0, 7); c.fill(); }
+  for (const q of CUYES) cuy(c, q.x, K.y1 - 0.025, q.d, q.col, px);
+  // las tablillas del frente
+  c.fillStyle = '#8b6a46'; for (let x = K.x0; x <= K.x1 - 0.04; x += 0.16) c.fillRect(x, K.y0, 0.045, K.y1 - K.y0);
+  c.fillStyle = '#9a7752'; c.fillRect(K.x0 - 0.04, K.y0 - 0.05, K.x1 - K.x0 + 0.08, 0.07); c.fillRect(K.x0 - 0.04, K.y1 - 0.02, K.x1 - K.x0 + 0.08, 0.06);
+}
+
+/* ---------- la vaca: la del Descenso del silvopastoreo, ahora en el comedero ---------- */
+const PELAJES = {
+  calido: { luz: '#f0ede6', base: '#d8d3c9', sombra: '#a19b8f', oscuro: '#3b3733', hocico: '#4a4540', oreja: '#caa89a', giba: true },
+  templado: { luz: '#c98252', base: '#a65b31', sombra: '#6b361b', oscuro: '#2f1f16', hocico: '#704a3a', oreja: '#b8765a' },
+  frio: { luz: '#f4f1ea', base: '#e3ded4', sombra: '#a8a296', oscuro: '#26231f', hocico: '#3a3531', oreja: '#caa89a', manchas: '#2a2723' },
+};
+PELAJES.limite = PELAJES.frio;
+function pata(c, pts, ws, col, P, px){
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++){ const a = pts[Math.max(0, i-1)], b = pts[Math.min(n-1, i+1)]; let tx = b[0]-a[0], ty = b[1]-a[1]; const l = Math.hypot(tx, ty) || 1e-9; tx /= l; ty /= l; const w = ws[i]/2; L.push([pts[i][0] - ty*w, pts[i][1] + tx*w]); R.push([pts[i][0] + ty*w, pts[i][1] - tx*w]); }
+  c.fillStyle = col; c.beginPath(); c.moveTo(L[0][0], L[0][1]); for (let i = 1; i < n; i++){ const m = [(L[i-1][0] + L[i][0])/2, (L[i-1][1] + L[i][1])/2]; c.quadraticCurveTo(L[i-1][0], L[i-1][1], m[0], m[1]); } c.lineTo(L[n-1][0], L[n-1][1]); c.lineTo(R[n-1][0], R[n-1][1]); for (let i = n-2; i >= 0; i--){ const m = [(R[i+1][0] + R[i][0])/2, (R[i+1][1] + R[i][1])/2]; c.quadraticCurveTo(R[i+1][0], R[i+1][1], m[0], m[1]); } c.lineTo(R[0][0], R[0][1]); c.closePath(); c.fill();
+  const z = pts[n-1], hw = ws[n-1]*0.62;
+  c.fillStyle = P.oscuro; c.beginPath(); c.moveTo(z[0] - hw, z[1] - 0.065); c.quadraticCurveTo(z[0], z[1] - 0.08, z[0] + hw, z[1] - 0.06); c.lineTo(z[0] + hw*1.25, z[1] + 0.004); c.lineTo(z[0] - hw*1.05, z[1] + 0.004); c.closePath(); c.fill();
+}
+const W_DEL = [0.2, 0.17, 0.12, 0.095, 0.09, 0.1], W_TRA = [0.34, 0.2, 0.13, 0.095, 0.09, 0.1];
+const PATAS = (() => { const del = x => [[x, -0.78], [x + 0.01, -0.56], [x + 0.02, -0.38], [x + 0.02, -0.12], [x + 0.035, -0.03], [x + 0.045, 0]];
+  const tra = x => [[x, -0.9], [x - 0.07, -0.64], [x - 0.12, -0.44], [x - 0.05, -0.13], [x - 0.035, -0.03], [x - 0.03, 0]];
+  return { dCerca: del(0.55), dLejos: del(0.42), tCerca: tra(-0.7), tLejos: tra(-0.58) }; })();
+function cuerpoVaca(c, giba){
+  c.moveTo(-0.99, -1.3);
+  c.bezierCurveTo(-0.84, -1.35, -0.66, -1.36, -0.55, -1.32);
+  c.bezierCurveTo(-0.2, -1.27, 0.2, -1.3, 0.42, -1.34);
+  if (giba) c.bezierCurveTo(0.48, -1.54, 0.66, -1.56, 0.76, -1.4); else c.bezierCurveTo(0.5, -1.34, 0.65, -1.36, 0.76, -1.35);
+  c.bezierCurveTo(0.95, -1.24, 1.07, -1.02, 1.12, -0.8); c.lineTo(1.04, -0.6); c.bezierCurveTo(0.98, -0.5, 0.86, -0.52, 0.8, -0.58); c.bezierCurveTo(0.78, -0.62, 0.76, -0.64, 0.72, -0.66);
+  c.bezierCurveTo(0.66, -0.72, 0.58, -0.76, 0.5, -0.74);
+  c.bezierCurveTo(0.25, -0.6, -0.2, -0.56, -0.5, -0.68);
+  c.bezierCurveTo(-0.62, -0.74, -0.7, -0.84, -0.8, -0.88);
+  c.bezierCurveTo(-0.98, -0.92, -1.06, -1.12, -0.99, -1.3); c.closePath();
+}
+function cabezaVaca(c, P, pol, hoc, px){
+  const dx = hoc[0] - pol[0], dy = hoc[1] - pol[1], L = Math.hypot(dx, dy), a = Math.atan2(dy, dx);
+  c.save(); c.translate(pol[0], pol[1]); c.rotate(a);
+  const g = c.createLinearGradient(0, -0.14, 0, 0.16); g.addColorStop(0, P.luz); g.addColorStop(0.5, P.base); g.addColorStop(1, P.sombra);
+  c.fillStyle = g; c.beginPath();
+  c.moveTo(-0.05, -0.11); c.bezierCurveTo(L*0.2, -0.135, L*0.55, -0.115, L*0.86, -0.085);
+  c.bezierCurveTo(L*0.97, -0.075, L*1.04, -0.03, L*1.02, 0.02); c.bezierCurveTo(L*1.0, 0.07, L*0.94, 0.09, L*0.88, 0.085);
+  c.bezierCurveTo(L*0.7, 0.09, L*0.55, 0.12, L*0.4, 0.165); c.bezierCurveTo(L*0.22, 0.2, 0.05, 0.19, -0.06, 0.1); c.closePath(); c.fill();
+  c.fillStyle = P.hocico; c.beginPath(); c.moveTo(L*0.86, -0.08); c.bezierCurveTo(L*0.97, -0.075, L*1.04, -0.03, L*1.02, 0.02); c.bezierCurveTo(L*1.0, 0.07, L*0.94, 0.09, L*0.88, 0.085); c.quadraticCurveTo(L*0.84, 0.0, L*0.86, -0.08); c.fill();
+  c.fillStyle = '#1b1612'; c.beginPath(); c.ellipse(L*0.24, -0.055, 0.03, 0.021, 0.15, 0, 7); c.fill();
+  if (px < 0.012){ c.fillStyle = 'rgba(255,255,255,.75)'; c.beginPath(); c.arc(L*0.24 + 0.009, -0.062, 0.007, 0, 7); c.fill(); }
+  c.fillStyle = P.sombra; c.beginPath(); c.ellipse(-0.05, 0.1, 0.22, 0.072, 1.2, 0, 7); c.fill();
+  c.fillStyle = P.oreja; c.beginPath(); c.ellipse(-0.045, 0.105, 0.16, 0.04, 1.2, 0, 7); c.fill();
+  c.restore();
+}
+function vaca(c, x, y, dir, px){
+  const P = PELAJES[piso];
+  c.save(); c.translate(x, y); c.scale(dir, 1); c.lineJoin = 'round';
+  c.fillStyle = 'rgba(20,24,12,.28)'; c.beginPath(); c.ellipse(-0.1, 0.01, 1.15, 0.06, 0, 0, 7); c.fill();
+  pata(c, PATAS.dLejos, W_DEL, P.sombra, P, px); pata(c, PATAS.tLejos, W_TRA, P.sombra, P, px);
+  c.strokeStyle = P.base; c.lineWidth = 0.04; c.lineCap = 'round'; c.beginPath(); c.moveTo(-0.99, -1.29); c.bezierCurveTo(-1.09, -1.05, -1.07, -0.7, -1.06, -0.4); c.stroke();
+  c.fillStyle = P.oscuro; c.beginPath(); c.ellipse(-1.06, -0.32, 0.04, 0.11, 0, 0, 7); c.fill();
+  pata(c, PATAS.dCerca, W_DEL, P.base, P, px); pata(c, PATAS.tCerca, W_TRA, P.base, P, px);
+  const g = c.createLinearGradient(0, -1.56, 0, -0.56); g.addColorStop(0, P.luz); g.addColorStop(0.42, P.base); g.addColorStop(1, P.sombra);
+  c.fillStyle = g; c.beginPath(); cuerpoVaca(c, P.giba); c.fill();
+  c.save(); c.beginPath(); cuerpoVaca(c, P.giba); c.clip();
+  if (P.manchas){ c.fillStyle = P.manchas; const r = rng(4); for (let i = 0; i < 6; i++){ c.beginPath(); c.ellipse(-0.9 + r()*1.8, -0.72 - r()*0.68, 0.16 + r()*0.2, 0.12 + r()*0.15, r()*3, 0, 7); c.fill(); } }
+  const gs = c.createRadialGradient(0.42, -1.02, 0.02, 0.42, -1.0, 0.42); gs.addColorStop(0, 'rgba(255,250,236,.2)'); gs.addColorStop(1, 'rgba(255,250,236,0)'); c.fillStyle = gs; c.fillRect(-0.2, -1.5, 1.2, 1);
+  const gb = c.createLinearGradient(0, -0.95, 0, -0.56); gb.addColorStop(0, 'rgba(20,16,12,0)'); gb.addColorStop(1, 'rgba(20,16,12,.22)'); c.fillStyle = gb; c.fillRect(-1.1, -0.95, 2.3, 0.4);
+  c.restore();
+  c.strokeStyle = rgba(P.oscuro, 0.35); c.lineWidth = Math.max(px, 0.012); c.beginPath(); cuerpoVaca(c, P.giba); c.stroke();
+  c.fillStyle = mix('#d9a99b', P.sombra, 0.25); c.beginPath(); c.ellipse(-0.47, -0.6, 0.11, 0.07, 0, 0, 7); c.fill();
+  cabezaVaca(c, P, [1.08, -0.78], [1.36, -0.36], px);    // la cabeza baja, en el comedero
+  c.restore();
+}
+/* ---------- la cabra, ramoneando en el bastidor ---------- */
+function cabra(c, x, y, dir, px){
+  const col = piso === 'frio' ? ['#f2eee6', '#cfc6b8', '#8a7a68'] : piso === 'templado' ? ['#c69a6a', '#9a7048', '#5e4026'] : ['#e9e2d6', '#c6b8a4', '#6a5340'];
+  c.save(); c.translate(x, y); c.scale(dir, 1); c.lineCap = 'round'; c.lineJoin = 'round';
+  c.fillStyle = 'rgba(20,24,12,.25)'; c.beginPath(); c.ellipse(0, 0.01, 0.5, 0.035, 0, 0, 7); c.fill();
+  const pataC = (x0, y0, x1, col2) => { c.strokeStyle = col2; c.lineWidth = 0.055; c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(x0 + (x1 - x0)*0.4, -0.2, x1, -0.03); c.stroke(); c.fillStyle = '#2a2018'; c.beginPath(); c.ellipse(x1 + 0.01, -0.012, 0.03, 0.018, 0, 0, 7); c.fill(); };
+  pataC(0.24, -0.4, 0.28, col[1]); pataC(-0.26, -0.42, -0.3, col[1]);
+  const g = c.createLinearGradient(0, -0.72, 0, -0.32); g.addColorStop(0, col[0]); g.addColorStop(1, col[1]);
+  c.fillStyle = g; c.beginPath(); c.moveTo(-0.4, -0.62); c.bezierCurveTo(-0.3, -0.72, 0.15, -0.72, 0.3, -0.66); c.bezierCurveTo(0.42, -0.62, 0.44, -0.46, 0.36, -0.38); c.bezierCurveTo(0.2, -0.32, -0.2, -0.32, -0.36, -0.38); c.bezierCurveTo(-0.46, -0.44, -0.47, -0.56, -0.4, -0.62); c.closePath(); c.fill();
+  if (piso === 'templado'){ c.fillStyle = col[2]; c.beginPath(); c.ellipse(-0.1, -0.62, 0.14, 0.05, 0, 0, 7); c.fill(); }
+  c.strokeStyle = col[0]; c.lineWidth = 0.035; c.beginPath(); c.moveTo(-0.4, -0.6); c.lineTo(-0.47, -0.72); c.stroke();      // la cola, parada
+  pataC(0.3, -0.38, 0.36, col[0]); pataC(-0.2, -0.4, -0.22, col[0]);
+  // el cuello que sube al bastidor y la cabeza
+  c.fillStyle = col[0]; c.beginPath(); c.moveTo(0.22, -0.66); c.quadraticCurveTo(0.36, -0.86, 0.5, -0.98); c.lineTo(0.6, -0.9); c.quadraticCurveTo(0.46, -0.72, 0.38, -0.5); c.closePath(); c.fill();
+  c.save(); c.translate(0.55, -0.97); c.rotate(-0.55);
+  c.fillStyle = col[0]; c.beginPath(); c.moveTo(-0.06, -0.06); c.bezierCurveTo(0.05, -0.08, 0.16, -0.05, 0.22, 0.0); c.bezierCurveTo(0.24, 0.03, 0.2, 0.06, 0.15, 0.05); c.bezierCurveTo(0.08, 0.06, -0.02, 0.07, -0.07, 0.03); c.closePath(); c.fill();
+  c.strokeStyle = '#8a7d66'; c.lineWidth = 0.022; c.beginPath(); c.moveTo(-0.02, -0.06); c.quadraticCurveTo(-0.1, -0.16, -0.17, -0.12); c.stroke();     // el cacho
+  c.fillStyle = col[1]; c.beginPath(); c.ellipse(-0.04, 0.0, 0.09, 0.025, 2.5, 0, 7); c.fill();                                                       // la oreja
+  c.fillStyle = '#1a140e'; c.beginPath(); c.arc(0.05, -0.025, 0.012, 0, 7); c.fill();
+  c.strokeStyle = col[1]; c.lineWidth = 0.02; c.beginPath(); c.moveTo(0.14, 0.05); c.lineTo(0.12, 0.11); c.stroke();                                     // la barba
+  c.restore();
+  c.restore();
+}
+/* el bastidor con ramas recién cortadas, colgado del poste del galpón */
+function pintaBastidor(c, px){
+  const x = GALPON.x0 - 0.3, y = -1.05, V = ESP[esp].verde, r = rng(61);
+  c.strokeStyle = '#6e5639'; c.lineWidth = Math.max(px, 0.04); c.beginPath(); c.moveTo(x - 0.35, y - 0.3); c.lineTo(x + 0.35, y - 0.3); c.moveTo(x - 0.32, y + 0.22); c.lineTo(x + 0.32, y + 0.22); c.stroke();
+  for (let i = 0; i < 40; i++){ c.fillStyle = V[Math.floor(r()*4)]; c.beginPath(); c.ellipse(x + (r()-.5)*0.6, y + (r()-.5)*0.45, 0.06 + r()*0.05, 0.03, r()*3, 0, 7); c.fill(); }
+  c.strokeStyle = 'rgba(70,50,30,.6)'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); for (let k = 0; k < 6; k++){ const xx = x - 0.3 + k*0.12; c.moveTo(xx, y - 0.3); c.lineTo(xx, y + 0.22); } c.stroke();
+}
+/* ---------- el abono: la boñiga y lo que sobra del comedero, en pila ---------- */
+function pintaAbono(c, px){
+  const A = ABONO, y = gF(A.x);
+  const g = c.createLinearGradient(0, y - 0.55, 0, y); g.addColorStop(0, '#5a4128'); g.addColorStop(1, '#2e2216');
+  c.fillStyle = g; c.beginPath(); c.moveTo(A.x - A.r, y + 0.02); c.bezierCurveTo(A.x - A.r*0.6, y - 0.5, A.x + A.r*0.5, y - 0.56, A.x + A.r, y + 0.02); c.closePath(); c.fill();
+  const r = rng(71); for (let i = 0; i < 40; i++){ const u = r()*2 - 1, h = (1 - u*u)*0.45; c.fillStyle = r() < 0.6 ? 'rgba(120,96,58,.6)' : 'rgba(96,124,58,.55)'; c.beginPath(); c.ellipse(A.x + u*A.r*0.85, y - r()*h, 0.04, 0.015, r()*3, 0, 7); c.fill(); }
+  c.strokeStyle = 'rgba(20,14,8,.45)'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); c.moveTo(A.x - A.r*0.7, y - 0.12); c.quadraticCurveTo(A.x, y - 0.28, A.x + A.r*0.7, y - 0.1); c.stroke();
+}
+/* ---------- el nacimiento de agua, con nacederos alrededor donde el piso lo permite {4} ---------- */
+function pintaAgua(c, px){
+  const A = AGUA, y = gF(A.x);
+  const g = c.createLinearGradient(0, y - 0.05, 0, y + 0.1); g.addColorStop(0, '#7fa6b4'); g.addColorStop(1, '#3e6270');
+  c.fillStyle = g; c.beginPath(); c.ellipse(A.x, y + 0.02, A.r, 0.11, 0, 0, 7); c.fill();
+  c.strokeStyle = 'rgba(230,242,246,.6)'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); c.ellipse(A.x - 0.15, y, A.r*0.5, 0.04, 0, Math.PI*1.1, Math.PI*1.8); c.stroke();
+  const r = rng(81); for (let i = 0; i < 12; i++){ const a = r()*6.28, x = A.x + Math.cos(a)*A.r*1.02, yy = y + 0.02 + Math.sin(a)*0.12; c.fillStyle = r() < 0.5 ? '#8b8a80' : '#6f6e66'; c.beginPath(); c.ellipse(x, yy, 0.07 + r()*0.05, 0.04, 0, 0, 7); c.fill(); }
+  if (piso === 'calido' || piso === 'templado'){
+    const V = ESP.nacedero.verde;
+    for (const [dx, s] of [[-1.15, 0.9], [1.05, 1.05], [0.2, 0.8]]){ const x = A.x + dx, yb = gF(x) - (dx === 0.2 ? 0.2 : 0); const rr = rng(Math.round(x*100));
+      c.strokeStyle = '#5c4a36'; c.lineWidth = Math.max(px, 0.05*s); c.beginPath(); c.moveTo(x, yb); c.lineTo(x + 0.04, yb - 1.1*s); c.stroke();
+      for (let i = 0; i < 36; i++){ const a = rr()*6.283, d = Math.sqrt(rr()); const R = (0.12 + rr()*0.1)*s; const luz = clamp(0.5 - Math.sin(a)*d*0.45 + (rr() - 0.5)*0.3, 0, 0.999);
+        c.fillStyle = V[Math.floor(luz*4)]; c.beginPath(); c.ellipse(x + Math.cos(a)*0.55*s*d, yb - 1.35*s + Math.sin(a)*0.45*s*d, R, R*0.7, rr()*3, 0, 7); c.fill(); } }
+  } else {
+    c.strokeStyle = '#6f8a48'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); for (let i = 0; i < 40; i++){ const x = A.x - A.r*1.3 + r()*A.r*2.6; const yy = gF(x) + 0.02; c.moveTo(x, yy); c.quadraticCurveTo(x + 0.03, yy - 0.2, x + (r()-.5)*0.15, yy - 0.3 - r()*0.2); } c.stroke();
+  }
+}
+/* ---------- la tierra bajo la finca ---------- */
+const TIERRA0 = (() => { const r = rng(401), tonos = ['#3a2a1c', '#443222', '#4d3827', '#33251a', '#56402b'], P = tonos.map(() => new Path2D());
+  for (let i = 0; i < 1600; i++){ const x = -12 + r()*24, y = 0.1 + r()*6, R = 0.04 + Math.pow(r(), 1.6)*0.18; const k = 5 + Math.floor(r()*4), a0 = r()*6.28, pts = [];
+    if (y < gF(x) + 0.08) continue;
+    for (let j = 0; j < k; j++){ const a = a0 + j/k*6.283 + (r()-.5)*0.5, d = R*(0.65 + r()*0.45); pts.push([x + Math.cos(a)*d, y + Math.sin(a)*d*0.85]); }
+    roundPoly(P[Math.floor(r()*tonos.length)], pts); }
+  return { tonos, P }; })();
+function pintaTierra0(c, v, px){
+  const x0 = v[0] - 1, x1 = v[2] + 1; if (v[3] < -0.5) return;
+  const g = c.createLinearGradient(0, 0, 0, 6); g.addColorStop(0, '#2e2016'); g.addColorStop(0.1, '#3d2b1d'); g.addColorStop(1, '#6a5034');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, gF(x0)); for (let x = x0; x <= x1; x += Math.max(0.1, (x1 - x0)/160)) c.lineTo(x, gF(x)); c.lineTo(x1, Math.max(v[3], 1) + 1); c.lineTo(x0, Math.max(v[3], 1) + 1); c.closePath(); c.fill();
+  TIERRA0.tonos.forEach((t, k) => { c.fillStyle = t; c.fill(TIERRA0.P[k]); });
+  const go = c.createLinearGradient(0, 0, 0, 0.5); go.addColorStop(0, 'rgba(14,9,6,.5)'); go.addColorStop(1, 'rgba(14,9,6,0)'); c.fillStyle = go; c.fillRect(x0, -0.2, x1 - x0, 0.8);
+}
+/* el ciclo de la finca, dibujado en la última estación: corral → abono → banco → comedero */
+const CICLO = { vis: 0 };
+function flecha(c, pts, px, a){
+  c.save(); c.globalAlpha *= a; c.strokeStyle = '#fff6d8'; c.lineWidth = Math.max(px*2.5, 0.05); c.setLineDash([0.18, 0.12]); c.lineCap = 'round';
+  c.beginPath(); suave(c, pts); c.stroke(); c.setLineDash([]);
+  const z = pts[pts.length - 1], y = pts[pts.length - 2], an = Math.atan2(z[1] - y[1], z[0] - y[0]);
+  c.fillStyle = '#fff6d8'; c.beginPath(); c.moveTo(z[0] + Math.cos(an)*0.2, z[1] + Math.sin(an)*0.2); c.lineTo(z[0] + Math.cos(an + 2.5)*0.22, z[1] + Math.sin(an + 2.5)*0.22); c.lineTo(z[0] + Math.cos(an - 2.5)*0.22, z[1] + Math.sin(an - 2.5)*0.22); c.closePath(); c.fill();
+  c.restore();
+}
+const RUTAS = [
+  [[6.9, -0.12], [5.0, 0.12], [3.6, 0.05], [2.95, -0.5]],                 // la boñiga, al abono
+  [[2.0, -0.7], [1.6, -1.05], [1.0, -1.0], [0.5, -0.6]],                  // el abono, al banco
+  [[-1.0, -2.3], [1.4, -3.4], [4.6, -3.3], [6.0, -1.0]],                  // el forraje, al comedero
+];
+function dibujaFinca(c, env){
+  const z = 1/env.f;
+  const tb = sstep(1.8, 4.5, z);
+  c.save(); const k = 1 - Math.pow(z, -0.7); c.translate(env.cx*k, env.cy*k*0.4); const sb = Math.pow(z, 0.25)/z; c.scale(sb, sb);
+  if (tb < 1 && fondoN) c.drawImage(fondoN, -1, -1, 2, 2);
+  if (tb > 0 && fondoB){ c.globalAlpha = tb; c.drawImage(fondoB, -1, -1, 2, 2); c.globalAlpha = 1; }
+  c.restore();
+  c.save(); c.scale(1/M0, 1/M0);
+  const v = env.view.map(q => q*M0), px = env.px*M0;
+  pintaTierra0(c, v, px);
+  { const x0 = v[0] - 1, x1 = v[2] + 1, paso = Math.max(0.1, (x1 - x0)/160); const P = CIELOS[piso];
+    c.fillStyle = mix(P.loma[1], '#3d5a28', 0.5); c.beginPath(); c.moveTo(x0, gF(x0) - 0.3); for (let x = x0; x <= x1; x += paso) c.lineTo(x, gF(x) - 0.3 - 0.03*Math.sin(x*3.1)); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, gF(x) + 0.01); c.closePath(); c.fill();
+    const rr = rng(33); c.strokeStyle = mix(P.loma[0], '#6f8f3e', 0.4); c.lineWidth = Math.max(px, 0.012); c.lineCap = 'round'; c.beginPath(); for (let i = 0; i < 260; i++){ const x = -11 + rr()*22; if (x < v[0] - 0.5 || x > v[2] + 0.5) { rr(); continue; } const y = gF(x) + 0.01; c.moveTo(x, y); c.quadraticCurveTo(x + 0.02, y - 0.12, x + (rr()-.5)*0.08, y - 0.16 - rr()*0.14); } c.stroke(); }
+  if (piso !== 'limite'){
+    pintaGalpon(c, px);
+    pintaCuyera(c, px);
+    vaca(c, VACA_X, gF(VACA_X) - 0.02, -1, px);
+    pintaComedero(c, px);
+    pintaTecho(c, px);
+    pintaBastidor(c, px);
+    cabra(c, CABRA_X, gF(CABRA_X) - 0.02, 1, px);
+    pintaAbono(c, px);
+    for (let k = 0; k < 3; k++) pintaFila(c, k, px);
+    { const det = clamp((0.012 - px)/0.008, 0, 1); pintaMata(c, XB, gF(XB) + 0.04, esp, TAU, px, det); pintaElegida(c, armaMata(esp, TAU), px, det, XB, gF(XB) + 0.04); }
+    pintaAgua(c, px);
+    if (CICLO.vis > 0.01) RUTAS.forEach(R => flecha(c, R, px, CICLO.vis));
+  }
+  const gl = c.createLinearGradient(0, v[1], 0, 0); gl.addColorStop(0, 'rgba(255,248,220,.08)'); gl.addColorStop(1, 'rgba(255,248,220,0)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2] - v[0], Math.min(0, v[3]) - v[1]);
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 1 · LA MATA (metros desde el portal; la base de la mata en y = BASE1)
+   ============================================================ */
+const M1 = LV[1].F, BASE1 = ALTO1 + 0.04;
+const g1 = x => gF(XB + x) - gF(XB) + BASE1;
+const LOB = { boton: 0.3, nacedero: 0.5, morera: 0.3 };
+let fondoMata = null, fondoHoja = null;
+function prepFondoMata(){
+  const res = Math.min(1600, Math.max(500, Math.round(S*DPR*0.55)));
+  const c = document.createElement('canvas'); c.width = c.height = res; const x = c.getContext('2d');
+  const lado = 8;                                                     // metros de lado; centrado en el portal
+  x.setTransform(res/lado, 0, 0, res/lado, res/2, res*0.55);
+  const P = CIELOS[piso], g = x.createLinearGradient(0, -4.4, 0, BASE1); g.addColorStop(0, P.cielo[0]); g.addColorStop(0.6, P.cielo[1]); g.addColorStop(1, P.cielo[2]);
+  x.fillStyle = g; x.fillRect(-4.2, -4.6, 8.4, 8.4);
+  x.fillStyle = mix(P.montes[2], P.cielo[2], 0.35); x.beginPath(); x.moveTo(-4.2, BASE1 - 1.6); for (let q = -4.2; q <= 4.2; q += 0.1) x.lineTo(q, BASE1 - 1.7 - 0.5*Math.sin(q*0.7 + 1) - 0.25*Math.sin(q*2.1)); x.lineTo(4.2, 4); x.lineTo(-4.2, 4); x.closePath(); x.fill();
+  // la finca alrededor de la mata, en sus metros de verdad: el banco detrás y la tierra
+  x.save(); x.translate(-XB, -(gF(XB) - ALTO1));
+  const v = [XB - 4.4, -4, XB + 4.4, 4];
+  pintaTierra0(x, v, 0.01);
+  x.fillStyle = mix(P.loma[1], '#3d5a28', 0.5); x.beginPath(); x.moveTo(v[0], gF(v[0]) - 0.3); for (let q = v[0]; q <= v[2]; q += 0.1) x.lineTo(q, gF(q) - 0.3); for (let q = v[2]; q >= v[0]; q -= 0.1) x.lineTo(q, gF(q) + 0.01); x.closePath(); x.fill();
+  pintaAbono(x, 0.01);
+  for (let k = 0; k < 3; k++) pintaFila(x, k, 0.01);
+  x.restore();
+  const c2 = document.createElement('canvas'); c2.width = c2.height = Math.round(res/2.2); const x2 = c2.getContext('2d');
+  if ('filter' in x2){ x2.filter = `blur(${Math.max(1.5, res/260)}px)`; x2.drawImage(c, 0, 0, c2.width, c2.height); x2.filter = 'none'; } else x2.drawImage(c, 0, 0, c2.width, c2.height);
+  fondoMata = c2;
+}
+/* la hojarasca y las ramas recién cortadas, al pie de la mata */
+const HOJARASCA1 = (() => { const r = rng(1401), f = []; for (let i = 0; i < 220; i++) f.push([-1.6 + r()*3.2, r(), 0.015 + r()*0.02, (r()-.5)*0.8, r()]); return f; })();
+function pintaSuelo1(c, v, px){
+  const x0 = v[0] - 0.2, x1 = v[2] + 0.2, paso = Math.max(0.01, (x1 - x0)/120);
+  const g = c.createLinearGradient(0, BASE1, 0, BASE1 + 1.2); g.addColorStop(0, '#33241a'); g.addColorStop(0.2, '#3f2d1f'); g.addColorStop(1, '#5e4630');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, g1(x0)); for (let x = x0; x <= x1; x += paso) c.lineTo(x, g1(x)); c.lineTo(x1, Math.max(v[3], BASE1) + 0.4); c.lineTo(x0, Math.max(v[3], BASE1) + 0.4); c.closePath(); c.fill();
+  for (const [x, u, L, a, t] of HOJARASCA1){ if (x < x0 || x > x1) continue; const y = g1(x) - 0.004 - u*0.012; c.fillStyle = t < 0.45 ? '#8a6c40' : t < 0.75 ? '#a4834f' : '#5f7a3a'; c.beginPath(); c.ellipse(x, y, L*0.5, L*0.2, a*0.4, 0, 7); c.fill(); }
+  const gc = c.createLinearGradient(0, BASE1 - 0.3, 0, BASE1); gc.addColorStop(0, 'rgba(70,96,46,0)'); gc.addColorStop(1, 'rgba(70,96,46,.65)'); c.fillStyle = gc; c.fillRect(x0, BASE1 - 0.3, x1 - x0, 0.31);
+}
+function pintaCortadas(c, tau, px){
+  if (tau >= 4) return;
+  const a = 1 - sstep(1, 4, tau), V = ESP[esp].verde, r = rng(1601);
+  c.save(); c.globalAlpha *= a;
+  for (let i = 0; i < 9; i++){ const x = 0.55 + r()*0.5, y = g1(x) - 0.02 - r()*0.04, L = 0.35 + r()*0.25, an = (r() - 0.5)*0.4;
+    c.strokeStyle = '#7d8c4a'; c.lineWidth = Math.max(px, 0.012); c.beginPath(); c.moveTo(x - Math.cos(an)*L/2, y - Math.sin(an)*L/2); c.lineTo(x + Math.cos(an)*L/2, y + Math.sin(an)*L/2); c.stroke();
+    for (let k = 0; k < 5; k++){ const u = k/5 - 0.4, Lh = ESP[esp].hoja*(0.6 + r()*0.3); c.save(); c.translate(x + Math.cos(an)*L*u, y + Math.sin(an)*L*u - 0.01); c.rotate(an + (r() < 0.5 ? -1 : 1)*(0.6 + r()*0.8)); c.scale(Lh, Lh*0.55); const pts = contorno(esp, r()); c.fillStyle = mix(V[0], V[2], r()); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (const q of pts) c.lineTo(q[0], q[1]); c.closePath(); c.fill(); c.restore(); } }
+  c.restore();
+}
+/* la hoja elegida, con su pecíolo hasta el rebrote más cercano. Se dibuja igual en los niveles 0, 1 y 2. */
+function tamElegida(tau){ return ESP[esp].hoja*sstep(12, 48, tau); }
+/* (x0, y0): dónde está la base de la mata en el dibujo que llama; CH está en metros del nivel 1, con la base en (0, BASE1) */
+function pintaElegida(c, M, px, det, x0, y0){
+  const L = tamElegida(TAU); if (L < 0.01) return;
+  const cx = x0 + CH.x, cy = y0 - BASE1 + CH.y, [bx, by] = rot(-L*0.62, 0, CH.a);
+  let best = null, d0 = 1e9; for (const B of M.brotes) for (const p of B.pts){ const d = Math.hypot(x0 + p[0] - (cx + bx), y0 + p[1] - (cy + by)); if (d < d0){ d0 = d; best = [x0 + p[0], y0 + p[1]]; } }
+  if (best){ c.strokeStyle = esp === 'nacedero' ? '#45703a' : '#6c8c45'; c.lineWidth = Math.max(px, 0.008); c.lineCap = 'round'; c.beginPath(); c.moveTo(best[0], best[1]); c.quadraticCurveTo((best[0] + cx + bx)/2, (best[1] + cy + by)/2 - 0.03, cx + bx, cy + by); c.stroke(); }
+  c.save(); c.translate(cx, cy); c.rotate(CH.a); c.translate(-L/2, 0); hojaSp(c, esp, L, LOB[esp], px, det, 0.75); c.restore();
+}
+function dibujaMata(c, env){
+  c.save(); c.scale(1/M1, 1/M1);
+  const v = env.view.map(q => q*M1), px = env.px*M1;
+  if (!fondoMata) prepFondoMata();
+  c.drawImage(fondoMata, -4, -0.55*8, 8, 8);
+  pintaSuelo1(c, v, px);
+  const M = armaMata(esp, TAU);
+  pintaMata(c, 0, BASE1, esp, TAU, px, 1);
+  pintaElegida(c, M, px, 1, 0, BASE1);
+  pintaCortadas(c, TAU, px);
+  // luz de la mañana, desde arriba a la derecha
+  const gl = c.createRadialGradient(1.4, -1.6, 0, 1.4, -1.6, 3); gl.addColorStop(0, 'rgba(255,246,210,.16)'); gl.addColorStop(1, 'rgba(255,246,210,0)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 2 · LA HOJA (metros desde su centro)
+   ============================================================ */
+const M2 = LV[2].F;
+const BOKEH = (() => { const r = rng(21), a = []; for (let i = 0; i < 30; i++){ const q = r(); a.push({ x: -0.45 + r()*0.9, y: -0.45 + r()*0.9, r: 0.03 + r()*0.08, k: q < 0.3 ? 0 : q < 0.7 ? 1 : q < 0.85 ? 2 : 3, a: 0.25 + r()*0.45 }); } return a; })();
+function dibujaHoja(c, env){
+  c.save(); c.scale(1/M2, 1/M2);
+  const v = env.view.map(q => q*M2), px = env.px*M2, P = CIELOS[piso], V = ESP[esp].verde;
+  const g = c.createLinearGradient(0, -0.4, 0, 0.4); g.addColorStop(0, P.cielo[1]); g.addColorStop(0.5, mix(V[2], P.cielo[2], 0.4)); g.addColorStop(1, V[0]);
+  c.fillStyle = g; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  const cols = [P.cielo[1], V[1], V[3], V[0]];
+  for (const b of BOKEH){ const col = cols[b.k], gg = c.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); gg.addColorStop(0, rgba(col, b.a)); gg.addColorStop(0.7, rgba(col, b.a*0.6)); gg.addColorStop(1, rgba(col, 0)); c.fillStyle = gg; c.fillRect(b.x - b.r, b.y - b.r, b.r*2, b.r*2); }
+  c.strokeStyle = 'rgba(70,60,40,.35)'; c.lineWidth = 0.012; c.beginPath(); c.moveTo(-0.5, 0.22); c.quadraticCurveTo(-0.1, 0.08, 0.5, 0.3); c.stroke();
+  const L = ESP[esp].hoja;
+  c.save(); c.rotate(CH.a); c.translate(-L/2, 0); hojaSp(c, esp, L, LOB[esp], px, 1, 0.75); c.restore();
+  c.restore();
+}
+/* el punto de la lámina donde entra el nivel 3: entre nervios, a un lado del central */
+const P3 = { u: 0.6, v: 0.11 };
+function fijaPortales(){
+  const L = ESP[esp].hoja, [x, y] = rot((P3.u - 0.5)*L, P3.v*L, CH.a);
+  fijaPortal(3, x/M2, y/M2);
+}
+
+/* ============================================================
+   NIVEL 3 · LA CARA DE LA HOJA (unidades de 8 mm desde el portal)
+   Areolas entre las venitas; de muy cerca, las células de la epidermis.
+   ============================================================ */
+let teselaAreolas = null;
+function prepTeselas(){
+  const r = rng(5);
+  const t = document.createElement('canvas'); t.width = t.height = 256; const c = t.getContext('2d');
+  const sites = []; for (let i = 0; i < 26; i++) sites.push([r()*256, r()*256]);
+  const all = []; for (const s of sites) for (let dx = -256; dx <= 256; dx += 256) for (let dy = -256; dy <= 256; dy += 256) all.push([s[0]+dx, s[1]+dy]);
+  const pol = voronoi(all, [-256,-256,512,512], 80);
+  c.strokeStyle = 'rgba(235,242,215,.55)'; c.lineWidth = 3; c.lineJoin = 'round';
+  for (const p of pol){ if (!inView(p.bb, [0,0,256,256], 30)) continue; c.beginPath(); p.p.forEach((q,i)=> i? c.lineTo(q[0],q[1]) : c.moveTo(q[0],q[1])); c.closePath(); c.stroke(); }
+  teselaAreolas = t;
+}
+const AREOLAS = (() => { const r = rng(31); return voronoi(jitterSites(r, [-1.35, -1.35, 1.35, 1.35], 0.11, 0.9), [-1.4, -1.4, 1.4, 1.4], 0.11); })();
+const EPID = (() => { const r = rng(37); return voronoi(jitterSites(r, [-0.09, -0.09, 0.09, 0.09], 0.0045, 0.95), [-0.095, -0.095, 0.095, 0.095], 0.0045); })();
+const CISTO = (() => { const r = rng(39), out = []; for (let i = 0; i < 1400; i++){ const x = -1.35 + r()*2.7, y = -1.35 + r()*2.7, a = r()*3.14, l = 0.006 + r()*0.008; out.push([x, y, a, l]); } return out; })();
+const venaY = x => -0.12 + 0.1*Math.sin(x*1.4 + 0.5);
+function dibujaCara(c, env){
+  const v = env.view, px = env.px, E = ESP[esp];
+  c.fillStyle = E.lamina[1]; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  // las areolas: cada una un poco abombada, con su luz
+  for (const a of AREOLAS){ if (!inView(a.bb, v, 0.05)) continue; const t = (Math.sin(a.s[0]*37.1 + a.s[1]*19.3) + 1)*0.5;
+    c.fillStyle = mix(E.lamina[0], E.lamina[1], 0.45 + t*0.4); c.beginPath(); roundPoly(c, shrink(a.p, a.c, 0.965)); c.fill(); }
+  c.strokeStyle = mix(E.lamina[2], '#e8f0d0', 0.35); c.lineWidth = Math.max(px, 0.006); c.lineJoin = 'round';
+  c.beginPath(); for (const a of AREOLAS){ if (!inView(a.bb, v, 0.05)) continue; c.moveTo(a.p[0][0], a.p[0][1]); for (const q of a.p) c.lineTo(q[0], q[1]); c.closePath(); } c.stroke();
+  // venitas libres que entran a cada areola
+  c.lineWidth = Math.max(px, 0.003); c.beginPath(); for (const a of AREOLAS){ if (!inView(a.bb, v, 0.05)) continue; const q = a.p[0]; c.moveTo(q[0], q[1]); c.quadraticCurveTo(lerp(q[0], a.c[0], 0.5) + 0.01, lerp(q[1], a.c[1], 0.5), lerp(q[0], a.c[0], 0.75), lerp(q[1], a.c[1], 0.75)); } c.stroke();
+  // una vena que cruza, en relieve
+  c.lineCap = 'round'; c.strokeStyle = mix(E.lamina[2], '#f2f6e0', 0.5); c.lineWidth = 0.07; c.beginPath(); for (let x = -1.4; x <= 1.41; x += 0.05) c.lineTo(x, venaY(x)); c.stroke();
+  c.strokeStyle = 'rgba(255,255,240,.55)'; c.lineWidth = 0.016; c.beginPath(); for (let x = -1.4; x <= 1.41; x += 0.05) c.lineTo(x, venaY(x) - 0.018); c.stroke();
+  // de muy cerca: las células de la epidermis, como piezas de rompecabezas
+  const aE = clamp((1.6e-4 - px)/1e-4, 0, 1);
+  if (aE > 0.01){ c.save(); c.globalAlpha = aE;
+    for (const q of EPID){ if (!inView(q.bb, v, 0.002)) continue; const t = (Math.sin(q.s[0]*3711 + q.s[1]*1931) + 1)*0.5; c.fillStyle = mix(E.lamina[1], E.lamina[2], 0.2 + t*0.35); c.beginPath(); roundPoly(c, shrink(q.p, q.c, 0.94)); c.fill(); }
+    c.strokeStyle = mix(E.lamina[2], '#f4f8e4', 0.6); c.lineWidth = Math.max(px*1.2, 0.0003); c.beginPath(); for (const q of EPID){ if (!inView(q.bb, v, 0.002)) continue; roundPoly(c, shrink(q.p, q.c, 0.98)); } c.stroke();
+    c.restore(); }
+  // los cistolitos del nacedero: rayitas de mineral en la cara de arriba {3}
+  if (esp === 'nacedero'){ c.strokeStyle = 'rgba(240,246,232,.8)'; c.lineCap = 'round'; c.lineWidth = Math.max(px, 0.0028); c.beginPath();
+    for (const [x, y, a, l] of CISTO){ if (x < v[0] - 0.02 || x > v[2] + 0.02 || y < v[1] - 0.02 || y > v[3] + 0.02) continue; c.moveTo(x - Math.cos(a)*l, y - Math.sin(a)*l); c.lineTo(x + Math.cos(a)*l, y + Math.sin(a)*l); } c.stroke(); }
+  const gl = c.createLinearGradient(-1, -1, 1, 1); gl.addColorStop(0, 'rgba(255,255,235,.16)'); gl.addColorStop(1, 'rgba(40,70,30,.16)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+}
+
+/* ============================================================
+   NIVEL 4 · LA HOJA DE CANTO (1 unidad = 412 µm). El corte del Descenso del café.
+   ============================================================ */
+const CORTE = (() => {
+  const r = rng(51);
+  const Y = { cut: -0.300, epiA: -0.297, epiB: -0.245, palA: -0.238, palB: -0.092, espA: -0.085, espB: 0.235, infA: 0.240, infB: 0.290 };
+  const epi = []; for (let x = -1.3; x < 1.3;){ const w = 0.05 + r()*0.03; epi.push([x, x + w]); x += w; }
+  const inf = []; for (let x = -1.3; x < 1.3;){ const w = 0.035 + r()*0.03; inf.push([x, x + w]); x += w; }
+  const pal = []; for (let k = -30; k <= 30; k++) pal.push({ x: k*0.042 + (k ? (r()-.5)*0.004 : 0), hw: 0.0185 + (k ? (r()-.5)*0.003 : 0), top: Y.palA + (k ? r()*0.006 : 0.003), bot: Y.palB - (k ? r()*0.01 : 0.004), seed: 100 + k });
+  const sites = jitterSites(r, [-1.25, Y.espA + 0.02, 1.25, Y.espB - 0.02], 0.062, 0.9);
+  const esp_ = voronoi(sites, [-1.3, Y.espA, 1.3, Y.espB], 0.062).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.7 + r()*0.08) }));
+  const est = []; for (let x = -1.2; x < 1.2; x += 0.16 + r()*0.18) est.push(x);
+  return { Y, epi, inf, pal, esp: esp_, est };
+})();
+/* los cloroplastos de una célula: en sombra se juntan en las caras que reciben luz (de dibujo) */
+function plastos(n, seed){
+  const r = rng(seed), out = [];
+  for (let i = 0; i < n; i++){
+    const lado = i % 2 ? 1 : -1;
+    const vH = -0.86 + 1.72 * ((Math.floor(i/2) + 0.5) / Math.ceil(n/2)) + (r()-.5)*0.05;
+    const huida = { u: lado*0.74, v: vH, rot: Math.PI/2 };
+    let acu;
+    if (i < 6){ acu = { u: -0.46 + (i%3)*0.46, v: -0.86 + Math.floor(i/3)*0.1, rot: 0 }; }
+    else if (i < 12){ const j = i - 6; acu = { u: -0.46 + (j%3)*0.46, v: 0.86 - Math.floor(j/3)*0.1, rot: 0 }; }
+    else { const j = i - 12; acu = { u: lado*0.74, v: (j < (n-12)/2 ? -0.72 : 0.5) + (j % 4)*0.07, rot: Math.PI/2 }; }
+    out.push({ huida, acu, ret: r()*0.35 });
+  }
+  return out;
+}
+const PLASTOS = plastos(22, 7);
+const LUZC = 0.15;
+function posPlasto(P, cx, cy, hw, hh){ const t = clamp((1 - LUZC - P.ret*0.6) / (1 - P.ret*0.6 + 1e-6), 0, 1); const e = t*t*(3-2*t);
+  return { x: cx + lerp(P.huida.u, P.acu.u, e)*hw, y: cy + lerp(P.huida.v, P.acu.v, e)*hh, rot: lerp(P.huida.rot, P.acu.rot, e) }; }
+function celulaEmpalizada(c, cx, top, bot, hw, px, detalle){
+  const cy = (top + bot) / 2, hh = (bot - top) / 2, rr = hw*0.8;
+  const caja = (x0, y0, x1, y1, r0) => { c.beginPath(); c.moveTo(x0 + r0, y0); c.arcTo(x1, y0, x1, y1, r0); c.arcTo(x1, y1, x0, y1, r0); c.arcTo(x0, y1, x0, y0, r0); c.arcTo(x0, y0, x1, y0, r0); c.closePath(); };
+  caja(cx - hw, top, cx + hw, bot, rr); c.fillStyle = detalle > 0.5 ? '#2c5139' : '#27493a'; c.fill();
+  const m = hw*0.2;
+  caja(cx - hw + m, top + m*1.4, cx + hw - m, bot - m*1.4, rr*0.8);
+  const gv = c.createLinearGradient(cx - hw, 0, cx + hw, 0); gv.addColorStop(0, 'rgba(159,211,224,.30)'); gv.addColorStop(0.5, 'rgba(159,211,224,.16)'); gv.addColorStop(1, 'rgba(159,211,224,.30)');
+  c.fillStyle = gv; c.fill();
+  if (detalle > 0.5){ c.strokeStyle = 'rgba(190,232,240,.55)'; c.lineWidth = Math.max(px, hw*0.02); c.stroke(); }
+  const cl = hw*0.30, cw = hw*0.13;
+  for (let i = 0; i < PLASTOS.length; i++){
+    const Q = posPlasto(PLASTOS[i], cx, cy, hw, hh);
+    c.save(); c.translate(Q.x, Q.y); c.rotate(Q.rot);
+    if (detalle > 0.5){ const g = c.createLinearGradient(0, -cw, 0, cw); g.addColorStop(0, '#9be07a'); g.addColorStop(1, '#4f9a3a'); c.fillStyle = g; }
+    else c.fillStyle = '#7ccf5b';
+    c.beginPath(); c.ellipse(0, 0, cl, cw, 0, 0, 7); c.fill();
+    if (detalle > 0.7){ c.fillStyle = 'rgba(30,80,34,.6)'; for (let k = -3; k <= 3; k++){ c.beginPath(); c.ellipse(k*cl*0.26, (k % 2)*cw*0.08, cl*0.07, cw*0.42, 0, 0, 7); c.fill(); } }
+    c.restore();
+  }
+  caja(cx - hw, top, cx + hw, bot, rr); c.strokeStyle = detalle > 0.5 ? '#d9c7a0' : 'rgba(217,199,160,.75)'; c.lineWidth = Math.max(px*1.2, hw*(detalle > 0.5 ? 0.075 : 0.1)); c.stroke();
+}
+function venaCorte(){ return PORT ? [0.12, 0.05] : [0.37, 0.07]; }
+function dibujaCanto(c, env){
+  const Y = CORTE.Y, v = env.view, px = env.px;
+  c.fillStyle = '#1f3b2a'; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  const gs = c.createLinearGradient(0, -1, 0, Y.cut); gs.addColorStop(0, '#d9ecb4'); gs.addColorStop(0.7, '#8fbf6a'); gs.addColorStop(1, '#5f8f4a'); c.fillStyle = gs; c.fillRect(v[0] - 0.1, Math.min(v[1], -1.5), v[2] - v[0] + 0.2, Y.cut - Math.min(v[1], -1.5));
+  const gi = c.createLinearGradient(0, Y.infB, 0, 1); gi.addColorStop(0, '#2a4a36'); gi.addColorStop(1, '#16281d'); c.fillStyle = gi; c.fillRect(v[0] - 0.1, Y.infB, v[2] - v[0] + 0.2, Math.max(v[3], 1.5) - Y.infB);
+  c.fillStyle = '#10261a'; c.fillRect(v[0] - 0.1, Y.palA, v[2] - v[0] + 0.2, Y.infA - Y.palA);
+  for (const q of CORTE.esp){ if (!inView(q.bb, v, 0.03)) continue;
+    c.beginPath(); roundPoly(c, q.sh); c.fillStyle = '#2a4d37'; c.fill(); c.strokeStyle = 'rgba(217,199,160,.55)'; c.lineWidth = Math.max(px, 0.0028); c.stroke();
+    const r = rng(Math.floor((q.c[0]+2)*1000)); c.fillStyle = '#6fbf52';
+    for (let i = 0; i < 5; i++){ const t = r()*6.28; const P = q.sh[Math.floor(r()*q.sh.length)]; const x = lerp(q.c[0], P[0], 0.8), y = lerp(q.c[1], P[1], 0.8); c.beginPath(); c.ellipse(x, y, 0.0075, 0.0038, t, 0, 7); c.fill(); } }
+  const det = px < 0.0025 ? 1 : 0.2;
+  for (const p of CORTE.pal){ if (p.x + 0.03 < v[0] || p.x - 0.03 > v[2]) continue; celulaEmpalizada(c, p.x, p.top, p.bot, p.hw, px, det); }
+  for (const [a, b] of CORTE.epi){ if (b < v[0] || a > v[2]) continue; c.beginPath(); c.roundRect ? c.roundRect(a + 0.002, Y.epiA, b - a - 0.004, Y.epiB - Y.epiA, 0.01) : c.rect(a, Y.epiA, b-a, Y.epiB-Y.epiA); c.fillStyle = '#3c6247'; c.fill(); c.strokeStyle = 'rgba(217,199,160,.7)'; c.lineWidth = Math.max(px, 0.003); c.stroke(); }
+  c.strokeStyle = '#eaf3c9'; c.lineWidth = Math.max(px*1.5, 0.005); c.beginPath(); c.moveTo(v[0] - 0.1, Y.cut); c.lineTo(v[2] + 0.1, Y.cut); c.stroke();
+  for (const [a, b] of CORTE.inf){ if (b < v[0] || a > v[2]) continue; if (CORTE.est.some(x => x > a - 0.02 && x < b + 0.02)) continue; c.beginPath(); c.roundRect ? c.roundRect(a + 0.002, Y.infA, b - a - 0.004, Y.infB - Y.infA, 0.008) : c.rect(a, Y.infA, b-a, Y.infB-Y.infA); c.fillStyle = '#3f6549'; c.fill(); c.strokeStyle = 'rgba(217,199,160,.7)'; c.lineWidth = Math.max(px, 0.003); c.stroke(); }
+  for (const x of CORTE.est){ if (x < v[0] - 0.05 || x > v[2] + 0.05) continue;
+    const g = c.createRadialGradient(x, Y.infA - 0.01, 0, x, Y.infA - 0.01, 0.06); g.addColorStop(0, '#081a10'); g.addColorStop(1, 'rgba(8,26,16,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(x, Y.infA - 0.01, 0.06, 0.045, 0, 0, 7); c.fill();
+    for (const s of [-1, 1]){ c.beginPath(); c.ellipse(x + s*0.013, Y.infA + 0.026, 0.011, 0.014, 0, 0, 7); c.fillStyle = '#9fbb74'; c.fill(); c.strokeStyle = 'rgba(217,199,160,.8)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); } }
+  const [vx, vy] = venaCorte(); c.fillStyle = '#35553f'; c.beginPath(); c.arc(vx, vy, 0.075, 0, 7); c.fill();
+  for (let i = 0; i < 14; i++){ const a = i/14*6.283; c.beginPath(); c.arc(vx + Math.cos(a)*0.062, vy + Math.sin(a)*0.062, 0.014, 0, 7); c.fillStyle = '#4b7353'; c.fill(); c.strokeStyle = 'rgba(217,199,160,.6)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); }
+  for (let i = 0; i < 7; i++){ const a = -2.4 + i*0.28; c.beginPath(); c.arc(vx + Math.cos(a)*0.028, vy + Math.sin(a)*0.028, 0.0085, 0, 7); c.strokeStyle = '#d9c7a0'; c.lineWidth = Math.max(px, 0.0035); c.stroke(); }
+  const gh = c.createLinearGradient(0, Y.cut, 0, Y.infB); gh.addColorStop(0, 'rgba(167,201,87,.10)'); gh.addColorStop(1, 'rgba(0,0,0,.18)'); c.fillStyle = gh; c.fillRect(v[0] - 0.1, Y.cut, v[2] - v[0] + 0.2, Y.infB - Y.cut);
+}
+/* el cloroplasto elegido: abajo, en el centro de la célula central de la empalizada */
+const PAL0 = CORTE.pal.find(q => q.x === 0);
+const CLO = (() => { const cy = (PAL0.top + PAL0.bot)/2, hh = (PAL0.bot - PAL0.top)/2; const Q = posPlasto(PLASTOS[7], 0, cy, PAL0.hw, hh); return { ...Q, cl: PAL0.hw*0.30, cw: PAL0.hw*0.13, pared: PAL0.bot }; })();
+fijaPortal(5, CLO.x, CLO.y);
+
+/* ============================================================
+   NIVEL 5 · UN CLOROPLASTO (1 unidad = 10 µm, desde su centro)
+   Dos membranas, pilas de tilacoides (granos) y el estroma, con la
+   Rubisco dibujada como puntos (de dibujo: es mucho más pequeña).
+   ============================================================ */
+const K5 = LV[4].F/LV[5].F;                                 // de unidades del canto a unidades del cloroplasto
+const CL5 = { a: CLO.cl*K5*1.04, b: CLO.cw*K5*1.12 };
+const GRANOS = (() => { const r = rng(5101), out = []; const n = 9;
+  for (let i = 0; i < n; i++){ const u = -0.78 + 1.56*(i + 0.5)/n + (r()-.5)*0.05, v = (r()-.5)*0.5; const disc = 5 + Math.floor(r()*5); out.push({ x: u*CL5.a, y: v*CL5.b*Math.sqrt(1 - u*u)*0.9, n: disc, w: (0.12 + r()*0.04)*CL5.a, inc: (r()-.5)*0.35 }); }
+  return out; })();
+const RUBISCO = (() => { const r = rng(5201), out = []; let t = 0; while (out.length < 2600 && t < 20000){ t++; const x = (r()*2 - 1)*CL5.a, y = (r()*2 - 1)*CL5.b; if ((x/CL5.a)**2 + (y/CL5.b)**2 > 0.86) continue; if (GRANOS.some(G => Math.abs(x - G.x) < G.w*0.6 && Math.abs(y - G.y) < G.n*0.0042)) continue; out.push([x, y, r()]); } return out; })();
+function dibujaCloroplasto(c, env){
+  const v = env.view, px = env.px;
+  // el citoplasma alrededor, la vacuola (arriba) y la pared de la célula (abajo)
+  c.fillStyle = '#183424'; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  const yP = (CLO.pared - CLO.y)*K5;
+  const gv = c.createLinearGradient(0, -1.2, 0, -CL5.b*1.6); gv.addColorStop(0, 'rgba(159,211,224,.5)'); gv.addColorStop(1, 'rgba(159,211,224,.12)'); c.fillStyle = gv; c.fillRect(v[0] - 0.1, Math.min(v[1], -1.5), v[2] - v[0] + 0.2, -CL5.b*1.6 - Math.min(v[1], -1.5));
+  c.strokeStyle = 'rgba(190,232,240,.55)'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(v[0] - 0.1, -CL5.b*1.6); c.lineTo(v[2] + 0.1, -CL5.b*1.6); c.stroke();
+  const gw = c.createLinearGradient(0, yP - 0.06, 0, yP + 0.06); gw.addColorStop(0, '#cdb88f'); gw.addColorStop(0.5, '#e2d3ae'); gw.addColorStop(1, '#bba47a'); c.fillStyle = gw; c.fillRect(v[0] - 0.1, yP - 0.05, v[2] - v[0] + 0.2, 0.12);
+  c.fillStyle = '#21402c'; c.fillRect(v[0] - 0.1, yP + 0.07, v[2] - v[0] + 0.2, Math.max(v[3], 1.5) - yP);
+  const rb = rng(5301); for (let i = 0; i < 22; i++){ const x = -1.2 + rb()*2.4, y = -0.6 + rb()*1.0, R = 0.01 + rb()*0.02; if (Math.abs(x) < CL5.a*1.1 && Math.abs(y) < CL5.b*1.2) continue; c.fillStyle = 'rgba(200,220,160,.18)'; c.beginPath(); c.arc(x, y, R, 0, 7); c.fill(); }
+  // cloroplastos vecinos, fuera de foco
+  for (const dx of [-0.62, 0.62]){ const g = c.createRadialGradient(dx, 0, 0, dx, 0, CL5.a); g.addColorStop(0, 'rgba(124,207,91,.35)'); g.addColorStop(1, 'rgba(124,207,91,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(dx, 0.01, CL5.a, CL5.b*1.2, 0, 0, 7); c.fill(); }
+  c.save(); c.rotate(CLO.rot);
+  // la membrana de afuera y la de adentro
+  c.fillStyle = '#5c9f45'; c.beginPath(); c.ellipse(0, 0, CL5.a, CL5.b, 0, 0, 7); c.fill();
+  const gS = c.createRadialGradient(-CL5.a*0.3, -CL5.b*0.4, 0, 0, 0, CL5.a); gS.addColorStop(0, '#d6eaa2'); gS.addColorStop(0.7, '#b9d985'); gS.addColorStop(1, '#9cc46c');
+  c.fillStyle = gS; c.beginPath(); c.ellipse(0, 0, CL5.a*0.965, CL5.b*0.93, 0, 0, 7); c.fill();
+  c.strokeStyle = '#e8f3c8'; c.lineWidth = Math.max(px, 0.0035); c.beginPath(); c.ellipse(0, 0, CL5.a, CL5.b, 0, 0, 7); c.stroke();
+  c.strokeStyle = '#4b8a3a'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.ellipse(0, 0, CL5.a*0.965, CL5.b*0.93, 0, 0, 7); c.stroke();
+  c.save(); c.beginPath(); c.ellipse(0, 0, CL5.a*0.95, CL5.b*0.91, 0, 0, 7); c.clip();
+  // la Rubisco en el estroma: puntos de dibujo, que aparecen al acercarse
+  const aR = clamp((0.004 - px)/0.003, 0, 1);
+  if (aR > 0.01){ c.globalAlpha = aR*0.75; for (const [x, y, t] of RUBISCO){ c.fillStyle = t < 0.5 ? '#86a24c' : '#9cb862'; c.beginPath(); c.arc(x, y, 0.0017, 0, 7); c.fill(); } c.globalAlpha = 1; }
+  // las láminas que unen los granos
+  c.strokeStyle = 'rgba(46,104,40,.75)'; c.lineWidth = Math.max(px, 0.003);
+  for (let i = 0; i < GRANOS.length - 1; i++){ const A = GRANOS[i], B = GRANOS[i + 1]; for (const k of [-1, 1]){ c.beginPath(); c.moveTo(A.x, A.y + k*A.n*0.0021); c.bezierCurveTo((A.x + B.x)/2, A.y + k*0.02, (A.x + B.x)/2, B.y - k*0.02, B.x, B.y - k*B.n*0.0021); c.stroke(); } }
+  // los granos: pilas de discos
+  for (const G of GRANOS){ c.save(); c.translate(G.x, G.y); c.rotate(G.inc);
+    const h = 0.0042, top = -G.n*h/2;
+    for (let k = 0; k < G.n; k++){ const y = top + k*h; c.fillStyle = k % 2 ? '#2f7a2c' : '#3e8f36'; c.beginPath(); c.roundRect ? c.roundRect(-G.w/2, y, G.w, h*0.78, h*0.39) : c.rect(-G.w/2, y, G.w, h*0.78); c.fill(); }
+    c.strokeStyle = 'rgba(210,240,180,.4)'; c.lineWidth = Math.max(px*0.6, 0.0008); c.beginPath(); for (let k = 0; k < G.n; k++){ const y = top + k*h + h*0.1; c.moveTo(-G.w/2 + 0.004, y); c.lineTo(G.w/2 - 0.004, y); } c.stroke();
+    c.restore(); }
+  c.restore();
+  c.restore();
+}
+const DIB = [dibujaFinca, dibujaMata, dibujaHoja, dibujaCara, dibujaCanto, dibujaCloroplasto];
+
+/* ============================================================
+   GUION DE CÁMARA (X, Y en metros del mundo; Z = ancho del cuadro)
+   ============================================================ */
+function K(L, x, y, f){ const l = LV[L]; return { X: l.O[0] + l.F*x, Y: l.O[1] + l.F*y, Z: l.F*f }; }
+function Km(L, xm, ym, wm){ const l = LV[L], z = wm*S/W; return K(L, xm/l.F, ym/l.F, z/l.F); }
+const Ku = (L, xu, yu, wm) => Km(L, xu*LV[L].F, yu*LV[L].F, wm);
+let SEGS = [], T = 0, EST = [], PARADAS = [];
+function guion(){
+  const P = PORT, a = W/H, E = ESP[esp];
+  const cy0 = (w, f) => -(f - 0.5)*w/a;                                     // el suelo cae a esa fracción del alto
+  const e0 = P ? Km(0, -0.5, gF(-0.5) + cy0(6.6, 0.52), 6.6) : Km(0, 0.65, cy0(17.6, 0.6), 17.6);
+  const need = E.alto + 0.55, w1 = P ? Math.max(1.6, need*a*1.15) : Math.max(2.6, need*a*1.08), h1 = w1/a;
+  const e1 = Km(1, P ? 0.06 : -0.2*w1 + 0.15, BASE1 - ((P ? 0.56 : 0.86) - 0.5)*h1, w1);
+  const e2 = Km(1, P ? 0.06 : -0.2*w1 + 0.15, BASE1 - ((P ? 0.56 : 0.86) - 0.5)*h1, w1*0.98);
+  const L = E.hoja, w3 = P ? L*1.45 : L*2.9;
+  const e3 = Km(2, P ? 0 : -0.16*w3, P ? 0.16*w3/a : 0.06*w3/a, w3);
+  const e3b = Ku(3, P ? 0 : -0.12, P ? 0.18 : 0.02, P ? 4e-3 : 7e-3);
+  const e3c = Ku(3, 0, 0, P ? 3e-4 : 4e-4);
+  const e4 = Ku(4, P ? 0 : -0.12, P ? 0.12 : -0.08, P ? 3e-4 : 4.12e-4);
+  const e5 = Ku(5, P ? 0 : -0.12, P ? 0.2 : 0.06, P ? 5.8e-6 : 9e-6);
+  const e6 = P ? Km(0, 6.3, cy0(4.8, 0.5), 4.8) : Km(0, 6.0, cy0(7.6, 0.6), 7.6);
+  const e7 = P ? Km(0, 1.9, cy0(9.8, 0.5), 9.8) : Km(0, 0.6, cy0(19, 0.6), 19);
+  const b = (A, k) => ({ ...A, Z: A.Z*k });
+  SEGS = [
+    { k:'hold', A:e0, B:b(e0, 0.95), w:1.0, st:0, card:'e0' },
+    { k:'move', A:b(e0, 0.95), B:e1, w:1.6 },
+    { k:'hold', A:e1, B:b(e1, 0.95), w:1.3, st:1, card:'e1' },
+    { k:'move', A:b(e1, 0.95), B:e2, w:0.4 },
+    { k:'hold', A:e2, B:b(e2, 0.98), w:3.2, st:2, card:'e2', dias:[0, DIAS] },
+    { k:'move', A:b(e2, 0.98), B:e3, w:1.6 },
+    { k:'hold', A:e3, B:b(e3, 0.95), w:1.3, st:3, card:'e3' },
+    { k:'move', A:b(e3, 0.95), B:e3b, w:1.4 },
+    { k:'hold', A:e3b, B:b(e3b, 0.94), w:0.9, card:'paso' },
+    { k:'move', A:b(e3b, 0.94), B:e3c, w:1.1 },
+    { k:'tilt', w:1.5, A:e3c, B:e4 },
+    { k:'hold', A:e4, B:b(e4, 0.95), w:1.3, st:4, card:'e4', raiz:4 },
+    { k:'move', A:b(e4, 0.95), B:e5, w:1.5, raiz:4 },
+    { k:'hold', A:e5, B:b(e5, 0.94), w:1.6, st:5, card:'e5', raiz:4 },
+    { k:'move', A:b(e5, 0.94), B:e4, w:1.1, raiz:4, card:'sube', sube:true },
+    { k:'tilt', w:1.2, A:e3c, B:e4, rev:true, card:'sube', sube:true },
+    { k:'move', A:e3c, B:e6, w:3.0, card:'sube', sube:true },
+    { k:'hold', A:e6, B:b(e6, 0.96), w:1.8, st:6, card:'e6' },
+    { k:'move', A:b(e6, 0.96), B:e7, w:1.3 },
+    { k:'hold', A:e7, B:b(e7, 0.97), w:1.6, st:7, card:'e7' },
+  ];
+  let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; s.raiz = s.raiz || 0; } T = acc;
+  EST = SEGS.filter(s => s.st !== undefined);
+  PARADAS = [0];
+  for (const s of SEGS){ if (s === SEGS[0]) continue;
+    if (s.st !== undefined){ if (s.dias) PARADAS.push(s.a + s.w*0.12, s.a + s.w*(0.08 + 0.84*60/DIAS), s.b - s.w*0.06); else PARADAS.push(s === SEGS[SEGS.length-1] ? T : (s.a + s.b)/2); }
+    else if (s.card === 'paso') PARADAS.push((s.a + s.b)/2); }
+}
+const estP = i => i === 0 ? 0 : i === EST.length - 1 ? T : (EST[i].a + EST[i].b)/2;
+const inicioSubida = () => SEGS.find(s => s.sube).a;
+/* el reloj: días desde el corte. Antes de la estación 3, la mata lleva 60 días; adentro corre de 0 a 90 */
+function tauDe(p){
+  const s = SEGS.find(q => q.dias); if (!s) return 60;
+  if (p <= s.a) return 60;
+  if (p >= s.b) return DIAS;
+  const u = (p - s.a)/s.w; return lerp(s.dias[0], s.dias[1], clamp((u - 0.08)/0.84, 0, 1));
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let s = SEGS[SEGS.length-1], i = SEGS.length - 1;
+  for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ s = SEGS[j]; i = j; break; } }
+  const u = clamp((p - s.a)/s.w, 0, 1); const A = s.A, B = s.B;
+  if (s.k === 'tilt'){ const t = s.rev ? 1 - u : u; return { tilt: true, t, X: 0, Y: 0, Z: lerp(A.Z*LV[3].F/LV[3].F, B.Z, 0.5), ZA: A.Z, ZB: B.Z, seg: s, i, u, raiz: t < 0.5 ? 0 : 4 }; }
+  if (s.k === 'hold') return { X: A.X, Y: A.Y, Z: A.Z*Math.pow(B.Z/A.Z, u), seg: s, i, u, raiz: s.raiz };
+  const e = u*u*(3 - 2*u);
+  const Z = A.Z*Math.pow(B.Z/A.Z, e);
+  let X, Y;
+  if (Math.abs(Math.log(B.Z/A.Z)) > 0.05){ const k = (A.Z - Z)/(A.Z - B.Z); X = A.X + (B.X - A.X)*k; Y = A.Y + (B.Y - A.Y)*k; }
+  else { X = lerp(A.X, B.X, e); Y = lerp(A.Y, B.Y, e); }
+  return { X, Y, Z, seg: s, i, u, raiz: s.raiz };
+}
+function anchoVista(cam){ if (cam.tilt) return Math.exp(lerp(Math.log(cam.ZA), Math.log(cam.ZB), cam.t))*W/S; return cam.Z*W/S; }
+
+/* ============================================================
+   RENDER (el de los descensos del café, del suelo y del silvopastoreo)
+   ============================================================ */
+const PERF = [0, 0, 0, 0, 0, 0];
+function envPara(L, cx, cy, f, ppu){ return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - CX/ppu, cy - CY/ppu, cx + (W - CX)/ppu, cy + (H - CY)/ppu] }; }
+function baseDe(cam){
+  let L = cam.raiz || 0;
+  for (;;){ let nx = -1;
+    for (const k of KIDS[L]){ const l = LV[k]; if (cam.Z/l.F > l.k/0.92) continue; const lx = (cam.X - l.O[0])/l.F, ly = (cam.Y - l.O[1])/l.F; if (Math.abs(lx) < 0.75 && Math.abs(ly) < 0.75){ nx = k; break; } }
+    if (nx < 0) return L; L = nx; }
+}
+function pintaNivel(c, L, cx, cy, f){
+  const ppu = S/f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(CX - cx*ppu), DPR*(CY - cy*ppu));
+  let t0 = performance.now(); DIB[L](c, envPara(L, cx, cy, f, ppu)); PERF[L] += performance.now() - t0;
+  for (const k of KIDS[L]){
+    const P = LV[k]; const pp = P.s*ppu*P.k; const a = sstep(0.28*S, 0.92*S, pp); if (a <= 0) continue;
+    const ox = CX + (P.x - cx)*ppu, oy = CY + (P.y - cy)*ppu;
+    if (ox + pp*1.3 < 0 || ox - pp*1.3 > W || oy + pp*1.3 < 0 || oy - pp*1.3 > H) continue;
+    const ppu2 = ppu*P.s, cx2 = (cx - P.x)/P.s, cy2 = (cy - P.y)/P.s, f2 = f/P.s;
+    const cubre = a >= 0.999; const dst = cubre ? c : bctx;
+    if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+    dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*(CX - cx2*ppu2), DPR*(CY - cy2*ppu2));
+    t0 = performance.now(); DIB[k](dst, envPara(k, cx2, cy2, f2, ppu2)); PERF[k] += performance.now() - t0;
+    if (cubre) continue;
+    bctx.setTransform(1,0,0,1,0,0);
+    bctx.globalCompositeOperation = 'destination-in';
+    const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+    const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+    gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+    bctx.globalCompositeOperation = 'source-over';
+    c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+  }
+}
+function pintaCam(c, cam){ const L = baseDe(cam), l = LV[L]; pintaNivel(c, L, (cam.X - l.O[0])/l.F, (cam.Y - l.O[1])/l.F, cam.Z/l.F); return L; }
+/* el giro: la cara de la hoja se tumba y el canto se levanta (el del Descenso del café) */
+function prepTexturasGiro(){
+  for (const t of [texA, texB]){ t.width = cv.width; t.height = cv.height; }
+  const s = SEGS.find(q => q.k === 'tilt');
+  pintaCam(texA.getContext('2d'), { ...s.A, raiz: 0 });
+  pintaCam(texB.getContext('2d'), { ...s.B, raiz: 4 });
+  texOK = true;
+}
+function pintaGiro(c, t){
+  if (!texOK) prepTexturasGiro();
+  const th = (t*t*(3 - 2*t)) * Math.PI/2;
+  const Wd = cv.width, Hd = cv.height, h = H, Dp = 1.8*Math.max(W, H);
+  c.setTransform(1,0,0,1,0,0);
+  c.fillStyle = '#1f3b2a'; c.fillRect(0, 0, Wd, Hd);
+  const ct = Math.cos(th), st = Math.sin(th);
+  const proy = (y, zp) => { const yr = y*ct - zp*st, zr = y*st + zp*ct + h/2; const k = Dp/(Dp + zr); return [H/2 + yr*k, k]; };
+  const paso = Math.max(2, Math.round(DPR*1.5));
+  if (th < Math.PI/2 - 0.001){
+    for (let j = 0; j < Hd; j += paso){
+      const y0 = j/DPR - h/2, y1 = (j + paso)/DPR - h/2;
+      const [s0, k0] = proy(y0, -h/2), [s1] = proy(y1, -h/2);
+      if (s1 - s0 <= 0) continue;
+      const ww = W * Math.max(1, k0);
+      c.drawImage(texA, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6);
+    }
+    const [ya] = proy(-h/2, -h/2), [yb] = proy(h/2, -h/2);
+    c.fillStyle = `rgba(8,20,12,${0.55*st})`; c.fillRect(0, ya*DPR, Wd, (yb - ya)*DPR);
+  }
+  for (let j = 0; j < Hd; j += paso){
+    const z0 = (Hd - j)/DPR, z1 = (Hd - j - paso)/DPR;
+    const [s0, k0] = proy(-h/2, z0 - h/2), [s1] = proy(-h/2, z1 - h/2);
+    if (s1 - s0 <= 0) continue;
+    const ww = W * Math.max(1, k0);
+    c.drawImage(texB, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6);
+  }
+  const [yc] = proy(-h/2, h/2), [yd] = proy(-h/2, -h/2);
+  c.fillStyle = `rgba(6,16,10,${0.6*ct})`; c.fillRect(0, yc*DPR, Wd, (yd - yc)*DPR);
+  c.strokeStyle = `rgba(234,243,201,${0.25 + 0.5*Math.sin(th*2)})`; c.lineWidth = 2*DPR; c.beginPath(); c.moveTo(0, yd*DPR); c.lineTo(Wd, yd*DPR); c.stroke();
+}
+let camR = null;
+function aPantalla(L, x, y){ const l = LV[L]; const X = l.O[0] + l.F*x, Y = l.O[1] + l.F*y; return [CX + (X - camR.X)*S/camR.Z, CY + (Y - camR.Y)*S/camR.Z]; }
+function luzProf(Z){ return clamp((Math.log10(Z) + 3.2)/4.4, 0, 1); }
+let pRender = 0;
+function render(){
+  const cam = camAt(pRender); camR = cam; TAU = tauDe(pRender);
+  if (cam.tilt){ pintaGiro(ctx, cam.t); cam.L = cam.t < 0.5 ? 3 : 4; }
+  else cam.L = pintaCam(ctx, cam);
+  ctx.setTransform(1,0,0,1,0,0);
+  const lz = cam.tilt ? 0.3 : luzProf(cam.Z);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, `rgba(8,10,4,${0.08 + 0.32*(1 - lz)})`);
+  ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.seg.k === 'move'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+
+/* ============================================================
+   TEXTOS: [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   Las páginas cambian con el piso y con la especie elegida.
+   ============================================================ */
+const POR_ESP = {
+  boton: { alto: ['Se usa cuando la mata tiene de 1 a 1,5 m de alto{2}.', 'Sin cortar llega a 2 o 3 m{2}.'],
+    cuando: ['En Obonuco, a los 60 días el botón de oro tenía 26,7 % de proteína; a los 80, 21,4 %{5}.', 'Pero a los 80 días dio el doble de comida: 30,6 toneladas de [[ms|materia seca]] por hectárea al año, contra 15,6{5}.'],
+    corte: ['En Obonuco, cortar a 10 o a 50 cm del suelo dio la misma comida{5}.', 'A 50 cm, las matas rebrotaron con más vigor{5}.'],
+    hoja: 'Tiene lóbulos y nervios que salen de la base, como los dedos de una mano{2}.' },
+  nacedero: { alto: ['Sin cortar, el nacedero es un arbusto o arbolito de hasta 5 m{3}.', 'En el banco se mantiene bajo, a punta de corte.'],
+    cuando: ['El primer corte va a los 8 a 10 meses de sembrado{4}.', 'Después, cada 2 a 4 meses{4}.'],
+    corte: ['Cortado a 1 m dio 17 toneladas de follaje fresco por hectárea en cada corte; cortado a 60 cm, 8{4}.'],
+    hoja: 'Es ovalada y angosta en las dos puntas{3}.' },
+  morera: { alto: ['Para el animal se maneja baja: se corta de 20 a 40 cm del suelo{9}.'],
+    cuando: ['En Colombia se corta cada 75 a 90 días{9}.', 'En Costa Rica se ensayaron cortes cada 56, 84 y 112 días{7}.'],
+    corte: ['Cada corte, 1 cm más arriba que el anterior{9}.', 'Cuando la mata se llena de ramitas viejas, una poda de renovación a 10–20 cm{9}.'],
+    hoja: 'Tiene la base en forma de corazón, el borde dentado y nervios que salen de la base{11}.' },
+};
+const PROT = { boton: ['botón de oro', '21 %', 'de 12 a 28', 12], nacedero: ['nacedero', '18 %', 'de 12 a 22', 13], morera: ['morera', '19 %', 'de 12 a 26', 11] };
+function paginas(){
+  const P = perfil, E = ESP[esp], X = POR_ESP[esp], varias = P.esp.length > 1;
+  const lista = piso === 'frio' ? 'botón de oro y, atrás, sauco{5}' : 'botón de oro, nacedero y morera{2,3,11}';
+  const filas = P.esp.map(k => { const [n, pc, r, f] = PROT[k]; return `${n[0].toUpperCase() + n.slice(1)}: ${pc}, ${r}{${f}}.`; });
+  return [
+    { t:'El banco de forraje', c:'El banco', pags:[
+      { s:[`Esto es un [[banco|banco de forraje]] en piso ${P.nombre.toLowerCase()}: matas sembradas juntas para cortarlas y llevarlas al animal.`, `Aquí se ven ${lista}.`, 'Las ramas se cortan y se llevan al corral: eso es corte y acarreo{3}.'], nota:'Las especies son ejemplos documentados para el piso; no son un inventario de su finca.' },
+      { s: P.aqui, nota:'La altitud orienta el piso{1}; el suelo y la lluvia de su finca también deciden.' },
+      { k:'cuanto', s:['De cada 100 kilos de forraje seco, esto es [[pc|proteína]], en promedio:'].concat(filas), nota:'Promedios de muchas muestras: cambian con la edad del corte y con la finca.' } ] },
+    { t:'La mata', c:'La mata', sel: varias ? 'esp' : undefined, pags:[
+      { s:[`Esta es una mata de ${E.nom} (<i>${E.cient}</i>).`, E.forma, varias ? 'Toque otra especie para comparar.' : 'En frío, en esta pieza, solo el botón de oro tiene ensayo propio.'], nota:'El dibujo muestra la mata a los 60 días del último corte.' },
+      { k:'hacer', s: E.siembra },
+      { k:'ojo', s: E.ojo },
+      { k:'tam', s: X.alto } ] },
+    { t:'El corte y el rebrote', c:'El rebrote', tiempo:true, pags:[
+      { s:['Ahora se corta la mata, y el recuadro de arriba cuenta los días.', `Aquí se corta ${E.corteTxt}.`, 'Del tocón salen los [[rebrote|rebrotes]].'], nota:'El ritmo del rebrote del dibujo es de ejemplo: en su finca lo deciden la lluvia, el suelo y la especie.' },
+      { k:'cuando', s: X.cuando },
+      { k:'hacer', s: X.corte },
+      { k:'pensar', s:['¿Qué le sirve más a su animal: menos comida con más proteína, o más comida con menos?', 'Pruebe dos tandas del banco, cortadas a edades distintas.'] } ] },
+    { t:'La hoja', c:'La hoja', pags:[
+      { s:['Esta es una sola hoja de la mata.', X.hoja, 'La proteína del forraje está sobre todo en la hoja{7,12}.'] },
+      { k:'cuanto', s:['En la morera, la hoja tenía 23,5 % de proteína y el tallo, 8,8 %{7}.', 'En el botón de oro, el tallo tiene menos de 10 %{12}.', 'Por eso conviene una mata con mucha hoja y poco palo.'] },
+      { k:'tam', s:[E.tam] },
+      { k:'hacer', s:['Corte una rama, separe las hojas de los tallos y pese cada montón.', '¿Cuánto de la rama es hoja?'] } ] },
+    { t:'Dentro de la hoja', c:'Por dentro', pags:[
+      { s:['Giramos la hoja y la vemos de canto, cortada como una tajada.', 'Arriba, una fila de células paradas y apretadas: la [[empalizada|empalizada]]{27}.', 'Abajo, células sueltas con aire entre ellas{27}.'], nota:'Colores de dibujo: a este tamaño no hay color que ver.' },
+      { s:['Los granos verdes son [[cloroplasto|cloroplastos]]{19}.', 'Las dos capas de la hoja tienen muchos{27}.', 'Ahí la hoja hace su comida con la luz del sol{19}.'] },
+      { k:'tam', s:['Mire el recuadro: el ancho de lo que ve es menos de medio milímetro.', 'Toda esta tajada cabe en el grueso de una hoja.'] } ] },
+    { t:'La proteína', c:'La proteína', pags:[
+      { s:['Este es un solo cloroplasto.', 'Tiene dos membranas y, por dentro, pilas de discos: los [[tilacoide|tilacoides]]{19}.', 'El líquido que rodea las pilas se llama [[estroma|estroma]]{19}.'] },
+      { s:['En el estroma trabaja la [[rubisco|Rubisco]]: la proteína que toma el aire y lo vuelve comida de la planta{20}.', 'Es la proteína que más hay en las partes verdes{21}.', 'Cerca de 3 de cada 100 kilos de hoja seca del planeta son Rubisco{22}.'], nota:'Los puntos son de dibujo: la Rubisco es mucho más pequeña de lo que se ve.' },
+      { k:'cuanto', s:['El tallo de la morera tenía casi el doble de fibra que la hoja: 63,6 % contra 32,8 %{7}.', 'Más palo es más fibra y menos proteína para el animal{7}.'] },
+      { k:'pensar', s:['Cuando el animal se come la hoja, ¿qué le pasa a esa proteína?', 'Subamos al corral a ver.'] } ] },
+    { t:'Al animal', c:'Al animal', pags:[
+      { s:['La vaca y la cabra son [[rumiante|rumiantes]]: su estómago tiene cuatro partes, con microbios que fermentan el forraje{23}.', 'En la panza, los microbios deshacen la proteína del forraje y con ese nitrógeno fabrican la suya{24}.', 'En la morera, de 80 a 90 de cada 100 partes de su proteína se deshicieron en 48 horas de panza{25}.'] },
+      { s:['El cuy no rumia: los microbios le trabajan al final de la tripa, en el ciego{29}.', 'Por eso se come parte de su estiércol, rico en proteína de microbios{29,26}.'] },
+      { k:'cuanto', s: P.vaca },
+      { k:'cuanto', s:['En el Valle del Cauca, terneras con la mitad del [[concentrado|concentrado]] cambiado por hoja de morera ganaron lo mismo: 406 gramos al día{9}.', 'Cabras comiendo solo morera picada cubrieron su proteína y les sobró para ganar más de 50 g al día{15}.', 'En cuyes de engorde, el botón de oro sirvió hasta la cuarta parte de la dieta{14}.'] },
+      { k:'ojo', s:['El botón de oro, el animal lo come a medias, por sustancias de la planta{2}.', 'Ninguno de estos forrajes va solo: cabras con solo botón de oro aprovecharon peor el nitrógeno{12}.', 'El nacedero lo aceptan bien después de acostumbrarse{3}.'] },
+      { k:'hacer', s:['Empiece con poco y suba de a poco, mientras el animal se acostumbra{3}.', 'Pese lo que le da y lo que deja en el comedero.'] } ] },
+    { t:'Su finca, en ciclo', c:'El ciclo', pags:[
+      { k:'hacer', s:['La boñiga del corral vuelve al banco como abono.', 'En Vietnam, el nacedero dio 9 toneladas de materia seca por hectárea con 30 de estiércol, y 5 con 15{3}.'] },
+      { k:'hacer', s: piso === 'frio' ? ['En frío, el nacedero no aguanta las heladas{3}: el nacimiento de agua se protege con lo que se da en su piso.', 'El sauco del banco también se ensayó en Obonuco{5}.'] : ['Siembre nacedero en la orilla de la quebrada y junto al nacimiento: ahí se le encuentra en el monte{4}.', 'Ayuda a que la orilla no se desmorone{3}.', 'Y sirve de cerca viva: un kilómetro de cerca dio 9,2 toneladas de hoja al año{3}.'] },
+      { k:'hacer', s:['El botón de oro crece en suelo pobre y saca fósforo que otras forrajeras no alcanzan{28}.', 'Lo que el animal deja en el comedero puede ir a la pila del abono.'] },
+      { k:'cuanto', s: P.cuenta, nota: P.cuentaNota },
+      { k:'pensar', s:['¿Cuánto concentrado compra al mes?', '¿Qué parte de esa proteína podría salir de un rincón de su finca?'], extra:'<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>' } ] },
+  ];
+}
+let ESTACIONES = paginas();
+const PASO_CARA = () => ({ t:'La cara de la hoja', c:'De paso', pags: [
+  { s:['Esta es la cara de arriba de la hoja, muy de cerca.', 'Las líneas claras son venas: traen el agua y se llevan lo que la hoja fabrica{27}.'] } ].concat(esp === 'nacedero' ? [{ s:['Las rayitas blancas son [[cistolito|cistolitos]]: granitos de mineral en la hoja del nacedero{3}.', 'Por eso su hoja tiene tanto calcio{4}.'] }] : []) });
+const PASO_SUBE = { t:'De vuelta al corral', c:'Subida', pags:[{ s:['Subimos de la hoja a la finca, al comedero donde esa proteína llega al animal.'] }] };
+const GLOS = [
+  ['banco', 'Banco de forraje', 'Matas forrajeras sembradas juntas para cortarlas y llevarlas al animal. El nacedero se usa así, en corte y acarreo{3}.'],
+  ['estaca', 'Estaca', 'Un pedazo de tallo que se entierra para que eche raíz y forme una mata nueva. El botón de oro, el nacedero y la morera se siembran así{2,3,9}.'],
+  ['ms', 'Materia seca', 'Lo que queda del forraje si se le saca toda el agua. El botón de oro fresco tiene cerca de 20 % de materia seca{12}: de 10 kg de rama, unos 2 kg.'],
+  ['pc', 'Proteína cruda', 'La proteína que da el laboratorio: el nitrógeno del forraje seco multiplicado por 6,25{2}. Se da como porcentaje de la materia seca.'],
+  ['rebrote', 'Rebrote', 'Las ramas nuevas que salen del tocón después del corte.'],
+  ['concentrado', 'Concentrado', 'Alimento comprado para completar la dieta. El de la cuenta de Obonuco tenía 18 % de proteína{5}; el de las terneras del Valle, 16 %{9}.'],
+  ['empalizada', 'Empalizada', 'La capa de células en columna, apretadas, bajo la cara de arriba de la hoja{27}.'],
+  ['cloroplasto', 'Cloroplasto', 'El granito verde de la célula donde se hace la fotosíntesis. Tiene dos membranas{19}.'],
+  ['tilacoide', 'Tilacoides', 'Los discos apilados dentro del cloroplasto. Cada pila se llama grano{19}.'],
+  ['estroma', 'Estroma', 'El líquido que rodea las pilas de tilacoides, dentro del cloroplasto. No es lo mismo que estoma, el huequito de la hoja{19}.'],
+  ['rubisco', 'Rubisco', 'La proteína que, en el estroma, une el aire (CO₂) a la comida de la planta{20}. Es la que más hay en las partes verdes{21}.'],
+  ['cistolito', 'Cistolito', 'Granito de mineral en la hoja del nacedero; se ve como rayitas cortas en la cara de arriba{3}.'],
+  ['rumiante', 'Rumiante', 'Animal de estómago de cuatro partes, como la vaca y la cabra; en las primeras viven microbios que fermentan el forraje{23}.'],
+];
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuándo?', cuanto:'¿Cuánto?', ojo:'Con cuidado' };
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => { if (!GLOS.some(g => g[0] === k)) throw new Error('palabra sin glosario: ' + k); return `<button type="button" class="t" data-g="${k}">${v}</button>`; })
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => { if (!FUENTES[+n - 1]) throw new Error('fuente sin ficha: ' + n); return `<a href="#f${n}" data-f>${n}</a>`; }).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ const s = document.createElement('span'); s.innerHTML = txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, ''); return s.textContent; }
+
+$('listaFuentes').innerHTML = FUENTES.map(([t, n, u], i) => `<li id="f${i + 1}"><b>${t}.</b> ${n} <a href="${u}" target="_blank" rel="noopener noreferrer">Leer fuente</a></li>`).join('');
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+function pintaCuentas(){ $('cuentas').innerHTML = marca('<b>Cuentas hechas con esas cifras.</b> Proteína en 10 kg de rama fresca: botón de oro 10 × 0,198 × 0,212 ≈ 0,42 kg{12}; nacedero 10 × 0,175 × 0,179 ≈ 0,31 kg{13}; morera 10 × 0,302 × 0,191 ≈ 0,58 kg{11}. ' + (perfil.cuentaNota || '') + ' La línea «En su regla» del medidor divide un milímetro entre el ancho de la vista, que es aproximado.'); }
+pintaCuentas();
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0] || PASO_SUBE, pagAct = 0;
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag${P.k === 'ojo' ? ' ojo' : ''}">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (estAct.sel === 'esp') h += `<div class="manejo" role="group" aria-label="Especie de la mata" id="selBtns">${perfil.esp.map(k => `<button type="button" class="bc" data-esp="${k}" aria-pressed="${k === esp}">${ESP[k].nom[0].toUpperCase() + ESP[k].nom.slice(1)}</button>`).join('')}</div>`;
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red (la del café) ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue);
+  else if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario), fuentes y repaso ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bRepaso').addEventListener('click', () => abreRepaso());
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); return; }
+  const s = e.target.closest && e.target.closest('[data-esp]'); if (s){ cambiaEspecie(s.dataset.esp); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = '';
+    el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } }
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'µm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){
+  if (x < 10) return '×' + fmt3(x);
+  const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2);
+  return '×' + miles(Math.round(r));
+}
+function fmtRegla(m){
+  const mm = m*1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1/mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n/q)*q; }
+  return `caben ${miles(r)} en 1 mm`;
+}
+/* el reloj del rebrote: corre solo en la estación del corte; antes y después dice la edad de la mata */
+function fmtTiempo(t, corre){ const d = Math.round(t); return corre ? { s: `día ${d} tras el corte`, c: 'corre' } : { s: `mata de ${d} días`, c: '' }; }
+const DONDE = ['en la finca', 'en la mata', 'en la hoja', 'en la cara de la hoja', 'dentro de la hoja', 'en un cloroplasto'];
+const NOTAS = ['Tamaños aproximados.', 'Tamaños aproximados; rebrote de ejemplo.', 'Tamaños aproximados.', 'Tamaños aproximados. Colores de dibujo.', 'Tamaños aproximados. Colores de dibujo.', 'Tamaños aproximados. Colores de dibujo.'];
+let anchoInicial = 0, ultCard = '', ultEst = -1;
+function cardDe(p){
+  for (const s of SEGS){ if (s.k !== 'hold' || !s.card) continue; if (p >= s.a - 0.25 && p <= s.b + 0.2) return { c: s.card, st: s.st === undefined ? -1 : s.st }; }
+  const sb = SEGS.filter(q => q.card === 'sube'); if (sb.length && p >= sb[0].a + 0.35 && p <= sb[sb.length - 1].b - 0.45) return { c: 'sube', st: -1 };
+  return null;
+}
+function estacionDe(p){ let st = 0; for (let i = 0; i < EST.length; i++){ if (p >= EST[i].a - 0.4) st = i; } return st; }
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial/ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+  const sD = SEGS.find(q => q.dias), corre = sD && pRender >= sD.a - 0.1 && pRender <= sD.b + 0.1;
+  const ti = fmtTiempo(TAU, corre), vT = $('vTiempo'); rueda(vT, ti.s); if (vT._c !== ti.c){ vT._c = ti.c; vT.className = ti.c; }
+  const st = estacionDe(pRender), e = ESTACIONES[st];
+  $('vEstacion').textContent = `${st + 1}/${ESTACIONES.length} · ${e.c}`;
+  const sub = cam.seg.sube, vl = $('vLuz'), tl = sub ? '↑ subiendo' : DONDE[cam.L] || '';
+  if (vl._s !== tl){ vl._s = tl; vl.textContent = tl; }
+  const nota = NOTAS[cam.L] || NOTAS[0]; if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  const cd = cardDe(pRender), key = cd ? cd.c + '|' + esp : '';
+  if (key !== ultCard){ ultCard = key; detenVoz();
+    if (!cd){ fr.classList.remove('ver'); }
+    else {
+      estAct = cd.c === 'sube' ? PASO_SUBE : cd.c === 'paso' ? PASO_CARA() : ESTACIONES[cd.st]; pagAct = 0;
+      $('fNum').textContent = cd.c === 'sube' ? 'De paso, subiendo' : cd.c === 'paso' ? 'De paso, entre la hoja y su interior' : `Estación ${cd.st + 1} de ${ESTACIONES.length}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = cd.c === 'sube' ? 'De paso: subiendo' : cd.c === 'paso' ? 'De paso: la cara de la hoja' : `Estación ${cd.st + 1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, pRender);
+  $('titulo').style.visibility = pRender > 0.65 ? 'hidden' : 'visible';
+  riel.classList.toggle('callado', pRender < 0.65);
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cd);
+}
+const riel = $('riel');
+function armaRiel(){ riel.innerHTML = ''; ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; if (e.tiempo) b.classList.add('tiempo'); if (i === 6) b.classList.add('sube'); b.innerHTML = `<i></i><span>${i + 1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i + 1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); }); ultEst = -1; }
+armaRiel();
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+const m0 = (txt, x, y) => [txt, 0, x/M0, y/M0];
+const m1 = (txt, x, y) => [txt, 1, x/M1, y/M1];
+const m2 = (txt, x, y) => [txt, 2, x/M2, y/M2];
+function etqEstacion(st){
+  const E = ESP[esp];
+  if (st === 0){ const out = [m0('la mata elegida', XB, gF(XB) - 1.35), m0('comedero', (COMEDERO.x0 + COMEDERO.x1)/2, COMEDERO.y0 - 0.05), m0('cuyera', (CUYERA.x0 + CUYERA.x1)/2, CUYERA.y0 + 0.1), m0('abono', ABONO.x, gF(ABONO.x) - 0.4), m0('nacimiento de agua', AGUA.x + 0.2, gF(AGUA.x))];
+    const vistas = new Set([esp]); [[2, -3.6], [1, -2.6], [0, -4.3]].forEach(([k, x]) => { const sp = perfil.filas[k]; if (!sp || vistas.has(sp)) return; vistas.add(sp); out.push(m0(sp === 'sauco' ? 'sauco' : ESP[sp].nom, x, gF(x) + FILA_DY[k] - altoDe(sp)*FILA_SC[k]*0.7)); });
+    return out; }
+  if (st === 1 || st === 2){ const M = armaMata(esp, TAU), out = [], T0 = M.tocones[0], z = T0.pts[2];
+    out.push(m1(st === 2 && TAU < 8 ? 'tocón recién cortado' : 'tocón', z[0], z[1] + BASE1));
+    const B = M.brotes[M.brotes.length - 1]; if (B && TAU > 6){ const q = B.pts[Math.floor(B.pts.length*0.6)]; out.push(m1(st === 2 ? `rebrote de ${Math.round(TAU)} días` : 'rebrote', q[0], q[1] + BASE1)); }
+    if (tamElegida(TAU) > 0.05) out.push(m1('hoja', CH.x, CH.y));
+    if (M.flores.length) out.push(m1('flor', M.flores[0].x, M.flores[0].y + BASE1));
+    if (st === 2 && TAU < 4) out.push(m1('ramas cortadas, para el corral', 0.8, g1(0.8) - 0.06));
+    return out; }
+  if (st === 3){ const L = E.hoja, p = (u, v) => { const [x, y] = rot((u - 0.5)*L, v*L, CH.a); return [x, y]; };
+    const out = [m2('nervio central', ...p(0.35, 0)), m2('pecíolo', ...p(-0.06, 0.01))];
+    if (esp === 'boton') out.push(m2('lóbulo', ...p(0.42, 0.4))); else if (esp === 'morera') out.push(m2('base acorazonada', ...p(0.0, 0.12))); else out.push(m2('punta angosta', ...p(0.92, 0)));
+    return out; }
+  if (st === 4){ const Y = CORTE.Y, [vx, vy] = venaCorte(); const Q = posPlasto(PLASTOS[2], 0.042*2, (PAL0.top + PAL0.bot)/2, PAL0.hw, (PAL0.bot - PAL0.top)/2);
+    let g = null, d = 1e9; for (const q of CORTE.esp){ for (let j = 0; j < q.p.length; j++){ const a = q.p[j], b = q.p[(j + 1) % q.p.length], pt = [(a[0] + b[0])/2, (a[1] + b[1])/2]; const dd = (pt[0] + 0.12)**2 + (pt[1] - 0.04)**2; if (dd < d && pt[1] > Y.espA + 0.04){ d = dd; g = pt; } } }
+    return [['empalizada', 4, -0.21, -0.2], g ? ['aire', 4, g[0], g[1]] : null, ['cloroplasto', 4, Q.x, Q.y], ['vena cortada', 4, vx, vy - 0.076]]; }
+  if (st === 5){ const G = GRANOS[5], [gx, gy] = rot(G.x, G.y, CLO.rot), [rx, ry] = rot(-CL5.a*0.55, CL5.b*0.55, CLO.rot), [mx, my] = rot(CL5.a*0.3, -CL5.b, CLO.rot);
+    return [['grano de tilacoides', 5, gx, gy], ['Rubisco (de dibujo)', 5, rx, ry], ['membrana doble', 5, mx, my], ['estroma', 5, ...rot(-CL5.a*0.2, -CL5.b*0.45, CLO.rot)]]; }
+  if (st === 6) return [m0('vaca', VACA_X - 0.2, gF(VACA_X) - 1.4), m0('cabra', CABRA_X - 0.1, gF(CABRA_X) - 0.62), m0('cuyes', CUYES[1].x, CUYERA.y1 - 0.08), m0('forraje picado', (COMEDERO.x0 + COMEDERO.x1)/2 - 0.3, COMEDERO.y0 - 0.06)];
+  if (st === 7) return CICLO.vis > 0.5 ? [m0('boñiga al abono', 4.4, 0.08), m0('abono al banco', 1.4, -1.06), m0('forraje al comedero', 2.6, -3.42), m0('nacimiento de agua', AGUA.x + 0.2, gF(AGUA.x))] : [];
+  return [];
+}
+function etqPaso(){ const out = [['vena', 3, 0.2, venaY(0.2)]]; if (esp === 'nacedero'){ let b = null, d = 1e9; for (const q of CISTO){ const dd = (q[0] - 0.12)**2 + (q[1] + 0.08)**2; if (dd < d){ d = dd; b = q; } } out.push(['cistolito', 3, b[0], b[1]]); } return out; }
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(16,18,10,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(16,18,10,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel', 'titulo', 'ubicacion']){ const el = $(id); if (id === 'titulo' && el.style.visibility === 'hidden') continue; const r = el.getBoundingClientRect(); if (r.width) o.push(r); } if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentroR = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const chocaR = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+const NIVEL_EST = [0, 1, 1, 2, 4, 5, 0, 0];
+function etiquetas(cam, cd){
+  let lista = [];
+  if (cd && cam.seg.k === 'hold'){
+    if (cd.c === 'paso' && cam.L === 3) lista = etqPaso();
+    else if (cd.st >= 0 && cam.L === NIVEL_EST[cd.st]) lista = etqEstacion(cd.st).filter(Boolean);
+  }
+  const tap = lista.length ? tapados() : [], ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    const [txt, L, x, y] = it; const [ax, ay] = aPantalla(L, x, y);
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentroR(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => chocaR(caja, r)) || ocupado.some(r => chocaR(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break;
+      } }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const Ln of [E.ln, E.halo]){ Ln.setAttribute('x1', ax.toFixed(1)); Ln.setAttribute('y1', ay.toFixed(1)); Ln.setAttribute('x2', lx.toFixed(1)); Ln.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿Qué parte de la mata trae más proteína?', ops:[{ m:3, n:'La hoja' }, { m:2, n:'El tocón' }, { m:0, n:'La pila de abono' }], ok:0, si:'Eso es: en la morera, la hoja tenía 23,5 % de proteína y el tallo 8,8 %.', no:'Esa no. Busque la parte verde y delgada.' },
+  { q:'En Obonuco, ¿qué corte del botón de oro tuvo más proteína?', ops:[{ t:'A los 60 días' }, { t:'A los 80 días' }, { t:'Los dos igual' }], ok:0, si:'Eso es: 26,7 % a los 60 días y 21,4 % a los 80. Pero a los 80 dio más comida.', no:'Esa no. Piense en la hoja más joven.' },
+  { q:'¿Dónde trabaja la Rubisco?', ops:[{ m:5, n:'En el cloroplasto' }, { m:6, n:'En el comedero' }, { m:1, n:'En el tocón' }], ok:0, si:'Eso es: en el estroma del cloroplasto.', no:'Esa no. Busque el granito verde, muy de cerca.' },
+  { q:'¿Cómo se siembra un banco de botón de oro, nacedero o morera?', ops:[{ t:'Por estaca' }, { t:'Por injerto' }, { t:'Solo por semilla comprada' }], ok:0, si:'Eso es: un pedazo de tallo que echa raíz.', no:'Esa no. Piense en cómo se siembra la yuca.' },
+  { q:'¿Quién se come parte de su estiércol para aprovechar los microbios?', ops:[{ t:'El cuy' }, { t:'La vaca' }, { t:'La cabra' }], ok:0, si:'Eso es: el cuy, que fermenta en el ciego.', no:'Esa no. La vaca y la cabra rumian.' },
+  { q:'¿Cómo se le empieza a dar un forraje nuevo al animal?', ops:[{ t:'Poco a poco y acompañado' }, { t:'Todo de una vez' }, { t:'Solo, sin nada más' }], ok:0, si:'Eso es: poco a poco, mientras se acostumbra, y nunca como único alimento.', no:'Esa no. El animal necesita acostumbrarse.' },
+];
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado + ':' + esp; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, CX, CY, bw: buf.width, bh: buf.height, camR, pR: pRender, tau: TAU };
+  W = H = S = lado; DPR = 1; PORT = false; CX = CY = lado/2; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  try { guion(); const pp = estP(i); TAU = tauDe(pp); const cam = camAt(pp); camR = cam; pintaCam(x, cam); }
+  finally { ({ W, H, S, DPR, PORT, CX, CY, camR } = g); pRender = g.pR; TAU = g.tau; buf.width = g.bw; buf.height = g.bh; guion(); sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó del banco a la proteína de la hoja, y volvió al animal.</p><p>Mañana corte una rama de su banco y pese cuánto es hoja.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver al banco</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Qp = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Qp.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80)/3)*Math.min(2, devicePixelRatio || 1));
+  Qp.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else { b.textContent = o.t; }
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Qp.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Qp.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Qp.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Qp.q].concat(Qp.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara y el reloj
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.5;
+function altoPista(){ pista.style.height = Math.round(innerHeight*(1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY/maxScroll(), 0, 1)*T; }
+function irA(pp){ const y = pp/T*maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let p = 0, pObj = 0, vel = 0, sucio = true;
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+/* «Bajar» va de parada en parada y se detiene: quien lee despacio decide cuándo seguir */
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = PARADAS.find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto/T*maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && e.target === bBajar)) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[55, 'sawtooth', 0.32], [82.4, 'sawtooth', 0.2], [110.2, 'triangle', 0.35], [164.8, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.querySelector('.est').textContent = audio.on ? 'sí' : 'no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){ if (!audio || !audio.on) return; const lz = cam.tilt ? 0.3 : luzProf(cam.Z); const t = audio.ac.currentTime; audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz, t, 0.2); const base = 55*(0.84 + 0.16*lz); [1, 1.4983, 2.004, 2.996].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4)); }
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W; CX = W/2; CY = H/2;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false;
+  guion();
+  anchoInicial = anchoVista(camAt(0));
+  prepFondo();
+  altoPista();
+  colocaArriba();
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+/* en el teléfono: la ubicación arriba, el medidor debajo y el título debajo del medidor */
+function colocaArriba(){
+  const u = $('ubicacion').getBoundingClientRect(), m = $('medidor');
+  if (W <= 640){ document.documentElement.style.setProperty('--med-top', Math.round(u.bottom + 8) + 'px'); const mb = m.getBoundingClientRect().bottom; $('titulo').style.top = Math.round(Math.max(mb, u.bottom) + 14) + 'px'; }
+  else { document.documentElement.style.removeProperty('--med-top'); $('titulo').style.top = Math.round(Math.max(125, u.bottom + 16)) + 'px'; }
+}
+$('ubicacion').addEventListener('toggle', () => { colocaArriba(); sucio = true; });
+addEventListener('resize', () => { const u = pObj/T; redim(); const pp = u*T; window.scrollTo(0, u*maxScroll()); pObj = pp; p = pp; rmHacia = null; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt)/1000); tAnt = now;
+  if (auto && !RM){ let y = scrollY + auto*(maxScroll()/T)*(T/95)*dt; const yM = metaAuto/T*maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  const antes = p;
+  if (RM){
+    let meta = PARADAS[0], best = 1e9; for (const q of PARADAS){ const d = Math.abs(q - pObj); if (d < best){ best = d; meta = q; } }
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+    if (rmT < 1){ rmT = Math.min(1, rmT + dt/0.9); sucio = true; }
+    p = rmHacia;
+  } else {
+    const k = 1 - Math.exp(-dt*7);
+    p += (pObj - p)*k; if (Math.abs(pObj - p) < 1e-5) p = pObj;
+  }
+  vel = dt > 0 ? (p - antes)/dt : 0;
+  // las flechas del ciclo aparecen en la última estación
+  const sc = SEGS[SEGS.length - 1]; const vc = sstep(sc.a - 0.6, sc.a + 0.2, p); if (Math.abs(vc - CICLO.vis) > 1e-3){ CICLO.vis = vc; sucio = true; }
+  if (p !== antes) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      pRender = rmDesde; cam = render(); bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); bctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = buf.width; copia.height = buf.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      pRender = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else { pRender = p; cam = render(); }
+    actualizaUI(cam); sonido(cam);
+    sucio = RM && rmT < 1;
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   LA ESPECIE Y EL PISO: cambian el dibujo, las cifras y el guion
+   ============================================================ */
+function rehaceTextos(){
+  const iEst = ESTACIONES.indexOf(estAct), pag = pagAct;
+  ESTACIONES = paginas(); armaRiel(); pintaCuentas();
+  if (iEst >= 0){ estAct = ESTACIONES[iEst]; pagAct = Math.min(pag, estAct.pags.length - 1); $('fTit').textContent = estAct.t; pintaPagina(); }
+  else ultCard = '';
+}
+function cambiaEspecie(k){
+  if (!ESP[k] || k === esp || !perfil.esp.includes(k)) return;
+  detenVoz(); esp = k;
+  fijaPortales(); guion(); texOK = false; mini = {}; fondoHoja = null;
+  rehaceTextos();
+  $('anuncio').textContent = 'La mata ahora es de ' + ESP[k].nom;
+  sucio = true;
+}
+function mostrarOrigen(){
+  document.body.dataset.piso = piso;
+  const alt = altura === null ? '' : ` · ${altura.toLocaleString('es-CO')} m`;
+  $('origenPiso').textContent = `${origen}${alt} · ${perfil.nombre}${muniURL ? ' · ' + muniURL : ''}`;
+  $('selectorPiso').value = piso;
+  $('alturaFinca').value = altura === null ? '' : altura;
+  $('detallePiso').textContent = piso === 'limite' ? 'Límite con el páramo: aquí no se propone un banco de forraje. La altitud sola no delimita el páramo; se necesita revisión humana del sitio.' : 'Piso orientado por la altitud (IGAC). Las especies son ejemplos con ensayo o ficha; confirme con asistencia técnica lo que se da en su finca.';
+  $('subtitulo').textContent = piso === 'limite' ? 'El páramo necesita protección y revisión humana. La altitud sola no delimita este ecosistema.' : 'Del banco de forraje a la hoja, y de la hoja a la proteína que come su vaca, su cabra o su cuy.';
+  colocaArriba();
+}
+function cambiarPiso(k, alt = null, fuente = 'Piso de ejemplo'){
+  ubicacionPendiente = false; piso = k; perfil = PISOS[k]; altura = alt; origen = fuente;
+  if (!perfil.esp.includes(esp)) esp = perfil.esp[0] || 'boton';
+  armaFilas(); fijaPortales(); guion(); prepFondo(); texOK = false; mini = {};
+  rehaceTextos(); ultCard = ''; ultEst = -1; sucio = true;
+  mostrarOrigen();
+}
+$('selectorPiso').addEventListener('change', e => cambiarPiso(e.target.value));
+$('alturaManual').addEventListener('submit', e => { e.preventDefault(); const alt = numero($('alturaFinca').value, 0, 6000); if (alt !== null){ cambiarPiso(pisoDe(alt), alt, 'Altitud indicada por usted'); $('ubicacion').open = false; } });
+let ubicacionPendiente = false;
+$('usarUbicacion').addEventListener('click', () => {
+  const estado = $('estadoUbicacion');
+  if (!navigator.geolocation){ estado.textContent = 'Este navegador no ofrece ubicación. Indique la altitud o elija un piso de ejemplo.'; return; }
+  estado.textContent = 'Esperando su permiso de ubicación…'; ubicacionPendiente = true;
+  const inicial = piso;
+  navigator.geolocation.getCurrentPosition(pos => {
+    if (!ubicacionPendiente || piso !== inicial) return; ubicacionPendiente = false;
+    const alt = numero(pos.coords.altitude, 0, 6000);
+    if (alt === null){ estado.textContent = 'El dispositivo dio coordenadas sin altitud. Indique los metros de su finca; seguimos con un piso de ejemplo.'; return; }
+    cambiarPiso(pisoDe(alt), alt, 'Altitud del dispositivo (aproximada)'); estado.textContent = 'La ubicación del dispositivo puede ser distinta de la de la finca.'; $('ubicacion').open = false;
+  }, err => { if (!ubicacionPendiente) return; ubicacionPendiente = false; estado.textContent = err.code === 1 ? 'Permiso de ubicación no concedido. Elija un piso de ejemplo o indique su altitud.' : 'No se pudo obtener la ubicación. Elija un piso de ejemplo o indique su altitud.'; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+prepTeselas();
+armaFilas();
+fijaPortales();
+redim();
+mostrarOrigen();
+if (altURL === null){
+  const lat = numero(qs.get('lat'), -90, 90), lon = numero(qs.get('lon'), -180, 180);
+  if (lat !== null && lon !== null) $('estadoUbicacion').textContent = 'La app entregó coordenadas sin altitud. Indique los metros de la finca o elija un piso de ejemplo.';
+  else if (qs.has('alt')) $('estadoUbicacion').textContent = 'La altitud de la URL no es válida. Elija un piso de ejemplo o indique la altitud.';
+}
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el medidor; no altera nada) */
+window.__descenso = {
+  get T(){ return T; }, get SEGS(){ return SEGS; }, get PARADAS(){ return PARADAS; }, estP, camAt, tauDe,
+  anchoVista: pp => anchoVista(camAt(pp)), base: pp => { const c = camAt(pp); return c.tilt ? -1 : baseDe(c); },
+  fijar(pp){ window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  especie(k){ cambiaEspecie(k); }, piso(k){ cambiarPiso(k); }, get esp(){ return esp; }, get pisoActual(){ return piso; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, PASO_SUBE, PASO_CARA: PASO_CARA(), GLOS, FUENTES, CAB }; },
+  perf(pp, n){ window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; pRender = pp; for (let i = 0; i < PERF.length; i++) PERF[i] = 0; const t0 = performance.now(); for (let i = 0; i < n; i++){ render(); } ctx.getImageData(0, 0, 1, 1); return { total: (performance.now() - t0)/n, porNivel: PERF.map(x => +(x/n).toFixed(1)) }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0)/ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1)/((marcas[marcas.length-1] - marcas[0])/1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

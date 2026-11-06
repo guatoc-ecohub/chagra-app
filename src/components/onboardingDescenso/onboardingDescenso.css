@@ -1,0 +1,507 @@
+/* Onboarding-juego: papel, tinta y botones de sello. Todo bajo .onbj. */
+.onbj {
+  --tinta: #231d17;
+  --papel: #f6eedb;
+  --papel-claro: #fffaf0;
+  --oro: #f2c14e;
+  --rojo-tierra: #7a4a1f;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #05070f;
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: 18px;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10;
+}
+.onbj *, .onbj *::before, .onbj *::after { box-sizing: border-box; }
+.onbj button { font: inherit; color: inherit; }
+.onbj :focus-visible { outline: 3px solid #2f6fd6; outline-offset: 3px; }
+
+.onbj-mundo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: manipulation;
+}
+
+/* ── HUD ───────────────────────────────────────── */
+.onbj-hud {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 3;
+}
+.onbj-hud > * { pointer-events: auto; }
+.onbj-altura {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 7.2rem;
+  padding: 6px 12px;
+  border: 2px solid var(--tinta);
+  border-radius: 999px;
+  background: rgba(246, 238, 219, .92);
+  box-shadow: 2px 3px 0 var(--tinta);
+  font: 700 .95rem/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+.onbj-altura-flecha { color: var(--rojo-tierra); }
+.onbj-puntos {
+  display: flex;
+  gap: 7px;
+  margin: 0;
+  padding: 7px 10px;
+  list-style: none;
+  border-radius: 999px;
+  background: rgba(246, 238, 219, .85);
+  border: 2px solid var(--tinta);
+}
+.onbj-puntos li {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--tinta);
+  background: transparent;
+}
+.onbj-puntos li.hecho { background: var(--tinta); }
+.onbj-puntos li.ahora { background: var(--oro); transform: scale(1.25); }
+.onbj-escuchar {
+  width: 48px;
+  height: 48px;
+  padding: 3px;
+  border: 2px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--papel);
+  box-shadow: 2px 3px 0 var(--tinta);
+  cursor: pointer;
+}
+.onbj-escuchar svg { width: 100%; height: 100%; }
+
+/* ── título del primer momento ─────────────────── */
+.onbj-titulo {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 70px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fbf1d6;
+  pointer-events: none;
+  z-index: 2;
+  padding: 0 16px;
+}
+.onbj-titulo h1 {
+  margin: 0;
+  font: 400 clamp(2rem, 8.4vw, 3.6rem)/1.02 var(--serif);
+  letter-spacing: -.01em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+}
+.onbj-titulo p {
+  margin: .4em 0 0;
+  font: italic 400 clamp(1.05rem, 3.6vw, 1.3rem)/1.35 var(--serif);
+  color: #f1dfb6;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .7);
+}
+
+/* ── abajo: el guía sobre el panel ─────────────── */
+.onbj-abajo {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+  display: flex;
+  flex-direction: column;
+  z-index: 4;
+  pointer-events: none;
+}
+.onbj-abajo > * { pointer-events: auto; }
+.onbj-fila-guia {
+  position: relative;
+  height: 0;
+  pointer-events: none;
+}
+.onbj-guia {
+  position: absolute;
+  left: 4px;
+  bottom: -30px;
+  width: 112px;
+  height: 112px;
+  z-index: 6;
+  pointer-events: none;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 5px 0 rgba(20, 14, 8, .2));
+}
+.onbj-guia.viaja { animation: onbj-flota 1.1s ease-in-out infinite; }
+@keyframes onbj-flota {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+.onbj-panel {
+  position: relative;
+  width: 100%;
+  max-height: calc(100dvh - 150px);
+  overflow-y: auto;
+  padding: 30px 16px 14px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 90% at 10% 0%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%),
+    var(--papel);
+  box-shadow: 4px 5px 0 var(--tinta), 0 18px 40px rgba(0, 0, 0, .35);
+  transition: opacity .35s ease;
+}
+.onbj-panel.viajando .onbj-dice { min-height: 0; font-style: italic; }
+.onbj-dice {
+  margin: 0 0 10px;
+  min-height: 2.2em;
+  font: 400 1.28rem/1.38 var(--serif);
+  cursor: default;
+}
+.onbj[data-paso="compai"] .onbj-panel { padding-top: 16px; }
+.onbj-quien { padding-left: 124px; }
+.onbj-quien {
+  display: block;
+  margin-bottom: 2px;
+  font: 800 .78rem/1.2 var(--sans);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--rojo-tierra);
+}
+.onbj-dice-resto { color: transparent; }
+.onbj-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── botones de sello ──────────────────────────── */
+.onbj-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.onbj-columna { flex-direction: column; align-items: stretch; }
+.onbj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--papel-claro);
+  box-shadow: 3px 4px 0 var(--tinta);
+  font-weight: 800 !important;
+  font-size: 1.08rem !important;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.onbj-btn:active:not(:disabled) { transform: translate(2px, 3px); box-shadow: 1px 1px 0 var(--tinta); }
+.onbj-btn:disabled { opacity: .55; cursor: default; }
+.onbj-primario { background: var(--oro); flex: 1 1 auto; }
+.onbj-grande { min-height: 60px; font-size: 1.2rem !important; }
+.onbj-btn-icono { width: 34px; height: 34px; display: inline-flex; }
+.onbj-btn-icono svg { width: 100%; height: 100%; }
+.onbj-enlace {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  font-weight: 700 !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+/* ── tarjetas de respuesta ─────────────────────── */
+.onbj-ubicacion-resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 12px; padding: 12px; border: 1px solid rgba(35, 29, 23, .28); border-radius: 14px; background: rgba(255, 250, 237, .88); }
+.onbj-ubicacion-resumen div { min-width: 0; }
+.onbj-ubicacion-resumen dt { color: #675844; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.onbj-ubicacion-resumen dd { margin: 2px 0 0; color: #292219; font-weight: 700; overflow-wrap: anywhere; }
+.onbj-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(98px, 1fr));
+  gap: 8px;
+}
+.onbj-tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 106px;
+  padding: 8px 6px;
+  border: 2px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--papel-claro);
+  box-shadow: 2px 3px 0 var(--tinta);
+  cursor: pointer;
+  text-align: center;
+  transition: transform .15s ease, background .15s ease;
+}
+.onbj-tarjeta.es-elegida { background: #ffe9a8; transform: translateY(-3px); box-shadow: 3px 6px 0 var(--tinta); }
+.onbj-tarjeta-icono svg { width: 48px; height: 48px; }
+.onbj-tarjeta-titulo { font-weight: 800; font-size: 1rem; line-height: 1.15; }
+.onbj-tarjeta-copy { font-size: .84rem; line-height: 1.2; color: #5a4a3a; }
+.onbj-sello-detalle { margin: 0 0 10px; }
+.onbj-sello-detalle fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 10px; margin: 0; padding: 8px 10px; border: 1.5px solid rgba(35, 29, 23, .45); border-radius: 12px; }
+.onbj-sello-detalle legend { padding: 0 5px; font-weight: 800; }
+.onbj-sello-detalle fieldset label { display: flex; align-items: center; gap: 6px; min-height: 30px; font-size: .9rem; }
+.onbj-sello-detalle input[type="checkbox"] { width: 26px; height: 26px; flex: 0 0 auto; accent-color: #4f6b37; }
+.onbj-sello-otro { display: grid; gap: 5px; margin-top: 8px; font-weight: 700; }
+.onbj-sello-otro input { min-height: 42px; padding: 7px 10px; border: 1.5px solid var(--tinta); border-radius: 10px; background: var(--papel-claro); }
+[data-testid="onbj-sellos"] .onbj-tarjeta { min-height: 62px; padding: 6px 5px; }
+[data-testid="onbj-sellos"] .onbj-tarjeta-icono { display: none; }
+[data-testid="onbj-sellos"] .onbj-tarjeta-titulo { font-size: .88rem; }
+
+/* ── cajas de los compais ──────────────────────── */
+.onbj-cajas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px 6px;
+  margin: 4px 0 2px;
+}
+.onbj-caja {
+  position: relative;
+  height: 118px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  animation: onbj-tiembla 5.5s ease-in-out infinite;
+}
+.onbj-caja:nth-child(2) { animation-delay: -1.1s; }
+.onbj-caja:nth-child(3) { animation-delay: -2.7s; }
+.onbj-caja:nth-child(4) { animation-delay: -3.9s; }
+.onbj-caja:nth-child(5) { animation-delay: -.6s; }
+.onbj-caja:nth-child(6) { animation-delay: -4.6s; }
+.onbj-caja:nth-child(7) { animation-delay: -2.1s; }
+.onbj-caja.es-elegida { animation: onbj-quiere-salir .5s ease-in-out infinite; }
+.onbj-caja:disabled { cursor: default; }
+@keyframes onbj-tiembla {
+  0%, 88%, 100% { transform: none; }
+  90% { transform: rotate(-3deg); }
+  93% { transform: rotate(3deg) translateY(-2px); }
+  96% { transform: rotate(-2deg); }
+}
+@keyframes onbj-quiere-salir {
+  0%, 100% { transform: rotate(0) scale(1); }
+  25% { transform: rotate(-2.5deg) scale(1.03, .98); }
+  75% { transform: rotate(2.5deg) scale(1.03, .98); }
+}
+.onbj-caja > * { pointer-events: none; }
+.onbj-caja::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 24px;
+  height: 58px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 6px;
+  background: linear-gradient(#4a301b, #6e4a2a);
+}
+.onbj-caja-luz {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 30px;
+  height: 64px;
+  background: radial-gradient(60% 70% at 50% 70%, rgba(255, 214, 130, .95), rgba(255, 180, 90, 0));
+  opacity: .55;
+  transition: opacity .3s ease;
+}
+.onbj-caja.es-elegida .onbj-caja-luz { opacity: 1; }
+.onbj-caja-compai {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  width: 74px;
+  height: 74px;
+  transform: translateX(-50%);
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1);
+  /* La caja entera es el botón: el compai no se queda con el toque. */
+  pointer-events: none;
+}
+.onbj-caja.es-elegida .onbj-caja-compai { transform: translate(-50%, -20px) scale(1.12); }
+.onbj-caja.sale .onbj-caja-compai { visibility: hidden; }
+.onbj-caja-frente {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 24px;
+  height: 30px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 6px;
+  background: repeating-linear-gradient(0deg, #c9935a 0 9px, #9b6a3a 9px 11px);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, .25);
+}
+.onbj-caja-tapa {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 78px;
+  height: 13px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 5px;
+  background: repeating-linear-gradient(90deg, #c9935a 0 14px, #a8733f 14px 16px);
+  transform-origin: 6% 100%;
+  transform: rotate(-5deg);
+  transition: transform .3s cubic-bezier(.3, 1.6, .5, 1);
+}
+.onbj-caja.es-elegida .onbj-caja-tapa { transform: translateY(-6px) rotate(-18deg); }
+.onbj-caja-nombre {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: 0;
+  font: 800 .8rem/1.1 var(--sans);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.onbj-caja.es-elegida .onbj-caja-nombre { color: var(--rojo-tierra); }
+.onbj-destello {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--dx, 50%) var(--dy, 70%), rgba(255, 236, 170, .95), rgba(255, 200, 110, .35) 30%, rgba(255, 200, 110, 0) 62%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.onbj-estallido {
+  position: fixed;
+  left: -500px;
+  top: -500px;
+  width: 340px;
+  height: 340px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
+}
+
+/* hojas y semillas que saltan con el compai */
+.onbj-hojas { position: fixed; inset: 0; pointer-events: none; z-index: 7; }
+.onbj-hoja {
+  position: fixed;
+  left: -100px;
+  top: -100px;
+  width: 16px;
+  height: 9px;
+  border: 1.5px solid var(--tinta);
+  border-radius: 0 100% 0 100%;
+  opacity: 0;
+}
+.onbj-hoja.h0 { background: #7bb257; }
+.onbj-hoja.h1 { background: #f2c14e; }
+.onbj-hoja.h2 { background: #5f9a47; width: 10px; height: 10px; border-radius: 50%; }
+.onbj-hoja.h3 { background: #e0873e; }
+
+/* ── formularios ───────────────────────────────── */
+.onbj-form { display: flex; flex-direction: column; gap: 4px; }
+.onbj-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 14px;
+  background: var(--papel-claro);
+  font: 600 1.15rem/1.2 var(--sans);
+  color: var(--tinta);
+}
+.onbj-input::placeholder { color: #6b6257; opacity: 1; }
+.onbj-buscar { display: flex; flex-direction: column; gap: 8px; }
+.onbj-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.onbj-lista button {
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 14px;
+  border: 2px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--papel-claro);
+  text-align: left;
+  cursor: pointer;
+}
+.onbj-lista b { font-size: 1.05rem; }
+.onbj-lista span { color: #5a4a3a; font-size: .9rem; margin-left: 6px; }
+.onbj-datos { margin: 0 0 8px; display: grid; gap: 6px; }
+.onbj-datos > div { display: grid; grid-template-columns: 6.2rem 1fr; align-items: center; gap: 8px; }
+.onbj-datos dt { font: 800 .78rem/1.2 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--rojo-tierra); }
+.onbj-datos dd { margin: 0; font-weight: 800; font-size: 1.1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.onbj-sin { font-weight: 500; font-style: italic; color: #6a5a48; }
+.onbj-lapiz {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--tinta);
+  border-radius: 10px;
+  background: var(--papel-claro);
+  font-size: .9rem !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+}
+.onbj-resumen { margin: 0 0 4px; font: italic 400 1.1rem/1.4 var(--serif); color: #4a3b2c; }
+
+/* ── escritorio: panel a la izquierda, mundo a la derecha ── */
+@media (min-aspect-ratio: 20/19) and (min-width: 760px) {
+  .onbj-abajo { left: 4vw; right: auto; bottom: 6vh; width: min(33rem, 40vw); }
+  .onbj-titulo { left: 4vw; right: auto; top: 16vh; width: min(33rem, 40vw); text-align: left; padding: 0; }
+  .onbj-guia { width: 132px; height: 132px; bottom: -34px; }
+  .onbj-quien { padding-left: 144px; }
+  .onbj-panel { max-height: calc(100dvh - 190px); }
+}
+
+/* ── menos movimiento ──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .onbj *, .onbj *::before, .onbj *::after { animation: none !important; transition: none !important; }
+}
+.onbj-quieto *, .onbj-quieto *::before, .onbj-quieto *::after { animation: none !important; transition: none !important; }
+
+/* ── auditoría 2026-10-04 ──────────────────────── */
+/* C52: la cifra del descenso dice qué mide («de altura»), no un «15.930 km» suelto. */
+.onbj-altura-cifra { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.onbj-altura-etq { font: 700 .62rem/1.1 var(--sans); letter-spacing: .02em; opacity: .78; }
+/* C19: «Ahora no» en la ubicación y los atajos a anotar o preguntar. */
+.onbj-ahora-no { opacity: .85; }
+.onbj-atajos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 4px;
+  margin: 8px 0 0;
+  font: 600 .92rem/1.2 var(--sans);
+}
+.onbj-atajos > span { flex-basis: 100%; text-align: center; opacity: .8; }
+/* C52: el dibujo del compai desborda ~23 px su caja de 112; con bottom:-30px las
+   patas y el ala caían sobre la primera línea del diálogo («¡Hola»). Subido para
+   que termine dentro del relleno superior del panel (30 px), con margen. */
+.onbj-guia { bottom: -4px; }
+@media (min-aspect-ratio: 20/19) and (min-width: 760px) {
+  .onbj-guia { bottom: -6px; }
+}

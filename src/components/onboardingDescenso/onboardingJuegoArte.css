@@ -1,0 +1,587 @@
+/* onboardingArteFlujo.css — forma Arte del onboarding unificado.
+ *
+ * Un solo escenario dibujado en tinta: el camino del valle con seis
+ * estaciones. La cámara viaja entre ellas (transform con parallax) y el compai
+ * camina al lado. Encima va la tarjeta de papel con la pregunta del paso.
+ *
+ * Canon visual: el camino de edu (papel, tinta, verde) y el aire de dibujo
+ * animado de los años treinta: viñeta, grano de película y un iris al entrar.
+ * Solo transform y opacity se animan; nada de filtros sobre capas grandes.
+ */
+
+.onba-arte {
+  --onba-tinta: #2b2118;
+  --onba-tinta-2: #4f4032;
+  --onba-papel: #f7efda;
+  --onba-papel-2: #efe4c6;
+  --onba-verde: #2f5d1e;
+  --onba-verde-claro: #a7c957;
+  --onba-borde: #3a2c1f;
+  --onba-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", "Noto Serif", Georgia, serif;
+  --onba-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --onba-viaje: 1.1s;
+  --onba-curva: cubic-bezier(0.65, 0.05, 0.3, 1);
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: #5c8a3e;
+  color: var(--onba-tinta);
+}
+
+.onba-escena {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* ─── el escenario ─────────────────────────────────────────────────────── */
+.onba-escenario {
+  --foco: 50cqw;
+  --caja-h: 30cqh;
+  --suelo: 9cqh;
+  --ax-compai: 20cqw;
+  --ax-angelita: 76cqw;
+  position: relative;
+  flex: none;
+  height: clamp(250px, 32dvh, 340px);
+  overflow: hidden;
+  container-type: size;
+  background: linear-gradient(180deg, #f3d9a4 0%, #e9dcb4 30%, #b9dce2 78%, #a9cde0 100%);
+}
+.onba-escenario::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(240, 140, 60, 0.35), rgba(240, 170, 80, 0) 70%);
+  opacity: 0;
+  transition: opacity 1.4s ease 0.6s;
+}
+.onba-root[data-paso="5"] .onba-escenario::after { opacity: 1; }
+
+.onba-paisaje { position: absolute; inset: 0; }
+
+.onba-sol {
+  position: absolute;
+  top: 5cqh;
+  left: calc(var(--foco) + 22cqw);
+  width: 20cqh;
+  height: 20cqh;
+}
+.onba-sol svg { width: 100%; height: 100%; overflow: visible; }
+.onba-sol-rayos { animation: onba-gira 48s linear infinite; transform-origin: 0 0; }
+
+.onba-nube { position: absolute; height: auto; animation: onba-nube 38s ease-in-out infinite alternate; }
+.onba-nube--a { top: 36cqh; left: -3cqw; width: 22cqw; max-width: 170px; }
+.onba-nube--b { top: 22cqh; left: 52cqw; width: 15cqw; max-width: 120px; animation-duration: 52s; animation-delay: -20s; }
+
+.onba-capa {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 600cqw;
+  transform: translateX(calc(var(--paso) * -100cqw));
+  transition: transform var(--onba-viaje) var(--onba-curva);
+  will-change: transform;
+}
+.onba-capa--lejos {
+  width: 300cqw;
+  height: 58%;
+  transform: translateX(calc(var(--paso) * -32cqw));
+}
+.onba-capa--lejos svg { display: block; width: 100%; height: 100%; }
+.onba-capa--frente { z-index: 3; pointer-events: none; }
+.onba-suelo { position: absolute; left: 0; bottom: 0; width: 100%; height: 30%; display: block; }
+
+.onba-estacion {
+  position: absolute;
+  bottom: var(--suelo);
+  left: calc(var(--i) * 100cqw + var(--foco) + var(--dx, 0cqw));
+  translate: -50% 0;
+}
+.onba-estacion > svg, .onba-estacion > div, .onba-prop { display: block; height: 100%; width: auto; overflow: visible; }
+.onba-estacion--caja { bottom: 7cqh; height: var(--caja-h); aspect-ratio: 200 / 170; }
+.onba-estacion--caja .onba-caja, .onba-caja-svg { width: 100%; height: 100%; overflow: visible; }
+.onba-estacion--letrero { --dx: 36cqw; height: 34cqh; bottom: calc(var(--suelo) - 1cqh); }
+.onba-estacion--poste { --dx: -2cqw; height: 40cqh; }
+.onba-estacion--montana { --dx: 14cqw; height: 72cqh; bottom: calc(var(--suelo) - 2cqh); }
+.onba-estacion--surcos { --dx: 12cqw; height: 34cqh; }
+.onba-estacion--invernadero { --dx: 14cqw; height: 34cqh; }
+.onba-estacion--casa { --dx: 18cqw; height: 46cqh; }
+
+.onba-caja-rotulo { font: 800 20px var(--onba-mono); fill: #5a3419; letter-spacing: 0.08em; }
+.onba-caja-rotulo--chico { font-size: 13px; letter-spacing: 0.16em; }
+.onba-letrero-texto { font: 800 19px var(--onba-serif); fill: var(--onba-tinta); letter-spacing: 0.06em; }
+.onba-piso-rotulo { font: 700 15px var(--onba-serif); fill: var(--onba-tinta); paint-order: stroke; stroke: rgba(255, 250, 235, 0.85); stroke-width: 3px; }
+.onba-piso-rotulo--marca { font-size: 16px; fill: #8c2a18; }
+.onba-montana-marca { transition: transform 0.8s var(--onba-curva); }
+
+/* la caja: cerrada se agita (alguien quiere salir), al elegir revienta */
+.onba-caja-cuerpo, .onba-caja-tapa { transform-box: fill-box; transform-origin: 50% 100%; }
+.onba-caja-tapa { transform-origin: 50% 50%; }
+.onba-caja-estallido, .onba-caja-polvo { opacity: 0; transform-box: view-box; transform-origin: 100px 50px; }
+.onba-caja--cerrada .onba-caja-cuerpo, .onba-caja--cerrada .onba-caja-tapa { animation: onba-caja-late 2.6s ease-in-out infinite; }
+.onba-caja--abre .onba-caja-cuerpo { animation: onba-caja-revienta 1.2s ease-out both; }
+.onba-caja--abre .onba-caja-tapa { animation: onba-tapa-vuela 1.2s ease-out both; }
+.onba-caja--abre .onba-caja-estallido { animation: onba-estallido 1.2s ease-out both; }
+.onba-caja--abre .onba-caja-polvo { animation: onba-polvo 1.4s ease-out both; transform-origin: 100px 160px; }
+
+/* el pin cae del cielo cuando hay ubicación */
+.onba-pin { transform-box: fill-box; transform-origin: 50% 100%; transform: translateY(-120%); opacity: 0; }
+.onba-pin--cae { animation: onba-pin-cae 0.8s cubic-bezier(0.3, 0.9, 0.4, 1) both; }
+
+.onba-casa-luz { transition: fill 1.2s ease 0.9s; }
+.onba-casa--llego .onba-casa-luz { fill: #ffd66b; }
+.onba-humo { animation: onba-humo 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* ─── los actores ──────────────────────────────────────────────────────── */
+.onba-actor {
+  --ax: var(--ax-compai);
+  --ay: var(--suelo);
+  position: absolute;
+  z-index: 2;
+  left: var(--ax);
+  bottom: var(--ay);
+  translate: -50% 0;
+  display: flex;
+  justify-content: center;
+  transition: left var(--onba-viaje) var(--onba-curva), bottom 0.5s var(--onba-curva);
+  line-height: 0;
+}
+.onba-root[data-paso="0"] .onba-actor--compai { --ax: var(--foco); --ay: calc(7cqh + var(--caja-h) * 0.6); }
+.onba-actor--angelita { --ax: var(--ax-angelita); --ay: calc(var(--suelo) + 8cqh); z-index: 4; }
+.onba-actor-sombra {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 60%;
+  height: 10px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: rgba(43, 33, 24, 0.28);
+}
+.onba-root[data-paso="0"] .onba-actor--compai .onba-actor-sombra { display: none; }
+.onba-actor-salto { transform-origin: 50% 100%; animation: onba-salta 1.25s cubic-bezier(0.3, 0.7, 0.35, 1) both; }
+.onba-root[data-camina="si"] .onba-actor--compai { animation: onba-anda 0.28s ease-in-out 4 alternate; }
+.onba-angelita-vuelo { animation: onba-angelita-llega 1s ease-out both, onba-flota 2.6s ease-in-out 1s infinite alternate; }
+
+/* ─── el globo ─────────────────────────────────────────────────────────── */
+.onba-globo {
+  --pico: calc(var(--ax-compai) - 4cqw);
+  position: absolute;
+  z-index: 5;
+  top: 3cqh;
+  left: 4cqw;
+  max-width: min(84cqw, 22rem);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.8rem 0.6rem;
+  background: #fffdf4;
+  color: var(--onba-tinta);
+  border: 2px solid var(--onba-borde);
+  border-radius: 14px;
+  box-shadow: 0 3px 0 var(--onba-borde);
+  font-family: var(--onba-serif);
+  font-size: 1.04rem;
+  line-height: 1.28;
+  transform-origin: 20% 100%;
+  animation: onba-globo 0.45s cubic-bezier(0.3, 1.4, 0.5, 1) 0.35s both;
+}
+.onba-globo::after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: clamp(14px, var(--pico), calc(100% - 28px));
+  width: 14px;
+  height: 14px;
+  background: #fffdf4;
+  border-right: 2px solid var(--onba-borde);
+  border-bottom: 2px solid var(--onba-borde);
+  rotate: 45deg;
+}
+.onba-globo-quien { font: 700 0.7rem var(--onba-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--onba-tinta-2); }
+.onba-root[data-paso="0"] .onba-globo { left: 50%; translate: -50% 0; transform-origin: 50% 100%; animation-delay: 1.05s; }
+.onba-root[data-paso="0"] .onba-globo::after { left: calc(50% - 7px); }
+.onba-globo--caja { animation-delay: 0.2s !important; }
+.onba-globo--angelita { left: auto; right: 4cqw; transform-origin: 80% 100%; animation-delay: 0.8s; }
+.onba-globo--angelita::after { left: auto; right: calc(100cqw - var(--ax-angelita) - 4cqw - 7px); }
+
+/* ─── la tarjeta de papel ──────────────────────────────────────────────── */
+.onba-tarjeta {
+  position: relative;
+  z-index: 6;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: -14px 10px 12px;
+  padding: 14px 14px 0;
+  background: var(--onba-papel);
+  border: 2px solid var(--onba-borde);
+  border-radius: 16px;
+  box-shadow: 0 5px 0 var(--onba-borde), 0 18px 30px -16px rgba(20, 30, 10, 0.6);
+}
+.onba-pasos { display: flex; gap: 5px; }
+.onba-pasos i { width: 22px; height: 6px; border-radius: 3px; background: #cdbf9d; }
+.onba-pasos i.hecho { background: #7fae4a; }
+.onba-pasos i.aqui { background: var(--onba-tinta); }
+.onba-paso-n { margin: -0.3rem 0 0; font: 600 0.72rem var(--onba-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--onba-tinta-2); }
+.onba-titulo { margin: -0.45rem 0 0; font: 700 1.7rem/1.1 var(--onba-serif); color: #1d1710; }
+.onba-texto { margin: 0; font-family: var(--onba-serif); font-size: 1.06rem; line-height: 1.35; color: #3f3326; }
+.onba-nota { margin: 0; font-size: 0.88rem; color: var(--onba-tinta-2); }
+
+.onba-opciones { display: grid; gap: 0.55rem; }
+.onba-opciones--sub { margin: 0.2rem 0 0 1rem; padding-left: 0.8rem; border-left: 3px dashed #b9a987; }
+.onba-opcion {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 60px;
+  padding: 0.35rem 2.6rem 0.35rem 0.7rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 1.06rem;
+  color: var(--onba-tinta);
+  background: #fffaf0;
+  border: 2px solid var(--onba-borde);
+  border-radius: 12px;
+  box-shadow: 0 3px 0 var(--onba-borde);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+.onba-opcion:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--onba-borde); }
+.onba-opcion .onba-icono { flex: none; }
+.onba-opcion--si { background: #e3efc8; border-color: var(--onba-verde); box-shadow: 0 3px 0 #1f3d15; }
+.onba-opcion--si::after {
+  content: "✓";
+  position: absolute;
+  right: 0.7rem;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--onba-verde);
+  color: #fff;
+  font-size: 0.95rem;
+  animation: onba-marca 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+.onba-campo { display: grid; gap: 0.3rem; font-weight: 700; color: var(--onba-tinta); }
+.onba-campo--fila { display: flex; align-items: center; gap: 0.6rem; }
+.onba-campo-nota { font-weight: 400; font-size: 0.85rem; color: var(--onba-tinta-2); }
+.onba-input {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  color: var(--onba-tinta);
+  background: #fffdf4;
+  border: 2px solid var(--onba-borde);
+  border-radius: 10px;
+}
+.onba-input--corto { width: 7rem; }
+.onba-lugar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.7rem;
+  background: #fffaf0;
+  border: 2px dashed #7a6a55;
+  border-radius: 12px;
+}
+.onba-mapa { display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 12px; margin: 12px 0; padding: 10px 12px; border: 1px solid #d7c7a8; border-radius: 14px; background: #f4eddb; }
+.onba-mapa svg { width: 84px; height: 84px; }
+.onba-mapa-tierra { fill: #d8e0ba; stroke: #536d3a; stroke-width: 2; stroke-linejoin: round; }
+.onba-mapa-rio { fill: none; stroke: #83b5bd; stroke-width: 1.5; stroke-dasharray: 3 3; }
+.onba-mapa-pin circle:first-child { fill: #b44934; stroke: #fff8e9; stroke-width: 2; }
+.onba-mapa-pin circle:last-child { fill: #fff8e9; }
+.onba-mapa-datos { display: grid; gap: 3px; color: #3a3020; font-size: .88rem; }
+.onba-mapa-datos strong { font-size: .95rem; }
+@media (max-width: 420px) { .onba-mapa { grid-template-columns: 68px minmax(0, 1fr); gap: 8px; padding: 8px; } .onba-mapa svg { width: 68px; height: 68px; } }
+.onba-lugar--columna { flex-direction: column; align-items: stretch; }
+.onba-lugar-nombre { margin: 0; font: 700 1.1rem/1.25 var(--onba-serif); color: var(--onba-tinta); }
+.onba-piso { margin: 0; }
+.onba-piso b { color: var(--onba-verde); }
+.onba-aviso { margin: 0; padding: 0.5rem 0.7rem; background: #fff1d6; border-left: 4px solid #d9843a; border-radius: 8px; }
+.onba-listo { display: grid; gap: 0.5rem; }
+
+.onba-acciones {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: auto -14px 0;
+  padding: 0.7rem 14px 0.9rem;
+  background: var(--onba-papel);
+  border-radius: 0 0 14px 14px;
+}
+.onba-acciones > span.flex-1 { flex: 1 1 auto; min-width: 0; }
+.onba-acciones > .onba-primario:last-child { margin-left: auto; }
+.onba-primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  min-height: 52px;
+  padding: 0.75em 1.35em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--onba-verde);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  box-shadow: 0 3px 0 #1b3510, 0 10px 24px -10px rgba(20, 40, 10, 0.7);
+}
+.onba-primario:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #1b3510; }
+.onba-primario:disabled { opacity: 0.45; cursor: not-allowed; }
+.onba-primario--ancho { width: 100%; }
+.onba-saltar { padding: 0.6em; font-size: 0.95rem; color: var(--onba-tinta-2); text-decoration: underline; text-underline-offset: 3px; }
+.onba-atras { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.6em 0.4em; color: var(--onba-tinta-2); font-weight: 600; }
+
+/* ─── el selector de siempre, vestido de cajas de madera ───────────────── */
+.onba-compai-selector > div { padding: 0 !important; background: transparent !important; border: 0 !important; }
+.onba-compai-selector > div > div {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(92px, auto);
+  align-items: stretch;
+  gap: 0.45rem;
+}
+.onba-compai-selector button {
+  width: 100%;
+  min-width: 0;
+  min-height: 92px;
+  align-self: stretch;
+  gap: 0.15rem;
+  padding: 0.35rem 0.2rem 0.4rem !important;
+  color: var(--onba-tinta);
+  background: repeating-linear-gradient(180deg, #e2b171 0 21px, #bf8850 21px 23px) !important;
+  border: 2px solid var(--onba-borde) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 3px 0 var(--onba-borde) !important;
+}
+.onba-compai-selector button[aria-pressed="true"] {
+  background: repeating-linear-gradient(180deg, #f3d59a 0 21px, #d8a868 21px 23px) !important;
+  border-color: var(--onba-verde) !important;
+  box-shadow: 0 3px 0 #1f3d15, 0 0 0 3px var(--onba-verde-claro) !important;
+  translate: 0 -2px;
+}
+.onba-compai-selector button > svg, .onba-compai-selector button > span > svg, .onba-compai-selector button svg[role="img"] { width: 2.7rem; height: 2.7rem; }
+.onba-compai-selector button > div:last-child {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  padding: 1px 2px;
+  background: #fffaf0;
+  border: 1.5px solid var(--onba-borde);
+  border-radius: 4px;
+}
+.onba-campo > .onba-input { display: block; min-height: 46px; border: 2px solid var(--onba-borde); box-shadow: inset 0 1px 2px rgba(43, 33, 24, .08); }
+.onba-compai-selector button p { overflow-wrap: normal; font-size: 10.5px; line-height: 1.2; color: var(--onba-tinta) !important; }
+.onba-compai-selector button p:last-child { display: none; }
+.onba-compai-selector button > span.absolute { background: var(--onba-verde) !important; border: 1.5px solid #1f3d15; }
+
+/* Sin elegir todavía: el selector compartido marca a Angelita por defecto;
+   aquí no se muestra marcada hasta que la persona toque una caja. */
+.onba-compai-selector--sin-elegir button[aria-pressed="true"] {
+  background: repeating-linear-gradient(180deg, #e2b171 0 21px, #bf8850 21px 23px) !important;
+  border-color: var(--onba-borde) !important;
+  box-shadow: 0 3px 0 var(--onba-borde) !important;
+  translate: none;
+}
+.onba-compai-selector--sin-elegir button > span.absolute { display: none; }
+
+/* VeredaPicker viene oscuro; en el papel se lee en tinta */
+.onba-vereda [data-testid="onb2-vereda-editar"] { padding: 0.5rem 0.6rem; background: #fffdf4; border: 2px solid var(--onba-borde); border-radius: 10px; }
+.onba-vereda .text-white, .onba-vereda .text-slate-100, .onba-vereda .text-slate-200 { color: var(--onba-tinta) !important; }
+.onba-vereda .text-slate-300, .onba-vereda .text-slate-400, .onba-vereda .text-slate-500 { color: var(--onba-tinta-2) !important; }
+.onba-vereda .bg-slate-800, .onba-vereda .bg-slate-900 { background: var(--onba-papel-2) !important; }
+.onba-vereda .border-slate-600, .onba-vereda .border-slate-700 { border-color: #7a6a55 !important; }
+.onba-vereda input { background: #fffdf4 !important; color: var(--onba-tinta) !important; }
+.onba-vereda .bg-emerald-700 { background: var(--onba-verde) !important; }
+
+/* ─── película: viñeta, grano y el iris de entrada ─────────────────────── */
+.onba-pelicula {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(43, 25, 10, 0.34) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .17 0 0 0 0 .13 0 0 0 0 .09 0 0 0 .55 0'/></filter><rect width='160' height='160' filter='url(%23g)'/></svg>");
+  opacity: 0.55;
+  animation: onba-parpadeo 0.5s steps(2, end) infinite;
+}
+.onba-iris {
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  top: 40%;
+  width: 170vmax;
+  height: 170vmax;
+  translate: -50% -50%;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 5%, #1a120b 5.6%);
+  will-change: transform, opacity;
+  /* transform y opacity: el compositor abre el iris aunque el hilo principal
+     esté montando los compais, así nunca queda una pantalla negra quieta */
+  animation: onba-iris 1.1s cubic-bezier(0.55, 0, 0.35, 1) 0.1s both;
+}
+
+/* ─── pantalla ancha: el valle es el fondo entero ──────────────────────── */
+@media (min-width: 900px) {
+  .onba-escena { justify-content: center; }
+  .onba-escenario {
+    --foco: 30cqw;
+    --caja-h: 25cqh;
+    --suelo: 10cqh;
+    --ax-compai: 12cqw;
+    --ax-angelita: 40cqw;
+    position: absolute;
+    inset: 0;
+    height: auto;
+  }
+  .onba-estacion--letrero { --dx: 22cqw; }
+  .onba-sol { left: calc(var(--foco) + 12cqw); top: 7cqh; }
+  .onba-estacion--montana { --dx: 8cqw; height: 58cqh; }
+  .onba-estacion--surcos, .onba-estacion--invernadero { --dx: 8cqw; }
+  .onba-estacion--casa { --dx: 10cqw; height: 38cqh; }
+  .onba-globo {
+    top: auto;
+    bottom: calc(var(--suelo) + 225px);
+    left: calc(var(--ax-compai) - 2cqw);
+    max-width: 24rem;
+    font-size: 1.2rem;
+  }
+  .onba-globo::after { left: 28px; }
+  .onba-root[data-paso="0"] .onba-globo { left: var(--foco); bottom: calc(7cqh + var(--caja-h) * 0.6 + 215px); }
+  .onba-globo--angelita { left: auto; right: calc(100cqw - var(--ax-angelita) - 3cqw); bottom: calc(var(--suelo) + 8cqh + 200px); }
+  .onba-globo--angelita::after { left: auto; right: 30px; }
+  .onba-tarjeta {
+    flex: none;
+    width: min(30rem, 38vw);
+    margin: 5dvh max(4vw, 32px) 5dvh auto;
+    padding: 20px 22px 0;
+  }
+  .onba-acciones { margin: auto -22px 0; padding: 0.9rem 22px 1.1rem; }
+  .onba-titulo { font-size: 2.2rem; }
+  .onba-compai-selector button > svg, .onba-compai-selector button svg[role="img"] { width: 3.4rem; height: 3.4rem; }
+}
+
+/* ─── quietud: sin viaje ni teatro, todo en su sitio ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .onba-iris { display: none; }
+  .onba-pelicula { animation: none; }
+  .onba-capa, .onba-actor, .onba-montana-marca, .onba-casa-luz { transition: none; }
+  .onba-sol-rayos, .onba-nube, .onba-humo, .onba-actor-salto, .onba-angelita-vuelo, .onba-globo,
+  .onba-caja-cuerpo, .onba-caja-tapa, .onba-caja-estallido, .onba-caja-polvo, .onba-opcion--si::after,
+  .onba-root[data-camina="si"] .onba-actor--compai { animation: none !important; }
+  .onba-caja--abre .onba-caja-tapa { opacity: 0; }
+  .onba-pin--cae { animation: none; transform: none; opacity: 1; }
+}
+
+@keyframes onba-gira { to { transform: rotate(360deg); } }
+@keyframes onba-nube { from { transform: translateX(-3cqw); } to { transform: translateX(6cqw); } }
+@keyframes onba-caja-late {
+  0%, 70%, 100% { transform: none; }
+  74% { transform: translateY(-3px) rotate(-2deg); }
+  78% { transform: translateY(0) rotate(1.5deg); }
+  82% { transform: translateY(-2px) rotate(-1deg); }
+  86% { transform: none; }
+}
+@keyframes onba-caja-revienta {
+  0% { transform: none; }
+  8% { transform: rotate(-3deg); }
+  16% { transform: rotate(3deg); }
+  24% { transform: rotate(-4deg) scale(1.02, 0.98); }
+  32% { transform: rotate(4deg) scale(1.03, 0.97); }
+  40% { transform: scale(1.12, 0.84); }
+  52% { transform: scale(0.94, 1.08); }
+  64% { transform: scale(1.03, 0.97); }
+  100% { transform: none; }
+}
+@keyframes onba-tapa-vuela {
+  0%, 36% { transform: none; opacity: 1; }
+  24% { transform: translateY(-4px) rotate(-2deg); }
+  48% { transform: translate(-24px, -70px) rotate(-40deg); opacity: 1; }
+  100% { transform: translate(-150px, -30px) rotate(-220deg); opacity: 0; }
+}
+@keyframes onba-estallido {
+  0%, 36% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+  44% { opacity: 1; transform: scale(1) rotate(0deg); }
+  60% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  76%, 100% { opacity: 0; transform: scale(1.3) rotate(6deg); }
+}
+@keyframes onba-polvo {
+  0%, 40% { opacity: 0; transform: scale(0.2); }
+  52% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.35) translateY(-8px); }
+}
+@keyframes onba-salta {
+  0%, 38% { transform: translateY(85%) scale(0.75, 1.1); opacity: 0; }
+  40% { opacity: 1; }
+  56% { transform: translateY(-38%) scale(0.9, 1.14) rotate(-4deg); }
+  70% { transform: translateY(-10%) scale(1, 1) rotate(3deg); }
+  80% { transform: translateY(0) scale(1.14, 0.86); }
+  90% { transform: translateY(-3%) scale(0.97, 1.04); }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes onba-anda {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-7px) rotate(2deg); }
+}
+@keyframes onba-angelita-llega {
+  from { transform: translate(40cqw, -40cqh) rotate(-14deg) scale(0.7); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes onba-flota { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+@keyframes onba-globo { from { transform: scale(0.4); opacity: 0; } 60% { opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes onba-pin-cae {
+  0% { transform: translateY(-140%); opacity: 0; }
+  20% { opacity: 1; }
+  62% { transform: translateY(0) scale(1.1, 0.88); }
+  78% { transform: translateY(-12%) scale(0.96, 1.05); }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes onba-humo { 0% { transform: translateY(0) scale(0.9); opacity: 0.9; } 100% { transform: translateY(-14px) scale(1.2); opacity: 0.2; } }
+@keyframes onba-marca { from { transform: scale(0); } to { transform: none; } }
+@keyframes onba-parpadeo { from { opacity: 0.5; } to { opacity: 0.62; } }
+@keyframes onba-iris {
+  0% { transform: scale(1); opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: scale(16); opacity: 0; visibility: hidden; }
+}
+
+/* La portada recupera solo la selección ilustrada de Arte dentro del Juego. */
+.onbj-arte-portada {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.onbj-arte-portada .onba-escenario { flex: 0 0 clamp(250px, 32dvh, 340px); }
+.onbj-arte-portada .onba-actor--compai { --ax: 50cqw; --ay: calc(7cqh + var(--caja-h) * .62); }
+.onbj-arte-compai { z-index: 2; }
+.onbj-arte-tarjeta { min-height: 0; }
+.onbj-arte-titulo { margin: 0; font-size: 1.45rem; }
+.onbj-arte-portada .onba-compai-selector { margin-top: .1rem; }
+.onbj-arte-portada .onba-compai-selector button { min-height: 86px; }
+.onbj-arte-portada .onba-compai-selector button:focus-visible { outline: 3px solid #2f5d1e; outline-offset: 3px; }
+@media (max-height: 760px) {
+  .onbj-arte-portada .onba-escenario { flex-basis: 250px; }
+  .onbj-arte-portada .onba-compai-selector button { min-height: 76px; }
+  .onbj-arte-portada .onba-compai-selector button > svg,
+  .onbj-arte-portada .onba-compai-selector button svg { width: 2.25rem; height: 2.25rem; }
+}

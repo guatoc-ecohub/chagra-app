@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — el páramo y el agua, de la niebla a su finca</title>
+<meta name="description" content="Una sola toma, sin cortes, siguiendo el agua: la montaña por pisos, la niebla en el páramo, el frailejón y los pelos de su hoja, el musgo y sus células, el suelo negro, el nacimiento y su finca. Con fuentes, palabras, lectura en voz alta y un repaso.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(12,16,24,.68); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a9d6b0; --acento-tinta:#c6e8cb; --agua:#7fb8d6;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#11171a;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#11171a;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+#frase [data-palabras],#frase [data-fuentes-est]{display:none}
+
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#1c2622}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#22302a;max-width:27rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#22302a;margin-top:1em;font-weight:600}
+#titulo h1,#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(240,242,236,.95),0 0 14px rgba(240,242,236,.85)}
+
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:min(22rem,calc(100vw - 2*var(--gut)));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .alt{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#medidor .alt .val{color:var(--acento-tinta);font-size:1.3rem}
+#medidor .piso{font-size:1rem;color:var(--tinta-2);text-align:right;margin-top:2px}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3)}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em;white-space:pre}
+
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(35rem,calc(100vw - 2*var(--gut)));max-height:calc(100vh - 2*var(--gut) - 4vh);overflow:hidden;display:flex;flex-direction:column;background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em;overflow:auto;flex:0 1 auto;overscroll-behavior:contain}
+#frase .num,#frase h2,#frase .pie,#frase .fila-acc{flex:0 0 auto}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(169,214,176,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde);flex-wrap:wrap}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a9d6b0;color:#10261a;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar,#frase.min .fila-acc{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+#frase .fila-acc{display:flex;gap:8px;margin-top:8px}
+#frase .fila-acc .bc{flex:1;padding-left:8px;padding-right:8px}
+
+.cuenta{margin:.4em 0 .2em;font-family:var(--sans)}
+.cuenta label{display:flex;align-items:center;gap:10px;font-size:1rem;color:var(--tinta-2);flex-wrap:wrap}
+.cuenta input[type=range]{flex:1;min-width:9rem;accent-color:#a9d6b0;height:44px}
+.cuenta output{font-family:var(--mono);color:var(--tinta);min-width:7ch}
+.cuenta .res{font-family:var(--serif);font-size:1.08rem;line-height:1.45;margin:.4em 0 .3em;color:var(--tinta)}
+.cuenta .fila-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:.3em}
+
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(10,14,22,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(12,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(30,36,50,.8);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a9d6b0;color:#10261a;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#bfe2c4}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#121a18;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(5,9,8,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#121a18;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+#fuentes a{color:var(--acento-tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:1fr;gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#1a2420;color:var(--tinta);border-radius:14px;padding:10px 14px;cursor:pointer;font-family:var(--sans);font-size:1.08rem;min-height:52px;text-align:left;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(169,214,176,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;max-width:none;padding:8px 12px 8px}
+  #medidor .val{font-size:1.2rem}
+  #medidor .alt{margin-top:4px;padding-top:4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  #medidor .alt .val{font-size:1.1rem}
+  #medidor .piso{margin-top:0}
+  #medidor .estacion,#medidor .nota,#medidor .alt .rot{display:none}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px;max-height:calc(62vh - 56px)}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:4.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 14px}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+}
+@media (max-width:370px){ .btn{padding:10px 10px} #frase .fila-acc .bc{font-size:.95rem} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo siguiendo el agua: de la montaña al páramo con niebla, al frailejón y los pelos de su hoja, al musgo y sus células, al suelo negro, al nacimiento y a una finca" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>El páramo</h1>
+  <p>De la niebla al frailejón, al musgo, al suelo negro, al nacimiento y a su finca: por qué cuidar el páramo es cuidar su agua.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño y de altura">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">24,0 km</span></div>
+  <div class="alt"><div class="fila"><span class="rot">Altura sobre el mar</span><span class="val rueda" id="vAltura">3 450 m</span></div><div class="piso" id="vPiso">páramo bajo</div></div>
+  <div class="estacion"><span id="vEstacion">1/9 · La montaña</span><span>IGAC</span></div>
+  <div class="nota" id="vNota">Altura del suelo en el centro del dibujo. Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 9</div>
+  <h2 id="fTit">La montaña</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+  <div class="fila-acc">
+    <button type="button" class="bc" data-palabras>Palabras</button>
+    <button type="button" class="bc" data-repaso-est>Repaso</button>
+    <button type="button" class="bc" data-fuentes-est>Fuentes</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el viento">♪ no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Cada cifra del recorrido viene de una de estas fuentes, leídas en su documento. Donde un estudio se hizo lejos de aquí (Ecuador, Venezuela, China), el texto lo dice. La montaña, el páramo, el frailejón, el musgo, el corte del suelo y la finca son <b>dibujos</b>: no son un sitio real. Las gotas de niebla, el azul del agua en el musgo y en el suelo, y la altura que marca el medidor son <b>de dibujo</b>. Los tamaños del medidor son <b>aproximados</b>.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>Cárdenas MF, Tobón C, Buytaert W (2017).</b> <em>Contribution of occult precipitation to the water balance of páramo ecosystems in the Colombian Andes.</em> Hydrological Processes 31: 4440–4449. doi:10.1002/hyp.11374 — la niebla es común en los páramos y se forma cuando el aire húmedo sube por la montaña y se enfría. En seis sitios de tres páramos de Colombia (Romerales, Quindío; Chingaza, Cundinamarca; Belmira, Antioquia), medida con cilindros atrapanieblas durante 7 a 17 meses, la niebla con llovizna sumó entre 7 % y 28 % a la lluvia; cambia mucho entre sitios y en el tiempo, y llega sobre todo en los periodos de poca lluvia. La hidrología del páramo tiene una proporción de escorrentía extraordinariamente alta.</li>
+      <li id="f2"><b>Cárdenas MF, Tobón C, Rock BN, del Valle JI (2018).</b> <em>Ecophysiology of frailejones (Espeletia spp.), and its contribution to the hydrological functioning of páramo ecosystems.</em> Plant Ecology 219: 185–198. doi:10.1007/s11258-017-0787-x — los páramos dan mucha agua y la regulan. En dos páramos de Colombia, el agua que pierden los frailejones al transpirar es muy poca, y eso contribuye a la alta escorrentía del páramo. Tres <i>Espeletia hartwegiana</i> fechados con radiocarbono crecieron entre 3,8 y 6,9 cm por año.</li>
+      <li id="f3"><b>Meinzer FC, Goldstein G (1985).</b> <em>Some consequences of leaf pubescence in the Andean giant rosette plant Espeletia timotensis.</em> Ecology 66: 512–520. doi:10.2307/1940399 — frailejón del páramo de los Andes de Venezuela, hasta 4 500 m. La capa de pelos de la hoja llega a 3 mm; actúa sobre todo engrosando la capa de aire quieto junto a la hoja; la hoja puede calentarse 5 °C o más sin transpirar más, lo que favorece su crecimiento donde la temperatura media del aire ronda los 3 °C.</li>
+      <li id="f4"><b>Sanchez A, Mercado LM, Posada JM, Smith WK (2025).</b> <em>Seasonal ecophysiology of two páramo species: the dominance of light over water limitations.</em> Frontiers in Plant Science 16: 1529852. doi:10.3389/fpls.2025.1529852 — <i>Espeletia grandiflora</i>, roseta gigante propia de la cordillera Oriental de Colombia, de hasta unos 5 m, con hojas cubiertas por un vello blanco y denso. Su capa de hojas secas alrededor del tronco lo protege de las heladas, y el tronco tiene una médula que guarda agua y ayuda a la planta cuando el suelo da poca.</li>
+      <li id="f5"><b>Yang R-R, Yang Z-J, Ma X-Y, Huang W-Z, Cheng X-F, Shu L, Zhu R-L (2024).</b> <em>The water absorption capacity of 21 Sphagnum species.</em> Bryophyte Diversity and Evolution 47: 182–192. doi:10.11646/bde.47.1.13 — en 21 especies de musgo de turbera de China, la absorción de agua a saturación fue de unas 19 a unas 44 veces el peso seco, mucho más que en otros musgos; la capacidad de cada especie crece en línea con el volumen de sus células hialinas.</li>
+      <li id="f6"><b>Ruiz EJ, Linares EL, Morales-P ME (2006).</b> <em>Sphagnum (Sphagnaceae) en el departamento de Boyacá, Colombia.</em> Revista de la Academia Colombiana de Ciencias 30 (114): 31–45. <a href="https://raccefyn.co/index.php/raccefyn/article/download/2213/3612/27256" rel="noopener">raccefyn.co</a> — en Colombia hay 32 taxones de <i>Sphagnum</i>; en Boyacá, 18 especies, varias en turberas de páramo (por ejemplo, entre 2 860 y 4 030 m). Sus hojas tienen células grandes hialinas y células verdes; las hialinas tienen fibrillas y poros.</li>
+      <li id="f7"><b>Buytaert W, Deckers J, Dercon G, De Bièvre B, Poesen J, Govers G (2002).</b> <em>Impact of land use changes on the hydrological properties of volcanic ash soils in South Ecuador.</em> Soil Use and Management 18: 94–100. doi:10.1079/SUM2001107 — Andosoles úmbricos bajo el matorral del subpáramo (3 000–3 300 m), de horizonte oscuro rico en humus, livianos, que dejan pasar el agua y la retienen mucho. En el punto de marchitez retenían en promedio 0,7 kg de agua por kg de suelo seco. Al secarse pierden parte de esa retención de forma irreversible: no se vio recuperación ni después de 50 años de pastos. La materia orgánica es lo que más cuenta. La capa de hojarasca retenía 16 mm de agua, que se pierden al desmontar para cultivar.</li>
+      <li id="f8"><b>Buytaert W, Célleri R, De Bièvre B, Cisneros F, Wyseure G, Deckers J, Hofstede R (2006).</b> <em>Human impact on the hydrology of the Andean páramos.</em> Earth-Science Reviews 79: 53–72. doi:10.1016/j.earscirev.2006.06.002 — el páramo es la principal fuente de agua de las tierras altas andinas y de extensas tierras bajas secas, para consumo, riego, industria y energía. El pastoreo intensivo, los cultivos y las plantaciones de pino alteran con fuerza su régimen de agua. <i>Se leyó el resumen, no el artículo entero.</i></li>
+      <li id="f9"><b>IGAC (2023).</b> <em>Actualización de áreas homogéneas de tierras a nivel municipal con fines multipropósito</em> (IN-AGR-PC05-01, versión 1), tabla 1, p. 4. <a href="https://www.igac.gov.co/sites/default/files/listadomaestro/in-agr-pc05-01_v1_actualizacion_de_areas_homogeneas_de_tierras.pdf" rel="noopener">igac.gov.co</a> — pisos térmicos por altitud: cálido 0–1 000 m; templado 1 000–2 000; frío 2 000–3 000; muy frío (páramo bajo) 3 000–3 700; extremadamente frío (páramo alto) 3 700–4 200; subnival 4 200–4 700; nival, más de 4 700.</li>
+      <li id="f10"><b>Ley 1930 de 2018</b>, «por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia» (Congreso de Colombia; texto en el Gestor Normativo de Función Pública, <a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=87764" rel="noopener">funcionpublica.gov.co</a>). Art. 2: los páramos son indispensables en la provisión de agua. Art. 3: el páramo queda entre el límite de arriba del bosque andino y, si hay, los glaciares; con pajonales, frailejonales, matorrales, turberas, lagunas y quebradas. Art. 4: la línea del páramo la traza el Ministerio de Ambiente, con el área de referencia del Instituto Humboldt a escala 1:25 000. Art. 5: en el páramo se prohíben, entre otras, las quemas, las talas, la maquinaria pesada en actividades agropecuarias y la degradación de la cobertura vegetal nativa. Art. 10: las actividades agropecuarias de alto impacto anteriores al 16 de junio de 2011 se sustituyen o reconvierten, con tiempo y medios para las comunidades; puede permitirse seguir con las de bajo impacto, con buenas prácticas.</li>
+      <li id="f11"><b>Decreto 1076 de 2015</b>, artículo 2.2.1.1.18.2 (Presidencia de la República; texto en el Gestor Normativo de Función Pública, <a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=78153" rel="noopener">funcionpublica.gov.co</a>) — los propietarios deben mantener en cobertura boscosa «los nacimientos de fuentes de aguas en una extensión por lo menos de 100 metros a la redonda, medidos a partir de su periferia», y «una faja no inferior a 30 metros de ancha» a cada lado de los cauces de ríos, quebradas y arroyos.</li>
+    </ol>
+    <p class="aviso"><b>Cuentas hechas con esas cifras.</b> Edad de un frailejón de 2 m: 200 cm ÷ 6,9 cm por año ≈ 29 años; 200 ÷ 3,8 ≈ 53 años [2]. Es una cuenta nuestra con el crecimiento de tres plantas de una especie: otro frailejón, en otro sitio, puede crecer distinto. Cuánto le falta a su finca para el páramo: 3 000 m menos la altura de su finca [9]; la altura sola no dice si un sitio está en el páramo delimitado [10].</p>
+    <p class="aviso"><b>Lo que no está.</b> No se dice que el frailejón «produce» agua: ninguna de estas fuentes lo sostiene. No se dan litros por frailejón ni cuánta agua atrapa cada hoja: no encontramos una medida que se pudiera leer. No se afirma que las especies dibujadas crezcan en su vereda.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso del páramo — una sola toma, de la montaña a la finca.
+   Cada escala vive dentro de otra (portal); los portales forman
+   un árbol: el frailejón tiene adentro su hoja, su musgo y su
+   suelo. La cámara la mueve solo quien lee (scroll, dedo,
+   teclado o «Bajar»): la niebla corre cuando usted baja.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false, ANC = 0.5;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const $ = id => document.getElementById(id);
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hsh(a, b){ let h = (Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
+function n1(x, s){ const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hsh(i, s), hsh(i + 1, s), u); }
+function fbm(x, s, o){ let a = 0, amp = 0.5, fr = 1; for (let k = 0; k < (o || 4); k++){ a += amp * n1(x * fr, s + k * 17); fr *= 2.03; amp *= 0.5; } return a; }
+function lg(c, x0, y0, x1, y1, stops){ const g = c.createLinearGradient(x0, y0, x1, y1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g; }
+function rg(c, x, y, r0, r1, stops){ const g = c.createRadialGradient(x, y, r0, x, y, r1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g; }
+function fondo(c, e, col){ const v = e.view; c.fillStyle = col; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2); }
+const enVista = (e, x, y, m) => x > e.view[0] - m && x < e.view[2] + m && y > e.view[1] - m && y < e.view[3] + m;
+const TINTA = '#231d17';
+function hex(h){ if (h[0] === 'r') return h.slice(h.indexOf('(') + 1, -1).split(',').map(Number); h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+const MEZCLAS = new Map();
+function mix(a, b, t){ const q = Math.round(clamp(t, 0, 1) * 64), k = a + '|' + b + '|' + q; let r = MEZCLAS.get(k); if (r) return r; const A = hex(a), B = hex(b), u = q / 64; r = `rgb(${Math.round(lerp(A[0],B[0],u))},${Math.round(lerp(A[1],B[1],u))},${Math.round(lerp(A[2],B[2],u))})`; if (MEZCLAS.size < 20000) MEZCLAS.set(k, r); return r; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+const miles = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const coma = (x, d) => x.toFixed(d).replace('.', ',');
+
+/* Voronoi por recorte de semiplanos (del Descenso del café): terrones del suelo */
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0; for (const p of poly){ cx+=p[0]; cy+=p[1]; } polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){ const out = []; for (let y = box[1]; y <= box[3]; y += step) for (let x = box[0]; x <= box[2]; x += step) out.push([x + (r() - 0.5) * step * jit, y + (r() - 0.5) * step * jit]); return out; }
+function roundPoly(c, pts, k){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2]; let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]); for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); } c.closePath(); }
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+
+/* ============================================================
+   LA FINCA POR LA URL: ?alt=&municipio=&lat=&lon=
+   La altitud orienta el piso (IGAC) [9]. Las coordenadas solas no
+   se usan para adivinar ni altura ni municipio, y nada se guarda.
+   ============================================================ */
+function numero(v, a, b){ if (v === null || v === '') return null; const n = Number(String(v).replace(',', '.')); return isFinite(n) && n >= a && n <= b ? n : null; }
+function limpio(v){ if (!v) return ''; return String(v).normalize('NFC').replace(/[^\p{L}\p{N} .'-]/gu, '').trim().slice(0, 40); }
+const finca = { alt: numero(qs.get('alt'), -50, 7000), mun: limpio(qs.get('municipio')), lat: numero(qs.get('lat'), -90, 90), lon: numero(qs.get('lon'), -180, 180), ejemplo: false, recorte: '' };
+if (finca.alt === null){ finca.alt = 2600; finca.ejemplo = true; }
+const ALT_MIN = 500, ALT_MAX = 3700;
+function recortaAlt(){ finca.recorte = finca.alt < ALT_MIN ? 'baja' : finca.alt > ALT_MAX ? 'alta' : ''; return clamp(finca.alt, ALT_MIN, ALT_MAX); }
+const PISOS = [[1000, 'cálido'], [2000, 'templado'], [3000, 'frío'], [3700, 'páramo bajo'], [4200, 'páramo alto'], [4700, 'subnival'], [1e9, 'nival']];
+const pisoDe = h => { for (const [t, n] of PISOS) if (h < t) return n; return 'nival'; };
+
+/* ============================================================
+   ESCALAS  (F = metros que mide una unidad de cada nivel)
+   0 montaña · 1 páramo · 2 frailejón · 3 pelos de la hoja
+   4 musgo · 5 células del musgo · 6 suelo negro · 7 finca
+   ============================================================ */
+const F = [24000, 150, 4, 0.012, 0.03, 0.0006, 0.03, 400];
+const PADRE = [-1, 0, 1, 2, 2, 4, 2, 0];
+const HIJOS = F.map((_, k) => PADRE.map((p, j) => p === k ? j : -1).filter(j => j >= 0));
+const REGION = [[-3, -3, 3, 3], [-2.2, -1.4, 2.6, 1.6], [-1.3, -1.1, 1.3, 1.0], [-0.9, -0.8, 0.9, 0.6], [-0.9, -0.8, 0.9, 0.8], [-0.9, -0.9, 0.9, 0.9], [-0.9, -0.9, 0.9, 0.9], [-1.6, -1.2, 1.6, 1.2]];
+
+/* nivel 0 · la montaña (la ladera de la derecha baja hacia su finca) */
+const K0 = 1 / 11000, Y0 = 0.33;
+function alt0(x){ return 330 + 4320 * Math.exp(-Math.pow(x / 0.34, 2)) * (1 + 0.035 * Math.sin(x * 23 + 1)) + 1300 * Math.exp(-Math.pow((x + 0.46) / 0.16, 2)) + 150 * (fbm(x * 7 + 3, 4, 5) - 0.5) + 35 * Math.sin(x * 41); }
+const y0de = x => Y0 - alt0(x) * K0;
+function xDeAlt(h){ let x = 0.0; for (; x < 0.9; x += 0.0004){ if (alt0(x) <= h) return x; } return x; }
+let ALT_F, ALT_P, FX0, PX0;
+/* nivel 1 · el páramo  */
+function D1(x){ return 0.24 / (1 + Math.exp(-(x - 0.62) / 0.09)) + 0.2 * Math.max(0, x - 0.62) + 0.06 * Math.max(0, x - 0.95); }
+function g1(x){ return D1(x) - D1(0) + 0.012 * (fbm(x * 4 + 2, 21, 4) - fbm(2, 21, 4)) + 0.004 * Math.sin(x * 11); }
+const NAC1 = 0.74, FRA1 = -0.2;
+/* nivel 2 · el frailejón (la base del tronco en 0,0; el suelo en y = 0) */
+const MUSGO2 = { x0: 0.11, x1: 0.4, cx: 0.26 };
+const SUELO_P = [-0.24, 0.1];   // donde se entra al suelo (40 cm de hondo)
+/* nivel 7 · la finca */
+function g7(x){ return 0.2 * x + 0.03 * Math.sin(x * 3.3 + 0.4) + 0.012 * (fbm(x * 5 + 9, 33, 4) - 0.5); }
+const CASA7 = 0.12, TOMA7 = -0.34;
+
+/* dónde queda cada hijo dentro de su padre */
+let PORTAL = [];
+let G = [];
+function armaPortales(){
+  ALT_F = recortaAlt();
+  ALT_P = clamp(Math.max(3450, ALT_F + 300), 3450, 4000);
+  PX0 = xDeAlt(ALT_P); FX0 = xDeAlt(ALT_F);
+  PORTAL = [];
+  PORTAL[1] = { x: PX0, y: y0de(PX0) + 0.002 };
+  PORTAL[2] = { x: FRA1, y: yProf1(FRA1, D_HEROE) };
+  PORTAL[3] = { x: FR2.hoja[0], y: FR2.hoja[1] };
+  PORTAL[4] = { x: MUSGO2.cx, y: -musgoAlto(MUSGO2.cx) * 0.55 };
+  PORTAL[5] = { x: MUSGO_HOJA[0], y: MUSGO_HOJA[1] };
+  PORTAL[6] = { x: SUELO_P[0], y: SUELO_P[1] };
+  PORTAL[7] = { x: FX0, y: y0de(FX0) + 0.001 };
+  for (let k = 1; k < F.length; k++) PORTAL[k].s = F[k] / F[PADRE[k]];
+  G = [{ ox: 0, oy: 0, s: 1, d: 0 }];
+  const orden = [1, 2, 3, 4, 5, 6, 7];
+  for (const k of orden){ const P = PORTAL[k], g = G[PADRE[k]]; G[k] = { ox: g.ox + g.s * P.x, oy: g.oy + g.s * P.y, s: g.s * P.s, d: g.d + 1 }; }
+}
+function aGlobal(L, x, y, f){ const g = G[L]; return { X: g.ox + g.s * x, Y: g.oy + g.s * y, w: g.s * f }; }
+
+/* ============================================================
+   EL FRAILEJÓN: la misma forma a toda escala (semilla fija)
+   Roseta de hojas vivas en espiral sobre un tronco con su ruana
+   de hojas secas [4]. Unidades: alto total = 1.
+   ============================================================ */
+function hazFrailejon(seed, detalle){
+  const r = rng(seed);
+  const o = { tronco: 0.7, rw: 0.05, muertas: [], vivas: [], nucleo: [] };
+  const nM = detalle ? 230 : 34;
+  for (let i = 0; i < nM; i++){
+    const t = Math.pow(r(), 0.75);
+    const y0 = -o.tronco * (0.02 + 0.97 * t);
+    const lado = (i % 2 ? -1 : 1) * (r() < 0.85 ? 1 : -1);
+    const abre = 0.1 + 0.32 * r() + 0.15 * (1 - t);
+    const L = 0.2 + 0.1 * r() - 0.05 * (1 - t);
+    o.muertas.push({ x: lado * o.rw * (0.2 + 0.8 * r()), y: y0, a: Math.PI / 2 - lado * abre, L, w: L * (0.1 + 0.06 * r()), col: r(), z: r(), cv: (r() - 0.5) * 0.3, t });
+  }
+  o.muertas.sort((a, b) => a.z - b.z);
+  const nV = detalle ? 78 : 18;
+  for (let i = 0; i < nV; i++){
+    const k = i / (nV - 1);
+    const phi = i * 2.39996 + 0.4;
+    const incl = 0.1 + 1.12 * Math.pow(k, 0.85);
+    const L = (0.26 + 0.12 * k) * (0.9 + 0.2 * r());
+    o.vivas.push({ phi, incl, L, w: L * (0.21 + 0.05 * r()), k, s: r(), prof: Math.sin(phi) * Math.sin(incl) });
+  }
+  o.vivas.sort((a, b) => a.prof - b.prof);
+  return o;
+}
+function puntoHoja(h, t, top){ // punto a la fracción t de la hoja viva h (unidades del frailejón, alto 1)
+  const dx = Math.sin(h.incl) * Math.cos(h.phi), dz = Math.sin(h.incl) * Math.sin(h.phi), dy = -Math.cos(h.incl);
+  const sx = dx, sy = dy + dz * 0.22;
+  const caida = 0.22 * h.k * h.k * t * t; // las de afuera arquean la punta
+  return [sx * h.L * t, top + sy * h.L * t + caida * h.L];
+}
+function formaHoja(c, x0, y0, ang, L, w, curva){ // lanceolada, de la base hacia ang
+  const ca = Math.cos(ang), sa = Math.sin(ang), nx = -sa, ny = ca;
+  const pt = (t, o) => { const b = curva * t * t * L; return [x0 + ca * L * t + nx * (o + b), y0 + sa * L * t + ny * (o + b)]; };
+  const ancho = t => w * Math.sin(Math.PI * Math.pow(t, 0.72)) * (1 - 0.15 * t);
+  c.moveTo(...pt(0, 0));
+  for (let i = 1; i <= 8; i++){ const t = i / 8; c.lineTo(...pt(t, ancho(t) * 0.5)); }
+  for (let i = 7; i >= 1; i--){ const t = i / 8; c.lineTo(...pt(t, -ancho(t) * 0.5)); }
+  c.closePath();
+}
+const COL_MUERTA = ['#7c6a56', '#8b7862', '#6b5b4a', '#9a8a72', '#75644f', '#a39377'];
+function dibujaFrailejon(c, x, y, Hh, px, o, luz, niebla){
+  const cuadros = Hh / px; // alto en píxeles
+  c.save(); c.translate(x, y); c.scale(Hh, Hh);
+  const pxl = px / Hh;
+  if (cuadros < 40){ // de lejos: tronco pardo y penacho plateado
+    c.fillStyle = mix('#6a5846', '#9a9486', niebla * 0.6); c.beginPath(); c.moveTo(-o.rw * 1.9, 0); c.lineTo(-o.rw * 1.3, -o.tronco); c.lineTo(o.rw * 1.3, -o.tronco); c.lineTo(o.rw * 1.9, 0); c.closePath(); c.fill();
+    c.strokeStyle = mix('#cdd4c0', '#9aa592', niebla); c.lineWidth = Math.max(pxl * 1.3, 0.05); c.lineCap = 'round'; c.beginPath();
+    for (let i = 0; i < 9; i++){ const a = -Math.PI / 2 + (i - 4) * 0.2, L = 0.27 - Math.abs(i - 4) * 0.02; c.moveTo(0, -o.tronco + 0.02); c.lineTo(Math.cos(a) * L, -o.tronco + 0.02 + Math.sin(a) * L); } c.stroke();
+    c.restore(); return;
+  }
+  const top = -o.tronco;
+  // la ruana de hojas secas [4]
+  c.fillStyle = '#4c3f33'; c.beginPath(); c.moveTo(-o.rw, 0); c.lineTo(-o.rw * 0.9, top); c.lineTo(o.rw * 0.9, top); c.lineTo(o.rw, 0); c.closePath(); c.fill();
+  c.lineJoin = 'round';
+  if (!o.pm){ o.pm = o.muertas.map(m => { const P = new Path2D(); formaHoja(P, m.x, m.y, m.a, m.L, m.w, m.cv); return P; });
+    o.pv = o.vivas.map(h => { const P = puntoHoja(h, 1, top), ang = Math.atan2(P[1] - top, P[0]), curva = -0.12 * h.k * Math.sign(Math.cos(h.phi) || 1), Lp = Math.hypot(P[0], P[1] - top); const F1 = new Path2D(); formaHoja(F1, 0, top, ang, Lp, h.w, curva); const N = new Path2D(); N.moveTo(0, top); N.lineTo(P[0] * 0.9, top + (P[1] - top) * 0.9); return { F: F1, N, P }; }); }
+  o.muertas.forEach((m, i) => {
+    const base = COL_MUERTA[Math.floor(m.col * COL_MUERTA.length)];
+    c.fillStyle = mix(base, '#b8b2a2', niebla * 0.35 + (m.z > 0.7 ? 0.08 : 0)); c.fill(o.pm[i]);
+    if (cuadros > 120){ c.strokeStyle = 'rgba(40,30,22,.55)'; c.lineWidth = Math.max(pxl * 0.8, 0.002); c.stroke(o.pm[i]); }
+  });
+  if (cuadros > 200){ // pelusa gris en los bordes de las secas
+    c.strokeStyle = 'rgba(214,206,190,.28)'; c.lineWidth = Math.max(pxl, 0.004);
+    o.muertas.forEach((m, i) => { if (m.z >= 0.55) c.stroke(o.pm[i]); });
+  }
+  // la roseta: hojas vivas, de atrás hacia adelante
+  o.vivas.forEach((h, iv) => {
+    const { F: FH, N: NH, P } = o.pv[iv];
+    const adelante = clamp(0.5 + h.prof * 0.8, 0, 1);
+    const verde = mix('#6f8c5c', '#9fb08c', adelante), plata = mix('#aab59c', '#e2e6d6', adelante * luz);
+    if (cuadros > 160){ const g = c.createLinearGradient(0, top, P[0], P[1]);
+      g.addColorStop(0, mix(verde, '#b7bea9', niebla * 0.4)); g.addColorStop(0.55, mix(plata, '#c9ccc0', niebla * 0.3)); g.addColorStop(1, mix(plata, '#f0f1e8', 0.35));
+      c.fillStyle = g; } else c.fillStyle = mix(plata, '#c9ccc0', niebla * 0.3);
+    c.fill(FH);
+    if (cuadros > 90){
+      c.strokeStyle = `rgba(245,247,238,${(0.25 + 0.4 * adelante).toFixed(2)})`; c.lineWidth = Math.max(pxl * 1.2, h.w * 0.12); c.stroke(FH);
+      c.strokeStyle = `rgba(70,84,60,${(0.25 + 0.2 * adelante).toFixed(2)})`; c.lineWidth = Math.max(pxl * 0.7, h.w * 0.05); c.stroke(NH);
+    }
+  });
+  c.restore();
+}
+const FR_L1 = [];               // frailejones del páramo (nivel 1), con su forma
+const FR_HEROE = hazFrailejon(20260930, true);
+const FR2 = { H: 0.43, x: 0, o: FR_HEROE, hoja: [0, 0] };
+(() => { // el punto de la hoja donde entra la cámara: una de adelante, a la derecha
+  let best = null, bs = -1e9;
+  for (const h of FR_HEROE.vivas){ const sc = h.prof * 2 + Math.cos(h.phi) - Math.abs(h.k - 0.7) * 3; if (sc > bs){ bs = sc; best = h; } }
+  const P = puntoHoja(best, 0.62, -FR_HEROE.tronco);
+  FR2.hoja = [FR2.x + P[0] * FR2.H, P[1] * FR2.H]; FR2.hojaH = best;
+})();
+
+/* ============================================================
+   NIEBLA (compartida): un sprite suave que la cámara arrastra
+   ============================================================ */
+let SPR_NUBE = null;
+function spriteNube(){
+  const n = 256, c0 = document.createElement('canvas'); c0.width = c0.height = n; const c = c0.getContext('2d');
+  const r = rng(77);
+  for (let i = 0; i < 30; i++){
+    const x = n * (0.14 + r() * 0.72), y = n * (0.45 + (r() - 0.5) * 0.2), rad = n * (0.09 + r() * 0.15);
+    const g = c.createRadialGradient(x, y, 0, x, y, rad);
+    g.addColorStop(0, 'rgba(240,242,240,.5)'); g.addColorStop(0.6, 'rgba(226,230,230,.24)'); g.addColorStop(1, 'rgba(210,216,220,0)');
+    c.fillStyle = g; c.fillRect(0, 0, n, n);
+  }
+  return c0;
+}
+function nube(c, x, y, w, a){ c.globalAlpha = a; c.drawImage(SPR_NUBE, x - w / 2, y - w * 0.3, w, w * 0.6); c.globalAlpha = 1; }
+
+/* ============================================================
+   NIVEL 0 · LA MONTAÑA POR PISOS  (1 unidad = 24 km) [9]
+   ============================================================ */
+const PAT = {};
+function tesela(dibujar, tam = 128){ const c0 = document.createElement('canvas'); c0.width = c0.height = tam; const c = c0.getContext('2d'); dibujar(c, tam, rng(tam * 7 + dibujar.length)); return c0; }
+function copasTesela(c, n, r, cols, fondoC, k){
+  c.fillStyle = fondoC; c.fillRect(0, 0, n, n);
+  for (let i = 0; i < 70; i++){ const x = r() * n, y = r() * n, rad = (5 + r() * 7) * (k || 1);
+    for (const [dx, dy] of [[0,0],[n,0],[-n,0],[0,n],[0,-n]]){ c.fillStyle = cols[Math.floor(r() * cols.length)]; c.strokeStyle = 'rgba(30,40,24,.55)'; c.lineWidth = 1.2; c.beginPath(); c.arc(x + dx, y + dy, rad, 0, 7); c.fill(); c.stroke(); } }
+}
+function crearPatrones(){
+  if (PAT.listo) return;
+  PAT.calido = ctx.createPattern(tesela((c, n, r) => copasTesela(c, n, r, ['#4f8e42', '#5f9a47', '#3e7a3c', '#6aa04a'], '#4b8540')), 'repeat');
+  PAT.templado = ctx.createPattern(tesela((c, n, r) => {
+    copasTesela(c, n, r, ['#4c8746', '#5b9450', '#3f7440'], '#5d8a45', 0.8);
+    for (let i = 0; i < 5; i++){ c.fillStyle = r() < 0.5 ? '#8fae5a' : '#a3b865'; c.strokeStyle = 'rgba(40,55,30,.6)'; c.lineWidth = 1.2; c.save(); c.translate(r() * n, r() * n); c.rotate(r() - 0.5); c.fillRect(-14, -8, 28, 16); c.strokeRect(-14, -8, 28, 16); c.restore(); }
+  }), 'repeat');
+  PAT.frio = ctx.createPattern(tesela((c, n, r) => {
+    copasTesela(c, n, r, ['#355f3a', '#2f5534', '#406b3f'], '#3e6a3d', 0.9);
+    const cols = ['#9bb465', '#8aa052', '#b3a468'];
+    for (let i = 0; i < 7; i++){ const x = r() * n, y = r() * n, w = 20 + r() * 20, h = 10 + r() * 10; c.save(); c.translate(x, y); c.rotate((r() - 0.5) * 0.7); c.fillStyle = cols[i % 3]; c.fillRect(-w / 2, -h / 2, w, h); c.strokeStyle = 'rgba(52,80,44,.8)'; c.lineWidth = 1.4; c.strokeRect(-w / 2, -h / 2, w, h); c.restore(); }
+  }), 'repeat');
+  PAT.paramo = ctx.createPattern(tesela((c, n, r) => {
+    c.fillStyle = '#8e9a62'; c.fillRect(0, 0, n, n); c.lineWidth = 1.2;
+    for (let i = 0; i < 110; i++){ const x = r() * n, y = r() * n; c.strokeStyle = r() < 0.5 ? '#b3ad6c' : '#7f9158'; c.beginPath(); for (let k = -2; k <= 2; k++){ c.moveTo(x, y); c.lineTo(x + k * 2, y - 5 - (2 - Math.abs(k)) * 1.5); } c.stroke(); }
+    for (let i = 0; i < 16; i++){ const x = r() * n, y = r() * n; c.strokeStyle = '#5a4a3a'; c.beginPath(); c.moveTo(x, y); c.lineTo(x, y - 6); c.stroke(); c.fillStyle = '#c9d0bb'; c.strokeStyle = 'rgba(35,29,23,.6)'; c.beginPath(); c.arc(x, y - 7, 3, 0, 7); c.fill(); c.stroke(); }
+  }), 'repeat');
+  PAT.alto = ctx.createPattern(tesela((c, n, r) => {
+    c.fillStyle = '#8f8f6c'; c.fillRect(0, 0, n, n);
+    for (let i = 0; i < 18; i++){ c.fillStyle = r() < 0.5 ? '#7d7a68' : '#a09c86'; c.strokeStyle = 'rgba(35,29,23,.5)'; c.lineWidth = 1; c.beginPath(); const x = r() * n, y = r() * n, s = 3 + r() * 5; c.moveTo(x - s, y); c.lineTo(x, y - s * 0.8); c.lineTo(x + s, y + 1); c.closePath(); c.fill(); c.stroke(); }
+    for (let i = 0; i < 50; i++){ const x = r() * n, y = r() * n; c.strokeStyle = '#a7a36e'; c.beginPath(); c.moveTo(x, y); c.lineTo(x - 2, y - 5); c.moveTo(x, y); c.lineTo(x + 2, y - 5); c.stroke(); }
+  }), 'repeat');
+  PAT.roca = ctx.createPattern(tesela((c, n, r) => { c.fillStyle = '#8b8a84'; c.fillRect(0, 0, n, n); for (let i = 0; i < 26; i++){ c.fillStyle = r() < 0.5 ? '#77766f' : '#a19f97'; c.strokeStyle = 'rgba(35,29,23,.55)'; c.lineWidth = 1; const x = r() * n, y = r() * n, s = 4 + r() * 7; c.beginPath(); c.moveTo(x - s, y + s * 0.4); c.lineTo(x - s * 0.2, y - s * 0.7); c.lineTo(x + s, y + s * 0.3); c.closePath(); c.fill(); c.stroke(); } }), 'repeat');
+  PAT.listo = true;
+}
+const CAJAS_PISOS = [];
+const BANDAS = [[-400, 1000, 'calido'], [1000, 2000, 'templado'], [2000, 3000, 'frio'], [3000, 3700, 'paramo'], [3700, 4200, 'alto'], [4200, 5200, 'roca']];
+const PISOS0 = [{ h: 600, nombre: 'cálido' }, { h: 1500, nombre: 'templado' }, { h: 2500, nombre: 'frío' }, { h: 3350, nombre: 'páramo bajo' }, { h: 3950, nombre: 'páramo alto' }];
+function copaTinta(c, x, y, rx, ry, col, px){
+  c.strokeStyle = TINTA; c.lineWidth = Math.max(px, rx * 0.12); c.beginPath(); c.moveTo(x, y); c.lineTo(x, y - ry * 1.1); c.stroke();
+  c.fillStyle = col; c.lineWidth = Math.max(px * 0.8, rx * 0.06); c.beginPath(); const cy = y - ry * 1.5;
+  for (let i = 0; i <= 10; i++){ const a = i / 10 * Math.PI * 2, b = 1 + 0.12 * Math.sin(i * 2.7); const X = x + Math.cos(a) * rx * b, Y = cy + Math.sin(a) * ry * b; i ? c.lineTo(X, Y) : c.moveTo(X, Y); }
+  c.closePath(); c.fill(); c.stroke();
+}
+function fraiSimbolo(c, x, y, s, px){
+  c.strokeStyle = '#5a4a3a'; c.lineWidth = Math.max(px, 0.004 * s); c.beginPath(); c.moveTo(x, y); c.lineTo(x, y - 0.026 * s); c.stroke();
+  c.fillStyle = '#c3cbb2'; c.strokeStyle = TINTA; c.lineWidth = Math.max(px * 0.7, 0.001 * s); const cy = y - 0.03 * s; c.beginPath();
+  for (let i = 0; i < 14; i++){ const a = i / 14 * Math.PI * 2, rr = i % 2 ? 0.005 * s : 0.012 * s; const xx = x + Math.cos(a) * rr, yy = cy + Math.sin(a) * rr * 0.7; i ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+  c.closePath(); c.fill(); c.stroke();
+}
+const VEG0 = (() => { const r = rng(11), a = []; for (let x = -0.72; x <= 0.72; x += 0.004) a.push({ x: x + (r() - 0.5) * 0.003, q: r(), s: 0.7 + r() * 0.45, d: r() }); return a; })();
+function rutaQuebrada0(t){ const x = lerp(PX0 + 0.004, FX0 + 0.08, t); return [x, y0de(x) + 0.006 + 0.004 * Math.sin(t * 17)]; }
+
+function dibujaMontana(c, e){
+  const v = e.view, px = e.px;
+  c.fillStyle = lg(c, 0, -0.7, 0, 0.4, [[0, '#8e9fad'], [0.45, '#bcc8cb'], [0.8, '#e0e3d8'], [1, '#e9e6d6']]);
+  c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  const luz = c.createRadialGradient(0.5, -0.12, 0, 0.5, -0.12, 0.8); luz.addColorStop(0, 'rgba(255,244,214,.4)'); luz.addColorStop(1, 'rgba(255,244,214,0)'); c.fillStyle = luz; c.fillRect(-0.3, -0.9, 1.7, 1.6);
+  for (const [col, dy, amp, fr, fa] of [['#b4bccb', 0.03, 0.2, 3.1, 1.2], ['#9aa7b6', 0.1, 0.15, 4.3, 2.9]]){
+    c.fillStyle = col; c.beginPath(); c.moveTo(v[0] - 0.1, v[3] + 0.1);
+    for (let x = v[0] - 0.1; x <= v[2] + 0.12; x += Math.max((v[2] - v[0]) / 90, px * 3)) c.lineTo(x, dy - amp * (0.55 + 0.3 * Math.sin(x * fr + fa) + 0.15 * Math.sin(x * fr * 2.7 + fa * 2)));
+    c.lineTo(v[2] + 0.12, v[3] + 0.1); c.closePath(); c.fill();
+  }
+  const N = 320, x0 = -0.8, x1 = 0.8, top = [];
+  for (let i = 0; i <= N; i++){ const x = lerp(x0, x1, i / N); top.push([x, y0de(x)]); }
+  const cuerpo = () => { c.beginPath(); c.moveTo(x0 - 2, top[0][1]); for (const p of top) c.lineTo(p[0], p[1]); c.lineTo(x1 + 2, top[N][1]); c.lineTo(x1 + 2, 3); c.lineTo(x0 - 2, 3); c.closePath(); };
+  c.fillStyle = lg(c, 0, Y0 - 4700 * K0, 0, Y0, [[0, '#8d8b74'], [0.12, '#8a9166'], [0.3, '#7d935c'], [0.5, '#3f6e40'], [0.8, '#4f8243'], [1, '#4e8a42']]);
+  cuerpo(); c.fill();
+  c.save(); cuerpo(); c.clip();
+  const alfaTex = 0.5 * sstep(0.08, 0.5, e.f);
+  if (alfaTex > 0.02) BANDAS.forEach(([h0, h1, k], i) => {
+    const pat = PAT[k]; pat.setTransform(new DOMMatrix().translateSelf(i * 0.37, i * 0.21).rotateSelf(i * 7 - 8).scaleSelf(0.0006, 0.0005));
+    c.fillStyle = pat; c.globalAlpha = alfaTex;
+    const borde = (h, x) => Y0 - h * K0 + 0.008 * Math.sin(x * 23 + i * 2) + 0.005 * Math.sin(x * 61 + i);
+    c.beginPath(); const xa = v[0] - 0.05, xb = v[2] + 0.05, paso = (xb - xa) / 70;
+    for (let x = xa; x <= xb + 1e-6; x += paso) x === xa ? c.moveTo(x, borde(h1, x)) : c.lineTo(x, borde(h1, x));
+    for (let x = xb; x >= xa - 1e-6; x -= paso) c.lineTo(x, i === 0 ? 3 : borde(h0, x));
+    c.closePath(); c.fill();
+  });
+  c.globalAlpha = 1;
+  // la línea de los 3 000 m: donde el IGAC pone el páramo bajo [9]
+  c.setLineDash([0.008, 0.006]); c.strokeStyle = 'rgba(250,246,230,.7)'; c.lineWidth = Math.max(px * 1.4, 0.0012); c.beginPath(); c.moveTo(v[0] - 0.1, Y0 - 3000 * K0); c.lineTo(v[2] + 0.1, Y0 - 3000 * K0); c.stroke(); c.setLineDash([]);
+  c.fillStyle = lg(c, 0, Y0 - 900 * K0, 0, Y0 + 0.1, [[0, 'rgba(232,230,218,0)'], [1, 'rgba(232,230,218,.4)']]); c.fillRect(v[0], Y0 - 0.3, v[2] - v[0], 0.6);
+  c.restore();
+  c.strokeStyle = TINTA; c.lineWidth = Math.max(px * 1.6, 0.0016); c.lineJoin = 'round'; c.beginPath(); top.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke();
+  const alVeg = sstep(0.2, 0.5, e.f); if (alVeg > 0.02){ c.globalAlpha = alVeg;
+    for (const g of VEG0){
+      const h = alt0(g.x), y = y0de(g.x) + 0.003 + g.d * 0.016; if (!enVista(e, g.x, y, 0.05)) continue;
+      if (h < 1000){ if (g.q < 0.7) copaTinta(c, g.x, y, 0.009 * g.s, 0.007 * g.s, '#4f8e42', px); }
+      else if (h < 2000){ if (g.q < 0.6) copaTinta(c, g.x, y, 0.011 * g.s, 0.007 * g.s, '#4c8746', px); }
+      else if (h < 3000){ if (g.q < 0.55) copaTinta(c, g.x, y, 0.008 * g.s, 0.011 * g.s, '#355f3a', px); }
+      else if (h < 4000){ if (g.q < 0.55) fraiSimbolo(c, g.x, y, g.s * 0.7, px); }
+    }
+    c.globalAlpha = 1; }
+  // la quebrada que baja del páramo a la finca
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(20,40,60,.55)'; c.lineWidth = Math.max(px * 3.2, 0.0028); c.beginPath(); for (let i = 0; i <= 60; i++){ const [x, y] = rutaQuebrada0(i / 60); i ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke();
+  c.strokeStyle = '#8cc6e4'; c.lineWidth = Math.max(px * 1.8, 0.0016); c.stroke();
+  const [nx, ny] = rutaQuebrada0(0); c.fillStyle = '#bfe3f2'; c.strokeStyle = TINTA; c.lineWidth = Math.max(px, 0.0006); c.beginPath(); c.arc(nx, ny, Math.max(px * 3, 0.0024), 0, 7); c.fill(); c.stroke();
+  // su finca
+  const fx = FX0, fy = y0de(fx);
+  c.fillStyle = '#efe6d2'; c.strokeStyle = TINTA; c.lineWidth = Math.max(px * 0.8, 0.0005);
+  const cs = Math.max(0.0028, px * 7);
+  c.beginPath(); c.rect(fx - cs * 0.5, fy - cs * 0.7, cs, cs * 0.7); c.fill(); c.stroke();
+  c.fillStyle = '#9a4f3a'; c.beginPath(); c.moveTo(fx - cs * 0.7, fy - cs * 0.65); c.lineTo(fx, fy - cs * 1.25); c.lineTo(fx + cs * 0.7, fy - cs * 0.65); c.closePath(); c.fill(); c.stroke();
+  // niebla pegada al páramo (corre con el recorrido)
+  const r = rng(12), dx = e.p * 0.012;
+  for (let i = 0; i < 16; i++){ const h = 3100 + r() * 900, lado = r() < 0.72 ? 1 : -1; const xx = lado * (0.06 + r() * 0.2) + dx * (0.5 + r()); const y = Y0 - h * K0 - 0.01; if (enVista(e, xx, y, 0.3)) nube(c, xx, y, 0.16 + r() * 0.14, 0.75 * (0.6 + 0.4 * sstep(0.15, 0.6, e.f))); }
+  for (let i = 0; i < 6; i++){ const x = -0.5 + i * 0.22 + (r() - 0.5) * 0.06 + dx, y = -0.22 + (r() - 0.5) * 0.04; if (enVista(e, x, y, 0.3)) nube(c, x, y, 0.3 + r() * 0.12, 0.7); }
+  // los nombres de los pisos, sobre su franja [9]
+  const al = sstep(0.62, 0.9, e.f);
+  if (al > 0.02){
+    const fs = Math.round(clamp(W * 0.042, 16, 21)), rr = $('riel').getBoundingClientRect();
+    c.save(); c.setTransform(DPR, 0, 0, DPR, 0, 0); c.globalAlpha = al;
+    c.font = `600 ${fs}px ${getComputedStyle(document.body).getPropertyValue('--sans')}`; c.textAlign = 'left'; c.textBaseline = 'middle';
+    for (const piso of PISOS0){
+      const xs = xDeAlt(piso.h);
+      const sy = H * ANC + (Y0 - piso.h * K0 - e.cy) * e.ppu, tw = c.measureText(piso.nombre).width, ph = fs * 0.5 + 5;
+      let xl;
+      if (PORT) xl = 16;
+      else {
+        let xr = Math.min(W / 2 + (xs - e.cx) * e.ppu - 12, W - 12);
+        if (sy + ph > rr.top && sy - ph < rr.bottom && xr + 8 > rr.left && xr - tw - 8 < rr.right) xr = Math.min(xr, rr.left - 10);
+        xl = xr - tw - 8;
+      }
+      if (xl < 8 || xl + tw + 16 > W - 8 || sy < ph || sy > H - ph) continue;
+      c.fillStyle = 'rgba(245,240,220,.9)'; c.beginPath(); c.roundRect(xl, sy - ph, tw + 16, ph * 2, ph); c.fill();
+      if (al > 0.5) CAJAS_PISOS.push({ left: xl, right: xl + tw + 16, top: sy - ph, bottom: sy + ph });
+      c.fillStyle = TINTA; c.fillText(piso.nombre, xl + 8, sy + 1);
+    }
+    c.restore();
+  }
+}
+
+/* ============================================================
+   NIVEL 1 · EL PÁRAMO EN LA NIEBLA  (1 unidad = 150 m)
+   Pajonal, frailejonal, turbera, y abajo el nacimiento con el
+   bosque altoandino: el páramo queda por encima de él [10]
+   ============================================================ */
+const PROF1 = 0.3;                        // cuánto baja en pantalla lo que está más adelante
+const persp1 = d => 0.4 + 1.8 * d;        // y cuánto crece
+const D_HEROE = 1 / 3;                    // a esta profundidad el tamaño es el real
+const yProf1 = (x, d) => g1(x) + d * PROF1;
+const enTurbera = (x, d) => Math.pow((x - 0.24) / 0.17, 2) + Math.pow((d - 0.55) / 0.3, 2) < 1;
+const P1 = (() => {
+  const r = rng(301), fr = [], paja = [], rocas = [], bosque = [], charcas = [], cojines = [], manchas = [];
+  for (let x = -2.1; x < 0.5; x += 0.016){
+    for (let k = 0; k < 3; k++){ const xx = x + (r() - 0.5) * 0.016, d = r();
+      if (enTurbera(xx, d) || r() < 0.4) continue;
+      if (Math.abs(xx - FRA1) < 0.03 && Math.abs(d - D_HEROE) < 0.15) continue;
+      fr.push({ x: xx, d, Hm: 1.1 + r() * 1.7, o: hazFrailejon(1000 + fr.length, false) }); }
+  }
+  for (let x = -2.1; x < 0.95; x += 0.004){ for (let k = 0; k < 2; k++){ const d = r(), xx = x + (r() - 0.5) * 0.004; if (enTurbera(xx, d) && r() < 0.8) continue; paja.push({ x: xx, d, s: 0.6 + r() * 0.7, c: r() }); } }
+  for (let i = 0; i < 40; i++){ const x = -2 + r() * 2.8; rocas.push({ x, d: r(), s: 0.5 + r(), a: r() }); }
+  for (let x = 0.8; x < 2.8; x += 0.012){ for (let k = 0; k < 4; k++) bosque.push({ x: x + (r() - 0.5) * 0.012, d: r(), s: 0.8 + r() * 0.6, c: r() }); }
+  for (let i = 0; i < 9; i++){ let x, d; do { x = 0.08 + r() * 0.32; d = 0.25 + r() * 0.6; } while (!enTurbera(x, d)); charcas.push({ x, d, w: 0.008 + r() * 0.014 }); }
+  for (let i = 0; i < 260; i++){ let x, d; do { x = 0.06 + r() * 0.36; d = r(); } while (!enTurbera(x, d)); cojines.push({ x, d, w: 0.0025 + r() * 0.004, c: r() }); }
+  for (let i = 0; i < 160; i++) manchas.push({ x: -2.1 + r() * 3, d: r(), w: 0.02 + r() * 0.05, c: r() });
+  for (const L of [fr, paja, rocas, bosque, charcas, cojines, manchas]) L.sort((a, b) => a.d - b.d);
+  return { fr, paja, rocas, bosque, charcas, cojines, manchas };
+})();
+const COL_PAJA = ['#a8a462', '#b6ad6b', '#8f9a58', '#9fa963', '#7f8f50', '#c1b577'];
+const PAJA_B = (() => { const NB = 14, out = []; for (let b = 0; b < NB; b++){ const d0 = b / NB, d1 = (b + 1) / NB, paths = COL_PAJA.map(() => new Path2D()); for (const q of P1.paja){ if (q.d < d0 || q.d >= d1) continue; macollaPath(paths[Math.floor(q.c * COL_PAJA.length)], q.x, yProf1(q.x, q.d), 0.005 * q.s * persp1(q.d)); } out.push({ d1: b === NB - 1 ? 9 : d1, paths, lw: 0.005 * persp1((d0 + d1) / 2) * 0.028 }); } return out; })();
+function macollaPath(P, x, y, s){ for (let k = -8; k <= 8; k++){ const a = k * 0.11 + 0.03 * Math.sin(k * 3.1 + x * 50), L = s * (0.75 + 0.3 * Math.cos(k * 1.7 + x * 90)); P.moveTo(x + k * s * 0.012, y); P.quadraticCurveTo(x + Math.sin(a) * L * 0.45, y - L * 0.8, x + Math.sin(a) * L * 1.1, y - L * Math.cos(a) * 0.85); } }
+function macolla(c, x, y, s, col, px){
+  c.strokeStyle = col; c.lineWidth = Math.max(px * 0.8, s * 0.028); c.beginPath();
+  for (let k = -8; k <= 8; k++){ const a = k * 0.11 + 0.03 * Math.sin(k * 3.1 + x * 50), L = s * (0.75 + 0.3 * Math.cos(k * 1.7 + x * 90)); c.moveTo(x + k * s * 0.012, y); c.quadraticCurveTo(x + Math.sin(a) * L * 0.45, y - L * 0.8, x + Math.sin(a) * L * 1.1, y - L * Math.cos(a) * 0.85); }
+  c.stroke();
+}
+function quebrada1(t){ const x = NAC1 + 0.01 + t * 1.9, d = 0.3 + 0.7 * sstep(0, 1, t); return [x, yProf1(x, d) + 0.004 * Math.sin(t * 31)]; }
+const NAC1Y = () => yProf1(NAC1, 0.3);
+function dibujaParamo(c, e){
+  const v = e.view, px = e.px;
+  c.fillStyle = lg(c, 0, v[1], 0, 0.1, [[0, '#98a7b0'], [0.55, '#c2cbc9'], [1, '#d9ddd3']]);
+  c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  // lomas del páramo, lejos, perdidas en la niebla
+  for (const [col, dy, amp, fr, fa] of [['#aab3ad', -0.12, 0.08, 2.1, 0.7], ['#96a595', -0.075, 0.06, 3.3, 2.2], ['#869a80', -0.04, 0.05, 4.9, 1.1]]){
+    c.fillStyle = col; c.beginPath(); c.moveTo(v[0] - 0.1, v[3] + 0.1);
+    for (let x = v[0] - 0.1; x <= v[2] + 0.12; x += Math.max((v[2] - v[0]) / 80, px * 4)) c.lineTo(x, dy - amp * (0.5 + 0.35 * Math.sin(x * fr + fa) + 0.15 * Math.sin(x * fr * 2.3 + fa)) + 0.1 * sstep(0.4, 1.2, x));
+    c.lineTo(v[2] + 0.12, v[3] + 0.1); c.closePath(); c.fill();
+    nubeBanda(c, e, dy - amp * 0.3, 0.45, 0.05);
+  }
+  // el suelo del páramo
+  const xa = v[0] - 0.05, xb = v[2] + 0.05, paso = Math.max((xb - xa) / 160, px * 2);
+  c.beginPath(); c.moveTo(xa, g1(xa)); for (let x = xa; x <= xb; x += paso) c.lineTo(x, g1(x)); c.lineTo(xb, v[3] + 1); c.lineTo(xa, v[3] + 1); c.closePath();
+  c.fillStyle = lg(c, 0, -0.01, 0, PROF1 + 0.05, [[0, '#94a064'], [0.4, '#869654'], [1, '#6e8446']]); c.fill();
+  c.strokeStyle = 'rgba(35,29,23,.6)'; c.lineWidth = Math.max(px * 1.2, 0.0006); c.stroke();
+  for (const m of P1.manchas){ const y = yProf1(m.x, m.d), k = persp1(m.d); if (!enVista(e, m.x, y, 0.1)) continue; c.fillStyle = m.c < 0.33 ? 'rgba(170,165,100,.35)' : m.c < 0.66 ? 'rgba(96,120,64,.3)' : 'rgba(140,150,90,.3)'; c.beginPath(); c.ellipse(m.x, y, m.w * k, m.w * k * 0.18, 0, 0, 7); c.fill(); }
+  // la turbera: cojines de musgo y charcas que copian el cielo
+  c.save(); c.translate(0.24, yProf1(0.24, 0.55)); c.scale(1, 0.3 * PROF1 / 0.18); c.fillStyle = rg(c, 0, 0, 0.05, 0.19, [[0, 'rgba(78,98,50,.6)'], [0.7, 'rgba(84,104,54,.4)'], [1, 'rgba(90,110,58,0)']]); c.beginPath(); c.arc(0, 0, 0.2, 0, 7); c.fill(); c.restore();
+  for (const q of P1.charcas){ const y = yProf1(q.x, q.d), k = persp1(q.d); if (!enVista(e, q.x, y, 0.05)) continue; c.fillStyle = '#b9c8cd'; c.strokeStyle = 'rgba(35,50,55,.7)'; c.lineWidth = Math.max(px, 0.0004); c.beginPath(); c.ellipse(q.x, y, q.w * k, q.w * k * 0.2, 0, 0, 7); c.fill(); c.stroke(); }
+  if (!P1.coj){ P1.coj = [new Path2D(), new Path2D(), new Path2D()]; for (const q of P1.cojines){ const y = yProf1(q.x, q.d), k = persp1(q.d), P = P1.coj[q.c < 0.3 ? 0 : q.c < 0.65 ? 1 : 2]; P.moveTo(q.x + q.w * k, y); P.ellipse(q.x, y, q.w * k, q.w * k * 0.55, 0, 0, Math.PI, true); P.closePath(); } }
+  ['#94503f', '#708f46', '#9aa650'].forEach((col, k) => { c.fillStyle = col; c.fill(P1.coj[k]); });
+  // bosque altoandino, abajo [10]
+  if (!P1.bos){ const NB = 6; P1.bos = []; for (let bnd = 0; bnd < NB; bnd++){ const B = { tronco: new Path2D(), copa: [new Path2D(), new Path2D(), new Path2D()], borde: new Path2D(), lw: 0.012 * persp1((bnd + 0.5) / NB) * 0.9 };
+      for (const b of P1.bosque){ if (b.d < bnd / NB || b.d >= (bnd + 1) / NB) continue; const y = yProf1(b.x, b.d) + 0.003, s = 0.012 * b.s * persp1(b.d), rx = s * 0.9, ry = s * 0.6; B.tronco.moveTo(b.x, y); B.tronco.lineTo(b.x, y - ry * 1.1); const cy = y - ry * 1.5, P = new Path2D(); for (let i = 0; i <= 10; i++){ const a = i / 10 * Math.PI * 2, f = 1 + 0.12 * Math.sin(i * 2.7), X = b.x + Math.cos(a) * rx * f, Y = cy + Math.sin(a) * ry * f; i ? P.lineTo(X, Y) : P.moveTo(X, Y); } P.closePath(); B.copa[b.c < 0.4 ? 0 : b.c < 0.75 ? 1 : 2].addPath(P); B.borde.addPath(P); }
+      P1.bos.push(B); } }
+  for (const B of P1.bos){ c.strokeStyle = TINTA; c.lineWidth = Math.max(px, B.lw * 0.12); c.stroke(B.tronco); ['#2f5a36', '#3a6a3d', '#46743f'].forEach((col, k) => { c.fillStyle = col; c.fill(B.copa[k]); }); c.lineWidth = Math.max(px * 0.8, B.lw * 0.06); c.stroke(B.borde); }
+  // la quebrada que sale del nacimiento
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.beginPath(); for (let i = 0; i <= 90; i++){ const [x, y] = quebrada1(i / 90); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+  c.strokeStyle = 'rgba(20,40,55,.6)'; c.lineWidth = Math.max(px * 3, 0.005); c.stroke();
+  c.strokeStyle = '#8ec3de'; c.lineWidth = Math.max(px * 1.6, 0.003); c.stroke();
+  // el nacimiento: un ojo de agua entre musgo
+  const ny = NAC1Y(); c.fillStyle = '#6f8f45'; c.beginPath(); c.ellipse(NAC1, ny + 0.001, 0.022, 0.006, 0, 0, 7); c.fill();
+  c.fillStyle = '#a9d3e6'; c.strokeStyle = 'rgba(20,40,55,.8)'; c.lineWidth = Math.max(px, 0.0005); c.beginPath(); c.ellipse(NAC1, ny, 0.011, 0.0032, 0, 0, 7); c.fill(); c.stroke();
+  // la ronda de 100 m del nacimiento [11]
+  const r100 = 100 / F[1], yr = ny, E7 = EST[7], alR = E7 ? sstep(E7.a - 1.2, E7.a - 0.2, e.p) * (1 - sstep(E7.b + 0.2, E7.b + 1.0, e.p)) : 0;
+  if (alR > 0.01){ c.globalAlpha = alR;
+  c.strokeStyle = 'rgba(20,24,28,.7)'; c.lineWidth = Math.max(px * 4, 0.0025); ronda1(c, yr, r100, px);
+  c.strokeStyle = '#fbfaf4'; c.lineWidth = Math.max(px * 2, 0.0012); ronda1(c, yr, r100, px); c.globalAlpha = 1; }
+  // pajonal, rocas y frailejonal, de atrás hacia adelante
+  let ip = 0, ir = 0;
+  const hasta = d => {
+    while (ir < P1.rocas.length && P1.rocas[ir].d <= d){ const q = P1.rocas[ir++]; const y = yProf1(q.x, q.d), s = 0.006 * q.s * persp1(q.d); if (!enVista(e, q.x, y, 0.05)) continue; c.fillStyle = q.a < 0.5 ? '#8c8a80' : '#77756c'; c.strokeStyle = 'rgba(35,29,23,.7)'; c.lineWidth = Math.max(px, s * 0.06); c.beginPath(); c.moveTo(q.x - s, y); c.quadraticCurveTo(q.x - s * 0.8, y - s * 0.9, q.x, y - s); c.quadraticCurveTo(q.x + s * 0.9, y - s * 0.7, q.x + s, y); c.closePath(); c.fill(); c.stroke(); }
+    while (ip < PAJA_B.length && PAJA_B[ip].d1 <= d + 1e-9){ const B = PAJA_B[ip++]; for (let k = 0; k < B.paths.length; k++){ c.strokeStyle = COL_PAJA[k]; c.lineWidth = Math.max(px * 0.8, B.lw); c.stroke(B.paths[k]); } }
+  };
+  let heroe = false;
+  for (const f of P1.fr){
+    if (!heroe && f.d > D_HEROE){ hasta(D_HEROE); dibujaFrailejon(c, FRA1, yProf1(FRA1, D_HEROE), FR2.H * F[2] / F[1], px, FR_HEROE, 1, 0.1); heroe = true; }
+    hasta(f.d);
+    const y = yProf1(f.x, f.d); if (!enVista(e, f.x, y, 0.06)) continue;
+    dibujaFrailejon(c, f.x, y, f.Hm / F[1] * persp1(f.d), px, f.o, 0.8, 0.4 * (1 - f.d));
+  }
+  hasta(2);
+  // bancos de niebla que pasan (la fase la pone el recorrido)
+  nubeBanda(c, e, 0.0, 0.5, 0.06);
+  nubeBanda(c, e, 0.2, 0.22, 0.1);
+}
+function ronda1(c, y, r100, px){ const ny = NAC1Y(), tk = Math.max(px * 8, 0.006); c.beginPath(); c.moveTo(NAC1 - r100, ny); c.lineTo(NAC1, ny); c.moveTo(NAC1 - r100, ny - tk); c.lineTo(NAC1 - r100, ny + tk); c.stroke(); c.setLineDash([Math.max(px * 10, 0.01), Math.max(px * 7, 0.007)]); c.beginPath(); c.ellipse(NAC1, ny, r100, r100 * 0.2, 0, 0, 7); c.stroke(); c.setLineDash([]); }
+function nubeBanda(c, e, y, a, alto){
+  const v = e.view, w = Math.max(0.35, (v[2] - v[0]) * 0.45), fase = e.p * 0.05;
+  const r = rng(Math.round(y * 1000) + 5);
+  for (let k = -1; k < 12; k++){
+    const x0 = v[0] + ((k * w * 0.55 + fase * (0.7 + 0.3 * r())) % (w * 6.6)) - w * 0.3;
+    if (x0 < v[0] - w || x0 > v[2] + w) continue;
+    nube(c, x0, y + (r() - 0.5) * alto, w * (0.9 + r() * 0.5), a * (0.5 + 0.5 * r()));
+  }
+}
+
+/* ============================================================
+   NIVEL 2 · EL FRAILEJÓN  (1 unidad = 4 m)
+   ============================================================ */
+function musgoAlto(x){ const t = (x - MUSGO2.x0) / (MUSGO2.x1 - MUSGO2.x0); return t <= 0 || t >= 1 ? 0 : 0.045 * Math.pow(Math.sin(Math.PI * t), 0.7) * (1 + 0.1 * Math.sin(t * 19)); }
+const P2 = (() => {
+  const r = rng(402), paja = [], lejos = [], raices = [], motas = [], piedras = [], gotas = [], cap = [];
+  for (let x = -1.4; x < 1.4; x += 0.02){ const d = r(); if (x > MUSGO2.x0 - 0.02 && x < MUSGO2.x1 && d < 0.8) continue; if (Math.abs(x) < 0.06 && d > 0.3) continue; paja.push({ x: x + (r() - 0.5) * 0.02, d, s: 0.7 + r() * 0.6, c: r() }); }
+  for (let i = 0; i < 8; i++) lejos.push({ x: -1.4 + i * 0.35 + r() * 0.2, y: -0.02 - r() * 0.05, h: 0.08 + r() * 0.14, o: hazFrailejon(700 + i, false), a: 0.25 + r() * 0.35 });
+  lejos.sort((a, b) => b.y - a.y);
+  const rama = (x, y, a, L, w, prof) => { const pts = [[x, y]]; let xx = x, yy = y, aa = a; const n = 14; for (let i = 0; i < n; i++){ aa += (r() - 0.5) * 0.35; xx += Math.cos(aa) * L / n; yy += Math.sin(aa) * L / n; pts.push([xx, yy]); } raices.push({ pts, w }); if (prof > 0) for (let k = 0; k < 2; k++){ const j = 4 + Math.floor(r() * 8); rama(pts[j][0], pts[j][1], aa + (r() - 0.5) * 1.6, L * 0.5, w * 0.6, prof - 1); } };
+  for (let i = 0; i < 9; i++) rama((r() - 0.5) * 0.08, 0.002, Math.PI / 2 + (r() - 0.5) * 1.2, 0.18 + r() * 0.1, 0.006, 2);
+  for (const q of paja) if (q.d > 0.6 && r() < 0.35) rama(q.x, 0.002, Math.PI / 2 + (r() - 0.5) * 0.6, 0.1 + r() * 0.06, 0.0025, 1);
+  for (let i = 0; i < 1400; i++){ const x = -1.4 + r() * 2.8, y = 0.01 + r() * 0.5; motas.push({ x, y, s: 0.0015 + r() * 0.004, c: r() }); }
+  for (let i = 0; i < 40; i++){ const x = -1.4 + r() * 2.8, y = 0.3 + r() * 0.3; piedras.push({ x, y, s: 0.01 + r() * 0.025, c: r() }); }
+  for (let i = 0; i < 40; i++){ const h = FR_HEROE.vivas[Math.floor(r() * FR_HEROE.vivas.length)]; if (h.prof < 0) continue; const P = puntoHoja(h, 0.8 + r() * 0.2, -FR_HEROE.tronco); gotas.push({ x: FR2.x + P[0] * FR2.H, y: P[1] * FR2.H, s: 0.0009 + r() * 0.0012, adelante: h.prof }); }
+  for (let x = MUSGO2.x0 + 0.003; x < MUSGO2.x1 - 0.003; x += 0.0032){ const t = musgoAlto(x); if (t <= 0) continue; for (let y = -t + 0.002; y < -0.001; y += 0.0045) cap.push({ x: x + (r() - 0.5) * 0.003, y: y + (r() - 0.5) * 0.002, s: 0.0024 + r() * 0.0018, c: r(), borde: y < -t + 0.006 }); }
+  cap.sort((a, b) => a.y - b.y);
+  return { paja, lejos, raices, motas, piedras, gotas, cap };
+})();
+const HORIZ2 = 0.3; // fondo del horizonte negro (1,2 m)
+function horiz2(x){ return HORIZ2 + 0.025 * Math.sin(x * 5.3) + 0.012 * Math.sin(x * 17 + 1); }
+function dibujaFrailejon2(c, e){
+  const v = e.view, px = e.px;
+  c.fillStyle = lg(c, 0, v[1], 0, 0, [[0, '#a3b0b5'], [0.7, '#cfd5d0'], [1, '#dde0d6']]); c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, -v[1] + 2);
+  nubeBanda(c, e, -0.3, 0.55, 0.2);
+  // otros frailejones, perdidos en la niebla
+  for (const f of P2.lejos){ if (!enVista(e, f.x, f.y, 0.3)) continue; c.globalAlpha = f.a; dibujaFrailejon(c, f.x, f.y, f.h, px, f.o, 0.6, 0.85); c.globalAlpha = 1; }
+  c.fillStyle = lg(c, 0, -0.16, 0, 0, [[0, 'rgba(214,220,214,0)'], [1, 'rgba(214,220,214,.6)']]); c.fillRect(v[0] - 1, -0.16, v[2] - v[0] + 2, 0.16);
+  c.fillStyle = '#80905a'; c.fillRect(v[0] - 1, -0.02, v[2] - v[0] + 2, 0.022);
+  // el suelo cortado: horizonte negro rico en humus [7] y abajo el de ceniza
+  c.fillStyle = '#5d5043'; c.fillRect(v[0] - 1, 0, v[2] - v[0] + 2, v[3] + 1);
+  c.beginPath(); c.moveTo(v[0] - 1, 0); for (let x = v[0] - 1; x <= v[2] + 1; x += Math.max(0.01, px * 3)) c.lineTo(x, horiz2(x)); c.lineTo(v[2] + 1, 0); c.closePath();
+  c.fillStyle = lg(c, 0, 0, 0, HORIZ2, [[0, '#1b1714'], [0.7, '#231d18'], [1, '#2e261f']]); c.fill();
+  if (!P2.mp){ P2.mp = [0, 1, 2, 3].map(() => new Path2D()); P2.bp = new Path2D(); P2.motas.forEach((m, i) => { const negro = m.y < horiz2(m.x); P2.mp[(negro ? 0 : 2) + (m.c < 0.5 ? 0 : 1)].rect(m.x, m.y, m.s, m.s * 0.7); if (negro && i % 9 === 0){ P2.bp.moveTo(m.x + 0.004 + m.s * 0.5, m.y); P2.bp.arc(m.x + 0.004, m.y, m.s * 0.5, 0, 7); } }); }
+  ['rgba(92,74,56,.8)', 'rgba(58,46,36,.9)', 'rgba(130,112,90,.8)', 'rgba(80,68,54,.8)'].forEach((col, k) => { c.fillStyle = col; c.fill(P2.mp[k]); });
+  for (const q of P2.piedras){ if (!enVista(e, q.x, q.y, 0.05) || q.y < horiz2(q.x) + 0.02) continue; c.fillStyle = q.c < 0.5 ? '#7c7466' : '#696357'; c.strokeStyle = 'rgba(30,24,18,.7)'; c.lineWidth = Math.max(px, 0.001); c.beginPath(); c.ellipse(q.x, q.y, q.s, q.s * 0.65, q.c, 0, 7); c.fill(); c.stroke(); }
+  // brillos de agua en el negro (de dibujo)
+  c.fillStyle = 'rgba(160,205,230,.35)'; c.fill(P2.bp);
+  c.strokeStyle = '#b89f7c'; c.lineCap = 'round';
+  for (const R of P2.raices){ c.lineWidth = Math.max(px * 0.8, R.w); c.beginPath(); R.pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); }
+  c.strokeStyle = 'rgba(245,238,220,.55)'; c.lineWidth = Math.max(px * 1.2, 0.0015); c.beginPath(); c.moveTo(v[0] - 1, 0.0005); c.lineTo(v[2] + 1, 0.0005); c.stroke();
+  // pajonal de atrás
+  for (const q of P2.paja){ if (q.d > 0.5 || !enVista(e, q.x, 0, 0.1)) continue; macolla(c, q.x, -0.004 + q.d * 0.004, 0.07 * q.s, mix(COL_PAJA[Math.floor(q.c * COL_PAJA.length)], '#b8bdb0', 0.3), px); }
+  // el frailejón
+  dibujaFrailejon(c, FR2.x, 0, FR2.H, px, FR_HEROE, 1, 0.05);
+  // gotas de niebla posadas en las puntas (de dibujo)
+  for (const g of P2.gotas){ if (!enVista(e, g.x, g.y, 0.01)) continue; c.fillStyle = 'rgba(230,242,248,.85)'; c.beginPath(); c.arc(g.x, g.y, g.s, 0, 7); c.fill(); c.fillStyle = 'rgba(255,255,255,.95)'; c.beginPath(); c.arc(g.x - g.s * 0.35, g.y - g.s * 0.35, g.s * 0.3, 0, 7); c.fill(); }
+  // el cojín de musgo al pie [6]
+  c.beginPath(); c.moveTo(MUSGO2.x0, 0.001); for (let x = MUSGO2.x0; x <= MUSGO2.x1; x += 0.004) c.lineTo(x, -musgoAlto(x)); c.lineTo(MUSGO2.x1, 0.001); c.closePath();
+  c.fillStyle = lg(c, 0, -0.05, 0, 0.002, [[0, '#7f8f44'], [0.5, '#6b7c3c'], [1, '#4a5530']]); c.fill();
+  if (!P2.capP){ P2.capP = [0, 1, 2, 3, 4, 5].map(() => new Path2D()); P2.capB = new Path2D(); for (const q of P2.cap){ const k = (q.c < 0.4 ? 0 : q.c < 0.75 ? 1 : 2) + (q.borde ? 0 : 3); P2.capP[k].moveTo(q.x + q.s, q.y); P2.capP[k].arc(q.x, q.y, q.s, 0, 7); if (q.borde){ P2.capB.moveTo(q.x + q.s, q.y); P2.capB.arc(q.x, q.y, q.s, 0, 7); } } }
+  ['#a24f3e', '#7f9c48', '#a8b058'].forEach((col, k) => { c.fillStyle = mix(col, '#3b4424', 0.35); c.fill(P2.capP[k + 3]); });
+  ['#a24f3e', '#7f9c48', '#a8b058'].forEach((col, k) => { c.fillStyle = col; c.fill(P2.capP[k]); });
+  c.strokeStyle = 'rgba(40,30,20,.4)'; c.lineWidth = Math.max(px * 0.6, 0.0005); c.stroke(P2.capB);
+  // pajonal de adelante
+  for (const q of P2.paja){ if (q.d <= 0.5 || !enVista(e, q.x, 0, 0.1)) continue; macolla(c, q.x, 0.001, 0.085 * q.s, COL_PAJA[Math.floor(q.c * COL_PAJA.length)], px); }
+  nubeBanda(c, e, -0.18, 0.28, 0.2);
+}
+
+/* ============================================================
+   NIVEL 3 · LOS PELOS DE LA HOJA  (1 unidad = 12 mm)
+   Capa de pelos de hasta 3 mm = 0,25 unidades [3]
+   ============================================================ */
+const PEL = (() => {
+  const r = rng(503), grupos = [[], [], []], puntas = [], nieblas = [];
+  for (let i = 0; i < 1500; i++){
+    const x0 = -1.0 + r() * 2.0, alto = 0.1 + r() * 0.17, g = r() < 0.35 ? 0 : r() < 0.6 ? 1 : 2;
+    let x = x0, y = 0, a = -Math.PI / 2 + (r() - 0.5) * 0.9; const pts = [[x, y]]; const n = 16, paso = alto / n * 1.3;
+    for (let k = 0; k < n; k++){ a += (r() - 0.5) * 0.9 + Math.sin(k * 0.8 + i) * 0.08; if (y - paso * Math.sin(-a) < -alto) a += 0.4; x += Math.cos(a) * paso; y += Math.sin(a) * paso; pts.push([x, y]); }
+    grupos[g].push(pts); if (g > 0 && y < -0.16 && r() < 0.07) puntas.push({ x, y, s: 0.003 + r() * 0.005 });
+  }
+  for (let i = 0; i < 120; i++) nieblas.push({ x: -1 + r() * 2, y: -0.9 + r() * 0.6, s: 0.0012 + r() * 0.002, v: 0.5 + r() });
+  const celulas = []; for (let x = -1.05; x < 1.05; x += 0.028 + r() * 0.008) celulas.push(x);
+  return { grupos: grupos.map(G => { const p = new Path2D(); for (const pts of G){ p.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length - 1; k++){ const m = [(pts[k][0] + pts[k + 1][0]) / 2, (pts[k][1] + pts[k + 1][1]) / 2]; p.quadraticCurveTo(pts[k][0], pts[k][1], m[0], m[1]); } } return p; }), puntas, nieblas, celulas };
+})();
+const HOJA3 = 0.08; // grueso de la lámina (≈ 1 mm): de dibujo
+function dibujaPelos(c, e){
+  const v = e.view, px = e.px;
+  c.fillStyle = lg(c, 0, v[1], 0, 0, [[0, '#8fa2ad'], [1, '#b9c5c6']]); c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, -v[1] + 1.1);
+  // gotitas de niebla que pasan (de dibujo; tamaño exagerado para verse)
+  for (const n of PEL.nieblas){ const x = ((n.x + e.p * 0.02 * n.v + 1) % 2) - 1, y = n.y; if (!enVista(e, x, y, 0.01)) continue; c.fillStyle = 'rgba(236,244,248,.8)'; c.beginPath(); c.arc(x, y, Math.max(n.s, px * 1.2), 0, 7); c.fill(); }
+  // el aire quieto entre los pelos [3]
+  c.fillStyle = lg(c, 0, -0.27, 0, 0, [[0, 'rgba(255,236,200,0)'], [0.5, 'rgba(255,232,196,.22)'], [1, 'rgba(255,226,186,.38)']]); c.fillRect(v[0] - 1, -0.28, v[2] - v[0] + 2, 0.28);
+  // la lámina de la hoja
+  c.fillStyle = lg(c, 0, 0, 0, HOJA3, [[0, '#6f9a52'], [0.15, '#4f7f3c'], [1, '#335b2c']]); c.fillRect(v[0] - 1, 0, v[2] - v[0] + 2, HOJA3);
+  c.fillStyle = '#1d2a1c'; c.fillRect(v[0] - 1, HOJA3, v[2] - v[0] + 2, v[3] + 1);
+  // la piel de la hoja (una fila de células) y debajo el verde
+  const cel = PEL.celulas;
+  for (let i = 0; i < cel.length - 1; i++){ const x0 = cel[i], x1 = cel[i + 1]; if (x1 < v[0] - 0.05 || x0 > v[2] + 0.05) continue;
+    c.fillStyle = '#86b064'; c.strokeStyle = 'rgba(30,55,28,.7)'; c.lineWidth = Math.max(px, 0.0012); c.beginPath(); c.roundRect(x0 + 0.002, 0.002, x1 - x0 - 0.004, 0.018, 0.006); c.fill(); c.stroke();
+    c.fillStyle = '#4f8a3e'; c.beginPath(); c.roundRect(x0 + 0.004, 0.024, (x1 - x0) * 0.42, 0.045, 0.006); c.roundRect(x0 + 0.004 + (x1 - x0) * 0.5, 0.024, (x1 - x0) * 0.42, 0.045, 0.006); c.fill();
+    c.fillStyle = 'rgba(30,80,30,.9)'; for (let k = 0; k < 3; k++){ c.beginPath(); c.arc(x0 + (x1 - x0) * (0.2 + k * 0.3), 0.034 + (k % 2) * 0.02, 0.003, 0, 7); c.fill(); } }
+  // los pelos: tres capas, atrás más tenues
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  const tonos = ['rgba(200,206,200,.35)', 'rgba(232,236,228,.55)', 'rgba(250,252,246,.8)'];
+  for (let g = 0; g < 3; g++){ c.strokeStyle = tonos[g]; c.lineWidth = Math.max(px * 0.9, 0.0016); c.stroke(PEL.grupos[g]); }
+  // gotas posadas en las puntas (de dibujo)
+  for (const q of PEL.puntas){ if (!enVista(e, q.x, q.y, 0.02)) continue; c.fillStyle = 'rgba(210,232,244,.75)'; c.strokeStyle = 'rgba(80,110,130,.5)'; c.lineWidth = Math.max(px * 0.8, 0.0008); c.beginPath(); c.arc(q.x, q.y, q.s, 0, 7); c.fill(); c.stroke(); c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(q.x - q.s * 0.35, q.y - q.s * 0.4, q.s * 0.28, 0, 7); c.fill(); }
+  // regla: 3 mm [3]
+  const rx = e.cx + (W * (PORT ? 0.3 : 0.16)) / e.ppu;
+  c.strokeStyle = 'rgba(20,24,28,.85)'; c.lineWidth = Math.max(px * 4, 0.004); regla3(c, rx, px);
+  c.strokeStyle = '#fbfaf4'; c.lineWidth = Math.max(px * 2, 0.002); regla3(c, rx, px);
+  c.save(); c.setTransform(DPR, 0, 0, DPR, 0, 0); const sx = W / 2 + (rx - e.cx) * e.ppu, sy = H * ANC + (-0.125 - e.cy) * e.ppu;
+  c.font = `600 16px ${getComputedStyle(document.body).getPropertyValue('--sans')}`; c.textAlign = 'right'; c.textBaseline = 'middle';
+  const t = '3 mm', tw = c.measureText(t).width; c.fillStyle = 'rgba(10,14,22,.85)'; c.beginPath(); c.roundRect(sx - tw - 24, sy - 13, tw + 14, 26, 8); c.fill(); c.fillStyle = '#fbfaf4'; c.fillText(t, sx - 17, sy + 1);
+  c.restore();
+}
+function regla3(c, x, px){ const tk = Math.max(px * 8, 0.012); c.beginPath(); c.moveTo(x, 0); c.lineTo(x, -0.25); c.moveTo(x - tk, 0); c.lineTo(x + tk, 0); c.moveTo(x - tk, -0.25); c.lineTo(x + tk, -0.25); c.stroke(); }
+
+/* ============================================================
+   NIVEL 4 · EL MUSGO DE TURBERA  (1 unidad = 3 cm) [5, 6]
+   Tallos con su cabezuela arriba y ramas en manojos: unas
+   abiertas y otras colgadas contra el tallo
+   ============================================================ */
+const MUS = (() => {
+  const r = rng(604), tallos = [];
+  for (let fila = 0; fila < 2; fila++) for (let i = 0; i < 30; i++){
+    const x = -1.1 + i * 0.075 + fila * 0.037 + (r() - 0.5) * 0.03, top = -0.22 - r() * 0.05 + fila * 0.02, sway = (r() - 0.5) * 0.05, prof = fila * 0.5 + r() * 0.5;
+    const ramas = [];
+    for (let y = top + 0.05; y < 0.95; y += 0.032 + r() * 0.01){
+      const edad = sstep(top + 0.05, 0.75, y);
+      const giro = (r() - 0.5) * 0.9;
+      for (const lado of [-1, 1]){ if (r() < 0.25) continue; const baja = 0.8 + r() * 0.6 + giro * lado; ramas.push({ y: y + (r() - 0.5) * 0.012, a: lado > 0 ? baja : Math.PI - baja, L: 0.04 + r() * 0.04, tipo: 'abierta', edad, rota: edad > 0.7 && r() < 0.5 }); }
+      for (let k = 0; k < 2; k++) if (r() < 0.75) ramas.push({ y, a: Math.PI / 2, L: 0.045 + r() * 0.03, tipo: 'colgada', lado: k ? 1 : -1, edad });
+    }
+    const cab = []; for (let k = 0; k < 40; k++){ const aa = -Math.PI / 2 + (r() - 0.5) * Math.PI * 1.95; cab.push({ a: aa, L: 0.026 + r() * 0.022 }); }
+    tallos.push({ x, top, sway, prof, ramas, cab, rojo: r() < 0.5 });
+  }
+  tallos.sort((a, b) => a.prof - b.prof);
+  const gotas = []; for (let i = 0; i < 26; i++) gotas.push({ x: -1 + r() * 2, y: -0.14 + r() * 0.24, s: 0.004 + r() * 0.006 });
+  return { tallos, gotas };
+})();
+function xTallo(T, y){ return T.x + T.sway * sstep(0.9, T.top, y) + 0.008 * Math.sin(y * 9 + T.x * 5); }
+let MUSGO_HOJA = [0, 0];
+(() => { const cand = MUS.tallos.filter(t => t.prof > 0.5 && Math.abs(t.x) < 0.25); const T = cand.reduce((b, t) => Math.abs(t.x) < Math.abs(b.x) ? t : b, cand[0]); const R = T.ramas.find(q => q.tipo === 'abierta' && q.y > T.top + 0.08 && Math.cos(q.a) > 0); const bx = xTallo(T, R.y); MUSGO_HOJA = [bx + Math.cos(R.a) * R.L * 0.55, R.y + Math.sin(R.a) * R.L * 0.55]; MUS.elegido = { T, R }; })();
+function colMusgo(T, edad){ return edad > 0.6 ? mix('#8a7048', '#5d4630', (edad - 0.6) / 0.4) : T.rojo ? mix('#b0503f', '#8f9a4c', edad / 0.6) : mix('#86a64c', '#a3a758', edad / 0.6); }
+function ramaMusgo(c, x, y, a, L, col, px, hojitas, grueso){
+  const ex = x + Math.cos(a) * L, ey = y + Math.sin(a) * L + L * 0.18;
+  const mx = x + Math.cos(a) * L * 0.5, my = y + Math.sin(a) * L * 0.5;
+  c.strokeStyle = col; c.lineWidth = Math.max(px, grueso || 0.005); c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(mx, my, ex, ey); c.stroke();
+  if (!hojitas) return;
+  c.fillStyle = col; const n = 7;
+  for (let k = 1; k <= n; k++){ const t = k / (n + 1), bx = lerp(lerp(x, mx, t), lerp(mx, ex, t), t), by = lerp(lerp(y, my, t), lerp(my, ey, t), t), s = 0.009 * (1 - t * 0.55);
+    for (const l of [-1, 1]){ const aa = a + l * 0.55; c.beginPath(); c.ellipse(bx + Math.cos(aa) * s * 0.45, by + Math.sin(aa) * s * 0.45, s * 0.55, s * 0.28, aa, 0, 7); c.fill(); } }
+}
+function trazosTallo(T){
+  if (T.K) return T.K;
+  const osc = T.prof < 0.5 ? 0.45 : 0, col = ed => mix(colMusgo(T, ed), '#1f2618', osc);
+  const tallo = new Path2D(); for (let y = T.top; y <= 1.0; y += 0.02){ const x = xTallo(T, y); y === T.top ? tallo.moveTo(x, y) : tallo.lineTo(x, y); }
+  const grupos = [0.2, 0.5, 0.75, 0.95].map(() => ({ ab: new Path2D(), cu: new Path2D() }));
+  const gi = ed => ed < 0.35 ? 0 : ed < 0.6 ? 1 : ed < 0.85 ? 2 : 3;
+  for (const R of T.ramas){ const x = xTallo(T, R.y), g = grupos[gi(R.edad)];
+    if (R.tipo === 'abierta'){ const L = R.rota ? R.L * 0.5 : R.L, ex = x + Math.cos(R.a) * L, ey = R.y + Math.sin(R.a) * L + L * 0.18; g.ab.moveTo(x, R.y); g.ab.quadraticCurveTo(x + Math.cos(R.a) * L * 0.5, R.y + Math.sin(R.a) * L * 0.5, ex, ey); }
+    else { g.cu.moveTo(x, R.y); g.cu.quadraticCurveTo(x + R.lado * 0.01, R.y + R.L * 0.5, x + R.lado * 0.004, R.y + R.L); } }
+  const cab = new Path2D(), cx = xTallo(T, T.top);
+  for (const q of T.cab){ const ex = cx + Math.cos(q.a) * q.L, ey = T.top + Math.sin(q.a) * q.L + q.L * 0.18; cab.moveTo(cx, T.top); cab.quadraticCurveTo(cx + Math.cos(q.a) * q.L * 0.5, T.top + Math.sin(q.a) * q.L * 0.5, ex, ey); }
+  const K = [[tallo, col(0.35), 0.008, false]];
+  const eds = [0.2, 0.5, 0.75, 0.95];
+  grupos.forEach((g, i) => { K.push([g.ab, col(eds[i]), 0.005, T.prof >= 0.5]); K.push([g.cu, col(eds[i]), 0.004, false]); });
+  const cc = mix(T.rojo ? '#bf5a45' : '#98b957', '#1f2618', osc);
+  K.push([cab, cc, 0.0045, T.prof >= 0.5]);
+  K.cabeza = mix(T.rojo ? '#c9664e' : '#a7c35f', '#1f2618', osc);
+  return (T.K = K);
+}
+function dibujaMusgo(c, e){
+  const v = e.view, px = e.px, hoj = 1 / px > 400;
+  c.fillStyle = lg(c, 0, v[1], 0, v[3], [[0, '#cfd6cf'], [0.2, '#7d8a66'], [0.45, '#34422b'], [1, '#1c2117']]); c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const T of MUS.tallos){
+    if (T.x < v[0] - 0.2 || T.x > v[2] + 0.2) continue;
+    const K = trazosTallo(T);
+    for (const [path, col, lw, hojas] of K){ c.strokeStyle = col; c.lineWidth = Math.max(px, lw); c.stroke(path);
+      if (hojas && hoj){ c.setLineDash([0.0055, 0.0035]); c.lineWidth = Math.max(px, lw * 2.4); c.stroke(path); c.setLineDash([]); } }
+    c.fillStyle = K.cabeza; c.beginPath(); c.arc(xTallo(T, T.top), T.top, 0.017, 0, 7); c.fill();
+  }
+  // el agua que guarda el cojín (de dibujo)
+  c.fillStyle = 'rgba(110,170,205,.22)'; c.fillRect(v[0] - 1, 0.12, v[2] - v[0] + 2, v[3] + 1);
+  c.strokeStyle = 'rgba(180,220,238,.6)'; c.lineWidth = Math.max(px * 1.5, 0.002); c.beginPath(); for (let x = v[0] - 0.1; x <= v[2] + 0.1; x += 0.02) c.lineTo(x, 0.12 + 0.003 * Math.sin(x * 30 + e.p * 2)); c.stroke();
+  // gotas entre las ramas (de dibujo)
+  for (const g of MUS.gotas){ if (!enVista(e, g.x, g.y, 0.03)) continue; c.fillStyle = 'rgba(210,232,244,.5)'; c.strokeStyle = 'rgba(90,130,150,.45)'; c.lineWidth = Math.max(px, 0.0008); c.beginPath(); c.arc(g.x, g.y, g.s, 0, 7); c.fill(); c.stroke(); c.fillStyle = 'rgba(255,255,255,.85)'; c.beginPath(); c.arc(g.x - g.s * 0.35, g.y - g.s * 0.35, g.s * 0.25, 0, 7); c.fill(); }
+  // la ramita elegida, con luz: por ahí se entra
+  const { T, R } = MUS.elegido, bx = xTallo(T, R.y);
+  c.fillStyle = rg(c, MUSGO_HOJA[0], MUSGO_HOJA[1], 0, 0.025, [[0, 'rgba(255,250,215,.35)'], [1, 'rgba(255,250,215,0)']]); c.beginPath(); c.arc(MUSGO_HOJA[0], MUSGO_HOJA[1], 0.025, 0, 7); c.fill();
+}
+
+/* ============================================================
+   NIVEL 5 · ADENTRO DEL MUSGO: sus células (1 unidad = 0,6 mm)
+   Células grandes hialinas, con fibrillas y poros, rodeadas de
+   una red de células verdes [6]. El agua va en las grandes [5]
+   ============================================================ */
+const CEL = (() => {
+  const r = rng(705), celdas = [], dU = 0.064, dV = 0.27, ang = -0.35;
+  for (let i = -20; i <= 20; i++) for (let j = -8; j <= 8; j++){
+    const u = i * dU, vv = j * dV + (i % 2 ? dV / 2 : 0) + (r() - 0.5) * 0.015;
+    const x = u * Math.cos(ang) - vv * Math.sin(ang), y = u * Math.sin(ang) + vv * Math.cos(ang);
+    celdas.push({ x, y, u: dU * 0.5 - 0.0075, v: dV * 0.5 - 0.006, lleno: r(), poros: [r(), r()], burbuja: r() < 0.3 });
+  }
+  return { celdas, ang, dU, dV };
+})();
+function nivelCelulas(p){ const s = EST[5]; return s ? sstep(s.a - 0.6, s.b, p) : 1; }
+function formaCel(c, q){ // alargada y en punta: las vecinas encajan y dejan entre ellas el hilo verde
+  const u = q.u, v = q.v, pu = CEL.dV * 0.25;
+  c.beginPath(); c.moveTo(0, -v - pu * 0.3); c.bezierCurveTo(u * 0.9, -v + pu * 0.1, u, -v * 0.4, u, 0); c.bezierCurveTo(u, v * 0.4, u * 0.9, v - pu * 0.1, 0, v + pu * 0.3); c.bezierCurveTo(-u * 0.9, v - pu * 0.1, -u, v * 0.4, -u, 0); c.bezierCurveTo(-u, -v * 0.4, -u * 0.9, -v + pu * 0.1, 0, -v - pu * 0.3); c.closePath();
+}
+function dibujaCelulas(c, e){
+  const v = e.view, px = e.px, ang = CEL.ang, llenado = nivelCelulas(e.p);
+  c.fillStyle = '#3f7a33'; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  for (const q of CEL.celdas){
+    if (!enVista(e, q.x, q.y, 0.3)) continue;
+    c.save(); c.translate(q.x, q.y); c.rotate(ang);
+    formaCel(c, q); c.fillStyle = '#e8efe3'; c.fill();
+    c.save(); formaCel(c, q); c.clip();
+    // el agua, que sube mientras usted está aquí (de dibujo)
+    const tope = q.v + CEL.dV * 0.1, nivel = lerp(0.1, 1.08, clamp(llenado * (0.7 + 0.6 * q.lleno), 0, 1));
+    const yAgua = tope - nivel * 2 * tope;
+    c.fillStyle = lg(c, 0, yAgua, 0, tope, [[0, 'rgba(140,195,225,.75)'], [1, 'rgba(95,160,200,.8)']]); c.fillRect(-q.u * 1.3, yAgua, q.u * 2.6, tope * 2.2);
+    if (nivel < 1.02){ c.strokeStyle = 'rgba(60,120,165,.8)'; c.lineWidth = Math.max(px, 0.0018); c.beginPath(); c.moveTo(-q.u * 1.3, yAgua); c.quadraticCurveTo(0, yAgua + 0.006, q.u * 1.3, yAgua); c.stroke(); }
+    if (q.burbuja && nivel < 0.95){ c.fillStyle = 'rgba(255,255,255,.7)'; c.strokeStyle = 'rgba(60,120,165,.6)'; c.lineWidth = Math.max(px, 0.0012); c.beginPath(); c.arc(q.u * 0.2, yAgua + 0.02, 0.009, 0, 7); c.fill(); c.stroke(); }
+    // fibrillas: anillos de refuerzo de lado a lado
+    c.strokeStyle = 'rgba(120,150,115,.75)'; c.lineWidth = Math.max(px, 0.0028);
+    c.beginPath(); for (let y0 = -tope; y0 <= tope; y0 += 0.024){ c.moveTo(-q.u * 1.1, y0 + 0.006); c.quadraticCurveTo(0, y0 - 0.005, q.u * 1.1, y0 + 0.006); } c.stroke();
+    c.restore();
+    // poros, pegados al borde
+    c.fillStyle = 'rgba(210,225,205,.9)'; c.strokeStyle = 'rgba(70,105,65,.9)'; c.lineWidth = Math.max(px, 0.0022);
+    q.poros.forEach((t, k) => { const yy = lerp(-q.v * 0.6, q.v * 0.6, t), xx = (k % 2 ? 1 : -1) * q.u * 0.72; c.beginPath(); c.ellipse(xx, yy, 0.006, 0.008, 0, 0, 7); c.fill(); c.stroke(); });
+    formaCel(c, q); c.strokeStyle = 'rgba(28,62,26,.9)'; c.lineWidth = Math.max(px, 0.0022); c.stroke();
+    c.restore();
+  }
+  // cloroplastos en los hilos verdes
+  const r = rng(9);
+  c.fillStyle = 'rgba(28,78,24,.95)';
+  if (!CEL.cloro){ CEL.cloro = new Path2D(); for (const q of CEL.celdas){ for (let k = 0; k < 4; k++){ const t = (k + 0.5) / 4 * 2 - 1, uu = q.u + 0.0075, vv = t * q.v * 0.85; const x = q.x + uu * Math.cos(ang) - vv * Math.sin(ang), y = q.y + uu * Math.sin(ang) + vv * Math.cos(ang); CEL.cloro.moveTo(x + 0.0045, y); CEL.cloro.ellipse(x, y, 0.0045, 0.0028, ang + Math.PI / 2, 0, 7); } } }
+  c.fill(CEL.cloro);
+}
+
+/* ============================================================
+   NIVEL 6 · EL SUELO NEGRO, POR DENTRO  (1 unidad = 3 cm) [7]
+   Migas oscuras llenas de humus, poros con agua (de dibujo),
+   raicillas y restos de plantas
+   ============================================================ */
+const SUE = (() => {
+  const r = rng(806);
+  const sites = jitterSites(r, [-1.3, -1.3, 1.3, 1.3], 0.075, 0.95);
+  const polys = voronoi(sites, [-1.35, -1.35, 1.35, 1.35], 0.075).map(q => { const k = 0.8 + r() * 0.1; const luz = shrink(q.p, q.c, k * 0.55).map(([x, y]) => [x - 0.008, y - 0.01]); return { ...q, k, luz, tono: r(), motas: Array.from({ length: 7 }, () => [r(), r(), r()]) }; });
+  const raices = []; for (let i = 0; i < 5; i++){ let x = -1.2 + r() * 2.4, y = -1.3, a = Math.PI / 2 + (r() - 0.5) * 0.6; const pts = [[x, y]]; for (let k = 0; k < 40; k++){ a += (r() - 0.5) * 0.25; x += Math.cos(a) * 0.07; y += Math.sin(a) * 0.07; pts.push([x, y]); } raices.push({ pts, w: 0.008 + r() * 0.01 }); }
+  const restos = []; for (let i = 0; i < 60; i++) restos.push({ x: -1.3 + r() * 2.6, y: -1.3 + r() * 2.6, a: r() * 3, L: 0.03 + r() * 0.06, c: r() });
+  return { polys, raices, restos };
+})();
+function dibujaSuelo(c, e){
+  const v = e.view, px = e.px;
+  // lo de entre las migas: poros, casi todos con agua (de dibujo)
+  c.fillStyle = '#1f3a47'; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  c.fillStyle = 'rgba(110,165,195,.22)'; for (let i = 0; i < 9; i++){ const y = -1.2 + i * 0.3 + 0.02 * Math.sin(e.p * 1.5 + i); c.beginPath(); c.ellipse(0.3 * Math.sin(i * 2.1), y, 1.6, 0.06, 0.1 * Math.sin(i), 0, 7); c.fill(); }
+  if (!SUE.K){ const K = SUE.K = { pel: new Path2D(), miga: [0, 1, 2, 3].map(() => new Path2D()), borde: new Path2D(), luz: [0, 1, 2, 3].map(() => new Path2D()), motas: [0, 1, 2].map(() => new Path2D()) };
+    const poly = (P, pts) => { const n = pts.length, m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; const s0 = m(pts[n - 1], pts[0]); P.moveTo(s0[0], s0[1]); for (let i = 0; i < n; i++){ const q = m(pts[i], pts[(i + 1) % n]); P.quadraticCurveTo(pts[i][0], pts[i][1], q[0], q[1]); } P.closePath(); };
+    for (const q of SUE.polys){ const pts = shrink(q.p, q.c, q.k), t = Math.min(3, Math.floor(q.tono * 4));
+      poly(K.pel, shrink(q.p, q.c, Math.min(0.98, q.k + 0.08))); poly(K.miga[t], pts); poly(K.borde, pts); poly(K.luz[t], q.luz);
+      for (const [a, b, sz] of q.motas){ const P = pts[Math.floor(b * pts.length) % pts.length], x = lerp(q.c[0], P[0], a * 0.75), y = lerp(q.c[1], P[1], a * 0.75), r0 = 0.002 + sz * 0.0028, M = K.motas[sz < 0.45 ? 0 : sz < 0.9 ? 1 : 2]; M.moveTo(x + r0, y); M.arc(x, y, r0, 0, 7); } } }
+  const K = SUE.K;
+  c.fillStyle = 'rgba(120,175,205,.35)'; c.fill(K.pel);
+  K.miga.forEach((P, t) => { c.fillStyle = mix('#1d1712', '#30261d', (t + 0.5) / 4); c.fill(P); });
+  c.strokeStyle = 'rgba(0,0,0,.5)'; c.lineWidth = Math.max(px, 0.0025); c.stroke(K.borde);
+  K.luz.forEach((P, t) => { c.fillStyle = mix('#3a2e23', '#4d3d2f', (t + 0.5) / 4); c.fill(P); });
+  ['rgba(92,74,54,.8)', 'rgba(30,24,20,.9)', 'rgba(128,120,104,.7)'].forEach((col, k) => { c.fillStyle = col; c.fill(K.motas[k]); });
+  // restos de hojas y raíces que se pudren despacio: la materia orgánica
+  for (const q of SUE.restos){ if (!enVista(e, q.x, q.y, 0.08)) continue; c.strokeStyle = q.c < 0.5 ? '#6d5238' : '#8a6a44'; c.lineWidth = Math.max(px, 0.008); c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(q.x + Math.cos(q.a) * q.L, q.y + Math.sin(q.a) * q.L); c.stroke(); }
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const R of SUE.raices){ c.strokeStyle = '#c9ab82'; c.lineWidth = Math.max(px, R.w); c.beginPath(); R.pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke();
+    c.strokeStyle = 'rgba(225,205,170,.6)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); for (let k = 2; k < R.pts.length; k += 2){ const p = R.pts[k]; c.moveTo(p[0], p[1]); c.lineTo(p[0] + 0.025 * Math.cos(k), p[1] + 0.025 * Math.sin(k * 1.3)); } c.stroke(); }
+}
+
+/* ============================================================
+   NIVEL 7 · SU FINCA  (1 unidad = 400 m)
+   La quebrada llega de arriba, con su faja de monte [11]
+   ============================================================ */
+const FIN = (() => {
+  const r = rng(907), arboles = [], huerta = [], lejos = [];
+  for (let t = 0; t <= 1; t += 0.016){ for (const lado of [-1, 1]) arboles.push({ t: t + (r() - 0.5) * 0.01, lado, off: 0.02 + r() * 0.05, s: 0.7 + r() * 0.4, c: r() }); }
+  for (let i = 0; i < 10; i++) huerta.push({ x: CASA7 + 0.05 + i * 0.013, y: 0.03 + r() * 0.004 });
+  for (let i = 0; i < 40; i++) lejos.push({ x: -1.5 + r() * 3, d: r(), s: 0.7 + r() * 0.6, c: r() });
+  return { arboles, huerta, lejos };
+})();
+function rio7(t){ const x = lerp(-1.1, 0.9, t); return [x, g7(x) + 0.03 + 0.05 * t + 0.012 * Math.sin(t * 13)]; }
+function dibujaFinca(c, e){
+  const v = e.view, px = e.px;
+  c.fillStyle = lg(c, 0, v[1], 0, 0.2, [[0, '#9fb3bf'], [0.6, '#d3dcda'], [1, '#e6e4d6']]); c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  // la montaña de arriba, con el páramo en la niebla
+  const cumbre = x => -0.2 - 0.2 * Math.exp(-Math.pow((x + 0.75) / 0.45, 2)) + 0.1 * (x + 0.75) + 0.015 * Math.sin(x * 7);
+  c.fillStyle = '#a7b09a'; c.beginPath(); c.moveTo(v[0] - 0.2, 0.3); for (let x = v[0] - 0.2; x <= v[2] + 0.2; x += 0.02) c.lineTo(x, cumbre(x)); c.lineTo(v[2] + 0.2, 0.3); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(96,130,82,.6)'; c.beginPath(); c.moveTo(v[0] - 0.2, 0.3); for (let x = v[0] - 0.2; x <= v[2] + 0.2; x += 0.02) c.lineTo(x, cumbre(x) + 0.07 + 0.01 * Math.sin(x * 11)); c.lineTo(v[2] + 0.2, 0.3); c.closePath(); c.fill();
+  nubeBanda(c, e, -0.3, 0.75, 0.06);
+  // la loma de la finca
+  const xa = v[0] - 0.1, xb = v[2] + 0.1;
+  c.beginPath(); c.moveTo(xa, g7(xa)); for (let x = xa; x <= xb; x += Math.max(0.01, px * 3)) c.lineTo(x, g7(x)); c.lineTo(xb, v[3] + 1); c.lineTo(xa, v[3] + 1); c.closePath();
+  c.fillStyle = lg(c, 0, -0.1, 0, 0.5, [[0, '#6f9a4f'], [1, '#4f7a3f']]); c.fill(); c.strokeStyle = 'rgba(35,29,23,.7)'; c.lineWidth = Math.max(px * 1.2, 0.001); c.stroke();
+  for (const q of FIN.lejos){ const y = g7(q.x) + 0.01 + q.d * 0.03; if (!enVista(e, q.x, y, 0.05) || Math.abs(q.x - CASA7 - 0.1) < 0.14) continue; copaTinta(c, q.x, y, 0.014 * q.s, 0.01 * q.s, q.c < 0.5 ? '#3f7440' : '#4f8646', px); }
+  // la faja de monte de 30 m a cada lado de la quebrada [11] (atrás se ve más corta: está más lejos)
+  const m30 = 30 / F[7], fAtras = 0.45, fAdel = 0.9;
+  const borde = (k) => { c.beginPath(); for (let i = 0; i <= 80; i++){ const [x, y] = rio7(i / 80); const yy = y + k * m30; i ? c.lineTo(x, yy) : c.moveTo(x, yy); } };
+  c.beginPath(); for (let i = 0; i <= 80; i++){ const [x, y] = rio7(i / 80); i ? c.lineTo(x, y - fAtras * m30) : c.moveTo(x, y - fAtras * m30); } for (let i = 80; i >= 0; i--){ const [x, y] = rio7(i / 80); c.lineTo(x, y + fAdel * m30); } c.closePath();
+  c.fillStyle = 'rgba(40,86,46,.35)'; c.fill();
+  const atras = FIN.arboles.filter(a => a.lado < 0), adelante = FIN.arboles.filter(a => a.lado > 0);
+  for (const a of atras){ const [x, y] = rio7(a.t); if (!enVista(e, x, y, 0.06)) continue; copaTinta(c, x, y - a.off / 0.07 * fAtras * m30 * 0.9, 0.012 * a.s, 0.009 * a.s, a.c < 0.5 ? '#2f5a36' : '#3d6c3d', px); }
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.beginPath(); for (let i = 0; i <= 80; i++){ const [x, y] = rio7(i / 80); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+  c.strokeStyle = 'rgba(20,40,55,.6)'; c.lineWidth = Math.max(px * 3, 0.012); c.stroke(); c.strokeStyle = '#8ec3de'; c.lineWidth = Math.max(px * 1.6, 0.008); c.stroke();
+  for (const a of adelante){ const [x, y] = rio7(a.t); if (!enVista(e, x, y, 0.06)) continue; copaTinta(c, x, y + 0.012 + a.off / 0.07 * fAdel * m30 * 0.8, 0.014 * a.s, 0.01 * a.s, a.c < 0.5 ? '#2f5a36' : '#467a42', px); }
+  const E8 = EST[8], alF = E8 ? sstep(E8.a - 1, E8.a, e.p) : 0;
+  if (alF > 0.01){ c.globalAlpha = alF; c.setLineDash([Math.max(px * 10, 0.012), Math.max(px * 7, 0.008)]);
+    for (const k of [-fAtras, fAdel]){ c.strokeStyle = 'rgba(20,24,28,.6)'; c.lineWidth = Math.max(px * 3.5, 0.004); borde(k); c.stroke(); c.strokeStyle = '#fbfaf4'; c.lineWidth = Math.max(px * 1.8, 0.002); borde(k); c.stroke(); }
+    c.setLineDash([]); c.globalAlpha = 1; }
+  // la toma, la manguera y el tanque
+  const [tx, ty] = rio7((TOMA7 + 1.1) / 2);
+  const tq = [CASA7 - 0.05, g7(CASA7 - 0.05) - 0.004];
+  c.strokeStyle = '#1f1f1f'; c.lineWidth = Math.max(px * 1.4, 0.002); c.beginPath(); c.moveTo(tx, ty); c.bezierCurveTo(tx + 0.1, ty + 0.03, tq[0] - 0.1, tq[1] + 0.01, tq[0], tq[1]); c.stroke();
+  c.fillStyle = '#9aa3a6'; c.strokeStyle = TINTA; c.lineWidth = Math.max(px, 0.0012); c.beginPath(); c.rect(tx - 0.007, ty - 0.006, 0.014, 0.008); c.fill(); c.stroke();
+  c.fillStyle = '#d9dcd6'; c.beginPath(); c.rect(tq[0] - 0.01, tq[1] - 0.018, 0.02, 0.018); c.fill(); c.stroke();
+  // la casa y la huerta
+  const cy = g7(CASA7);
+  c.fillStyle = '#efe6d2'; c.beginPath(); c.rect(CASA7 - 0.028, cy - 0.03, 0.056, 0.03); c.fill(); c.stroke();
+  c.fillStyle = '#9a4f3a'; c.beginPath(); c.moveTo(CASA7 - 0.036, cy - 0.028); c.lineTo(CASA7, cy - 0.055); c.lineTo(CASA7 + 0.036, cy - 0.028); c.closePath(); c.fill(); c.stroke();
+  c.fillStyle = '#6b4b33'; c.fillRect(CASA7 - 0.006, cy - 0.016, 0.012, 0.016);
+  for (const q of FIN.huerta){ const y = g7(q.x) + q.y; c.fillStyle = '#6f5a40'; c.fillRect(q.x - 0.005, y - 0.002, 0.01, 0.018); c.fillStyle = '#7fb04e'; for (let k = 0; k < 4; k++){ c.beginPath(); c.arc(q.x, y + k * 0.004, 0.0028, 0, 7); c.fill(); } }
+}
+
+const LV = [dibujaMontana, dibujaParamo, dibujaFrailejon2, dibujaPelos, dibujaMusgo, dibujaCelulas, dibujaSuelo, dibujaFinca];
+
+/* ============================================================
+   GUION DE CÁMARA: paradas (hold) y viajes entre ellas
+   ============================================================ */
+let KF = {};
+function armaKF(){
+  armaPortales();
+  const [mx0, my0] = [lerp(PX0, FX0, 0.5), y0de(lerp(PX0, FX0, 0.5))];
+  KF = {
+    mont0: [0, PORT ? 0.16 : 0.1, PORT ? -0.1 : 0.02, PORT ? 1.15 : 1.0], mont1: [0, PORT ? 0.17 : 0.12, PORT ? -0.1 : 0.02, PORT ? 1.1 : 0.9],
+    par0: [1, PORT ? -0.12 : 0.02, PORT ? 0.14 : 0.06, 1.0], par1: [1, PORT ? -0.14 : 0.0, PORT ? 0.14 : 0.06, 0.93],
+    fra0: [2, PORT ? 0.02 : 0.06, PORT ? -0.14 : -0.15, 1.0], fra1: [2, PORT ? 0.02 : 0.06, PORT ? -0.14 : -0.15, 0.95],
+    hoja0: [3, 0.0, PORT ? -0.02 : -0.08, PORT ? 1.0 : 0.95], hoja1: [3, 0.02, PORT ? -0.02 : -0.08, PORT ? 0.94 : 0.88],
+    fraM: [2, 0.2, -0.08, 0.7],
+    musgo0: [4, 0.0, PORT ? -0.02 : -0.08, 1.0], musgo1: [4, 0.02, PORT ? -0.02 : -0.08, 0.92],
+    cel0: [5, 0.0, 0.0, 1.0], cel1: [5, 0.02, 0.0, 0.9],
+    fraS: [2, -0.1, 0.04, 0.8],
+    suelo0: [6, 0.0, 0.0, 1.0], suelo1: [6, 0.03, 0.0, 0.9],
+    parS: [1, 0.25, 0.0, 1.0],
+    nac0: [1, NAC1 - (PORT ? 0.12 : 0.3), NAC1Y() + (PORT ? 0.12 : -0.02), 1.0], nac1: [1, NAC1 - (PORT ? 0.11 : 0.28), NAC1Y() + (PORT ? 0.12 : -0.02), 0.95],
+    montF: [0, mx0, my0, 0.3],
+    fin0: [7, PORT ? 0.05 : 0.0, PORT ? 0.1 : -0.02, 1.0], fin1: [7, PORT ? 0.07 : 0.02, PORT ? 0.1 : -0.02, 0.92],
+  };
+  for (const s of SEGS){ s.A = aGlobal(...KF[s.a]); s.B = aGlobal(...KF[s.b]); }
+}
+const SEGS = [
+  { a:'mont0', b:'mont1', st:0, w:1.0 },
+  { a:'mont1', b:'par0', w:1.9, e:'both' },
+  { a:'par0', b:'par1', st:1, w:1.2 },
+  { a:'par1', b:'fra0', w:1.5, e:'both' },
+  { a:'fra0', b:'fra1', st:2, w:1.3 },
+  { a:'fra1', b:'hoja0', w:1.3, e:'both' },
+  { a:'hoja0', b:'hoja1', st:3, w:1.2 },
+  { a:'hoja1', b:'fraM', w:1.2, e:'both' },
+  { a:'fraM', b:'musgo0', w:1.1, e:'both' },
+  { a:'musgo0', b:'musgo1', st:4, w:1.2 },
+  { a:'musgo1', b:'cel0', w:1.0, e:'both' },
+  { a:'cel0', b:'cel1', st:5, w:1.4 },
+  { a:'cel1', b:'fraS', w:1.4, e:'both' },
+  { a:'fraS', b:'suelo0', w:1.1, e:'both' },
+  { a:'suelo0', b:'suelo1', st:6, w:1.3 },
+  { a:'suelo1', b:'parS', w:1.4, e:'both' },
+  { a:'parS', b:'nac0', w:1.0, e:'both' },
+  { a:'nac0', b:'nac1', st:7, w:1.2 },
+  { a:'nac1', b:'montF', w:1.4, e:'both' },
+  { a:'montF', b:'fin0', w:1.2, e:'both' },
+  { a:'fin0', b:'fin1', st:8, w:1.4 },
+];
+let acc = 0; for (const s of SEGS){ s.a0 = acc; acc += s.w; s.b0 = acc; }
+const T = acc;
+const NEST = 9;
+const EST = SEGS.filter(s => s.st !== undefined).map(s => ({ a: s.a0, b: s.b0, st: s.st }));
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const easeF = { '': u => u, both: u => u * u * (3 - 2 * u) };
+const LVL_EST = [0, 1, 2, 3, 4, 5, 6, 1, 7];
+
+function camGlobal(p){
+  p = clamp(p, 0, T);
+  let s = SEGS[SEGS.length - 1];
+  for (const q of SEGS){ if (p <= q.b0){ s = q; break; } }
+  const u = clamp((p - s.a0) / s.w, 0, 1), uu = easeF[s.e || ''](u);
+  const A = s.A, B = s.B;
+  let w, X, Y;
+  if (Math.abs(Math.log(A.w / B.w)) > 1e-3){
+    w = Math.exp(lerp(Math.log(A.w), Math.log(B.w), uu));
+    const k = (w - B.w) / (A.w - B.w);
+    X = B.X + (A.X - B.X) * k; Y = B.Y + (A.Y - B.Y) * k;
+  } else { w = lerp(A.w, B.w, uu); X = lerp(A.X, B.X, uu); Y = lerp(A.Y, B.Y, uu); }
+  return { X, Y, w, seg: s, u };
+}
+/* el nivel base es el más hondo cuya unidad ya llena la pantalla y que contiene el centro */
+function camAt(p){
+  const g = camGlobal(p);
+  let L = 0;
+  for (let k = 1; k < G.length; k++){
+    if (G[k].s / g.w < 0.92 || G[k].d <= G[L].d) continue;
+    const x = (g.X - G[k].ox) / G[k].s, y = (g.Y - G[k].oy) / G[k].s, R = REGION[k];
+    if (x < R[0] || x > R[2] || y < R[1] || y > R[3]) continue;
+    L = k;
+  }
+  const gl = G[L];
+  return { L, cx: (g.X - gl.ox) / gl.s, cy: (g.Y - gl.oy) / gl.s, f: g.w / gl.s, seg: g.seg, u: g.u, g };
+}
+function anchoVista(cam){ return F[cam.L] * cam.f * (W / S); }
+function alturaDe(cam){
+  const L = cam.L;
+  if (L === 0) return { h: clamp(alt0(cam.cx), 0, 4700) };
+  if (L === 1) return { h: ALT_P - (g1(cam.cx) - g1(FRA1)) * F[1] };
+  if (L === 7) return { h: ALT_F - g7(cam.cx) * F[7] };
+  if (L === 6) return { h: ALT_P, hondo: SUELO_P[1] * F[2] };
+  if (L === 2) return cam.cy > 0.02 ? { h: ALT_P, hondo: cam.cy * F[2] } : { h: ALT_P };
+  return { h: ALT_P };
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu){ const hw = W / 2 / ppu, hh0 = H * ANC / ppu, hh1 = H * (1 - ANC) / ppu; return { L, cx, cy, f, ppu, px: 1 / ppu, view: [cx - hw, cy - hh0, cx + hw, cy + hh1], p }; }
+function pintaNivel(c, L, cx, cy, f, prof){
+  const ppu = S / f;
+  c.setTransform(DPR * ppu, 0, 0, DPR * ppu, DPR * (W / 2 - cx * ppu), DPR * (H * ANC - cy * ppu));
+  LV[L](c, envPara(L, cx, cy, f, ppu));
+  if (prof > 2) return;
+  for (const k of HIJOS[L]){
+    const P = PORTAL[k]; const pp = P.s * ppu, a = sstep(0.28 * S, 0.92 * S, pp);
+    if (a <= 0) continue;
+    const ox = W / 2 + (P.x - cx) * ppu, oy = H * ANC + (P.y - cy) * ppu;
+    if (ox < -pp * 1.3 || ox > W + pp * 1.3 || oy < -pp * 1.3 || oy > H + pp * 1.3) continue;
+    const cx2 = (cx - P.x) / P.s, cy2 = (cy - P.y) / P.s, f2 = f / P.s;
+    const cubre = a >= 0.999 && c === ctx, dst = cubre ? c : bctx;
+    if (!cubre){ bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.clearRect(0, 0, buf.width, buf.height); }
+    dst.setTransform(DPR * pp, 0, 0, DPR * pp, DPR * ox, DPR * oy);
+    LV[k](dst, envPara(k, cx2, cy2, f2, pp));
+    if (cubre) continue;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalCompositeOperation = 'destination-in';
+    const r0 = pp * lerp(0.22, 0.85, a) * DPR, r1 = r0 + pp * 0.16 * DPR;
+    const gm = bctx.createRadialGradient(ox * DPR, oy * DPR, r0, ox * DPR, oy * DPR, r1);
+    gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height); bctx.globalCompositeOperation = 'source-over';
+    c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(buf, 0, 0);
+  }
+}
+function render(){
+  const cam = camAt(p);
+  CAJAS_PISOS.length = 0;
+  pintaNivel(ctx, cam.L, cam.cx, cam.cy, cam.f, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const gv = ctx.createRadialGradient(cv.width / 2, cv.height / 2, Math.min(cv.width, cv.height) * 0.35, cv.width / 2, cv.height / 2, Math.hypot(cv.width, cv.height) * 0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(8,14,12,.22)'); ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25){
+    const k = clamp(Math.abs(vel) * 0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25) * 0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width * (1 + k), sh = cv.height * (1 + k);
+    ctx.drawImage(cv, (cv.width - sw) / 2, (cv.height - sh) / 2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+
+/* ============================================================
+   INTERFAZ: estaciones por páginas, palabras, fuentes
+   [[clave|texto]] = palabra del glosario · {n,m} = fuentes · %x% = de su finca
+   ============================================================ */
+const ESTACIONES = [
+  { t:'La montaña', c:'La montaña', f:[9, 10], pags:[
+    { s:['Esta es una montaña de los Andes, con sus pisos.', 'Arriba, donde hace frío y se pega la niebla, está el páramo.', 'Vamos a bajar con el agua: de la niebla al frailejón, al musgo, al suelo negro, al nacimiento y a su finca.'] },
+    { k:'tam', s:['El [[igac|IGAC]] llama páramo bajo al piso de 3 000 a 3 700 metros, y páramo alto al de 3 700 a 4 200{9}.', 'Por debajo de 3 000 metros está la tierra fría{9}.'], nota:'La raya blanca de puntos marca los 3 000 metros. La altura orienta, pero no traza la línea del páramo: esa la traza el Ministerio de Ambiente sobre un mapa{10}.' },
+    { s:['%finca1%', '%finca2%'], nota:'%finca3%' },
+    { s:['El recuadro de arriba dice cuánto mide de ancho lo que usted ve.', 'Y a qué altura sobre el mar está el centro del dibujo, con su piso{9}.'], nota:'La montaña es un dibujo, no un sitio real. Las alturas y los tamaños son aproximados.' } ] },
+  { t:'La niebla en el páramo', c:'La niebla', f:[1, 10], pags:[
+    { s:['Esto es un páramo: [[pajonal|pajonal]], frailejones, musgos y charcas{10}.', 'Queda por encima del bosque de la montaña{10}: abajo, a la derecha, empieza el monte.'] },
+    { s:['La niebla es común en el páramo{1}.', 'Se forma cuando el aire húmedo sube por la montaña y se enfría{1}.'] },
+    { k:'tam', s:['La niebla también trae agua.', 'En seis sitios de tres páramos de Colombia, la niebla y la llovizna le sumaron a la lluvia entre 7 y 28 litros por cada 100 que dio la lluvia{1}.'], nota:'Se midió con cilindros atrapanieblas, en Romerales (Quindío), Chingaza (Cundinamarca) y Belmira (Antioquia). Cambia mucho de un sitio a otro y de un mes a otro{1}.' },
+    { s:['Y llega sobre todo cuando llueve poco{1}.', 'Por eso cuenta para el agua de abajo en el tiempo seco{1}.'] },
+    { k:'pensar', s:['¿Cuántas mañanas de la semana amanece con niebla su loma?', '¿En qué meses más?'] } ] },
+  { t:'El frailejón', c:'El frailejón', f:[4, 2], pags:[
+    { s:['El frailejón es una [[roseta|roseta]] gigante: un penacho de hojas encima de un tronco{4}.', 'Las hojas viejas se secan pero no se caen: quedan pegadas al tronco, como una ruana{4}.', 'Esa ruana lo protege de la helada{4}.'] },
+    { s:['Por dentro, el tronco tiene una [[medula|médula]] que guarda agua{4}.', 'Con ella la planta aguanta cuando el suelo le da poca{4}.'] },
+    { k:'cuando', s:['Crece despacio.', 'Tres frailejones de Colombia, fechados con [[carbono|carbono 14]], crecieron entre 3,8 y 6,9 centímetros al año{2}.', 'Uno de dos metros tendría entre 29 y 53 años{2}.'], nota:'Esa edad es una cuenta nuestra: 200 centímetros entre lo que crecieron esos tres, de una sola especie{2}. Otro frailejón puede crecer distinto.' },
+    { s:['El frailejón gasta muy poca agua al [[transpirar|transpirar]]{2}.', 'Eso ayuda a que del páramo salga mucha del agua que le cae{2}.'] },
+    { k:'hacer', s:['No le arranque las hojas secas al frailejón: son su abrigo{4}.', 'Y no lo corte: tarda décadas en volver a esa altura{2}.'] } ] },
+  { t:'Los pelos de la hoja', c:'Los pelos', f:[3, 4], pags:[
+    { s:['De cerca, la hoja está cubierta de pelos blancos: un [[vello|vello]] denso{4}.', 'En un frailejón de Venezuela se midió esa capa: llega a 3 milímetros de grueso{3}.'], nota:'La raya de la derecha mide 3 milímetros{3}.' },
+    { s:['Los pelos atajan una capa de aire quieto contra la hoja{3}.', 'Con sol, la hoja se puede calentar 5 grados o más sin gastar más agua{3}.', 'Donde el aire es tan frío, ese calor le sirve para crecer{3}.'], nota:'El tono dorado entre los pelos es ese aire quieto. Es de dibujo.' },
+    { k:'pensar', s:['Se dice que el frailejón «hace agua».', 'No la fabrica: la niebla la trae{1}, y el frailejón gasta poca{2}.', 'Las gotas del dibujo muestran la niebla que se posa: no están medidas.'] } ] },
+  { t:'El musgo', c:'El musgo', f:[6, 5], pags:[
+    { s:['Al pie del frailejón hay un cojín de [[musgo|musgo de turbera]]: el género Sphagnum{6}.', 'En Colombia se conocen 32 clases{6}. En Boyacá crecen en [[turbera|turberas]] del páramo{6}.'] },
+    { s:['Cada tallo tiene arriba una cabezuela, y en el tallo, manojos de ramitas: unas abiertas y otras colgadas{6}.', 'El agua se queda entre las ramitas y adentro de ellas.'], nota:'El azul de abajo es el agua que guarda el cojín. Es de dibujo.' },
+    { k:'tam', s:['Es una esponja viva.', 'En laboratorio, 21 especies de este musgo absorbieron entre 19 y 44 veces su peso seco en agua{5}.'], nota:'Eran musgos de China{5}. Cada especie guarda distinto{5}.' },
+    { k:'hacer', s:['Apriete con la mano un cojín de musgo mojado, sin arrancarlo.', '¿Cuánta agua sale? ¿Y cuánto tarda en volver a mojarse?'] } ] },
+  { t:'Adentro del musgo', c:'Sus células', f:[6, 5], pags:[
+    { s:['Esta es una hojita del musgo, muy de cerca.', 'Tiene dos clases de [[celula|células]]: unas angostas y verdes, y otras grandes y vacías, las [[hialinas|células hialinas]]{6}.'] },
+    { s:['Las grandes tienen unos refuerzos en espiral, las fibrillas, y unos poros{6}.', 'Entre más espacio tienen esas células vacías, más agua guarda el musgo{5}.'], nota:'El azul que sube es el agua. Es de dibujo. Las formas son aproximadas.' },
+    { k:'pensar', s:['Una planta que guarda agua en células muertas.', '¿Qué le pasa a ese musgo si lo sacan y lo dejan al sol?'] } ] },
+  { t:'El suelo negro', c:'El suelo', f:[7, 10], pags:[
+    { s:['Debajo está el suelo del páramo, por dentro.', 'Es negro por el [[humus|humus]]; es liviano, deja pasar el agua y la retiene mucho{7}.'], nota:'Migas negras con restos de plantas y raicillas; el azul de los huecos es el agua. Es de dibujo.' },
+    { k:'tam', s:['En el sur de Ecuador midieron este suelo en su punto más seco para las plantas, el [[marchitez|punto de marchitez]]{7}.', 'Aun así retenía, en promedio, 0,7 kilos de agua por cada kilo de tierra seca{7}.'], nota:'Suelos de ceniza volcánica bajo el matorral del subpáramo, entre 3 000 y 3 300 metros{7}.' },
+    { s:['Si ese suelo se seca del todo, pierde parte de su fuerza para retener agua, y no la recupera{7}.', 'En potreros de 50 años no se había recuperado{7}.', 'Lo que más cuenta es la [[organica|materia orgánica]]{7}.'] },
+    { s:['La capa de hojas y ramitas de encima retenía 16 milímetros de agua{7}.', 'Se pierden cuando se limpia el monte para cultivar{7}.'] },
+    { k:'hacer', s:['En el páramo, la ley prohíbe las quemas y la maquinaria pesada para cultivar{10}.', 'También prohíbe dañar la vegetación nativa{10}: es la cobija de la esponja.'] } ] },
+  { t:'El nacimiento', c:'El nacimiento', f:[2, 8, 11], pags:[
+    { s:['Más abajo, el agua sale de la tierra: es un [[nacimiento|nacimiento]].', 'Los páramos dan mucha agua y la regulan{2}.', 'De ellos toma el agua mucha gente de la montaña y de las tierras de abajo{8}.'] },
+    { s:['La ley pide mantener en monte al menos 100 metros a la redonda de un nacimiento{11}.', 'Y una faja de al menos 30 metros a cada lado de las quebradas{11}.'], nota:'La raya blanca va del nacimiento a 100 metros; la línea de puntos es esa ronda{11}.' },
+    { s:['El pastoreo intensivo, los cultivos y los pinos sembrados en el páramo le cambian el agua{8}.', 'Esta pieza no propone ganado en el páramo.'], nota:'La ley deja seguir las actividades del campo de bajo impacto que ya había, con buenas prácticas; las de alto impacto se cambian poco a poco, con tiempo y apoyo{10}.' },
+    { k:'hacer', s:['Mire su nacimiento en el verano más duro que recuerde.', '¿Qué tenía arriba entonces? ¿Y qué tiene ahora?'] } ] },
+  { t:'Su finca', c:'Su finca', f:[9, 11, 10], pags:[
+    { s:['%finca4%', 'En el dibujo, la quebrada que la baña nace en el páramo.', 'Averigüe de dónde viene la suya.'], extra:'finca' },
+    { s:['A la orilla de la quebrada, la ley pide al menos 30 metros de monte a cada lado{11}.', 'La toma y la manguera llevan el agua al tanque de la casa.'], nota:'Las líneas de puntos marcan esa faja de 30 metros a cada lado{11}.' },
+    { k:'hacer', s:['No queme arriba: en el páramo, la ley lo prohíbe{10}.', 'Deje el monte del nacimiento y el de la orilla{11}.', 'Y no abra potrero ni cultivo nuevo en el páramo: la ley prohíbe degradar la vegetación nativa{10}.'] },
+    { k:'pensar', s:['¿Quién cuida el páramo del que viene su agua?', '¿Qué puede hacer su vereda para cuidarlo?'], extra:'repaso' } ] },
+];
+
+const GLOS = [
+  ['igac', 'IGAC', 'El Instituto Geográfico Agustín Codazzi. Clasifica los pisos térmicos por altitud y temperatura: el páramo bajo va de 3 000 a 3 700 metros{9}.'],
+  ['pajonal', 'Pajonal', 'Las pajas del páramo, que crecen en macollas. Con los frailejones, los matorrales y las turberas, forma el páramo{10}.'],
+  ['niebla', 'Niebla y llovizna', 'El agua que llega sin aguacero: nubes pegadas a la montaña y lloviznas. En páramos de Colombia le sumaron a la lluvia entre 7 y 28 %{1}.'],
+  ['roseta', 'Roseta', 'Una planta con las hojas en círculo alrededor de un punto. En el frailejón, la roseta va encima de un tronco{4}.'],
+  ['medula', 'Médula', 'El centro blando del tronco del frailejón. Guarda agua{4}.'],
+  ['carbono', 'Carbono 14', 'Una forma de fechar restos de seres vivos. Con ella se supo cuántos años tenían tres frailejones{2}.'],
+  ['transpirar', 'Transpirar', 'Soltar agua al aire por las hojas. El frailejón transpira muy poca{2}.'],
+  ['vello', 'Vello', 'Los pelos de la hoja. En el frailejón forman una capa blanca y densa{4}, de hasta 3 milímetros{3}.'],
+  ['musgo', 'Musgo de turbera', 'Un musgo del género Sphagnum. Crece en sitios muy húmedos, como las turberas del páramo{6}, y guarda mucha agua{5}.'],
+  ['turbera', 'Turbera', 'Un humedal donde las plantas muertas se acumulan sin pudrirse del todo. La ley la cuenta entre los humedales del páramo{10}.'],
+  ['celula', 'Célula', 'Cada una de las piezas pequeñitas de las que está hecho un ser vivo. En el musgo se ven verdes o vacías{6}.'],
+  ['hialinas', 'Células hialinas', 'Las células grandes y vacías de la hoja del musgo de turbera, con fibrillas y poros{6}. Entre más espacio tienen, más agua guarda el musgo{5}.'],
+  ['humus', 'Humus', 'La parte negra de la tierra que viene de plantas podridas. En el suelo del páramo hay mucho{7}.'],
+  ['marchitez', 'Punto de marchitez', 'Tan seco está el suelo que las plantas ya no pueden sacarle agua y se marchitan. Aun así, el suelo del subpáramo retenía mucha{7}.'],
+  ['organica', 'Materia orgánica', 'Lo que queda en la tierra de plantas y animales muertos. En el suelo del páramo es lo que más le ayuda a retener agua{7}.'],
+  ['nacimiento', 'Nacimiento', 'El sitio donde el agua de adentro sale de la tierra y empieza una quebrada. La ley pide monte a su alrededor: al menos 100 metros a la redonda{11}.'],
+];
+
+function numeroTxt(n){ return miles(n); }
+function vars(txt){
+  if (txt.indexOf('%') < 0) return txt;
+  const real = finca.alt, piso = pisoDe(real), dif = 3000 - real, mun = finca.mun ? ` en ${finca.mun}` : '';
+  const recorte = finca.recorte === 'alta' ? ` El dibujo la pone a ${numeroTxt(ALT_MAX)} metros: la montaña del dibujo no alcanza más arriba con finca.` : finca.recorte === 'baja' ? ` El dibujo la pone a ${numeroTxt(ALT_MIN)} metros: la montaña del dibujo no baja más.` : '';
+  const V = {};
+  if (finca.ejemplo){
+    V.finca1 = 'La casita del dibujo es una finca de ejemplo, a 2 600 metros: tierra fría{9}.';
+    V.finca2 = 'El páramo bajo empieza unos 400 metros más arriba{9}.';
+    V.finca3 = (finca.lat !== null ? 'Llegó una ubicación sin altura: la pieza no adivina la altura por el mapa. ' : '') + 'Puede poner la altura de su finca en la última estación. No se guarda ni se envía.';
+    V.finca4 = 'Aquí llega el agua a esta finca de ejemplo, a 2 600 metros: tierra fría{9}.';
+  } else if (real >= 3000){
+    V.finca1 = `Su finca${mun} está a ${numeroTxt(real)} metros: a la altura del ${piso}{9}.`;
+    V.finca2 = 'Que esté dentro del páramo delimitado lo dice el mapa, no la altura{10}.';
+    V.finca3 = 'En el páramo delimitado rigen las prohibiciones de la ley, como las quemas{10}.' + recorte;
+    V.finca4 = `Aquí está su finca${mun}, a ${numeroTxt(real)} metros: a la altura del ${piso}{9}.`;
+  } else {
+    V.finca1 = `Su finca${mun} está a ${numeroTxt(real)} metros: piso ${piso}{9}.`;
+    V.finca2 = `El páramo bajo empieza unos ${numeroTxt(Math.round(dif / 10) * 10)} metros más arriba{9}.`;
+    V.finca3 = 'Es la altura que usted dio. No se guarda ni se envía.' + recorte;
+    V.finca4 = `Aquí llega el agua a su finca${mun}, a ${numeroTxt(real)} metros: piso ${piso}{9}.`;
+  }
+  return txt.replace(/%(\w+)%/g, (m, n) => V[n] !== undefined ? V[n] : m);
+}
+function marca(txt){
+  return vars(txt).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return vars(txt).replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '').replace(/(\d) (\d{3})/g, '$1$2').replace(/«|»/g, ''); }
+
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i + 1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i + 1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- la altura de su finca (no se guarda ni se envía) ---------- */
+function htmlFinca(){
+  return `<div class="cuenta"><label for="rAlt">Altura de su finca: <input type="range" id="rAlt" min="${ALT_MIN}" max="${ALT_MAX}" step="50" value="${Math.round(ALT_F / 50) * 50}"> <output id="oAlt">${miles(finca.alt)} m</output></label>
+    <div class="fila-b"><button type="button" class="bc" id="bUbic">Usar la altura del teléfono</button></div>
+    <p class="res" id="rAltRes"></p></div>`;
+}
+function pintaFinca(){ const h = finca.alt, o = $('oAlt'); if (o) o.textContent = miles(h) + ' m'; const r = $('rAltRes'); if (r) r.innerHTML = marca(`Piso ${pisoDe(h)}{9}. ` + (h >= 3000 ? 'A la altura del páramo: lo que decide si está adentro es el mapa{10}.' : `El páramo bajo empieza unos ${miles(Math.round((3000 - h) / 10) * 10)} metros más arriba{9}.`)); }
+function cambiaAlt(h, deUsuario){
+  finca.alt = h; finca.ejemplo = false; const pp = pObj; armaKF(); sucio = true;
+  window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp;
+  const P = estAct.pags[pagAct]; const ps = $('fCuerpo').querySelector('p'); if (ps && P.s) ps.innerHTML = P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ');
+  pintaFinca(); if (deUsuario) $('anuncio').textContent = `Altura de la finca: ${miles(h)} metros, piso ${pisoDe(h)}.`;
+}
+function enlazaFinca(){
+  const r = $('rAlt'); if (r) r.addEventListener('input', () => cambiaAlt(+r.value, true));
+  const b = $('bUbic'); if (b) b.addEventListener('click', () => {
+    if (!navigator.geolocation){ b.textContent = 'Este teléfono no da la altura'; b.setAttribute('aria-disabled', 'true'); return; }
+    b.textContent = 'Buscando…';
+    navigator.geolocation.getCurrentPosition(pos => {
+      const h = pos.coords.altitude;
+      if (h === null || !isFinite(h)){ b.textContent = 'El teléfono no dio la altura: póngala a mano'; return; }
+      const hh = Math.round(h / 10) * 10; if ($('rAlt')) $('rAlt').value = clamp(Math.round(h / 50) * 50, ALT_MIN, ALT_MAX); cambiaAlt(hh, true); b.textContent = `Altura del teléfono: ${miles(Math.round(h))} m`;
+    }, () => { b.textContent = 'Sin permiso o sin señal: póngala a mano'; }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 600000 });
+  });
+}
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], estIdx = 0, pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿Cuánto?', cuando:'¿Cuándo?' };
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra === 'finca') h += htmlFinca();
+  if (P.extra === 'repaso') h += `<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>`;
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  if (P.extra === 'finca'){ enlazaFinca(); pintaFinca(); }
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length){ voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){ if (!voz.turno) return; voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz(); }
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v) voz.motivo = 'Sin voz en español';
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer'); };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] : ''), turno, sigue);
+  else if (P.k) di(CAB[P.k], turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras, repaso y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function marcaLi(id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a9d6b0'; setTimeout(() => li.style.outline = '', 1600); } }
+function abreFuentes(id){ abre(dlgF); if (id) marcaLi(id); }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  if (e.target.closest && e.target.closest('[data-palabras]')){ abrePalabra(''); return; }
+  if (e.target.closest && e.target.closest('[data-fuentes-est]')){ abreFuentes('f' + (estAct.f ? estAct.f[0] : 1)); return; }
+  if (e.target.closest && e.target.closest('[data-repaso-est]')){ abreRepaso(Math.min(estIdx, PREG.length - 1) >= 0 ? preguntaDe(estIdx) : 0); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(0); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch; el.appendChild(s); } } }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch) * 1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+function fmtEscala(m){
+  const U = [['km', 1e3], ['m', 1], ['cm', 1e-2], ['mm', 1e-3], ['µm', 1e-6]];
+  for (const [u, k] of U){ if (m >= k * 0.9999 || u === 'µm'){ const v = m / k; if (v >= 999.5 && u !== 'km') continue; return fmt3(v) + ' ' + u; } }
+}
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  rueda($('vEscala'), fmtEscala(anchoVista(cam)));
+  const A = alturaDe(cam), hh = Math.round(A.h / 10) * 10;
+  rueda($('vAltura'), miles(hh) + ' m');
+  const pisoTxt = pisoDe(A.h) + (A.hondo ? ` · ${Math.round(A.hondo * 100)} cm bajo el suelo` : '');
+  if ($('vPiso')._s !== pisoTxt){ $('vPiso')._s = pisoTxt; $('vPiso').textContent = pisoTxt; }
+  let st = 0; for (let i = 0; i < EST.length; i++){ if (p >= EST[i].a - 0.4) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const cap = vis ? 'e' + st : '';
+  $('vEstacion').textContent = `${st + 1}/${NEST} · ${e.c}`;
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else { estAct = e; estIdx = st; pagAct = 0; $('fNum').textContent = `Estación ${st + 1} de ${NEST}`; $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver'); $('anuncio').textContent = `Estación ${st + 1}: ${estAct.t}`; }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena ---------- */
+function etqEstacion(st){
+  if (st === 0) return [['Páramo', PX0, y0de(PX0) - 0.004], [finca.ejemplo ? 'Finca de ejemplo' : 'Su finca', FX0, y0de(FX0) - 0.003], ['Niebla', 0.16, Y0 - 3700 * K0 - 0.012]];
+  if (st === 1){ const f = P1.fr.filter(q => q.d > 0.55 && q.d < 0.8 && q.x > -0.35 && q.x < 0.05)[0]; return [f ? ['Frailejón', f.x, yProf1(f.x, f.d) - f.Hm / F[1] * persp1(f.d) * 0.9] : null, ['Pajonal', -0.3, yProf1(-0.3, 0.95)], ['Turbera', 0.24, yProf1(0.24, 0.55)], ['Bosque', 0.8, yProf1(0.8, 0.3)], ['Niebla', -0.2, -0.08]]; }
+  if (st === 2) return [['Hojas vivas: la roseta', FR2.x - 0.1, -FR_HEROE.tronco * FR2.H - 0.05], ['Hojas secas: su ruana', FR2.x - 0.03, -0.14], ['Musgo', MUSGO2.cx, -0.03], ['Suelo negro', -0.45, 0.12], ['Raíces', 0.02, 0.1]];
+  if (st === 3) return [['Pelos', -0.22, -0.12], ['Aire quieto', 0.1, -0.05], ['La hoja', -0.1, 0.04], ['Gota de niebla', PEL.puntas.find(q => Math.abs(q.x) < 0.3)?.x || 0, PEL.puntas.find(q => Math.abs(q.x) < 0.3)?.y || -0.2]];
+  if (st === 4){ const T0 = MUS.tallos.find(t => t.prof > 0.5 && Math.abs(t.x) < 0.3) || MUS.tallos[0]; const R = T0.ramas.find(q => q.tipo === 'colgada' && q.y > 0) || T0.ramas[T0.ramas.length - 1]; return [['Cabezuela', xTallo(T0, T0.top), T0.top], ['Rama colgada', xTallo(T0, R.y), R.y + 0.04], ['Agua guardada', -0.3, 0.2]]; }
+  if (st === 5){ const q = CEL.celdas.reduce((b, c) => Math.hypot(c.x, c.y) < Math.hypot(b.x, b.y) ? c : b); const q2 = CEL.celdas.reduce((b, c) => Math.hypot(c.x - 0.2, c.y + 0.1) < Math.hypot(b.x - 0.2, b.y + 0.1) ? c : b); return [['Célula hialina', q.x, q.y], ['Célula verde', q.x + (q.u + 0.0075) * Math.cos(CEL.ang), q.y + (q.u + 0.0075) * Math.sin(CEL.ang)], (() => { const xx = -q.u * 0.72, yy = lerp(-q.v * 0.6, q.v * 0.6, q.poros[0]); return ['Poro', q.x + xx * Math.cos(CEL.ang) - yy * Math.sin(CEL.ang), q.y + xx * Math.sin(CEL.ang) + yy * Math.cos(CEL.ang)]; })()]; }
+  if (st === 6){ const m = SUE.polys.reduce((b, c) => Math.hypot(c.c[0] - 0.1, c.c[1]) < Math.hypot(b.c[0] - 0.1, b.c[1]) ? c : b); const R = SUE.raices[0].pts[20]; return [['Miga de suelo', m.c[0], m.c[1]], ['Poro con agua', (m.p[0][0] + m.c[0]) / 2 + 0.03, m.p[0][1]], ['Raicilla', R[0], R[1]]]; }
+  if (st === 7) return [['Nacimiento', NAC1, NAC1Y()], ['Quebrada', ...quebrada1(0.1)], ['100 m', NAC1 - 100 / F[1] * 0.75, NAC1Y()], ['Bosque', 0.9, yProf1(0.9, 0.2)]];
+  if (st === 8){ const [bx, by] = rio7(0.7); return [['Quebrada', ...rio7(0.45)], ['Faja de monte: 30 m', bx, by + 0.9 * 30 / F[7]], ['Toma', ...rio7((TOMA7 + 1.1) / 2)], ['Casa', CASA7, g7(CASA7) - 0.03]]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(10,14,22,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(10,14,22,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); const t = $('titulo'); if (t.style.visibility !== 'hidden' && +t.style.opacity > 0.3) o.push(t.getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  const sg = SEGS.find(s => s.st === st), fa = KF[sg.a][3], fb = KF[sg.b][3];
+  if (cap && cam.L === LVL_EST[st] && cam.f > Math.min(fa, fb) * 0.8 && cam.f < Math.max(fa, fb) * 1.25) lista = etqEstacion(st).filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / cam.f, ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W / 2 + (x - cam.cx) * ppu, ay = H * ANC + (y - cam.cy) * ppu;
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r)) || CAJAS_PISOS.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break;
+      } }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const L of [E.ln, E.halo]){ L.setAttribute('x1', ax.toFixed(1)); L.setAttribute('y1', ay.toFixed(1)); L.setAttribute('x2', lx.toFixed(1)); L.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿De dónde le llega agua al páramo, además de la lluvia?', ops:['De la niebla y la llovizna', 'De las raíces del frailejón', 'Del nacimiento'], ok:0, si:'Eso es: la niebla y la llovizna le suman agua, sobre todo cuando llueve poco.', no:'Esa no. Mire lo que pasa por el páramo casi siempre, blanco y suave.', est:[0, 1] },
+  { q:'¿Para qué le sirven al frailejón los pelos de la hoja?', ops:['Para chupar agua del aire', 'Para guardar aire quieto y calentarse sin gastar agua', 'Para espantar a los animales'], ok:1, si:'Eso es: son un abrigo de aire quieto.', no:'Esa no. Piense en el tono dorado entre los pelos.', est:[2, 3] },
+  { q:'¿Dónde guarda el agua el musgo de turbera?', ops:['En unas células grandes y vacías', 'En la raíz', 'En las flores'], ok:0, si:'Eso es: en sus células hialinas, y entre sus ramitas.', no:'Esa no. Mire las células que se llenan de azul.', est:[4, 5] },
+  { q:'El suelo negro del páramo se seca del todo. ¿Qué pasa?', ops:['Vuelve a ser igual con el primer aguacero', 'Pierde parte de su fuerza para retener agua, y no la recupera', 'Retiene más agua que antes'], ok:1, si:'Eso es: y no se recuperó ni en potreros de 50 años.', no:'Esa no. Recuerde lo que midieron en el sur de Ecuador.', est:[6] },
+  { q:'¿Cuánto monte pide la ley alrededor de un nacimiento?', ops:['10 metros', 'Al menos 100 metros a la redonda', 'Ninguno'], ok:1, si:'Eso es: y 30 metros a cada lado de las quebradas.', no:'Esa no. Mire la raya blanca junto al nacimiento.', est:[7, 8] },
+];
+function preguntaDe(st){ const i = PREG.findIndex(q => q.est.includes(st)); return i < 0 ? 0 : i; }
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó con el agua, de la niebla a su finca.</p><p>La próxima vez que suba al páramo, mire el frailejón, el musgo y la tierra negra: ahí se guarda su agua.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Subir a la montaña</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op'; b.textContent = o;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops);
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(desde){ rq = desde || 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T * PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function paradas(){ const out = []; for (let i = 0; i < NEST; i++) out.push(estP(i)); return out; }
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && e.target === bBajar)) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: viento del páramo (ruido filtrado) y un bordón que
+   se oscurece al entrar a lo pequeño
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const n = ac.sampleRate * 4, b = ac.createBuffer(1, n, ac.sampleRate), d = b.getChannelData(0); let last = 0;
+      for (let i = 0; i < n; i++){ const w = Math.random() * 2 - 1; last = (last + 0.012 * w) / 1.012; d[i] = last * 4.2 + w * 0.03; }
+      const src = ac.createBufferSource(); src.buffer = b; src.loop = true;
+      const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 420; bp.Q.value = 0.6; const gl = ac.createGain(); gl.gain.value = 0.7;
+      src.connect(bp); bp.connect(gl); gl.connect(master); src.start();
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.frequency.value = 600; filtro.connect(master);
+      const oscs = [[49, 'triangle', 0.16], [73.4, 'sine', 0.11], [98, 'sine', 0.08]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, bp, gl, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.14 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? '♪ sí' : '♪ no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el viento');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){
+  if (!audio || !audio.on) return; const t = audio.ac.currentTime;
+  const afuera = cam.L <= 2 || cam.L === 7 ? 1 : 0.25;
+  audio.gl.gain.setTargetAtTime(0.2 + 0.6 * afuera, t, 0.3);
+  audio.bp.frequency.setTargetAtTime(afuera > 0.5 ? 420 : 220, t, 0.4);
+  audio.filtro.frequency.setTargetAtTime(afuera > 0.5 ? 650 : 380, t, 0.4);
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W; ANC = PORT ? 0.36 : 0.47; armaKF();
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? (mb + 14) + 'px' : '';
+  pObj = pDeScroll(); sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (auto && !RM){ const y = scrollY + auto * (maxScroll() / T) * (T / 100) * dt * 1.0; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){
+    let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i);
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+  }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      p = rmDesde; render(); bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.clearRect(0, 0, buf.width, buf.height); bctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = cv.width; copia.height = cv.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      p = rmHacia; cam = render();
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1 - (rmT * rmT * (3 - 2 * rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render();
+    actualizaUI(cam); sonido(cam);
+    sucio = (RM && rmT < 1);
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+SPR_NUBE = spriteNube();
+crearPatrones();
+redim();
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas; no altera nada) */
+window.__descenso = {
+  T, SEGS, estP, camAt, NEST, anchoVista: pp => anchoVista(camAt(pp)), altura: pp => alturaDe(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; },
+  costo(pp, n){ const antes = p; p = pp; render(); const t0 = performance.now(); for (let i = 0; i < (n || 10); i++) render(); const ms = (performance.now() - t0) / (n || 10); p = antes; sucio = true; return ms; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  finca(){ return { ...finca, ALT_F, ALT_P, piso: pisoDe(ALT_F) }; },
+  repaso(){ abreRepaso(0); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, GLOS, PREG, vars }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]).sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1) / ((marcas[marcas.length - 1] - marcas[0]) / 1000), medianaMs: dts[Math.floor(dts.length / 2)], p95Ms: dts[Math.floor(dts.length * 0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

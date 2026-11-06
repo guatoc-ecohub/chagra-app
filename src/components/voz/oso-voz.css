@@ -1,0 +1,88 @@
+/* Dirección local: pies quietos, mirada inmediata, cabeza y peso con demora.
+   Ningún reloj de idle ni filtro animado compite con esta actuación. */
+.oso-voz { position: relative; width: min(260px, 100%); aspect-ratio: 1; margin-inline: auto; }
+.oso-voz.oso-ventana-oso { width: 100%; max-width: 440px; height: 100%; aspect-ratio: 34 / 42; margin: 0; }
+.oso-voz > svg { position: relative; width: 100%; height: 100%; overflow: visible; }
+.oso-voz-suelo { position: absolute; bottom: 5%; left: 15%; width: 73%; height: 6%; border-radius: 50%; background: #c5b793; }
+.oso-voz [data-creature] * { animation: none !important; }
+.oso-voz .rh-mirada { transform: translate(0, 0); transition: transform 180ms ease-out; }
+.oso-voz .osb-cabeza { transform: rotate(0deg); transition: transform 650ms cubic-bezier(.22,.61,.36,1) 160ms; }
+.oso-voz .osb-columna { transform: rotate(0deg); transition: transform 900ms cubic-bezier(.22,.61,.36,1) 340ms; }
+.oso-voz .crt-brazo-l { transition: transform 850ms ease-out 480ms; }
+.oso-voz .osb-hocico { transition: transform 420ms ease-out 220ms; }
+
+/* ═══ LAS CINCO POSTURAS — cada estado es un cuerpo distinto, no un rótulo.
+   La columna pivota en la pelvis (center bottom), la testa en la quijada
+   (50% 88%) y la zarpa libre en el hombro. En SVG el rotate positivo cae a la
+   DERECHA y el negativo a la IZQUIERDA; la zarpa libre gira hacia el cuerpo
+   con rotate negativo y se suelta hacia afuera con positivo. Inclinar la
+   columna ES cambiar el apoyo: adelante = peso a la punta, atrás = al talón. */
+
+/* REPOSO — disponible y tranquilo: erguido, peso parejo, zarpa en jarra. */
+.oso-voz[data-estado='reposo'] { --oso-cabeza: 0deg; --oso-peso: 0deg; --oso-ojo: 0px; }
+.oso-voz[data-estado='reposo'] .osb-cabeza { transform: rotate(0deg); }
+.oso-voz[data-estado='reposo'] .osb-columna { transform: rotate(0deg); }
+.oso-voz[data-estado='reposo'] .crt-brazo-l { transform: rotate(0deg); }
+
+/* ESCUCHANDO — atención dirigida a la persona: la mole se inclina adelante y
+   la testa se ladea (oreja al frente); la zarpa libre se suelta, la mirada
+   sube hacia quien habla. */
+.oso-voz[data-estado='escuchando'] { --oso-cabeza: -12deg; --oso-peso: -8deg; --oso-ojo: .5px; }
+.oso-voz[data-estado='escuchando'] .osb-columna { transform: rotate(-8deg); }
+.oso-voz[data-estado='escuchando'] .osb-cabeza { transform: rotate(-12deg); }
+.oso-voz[data-estado='escuchando'] .crt-brazo-l { transform: rotate(6deg); }
+.oso-voz[data-estado='escuchando'] .rh-mirada { transform: translate(.5px, -.25px); }
+
+/* PENSANDO — recogido, pausa activa: se encorva hacia el bastón, la testa cae
+   al lado opuesto del escuchar y la mirada baja; la zarpa libre roza la panza
+   y el hocico se recoge. */
+.oso-voz[data-estado='pensando'] { --oso-cabeza: 13deg; --oso-peso: 6deg; --oso-ojo: -.6px; }
+.oso-voz[data-estado='pensando'] .osb-columna { transform: rotate(6deg); }
+.oso-voz[data-estado='pensando'] .osb-cabeza { transform: rotate(13deg); }
+.oso-voz[data-estado='pensando'] .crt-brazo-l { transform: rotate(-12deg); }
+.oso-voz[data-estado='pensando'] .osb-hocico { transform: translateY(.3px); }
+.oso-voz[data-estado='pensando'] .rh-mirada { transform: translate(-.6px, .4px); }
+
+/* HABLANDO — articula: erguido, la testa alta y la zarpa libre gesticula
+   (el lip-sync corre solo; acá solo se le da cuerpo al gesto). */
+.oso-voz[data-estado='hablando'] { --oso-cabeza: -6deg; --oso-peso: -2deg; --oso-ojo: .2px; }
+.oso-voz[data-estado='hablando'] .osb-columna { transform: rotate(-2deg); }
+.oso-voz[data-estado='hablando'] .osb-cabeza { transform: rotate(-6deg); }
+.oso-voz[data-estado='hablando'] .crt-brazo-l { transform: rotate(-25deg); }
+.oso-voz[data-estado='hablando'] .rh-mirada { transform: translate(.2px, -.2px); }
+
+/* ERROR — interrupción con salida clara: se echa ATRÁS (apoyo al talón) y
+   alza la zarpa libre al costado; es el espejo del escuchar. */
+.oso-voz[data-estado='error'] { --oso-cabeza: 7deg; --oso-peso: 10deg; --oso-ojo: .15px; }
+.oso-voz[data-estado='error'] .osb-columna { transform: rotate(10deg); }
+.oso-voz[data-estado='error'] .osb-cabeza { transform: rotate(7deg); }
+.oso-voz[data-estado='error'] .crt-brazo-l { transform: rotate(40deg); }
+.oso-voz[data-estado='error'] .rh-mirada { transform: translate(.15px, .5px); }
+
+/* Una toma al llegar: primero averigua quién llegó, luego acomoda la mole.
+   Las vars --oso-* de cada estado hacen que la toma aterrice EXACTA en la
+   postura final, sin salto al terminar la entrada. */
+.oso-voz [data-creature] .rh-mirada { animation: oso-voz-llega-ojo 1.5s backwards !important; }
+.oso-voz [data-creature] .osb-cabeza { animation: oso-voz-llega-cabeza 1.5s backwards !important; }
+.oso-voz [data-creature] .osb-columna { animation: oso-voz-llega-peso 1.5s backwards !important; }
+@keyframes oso-voz-llega-ojo { 0%, 8% { transform: translate(-.5px, .25px); } 25%, 100% { transform: translateX(var(--oso-ojo, 0px)); } }
+@keyframes oso-voz-llega-cabeza { 0%, 22% { transform: rotate(3deg); } 65%, 100% { transform: rotate(var(--oso-cabeza, 0deg)); } }
+@keyframes oso-voz-llega-peso { 0%, 38% { transform: rotate(.5deg); } 100% { transform: rotate(var(--oso-peso, 0deg)); } }
+.oso-voz [data-creature] .rh-blink { animation: oso-voz-parpadeo 900ms linear 1 !important; }
+@keyframes oso-voz-parpadeo { 0%, 66%, 82%, 100% { transform: scaleY(1); } 73% { transform: scaleY(.12); } }
+
+.agent-voz-campo { display: flex; align-items: center; gap: 12px; padding: 8px 16px; margin-bottom: 8px; background: #f6edda; color: #282d20; border: 1px solid #756d52; border-radius: 18px; }
+.agent-voz-campo .oso-voz { width: 118px; flex: 0 0 118px; margin: 0; }
+.agent-voz-campo-contenido { flex: 1; min-width: 0; }
+.agent-voz-campo small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: #53603c; }
+.agent-voz-campo p { color: #282d20; }
+.agent-voz-campo [data-testid='voice-status-strip'] { margin: 0; }
+.voz-campo-estado { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-block: 6px; }
+.voz-campo-estado p { min-width: 100px; }
+.agent-voz-campo button { background: #334b2d; color: #fffbea; border: 1px solid #334b2d; min-height: 44px; }
+.agent-voz-campo button:focus-visible { outline: 3px solid #a65a20; outline-offset: 3px; }
+.agent-voz-campo [data-testid='voice-notice'] { color: #282d20; }
+@media (max-height: 650px) { .agent-voz-campo .oso-voz { width: 76px; flex-basis: 76px; } }
+@media (prefers-reduced-motion: reduce) {
+  .oso-voz.oso-voz [data-creature] * { animation: none !important; transition: none !important; }
+}

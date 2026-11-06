@@ -1,0 +1,195 @@
+/* La noche es el espacio principal; el cuaderno tiene un límite de altura propio. */
+.luci-ventana {
+  --luci-luz: .85;
+  --luci-agua: .19;
+  --luci-compas: 3.6s;
+  --luci-amplitud: .78;
+  --luci-papel: #e8ead6;
+  color: var(--luci-papel);
+  background: #06171c;
+  font: 16px/1.5 'Trebuchet MS', sans-serif;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto auto;
+  isolation: isolate;
+  overflow-x: clip;
+  color-scheme: dark;
+}
+.luci-ventana *, .luci-ventana *::before, .luci-ventana *::after { box-sizing: border-box; }
+.luci-ventana :is(h1, h2, p, ol) { margin: 0; }
+.luci-ventana button, .luci-ventana a { -webkit-tap-highlight-color: transparent; }
+.luci-ventana button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; min-height: 44px; padding: 8px 12px; }
+.luci-ventana button:disabled { opacity: .55; cursor: default; }
+.luci-ventana :is(button, a, summary, [tabindex]):focus-visible { outline: 2px solid #ffe69b; outline-offset: -2px; border-radius: 4px; }
+.luci-ventana button:hover { background-color: #c6d7a816; }
+.luci-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px max(18px, env(safe-area-inset-left)); border-bottom: 1px solid #9ebf9a1a; z-index: 1; }
+.luci-cabecera > a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 9px; min-height: 44px; font: bold 25px Georgia, serif; }
+.luci-punto { color: #e8cc70; }
+.luci-nombre { font-size: 14px; }
+.luci-nombre > span { color: #a9bba9; }
+.luci-cabecera button { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.luci-encuentro { position: relative; overflow: hidden; }
+.luci-paisaje { position: relative; height: clamp(360px, 52svh, 620px); overflow: hidden; pointer-events: none; }
+.luci-noche { position: absolute; width: 100%; max-width: 1200px; height: 100%; top: 0; left: 50%; transform: translateX(-50%); }
+.luci-saludo { position: absolute; left: 7%; top: 8%; pointer-events: none; max-width: 35%; }
+.luci-ceja { color: #bac6a6; font-size: 10px; letter-spacing: .2em; }
+.luci-saludo h1 { font: normal clamp(28px, 3.4vw, 49px)/1.12 Georgia, serif; margin-top: 12px; max-width: 17ch; text-wrap: balance; text-shadow: 0 2px 16px #06171c; }
+.luci-saludo h1 em { color: #d3d69f; font-weight: normal; }
+.luci-presencia { position: relative; margin: 0 7% 18px; display: flex; align-items: center; gap: 9px; font-size: 13px; color: #c8d1b8; }
+.luci-latido { width: 6px; height: 6px; background: #ead686; border-radius: 50%; box-shadow: 0 0 12px #e1d07288; animation: luci-superficie var(--luci-compas) ease-in-out infinite; }
+/* La misma fuente recorre las superficies, el abdomen y su reflejo. */
+.luci-hoja-luz { opacity: .55; }
+.luci-viajera .luci-demo-cuerpoRig > ellipse:first-child { opacity: calc(var(--luci-luz) * .35); }
+.luci-luz-local { opacity: var(--luci-luz); }
+.luci-suelo-luz, .luci-reflejo { opacity: var(--luci-agua); }
+.luci-sombra-hoja { transform-origin: 520px 442px; animation: luci-sombra 11s ease-in-out infinite; }
+.luci-ventana [data-creature='luciernaga'] .luci-demo-cuerpoRig :is(.luci-linterna-core, .luci-linterna-halo, .luci-luz-rebote) {
+  animation: none;
+  opacity: var(--luci-luz);
+}
+.luci-ventana [data-pose='vuela'] .luci-demo-pliegueAla { animation: luci-alas .11s steps(2, end) infinite; }
+.luci-ventana [data-pose='vuela'] .luci-demo-patasBiologicas { transform: scaleY(.86); }
+.luci-ventana .luci-demo-antena { animation: luci-antena 8s ease-in-out infinite; }
+.luci-ventana .luci-demo-antenaDer { animation-delay: -3s; }
+.luci-ventana .luci-demo-cuerpoRig.rh-boil { animation: none; }
+.luci-bruma { animation: luci-bruma 9s ease-in-out infinite; }
+.luci-lejania { transform-origin: center bottom; animation: luci-fondo 8s ease-in-out infinite; }
+.luci-primer-plano { transform-origin: center bottom; animation: luci-fondo 6s ease-in-out infinite reverse; }
+.luci-onda { transform-origin: 622px 468px; animation: luci-onda 4.8s ease-out infinite; }
+.luci-onda-dos { animation-delay: -4s; }
+.luci-motas > circle { animation: luci-mota 6s ease-in-out infinite; }
+.luci-motas .luci-mota-b { animation-delay: -5s; animation-duration: 8s; }
+.luci-motas .luci-mota-c { animation-delay: -9s; }
+.luci-ventana[data-estado='mirando'] { --luci-amplitud: .96; }
+.luci-ventana[data-estado='escuchando'] { --luci-compas: 4.8s; --luci-amplitud: .88; }
+.luci-ventana[data-estado='pensando'] { --luci-compas: 6s; --luci-amplitud: .64; }
+.luci-ventana[data-estado='hablando'] { --luci-compas: 2.4s; --luci-amplitud: 1; }
+.luci-ventana[data-estado='hablando'] .luci-demo-boca { animation: luci-palabra .8s ease-in-out infinite; }
+.luci-muestra { position: absolute; left: 7%; bottom: 17%; width: clamp(128px, 23%, 238px); max-height: 48%; overflow: auto; border: 1px solid #b7be8266; border-radius: 6px; background: #0d2525; box-shadow: 6px 10px 0 #020d1455; }
+.luci-muestra > :is(svg, canvas, img, video) { display: block; width: 100%; max-height: 180px; object-fit: contain; }
+.luci-muestra p { padding: 7px 10px; color: #d0d9bc; font-size: 12px; }
+.luci-sonido { padding: 16px 8px; }
+.luci-sonido > svg { margin: 0 auto 10px; display: block; }
+.luci-medidor { height: 8px; background: #30483c; border-radius: 4px; overflow: hidden; }
+.luci-medidor > span { display: block; height: 100%; background: #e8d887; transform-origin: left; transform: scaleX(var(--nivel, .035)); }
+/* Una franja baja de lectura, con desplazamiento propio y sin cubrir la escena. */
+.luci-cuaderno { width: min(100% - 36px, 880px); justify-self: center; position: relative; border-block: 1px solid #acb98140; border-left: 2px solid #d3c579; background: #102729; border-radius: 3px 9px 9px 3px; box-shadow: -8px -4px 32px #c9ba4810; }
+.luci-cuaderno-tapa { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; }
+.luci-cuaderno-tapa > span { font: 19px Georgia, serif; }
+.luci-cuaderno-tapa small { font: 12px 'Trebuchet MS', sans-serif; color: #b9c7ac; margin-left: 14px; }
+.luci-cuaderno > div:not([hidden]) { height: clamp(174px, 24svh, 220px); display: flex; flex-direction: column; }
+.luci-cuaderno .voz-cuaderno { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.luci-cuaderno .voz-cuaderno-cabecera { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.luci-cuaderno .voz-cuaderno-nav { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #c7c98d26; padding-inline: 4px; }
+.luci-cuaderno .voz-cuaderno-nav button { font-size: 12px; padding-block: 4px; }
+.luci-cuaderno .voz-conversacion-scroll { min-height: 0; flex: 1; overflow: auto; padding: 10px 16px 18px; overscroll-behavior: contain; scrollbar-color: #72876d #102729; scrollbar-width: thin; }
+.luci-cuaderno .voz-turno { padding: 12px 0; border-bottom: 1px solid #c7c98d26; overflow-wrap: anywhere; }
+.luci-cuaderno .voz-turno:first-child { padding-top: 0; }
+.luci-cuaderno .voz-turno > header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; font-size: 12px; color: #ced8bb; }
+.luci-cuaderno .voz-palabras { white-space: pre-wrap; }
+.luci-cuaderno .voz-turno[data-persona='true'] .voz-palabras { font: italic 19px/1.5 Georgia, serif; }
+.luci-cuaderno .agent-md { font: inherit; color: inherit; }
+.luci-cuaderno .agent-md :is(p, ul, ol, blockquote, h3, h4) { color: inherit; margin-block: 0 10px; }
+.luci-cuaderno .agent-md :is(ul, ol) { padding-left: 22px; }
+.luci-cuaderno .agent-md ul { list-style: disc; }
+.luci-cuaderno .agent-md ol { list-style: decimal; }
+.luci-cuaderno .voz-confianza { display: flex; gap: 7px; align-items: start; font-size: 13px; color: #efda94; margin: 10px 0; }
+.luci-cuaderno .voz-confianza svg { flex-shrink: 0; }
+.luci-cuaderno .voz-confianza[data-nivel='verde'] { color: #c2e0ac; }
+.luci-cuaderno .voz-confianza[data-nivel='rojo'], .luci-cuaderno .voz-advertencia[data-nivel='rojo'] { color: #ffbda5; }
+.luci-cuaderno .voz-advertencia { border-left: 2px solid #dac884; padding: 8px 12px; margin: 10px 0; color: #efda94; font-size: 14px; }
+.luci-cuaderno .voz-fuentes { font-size: 14px; color: #d4ddbe; }
+.luci-cuaderno .voz-fuentes summary { min-height: 44px; padding-block: 10px; cursor: pointer; }
+.luci-cuaderno .voz-fuentes a { display: inline-block; padding-block: 10px; color: #f2df94; text-decoration: underline; }
+.luci-cuaderno .voz-fuentes li { margin: 12px 0; }
+.luci-cuaderno .voz-fuentes li > :is(span, strong) { display: block; }
+.luci-cuaderno .voz-leer { display: flex; align-items: center; gap: 8px; color: #f2df94; text-decoration: underline; }
+.luci-cuaderno .voz-foto-conversacion { max-width: 100%; max-height: 160px; object-fit: contain; }
+.luci-cuaderno .voz-conversacion-vacia { font: italic 19px/1.5 Georgia, serif; color: #c6d2b7; }
+.luci-cuaderno .voz-solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.luci-archivo { display: flex; flex-wrap: wrap; justify-content: space-between; padding-inline: 4px; border-top: 1px solid #c7c98d26; }
+.luci-archivo button { font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.luci-archivo p { font-size: 13px; padding: 8px; }
+.luci-pie { width: min(100%, 920px); justify-self: center; padding: 14px 18px max(12px, env(safe-area-inset-bottom)); text-align: center; }
+.luci-acciones { display: flex; justify-content: center; gap: 12px; }
+.luci-acciones button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; border: 1px solid #b6c69a66; border-radius: 6px; padding: 10px 20px; }
+.luci-acciones svg { flex-shrink: 0; }
+.luci-acciones .luci-principal { color: #1b2c20; background: #e2d58f; border-color: #e2d58f; }
+.luci-acciones .luci-principal:hover { background: #f3e4a1; }
+.luci-pie .luci-ejemplo { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: #d0daba; }
+.luci-limite { font-size: 12px; color: #a6bba9; max-width: 64ch; margin-inline: auto !important; }
+.luci-aviso { background: #23362d; padding: 8px 12px; margin-bottom: 12px !important; border-left: 2px solid #e2d58f; font-size: 14px; text-align: left; }
+.luci-recorrido ol { display: flex; justify-content: center; list-style: none; padding: 0; }
+.luci-recorrido li { flex: 1; max-width: 140px; }
+.luci-recorrido button { width: 100%; font-size: 13px; border-bottom: 2px solid #52664b; }
+.luci-recorrido button span { margin-right: 6px; color: #a8ba9c; }
+.luci-recorrido button[aria-current='step'] { border-color: #edda86; color: #edda86; }
+.luci-recorrido > p { padding: 8px 0 12px; font-size: 13px; color: #ccd4bb; }
+@keyframes luci-alas { from { transform: scale(1.18, .9); } to { transform: scale(.8, 1.1); } }
+@keyframes luci-palabra { 0%, 100% { transform: scaleY(.9); } 45% { transform: scaleY(1.3); } }
+@keyframes luci-superficie { 0%, 100% { opacity: .38; } 45% { opacity: var(--luci-amplitud); } }
+@keyframes luci-sombra { 0%, 100% { opacity: .7; transform: scaleX(.95); } 50% { opacity: .45; transform: scaleX(1.08) translateX(5px); } }
+@keyframes luci-antena { 0%, 65%, 100% { transform: rotate(0deg); } 72%, 84% { transform: rotate(7deg); } 78% { transform: rotate(-3deg); } }
+@keyframes luci-bruma { 0%, 100% { transform: translateX(-48px); opacity: .18; } 50% { transform: translateX(64px); opacity: .38; } }
+@keyframes luci-fondo { 0%, 100% { transform: skewX(-2deg); } 50% { transform: skewX(3deg); } }
+@keyframes luci-onda { 0% { transform: scale(.4); opacity: 0; } 15% { opacity: .4; } 100% { transform: scale(1.8); opacity: 0; } }
+@keyframes luci-mota { 0%, 100% { opacity: .1; transform: translate(0, 8px); } 45% { opacity: .65; transform: translate(34px, -44px); } 75% { opacity: .3; transform: translate(-16px, -58px); } }
+/* Luces pequeñas a distintas distancias; la viajera conserva el foco principal. */
+.luci-luz-errante { animation: luci-errante var(--duracion) ease-in-out var(--demora) infinite; }
+@keyframes luci-errante {
+  0%, 100% { transform: translate(-16px, 12px); opacity: .08; }
+  24% { transform: translate(12px, -20px); opacity: .65; }
+  48% { transform: translate(38px, -8px); opacity: .18; }
+  72% { transform: translate(4px, 28px); opacity: .5; }
+}
+/* Pausar conserva la pose y la luz. No desmonta ni reinicia el cuerpo. */
+.luci-ventana[data-pausada='true'] *, .luci-ventana[data-pausada='true'] *::before, .luci-ventana[data-pausada='true'] *::after { animation-play-state: paused !important; }
+@media (min-width: 760px) { .luci-cabecera { padding-inline: 5%; } }
+@media (max-width: 759px) {
+  .luci-saludo { position: relative; left: auto; top: auto; padding: 20px 6% 0; max-width: none; }
+  .luci-saludo h1 { max-width: 24ch; }
+  .luci-paisaje { height: clamp(300px, 48svh, 460px); }
+  .luci-muestra { position: relative; left: auto; bottom: auto; width: min(88%, 300px); max-height: 220px; margin: 12px 6%; }
+}
+
+@media (min-width: 760px) {
+  .luci-ventana { grid-template-rows: auto minmax(0, 1fr) auto auto; height: 100svh; min-height: 100svh; overflow: hidden; }
+  .luci-encuentro { min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  .luci-paisaje { position: absolute; inset: 0 0 32px; width: 100%; height: auto; }
+  .luci-saludo { position: relative; left: auto; top: auto; z-index: 2; margin-top: 0; padding: 0 0 0 7%; width: 42%; max-width: 520px; pointer-events: auto; }
+  .luci-saludo .voz-finca-aviso { pointer-events: auto; transform: translateY(-4px); }
+  .luci-presencia { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; margin: 0 7% 12px; }
+}
+
+@media (max-width: 759px) {
+  .luci-ventana { grid-template-rows: auto minmax(0, 1fr) auto auto; min-height: 100svh; height: 100svh; overflow-y: hidden; }
+  .luci-encuentro { overflow: visible; }
+  .luci-paisaje { height: 250px; }
+  .luci-cuaderno > div:not([hidden]) { height: 128px; }
+  .luci-pie { padding-top: 8px; }
+  .luci-limite { line-height: 1.3; }
+}
+
+@media (max-width: 480px) {
+  .luci-saludo { padding-top: 12px; }
+  .luci-saludo h1 { margin-top: 8px; }
+  .luci-ventana .voz-finca-aviso { margin-top: 10px; padding: 10px 12px; }
+  .luci-ventana .voz-finca-aviso__texto { font-size: 13px; line-height: 1.35; }
+  .luci-ventana .voz-finca-aviso__acciones { margin-top: 8px; }
+}
+@media (max-width: 480px) {
+  .luci-nombre > span, .luci-cabecera button > span { display: none; }
+  .luci-ceja { font-size: 9px; letter-spacing: .15em; }
+  .luci-saludo h1 { font-size: 27px; max-width: 17ch; }
+  .luci-cuaderno { width: calc(100% - 24px); }
+  .luci-cuaderno-tapa small { font-size: 11px; margin-left: 8px; }
+  .luci-cuaderno-tapa > span { font-size: 17px; }
+  .luci-acciones { gap: 8px; }
+  .luci-acciones button { padding-inline: 12px; font-size: 16px; }
+  .luci-archivo button { font-size: 12px; padding-inline: 8px; }
+  .luci-pie { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luci-ventana *, .luci-ventana *::before, .luci-ventana *::after { animation: none !important; transition: none !important; }
+  .luci-motas, .luci-bruma { opacity: .25; }
+}

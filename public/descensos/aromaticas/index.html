@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aromáticas — el viaje del olor</title>
+<meta name="description" content="De la menta piperita a la glándula y el mentol; cultivar, cosechar, secar y vender con fuentes. Saber tradicional, no medicina.">
+<meta name="color-scheme" content="dark light">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(12,16,24,.66); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#0b0d1e;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#0b0d1e;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#17311d}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1f3d24;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1f3d24;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(236,244,240,.95),0 0 14px rgba(236,244,240,.8)}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline}
+.rueda{line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+#frase .leyenda{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:.5em;font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase .leyenda b{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.05em;margin-right:.35em}
+#frase .luz{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);margin-top:.5em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#frase .luz .barra{flex:0 0 6rem;height:5px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+#frase .luz .barra i{display:block;height:100%;background:#f2e3a0;width:100%}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(10,14,22,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(12,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(30,36,50,.8);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+#girar{display:none}
+#girar.ver{display:inline-block}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#12151f;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(5,7,14,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#12151f;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#fuentes code{font-family:var(--mono);font-size:.9em}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#1a1e2b;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op .letra{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:#10131c;width:100%;aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.solo-ancho{display:inline-block}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 14px}
+  .solo-ancho{display:none}
+  #girar.ver{position:fixed;right:var(--gut);top:var(--girar-top,150px)}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 10px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+
+#titulo{background:rgba(238,241,215,.94);border-radius:14px;padding:16px 20px;max-width:32rem}
+#titulo h1{font-size:clamp(2.2rem,6vw,4.6rem)}
+#titulo #origenPiso{font-family:var(--sans);font-style:normal;font-size:.9rem}
+#medidor .val{font-size:1rem} #medidor .val.pq{font-size:.9rem}
+#frase{max-height:calc(100dvh - 270px);overflow:auto}
+#controles{max-width:42rem} #girar{display:none!important}
+@media(max-width:640px){
+ #controles{right:8px;left:8px;bottom:8px;max-width:none;justify-content:center;gap:5px}
+ #controles .btn{font-size:.86rem;padding:10px 9px;min-height:40px}
+ #frase{bottom:105px;max-height:calc(100dvh - 310px)}
+ #titulo{left:12px;right:12px;padding:12px 16px;max-width:none}
+ #titulo h1{font-size:2.4rem} #titulo p{font-size:1.05rem;margin:.4em 0 0}
+ #medidor{left:12px;right:12px;min-width:0;max-width:none;padding:9px 12px}
+ #medidor .rot{font-size:.88rem} #medidor .nota{font-size:.85rem;max-width:none}
+ #medidor .regla{font-size:.85rem} #medidor .estacion{font-size:.85rem}
+ #frase .pie{gap:6px} #frase .pag{font-size:.85rem;min-width:3em} #bEscuchar{font-size:.8rem;padding:8px}
+ #frase p{font-size:1.05rem;line-height:1.38} #frase .nota{font-size:.88rem}
+}
+
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Viaje ilustrado de la menta piperita al mentol, la cosecha y el secado" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>El viaje del olor</h1>
+  <p>De la mata a la hoja, la glándula y el mentol. Después, cosechar y secar bien.</p>
+  <p class="pista">Saber tradicional, no medicina.</p><p id="origenPiso"></p>
+</header>
+
+<aside id="medidor" aria-label="Medidor del descenso">
+  <div class="fila"><span class="rot">Vista del descenso</span><span class="val rueda" id="vEscala">Mata ilustrada</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">Sin escala física</span></div>
+  <div class="regla"><span>Escala:</span><b id="vRegla">No es una medición</b></div>
+  <div class="estacion"><span id="vEstacion">1/6 · La mata</span><span id="vLuz">luz alta</span></div>
+  <div class="nota" id="vNota">Esquemas sin escala física.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 6</div>
+  <h2 id="fTit">La menta piperita</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="girar" aria-label="Girar la hélice 90 grados sobre su eje">Girar 90°</button>
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón">Sonido: no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso"><b>Saber tradicional, no medicina.</b> No hay dosis ni promesas de cura. Cada especie necesita identificación y manejo propios. Los dibujos muestran relaciones, no tamaños medidos. Las fuentes están transcritas aquí para leerlas sin señal; los enlaces necesitan conexión.</p>
+    <ol id="listaFuentes"><li id="f1"><b>RHS · How to grow Mint</b>. Identidad, usos culinarios, propagación, humedad, compost, cobertura, recipientes y polinizadores. Advierte sobre Mentha pulegium. Guía británica: no se traslada su calendario a Colombia. <a href="https://www.rhs.org.uk/herbs/mint/grow-your-own" target="_blank" rel="noopener">Documento</a></li><li id="f2"><b>Turner, Gershenzon y Croteau · Development of Peltate Glandular Trichomes of Peppermint</b>. Artículo primario: disco de ocho células secretoras y aceite bajo la cutícula. Véase también Distribution of Peltate Glandular Trichomes, doi:10.1104/pp.124.2.655, para mentona y mentol durante el desarrollo. <a href="https://doi.org/10.1104/pp.124.2.665" target="_blank" rel="noopener">Documento</a></li><li id="f3"><b>FiBL / Caritas · Harvest and post-harvest handling of herbs</b>. Guía técnica de Kosovo: menta piperita, cosecha al botón floral/inicio de floración, hojas secas y corte a unos 10 cm (página PDF 16); relación hojas frescas/secas 6:1 (página PDF 24); bandejas de 1–1,5 m², 50 cm sobre suelo y 40 cm entre ellas (página PDF 26); secado 38–42 °C (página PDF 29); hoja entera conserva mejor aceite (página PDF 32); empaque e identificación (páginas PDF 33–35), almacenamiento (páginas PDF 37–38). Son orientaciones, no rendimiento validado localmente. <a href="https://www.fibl.org/fileadmin/documents/shop/1233-harvest-post-harvest-herbs.pdf" target="_blank" rel="noopener">Documento</a></li><li id="f4"><b>PubChem · Menthol, CID 1254</b>. Fórmula molecular C10H20O. Dibujo de conectividad; hidrógenos omitidos, sin escala ni estereoquímica. <a href="https://pubchem.ncbi.nlm.nih.gov/compound/1254" target="_blank" rel="noopener">Documento</a></li><li id="f5"><b>EMA · Menthae piperitae folium</b>. Uso digestivo tradicional documentado; riesgos de reflujo/acidez y problemas biliares. Se cita para contexto y precauciones, sin copiar dosis ni recomendar tratamiento. <a href="https://www.ema.europa.eu/en/medicines/herbal/menthae-piperitae-folium" target="_blank" rel="noopener">Documento</a></li><li id="f6"><b>NCCIH · Peppermint Oil: Usefulness and Safety</b>. Aceite concentrado: irritación, riesgos al aplicarlo en la cara de bebés y niños pequeños. La seguridad en embarazo/lactancia para cantidades medicinales no está bien establecida. <a href="https://www.nccih.nih.gov/health/peppermint-oil" target="_blank" rel="noopener">Documento</a></li><li id="f7"><b>Cuentas didácticas · elaboración de esta lección</b>. Datos inventados, no ensayos: (3−2)/3 × 100 ≈ 33 %; 12 kg ÷ 6 = 2 kg usando la referencia FiBL; 1 000−100 = 900 g y 900/30 = 30 paquetes. Ninguna cifra es una dosis o una previsión de precio. Las seis estaciones y numeraciones son organización editorial. <a href="#f7" target="_blank" rel="noopener">Documento</a></li><li id="f8"><b>NCHFP / University of Georgia · Herbs</b>. Secar con ventilación y sin sol directo; la menta puede enmohecer si no seca pronto; hojas que se desmenuzan y tallos que quiebran como señales domésticas. Envase cerrado, sitio fresco, seco y oscuro. No certifican inocuidad comercial. <a href="https://nchfp.uga.edu/how/dry/recipes/herbs/" target="_blank" rel="noopener">Documento</a></li><li id="f9"><b>IGAC · Actualización de áreas homogéneas de tierras, tabla 1</b>. Pisos por altitud: cálido 0–1 000 m, templado 1 000–2 000 m, frío 2 000–3 000 m; en límites se elige el superior. Desde 3 000 m la lección exige revisión humana; no delimita páramo ni propone abrir cultivo. Coordenadas y municipio no se guardan ni se usan para adivinar clima. <a href="https://www.igac.gov.co/sites/default/files/listadomaestro/in-agr-pc05-01_v1_actualizacion_de_areas_homogeneas_de_tierras.pdf" target="_blank" rel="noopener">Documento</a></li></ol>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso — de la mata al aroma y a la venta.
+   Cada escala vive dentro de la anterior (portal). La cámara
+   baja por un parámetro p que solo mueve el usuario (scroll,
+   dedo, teclado o «Bajar»). Nada se mueve sin ese dato.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'); const texB = document.createElement('canvas');
+let texOK = false;
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+/* Voronoi por recorte de semiplanos, con cubetas para vecinos */
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function roundPoly(c, pts, k){ // polígono redondeado por puntos medios
+  const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath();
+}
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   ============================================================ */
+
+// Scene units are diagram coordinates, never botanical measurements.
+const F=[1,1,1,1,1,1];
+const PORTAL=[{x:.055,y:-.065,s:.10},{x:.10,y:.02,s:.10},{x:0,y:-.035,s:.10},null,{x:.145,y:.15,s:.30},null];
+const SEGS=[
+ {k:'hold',L:0,f0:1,f1:.90,st:0,w:1},
+ {k:'zoom',L:0,f0:.90,e:'both',w:1.5},
+ {k:'hold',L:1,f0:1,f1:.92,st:1,w:1},
+ {k:'zoom',L:1,f0:.92,e:'both',w:1.5},
+ {k:'hold',L:2,f0:1,f1:.92,st:2,w:1},
+ {k:'zoom',L:2,f0:.92,e:'both',w:1.5},
+ {k:'hold',L:3,f0:1,f1:.95,st:3,w:1},
+ {k:'retorno',w:4},
+ {k:'cosecha',w:1},
+ {k:'hold',L:4,f0:1,f1:.90,st:4,w:1},
+ {k:'zoom',L:4,f0:.90,e:'both',w:2},
+ {k:'hold',L:5,f0:1,f1:.95,st:5,w:1.5}
+];
+let acc=0;for(const s of SEGS){s.a=acc;acc+=s.w;s.b=acc;}const T=acc;
+const EST=SEGS.filter(s=>s.k==='hold').map(s=>({a:s.a,b:s.b,st:s.st}));
+const estP=i=>i===0?0:i===5?T:(EST[i].a+EST[i].b)/2;
+const easeF={'':u=>u,both:u=>u*u*(3-2*u)};
+function camAt(pp){
+ pp=clamp(pp,0,T);const s=SEGS.find(q=>pp<=q.b)||SEGS.at(-1),u=clamp((pp-s.a)/s.w,0,1);
+ if(s.k==='retorno')return camAt(lerp(SEGS[6].b,0,easeF.both(u)));
+ if(s.k==='cosecha')return {k:'mix',L:0,L2:4,t:easeF.both(u),cx:0,cy:0,f:1,seg:s,u};
+ if(s.k==='hold')return {k:'lvl',L:s.L,cx:0,cy:0,f:s.f0*Math.pow(s.f1/s.f0,u),seg:s,u};
+ const P=PORTAL[s.L],f=s.f0*Math.pow(P.s/s.f0,easeF[s.e](u)),k=(s.f0-f)/(s.f0-P.s);
+ return {k:'lvl',L:s.L,cx:P.x*k,cy:P.y*k,f,seg:s,u};
+}
+function anchoVista(cam){return F[cam.L]*cam.f*W/S;}
+function luzGlobal(pp){return pp<EST[4].a?.95-.6*clamp(pp/SEGS[6].b,0,1):.8;}
+let giro=0,giroObj=0,giroArr=0;
+const seed=Number(qs.get('semilla'))||20260930;
+const densidad=clamp(Number(qs.get('densidad'))||1,.65,1.35);
+function fondo(c,e,color){c.fillStyle=color;c.fillRect(...[e.view[0],e.view[1],e.view[2]-e.view[0],e.view[3]-e.view[1]]);}
+function line(c,x,y,x2,y2,col,w){c.strokeStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(x,y);c.lineTo(x2,y2);c.stroke();}
+function oval(c,x,y,rx,ry,col){c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,0,0,Math.PI*2);c.fill();}
+function texto(c,t,x,y,size=.018,color='#ebead8'){c.save();c.translate(x,y);c.scale(size/100,size/100);c.fillStyle=color;c.font='100px Georgia';c.textAlign='center';c.fillText(t,0,0);c.restore();}
+function hoja(c,x,y,L,ang,tone='#417642',det=true){
+ c.save();c.translate(x,y);c.rotate(ang);
+ const path=()=>{c.beginPath();c.moveTo(0,0);for(let i=1;i<=36;i++){let u=i/36,w=L*.30*Math.pow(Math.sin(Math.PI*u),.88)*(1+(i%2?.055:-.055));c.lineTo(L*u,-w);}for(let i=35;i>=0;i--){let u=i/36,w=L*.30*Math.pow(Math.sin(Math.PI*u),.88)*(1+(i%2?.055:-.055));c.lineTo(L*u,w);}c.closePath();};
+ path();const g=c.createLinearGradient(0,-L*.25,0,L*.25);g.addColorStop(0,'#98b866');g.addColorStop(.48,tone);g.addColorStop(1,'#1b4a31');c.fillStyle=g;c.fill();c.strokeStyle='#356248';c.lineWidth=L*.009;c.stroke();
+ if(det){c.save();path();c.clip();line(c,0,0,L,0,'#c0cf7d',L*.009);for(let j=1;j<12;j++){let u=j/13;for(let side of [-1,1]){let w=L*.28*Math.sin(Math.PI*u);c.strokeStyle='rgba(197,214,143,.48)';c.lineWidth=L*.004;c.beginPath();c.moveTo(L*u,0);c.quadraticCurveTo(L*(u+.08),side*w*.45,L*Math.min(.98,u+.16),side*w);c.stroke();}}c.restore();}
+ c.restore();
+}
+const planta=(()=>{const r=rng(seed),tallos=[];for(let j=0;j<Math.round(11*densidad);j++){const x=(r()-.5)*.25,h=.26+r()*.17;const leaves=[];for(let k=1;k<=6;k++){const y=.16-k*h/7;for(const side of [-1,1])leaves.push({x:x+(y-.16)*.12,y,L:.045+r()*.035,a:side<0?Math.PI+.25:-.35,side});}tallos.push({x,h,leaves});}return tallos;})();
+function mata(c,e,cosecha=false){
+ fondo(c,e,'#d4dfc4');
+ const g=c.createLinearGradient(0,-.5,0,.25);g.addColorStop(0,'#edf0db');g.addColorStop(.60,'#cfdbb7');g.addColorStop(1,'#7a9471');c.fillStyle=g;c.fillRect(e.view[0],e.view[1],e.view[2]-e.view[0],e.view[3]-e.view[1]);
+ const r=rng(seed+1);for(let j=0;j<36;j++){let x=-1+r()*2;oval(c,x,.15+r()*.035,.06+r()*.08,.10+r()*.13,'rgba(80,112,71,.18)');}
+ c.fillStyle='#6b6746';c.beginPath();c.moveTo(-2,.18);c.quadraticCurveTo(0,.16,2,.2);c.lineTo(2,2);c.lineTo(-2,2);c.fill();
+ // Ground cover is a continuous mass, with a few fibre strokes.
+ oval(c,0,.20,.27,.038,'#a99b68');for(let j=0;j<130;j++){let x=(r()-.5)*.5,y=.18+r()*.07;line(c,x,y,x+.015,y-.005,'rgba(209,192,133,.5)',.001);}
+ for(const t of planta){line(c,t.x,.17,t.x-.04,cosecha?-.01:.16-t.h,'#506b3b',.003);for(const l of t.leaves){if(cosecha&&l.y<-.01)continue;hoja(c,l.x,l.y,l.L,l.a);}}
+ // The exact same selected leaf becomes the next portal.
+ hoja(c,.025,-.065,.08,0,'#447d42');
+ if(cosecha){c.save();c.translate(.145,.15);oval(c,0,0,.14,.045,'#5a4230');for(let j=0;j<12;j++)line(c,-.125+j*.022,-.02,-.12+j*.022,.029,'#b18b58',.006);for(let j=0;j<16;j++)hoja(c,(r()-.5)*.19,-.01-r()*.02,.055,r()*6);c.restore();}
+}
+function dibujaMata(c,e){mata(c,e);}
+function dibujaHoja(c,e){
+ fondo(c,e,'#294c37');c.save();c.translate(-.43,.015);hoja(c,0,0,.86,0,'#3d7548');c.restore();
+ const r=rng(seed+2);for(let j=0;j<210;j++){let x=(r()-.5)*.72,y=(r()-.5)*.28;if(Math.abs(y)>.22*Math.sin(Math.PI*(x+.43)/.86))continue;oval(c,x,y,.0014,.0014,'rgba(220,220,130,.32)');}
+ // One pedagogically enlarged gland; density is illustrative.
+ oval(c,.10,.02,.020,.014,'#d7b66e');oval(c,.098,.017,.012,.008,'#f0d9a0');
+}
+function dibujaGlandula(c,e){
+ fondo(c,e,'#162e29');const r=rng(seed+3);
+ for(let j=0;j<120;j++){let x=(r()-.5)*2,y=.21+r()*.06;oval(c,x,y,.028,.025,j%2?'#31513d':'#3c6445');}
+ c.fillStyle='#537448';c.fillRect(-2,.18,4,.023);line(c,0,.18,0,.03,'#88935c',.047);
+ // Eight secretory cells below a lifted cuticle, in a cutaway diagram.
+ c.save();c.beginPath();c.ellipse(0,.035,.20,.085,0,0,Math.PI*2);c.clip();for(let i=0;i<8;i++){let a=i*Math.PI/4;c.fillStyle=i%2?'#64864c':'#829b57';c.beginPath();c.moveTo(0,.035);c.lineTo(Math.cos(a)*.26,.035+Math.sin(a)*.11);c.lineTo(Math.cos(a+Math.PI/4)*.26,.035+Math.sin(a+Math.PI/4)*.11);c.closePath();c.fill();c.strokeStyle='#b4bf79';c.lineWidth=.004;c.stroke();}c.restore();
+ const g=c.createRadialGradient(-.04,-.08,.015,0,-.04,.21);g.addColorStop(0,'#f5d88c');g.addColorStop(.55,'#bc8a40');g.addColorStop(1,'#775b2c');
+ c.fillStyle=g;c.beginPath();c.ellipse(0,-.035,.21,.15,0,Math.PI,Math.PI*2);c.lineTo(.21,.035);c.lineTo(-.21,.035);c.closePath();c.fill();
+ c.strokeStyle='#e4dbae';c.lineWidth=.007;c.beginPath();c.ellipse(0,-.035,.215,.16,0,Math.PI,Math.PI*2);c.stroke();
+ for(let j=0;j<35;j++)oval(c,(r()-.5)*.34,-.025-r()*.1,.0015+r()*.002,.0015,'rgba(255,228,155,.5)');
+}
+const atoms=[[-.13,0],[-.07,-.11],[.07,-.11],[.13,0],[.07,.11],[-.07,.11],[.14,-.22],[.255,-.23],[.12,-.32],[-.13,.23],[.255,-.025]];
+const bonds=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[2,6],[6,7],[6,8],[5,9],[3,10]];
+function dibujaMentol(c,e){
+ fondo(c,e,'#102925');const g=c.createRadialGradient(0,0,.02,0,0,.6);g.addColorStop(0,'#284c3d');g.addColorStop(1,'#102925');c.fillStyle=g;c.fillRect(...[e.view[0],e.view[1],e.view[2]-e.view[0],e.view[3]-e.view[1]]);
+ c.save();c.rotate(giro*.06);for(const [a,b]of bonds){line(c,...atoms[a],...atoms[b],'#adc3a0',.008);line(c,atoms[a][0]-.003,atoms[a][1]-.003,atoms[b][0]-.003,atoms[b][1]-.003,'#e3dcb1',.002);}
+ atoms.forEach(([x,y],i)=>{const g=c.createRadialGradient(x-.008,y-.009,.002,x,y,.024);g.addColorStop(0,i===10?'#ffd1aa':'#f5efd2');g.addColorStop(.4,i===10?'#cf754d':'#adbda0');g.addColorStop(1,i===10?'#7c3d26':'#526b54');oval(c,x,y,.024,.024,g);texto(c,i===10?'OH':'C',x,y+.005,.017,'#162b23');});c.restore();
+ texto(c,'Mentol · C₁₀H₂₀O',0,.32,.030);texto(c,'Conexiones ilustradas · hidrógenos omitidos',0,.36,.013,'#b5c6a7');
+}
+function dibujaCosecha(c,e){mata(c,e,true);}
+function dibujaSecado(c,e){
+ fondo(c,e,'#253e32');const r=rng(seed+4);
+ c.fillStyle='#c1b58a';c.fillRect(-.34,-.29,.68,.045);line(c,-.31,-.27,-.31,.27,'#b9a578',.016);line(c,.31,-.27,.31,.27,'#b9a578',.016);
+ for(let j=0;j<3;j++){let y=-.18+j*.125;c.fillStyle='#8b8f68';c.fillRect(-.29,y,.58,.01);for(let k=0;k<40;k++){let x=-.28+k*.014;line(c,x,y-.006,x+.02,y+.013,'#5d7158',.001);}for(let k=0;k<15;k++)hoja(c,-.27+k*.036,y-.01,.028,-.25+(r()-.5)*.8,j===2?'#718557':'#5c8246');}
+ for(let j=0;j<3;j++){let y=-.12+j*.1;c.strokeStyle='rgba(172,205,190,.5)';c.lineWidth=.002;c.beginPath();c.moveTo(-.40,y);c.bezierCurveTo(-.20,y-.035,.13,y+.035,.38,y-.03);c.stroke();line(c,.38,y-.03,.365,y-.04,'#accdbe',.002);}
+ c.fillStyle='#d0b98b';c.fillRect(.08,.25,.17,.13);texto(c,'MENTA',.165,.29,.018,'#324931');texto(c,'lote · masa · fecha',.165,.32,.009,'#324931');
+ // Thermometer: diagram of the FiBL range, never a measurement of this scene.
+ c.fillStyle='#e7e7c8';c.fillRect(-.24,.27,.22,.08);texto(c,'38–42 °C',-.13,.303,.022,'#264331');texto(c,'guía FiBL',-.13,.329,.012,'#264331');
+}
+const originales=[dibujaMata,dibujaHoja,dibujaGlandula,dibujaMentol,dibujaCosecha,dibujaSecado];
+const marco=[1,1,1,1,1,1];
+const desplazamiento=[0,0,0,0,0,0];
+const portalesBase=PORTAL.map(p=>p?{...p}:null);
+function encuadrar(){
+ const anchos=[.50,.90,.45,.62,.60,1.0];
+ for(let L=0;L<6;L++){
+  marco[L]=PORT?Math.min(1,W/S*.90/anchos[L]):L===3?.72:L===5?.82:.92;
+  desplazamiento[L]=PORT?(L===0?-.02:L===3?-.12:L===5?-.13:-.09):L===3?-.02:L===5?-.05:0;
+  if(portalesBase[L])PORTAL[L]={x:portalesBase[L].x*marco[L],y:portalesBase[L].y*marco[L]+desplazamiento[L],s:portalesBase[L].s*marco[L]};
+ }
+}
+const LV=originales.map((fn,L)=>(c,e)=>{
+ const k=marco[L],dy=desplazamiento[L];c.save();c.translate(0,dy);c.scale(k,k);
+ const view=[e.view[0]/k,(e.view[1]-dy)/k,e.view[2]/k,(e.view[3]-dy)/k];
+ fn(c,{...e,view,px:e.px/k});c.restore();
+});
+let p=0,pObj=0,pPrev=0,vel=0,sucio=true;
+function envPara(L,cx,cy,f,ppu){const hw=W/2/ppu,hh=H/2/ppu;return {L,cx,cy,f,ppu,px:1/ppu,view:[cx-hw,cy-hh,cx+hw,cy+hh]};}
+function pintaNivel(c,L,cx,cy,f){
+ const ppu=S/f;c.setTransform(DPR*ppu,0,0,DPR*ppu,DPR*(W/2-cx*ppu),DPR*(H/2-cy*ppu));LV[L](c,envPara(L,cx,cy,f,ppu));
+ const P=PORTAL[L];if(!P)return;const pp=P.s*ppu,a=sstep(.28*S,.92*S,pp);if(a<=0)return;
+ const ppu2=ppu*P.s,ox=W/2+(P.x-cx)*ppu,oy=H/2+(P.y-cy)*ppu;
+ bctx.setTransform(1,0,0,1,0,0);bctx.clearRect(0,0,buf.width,buf.height);
+ bctx.setTransform(DPR*ppu2,0,0,DPR*ppu2,DPR*ox,DPR*oy);
+ LV[L+1](bctx,envPara(L+1,(cx-P.x)/P.s,(cy-P.y)/P.s,f/P.s,ppu2));
+ bctx.setTransform(1,0,0,1,0,0);bctx.globalCompositeOperation='destination-in';
+ if(a>=.999){bctx.fillStyle='#000';bctx.fillRect(0,0,buf.width,buf.height);}else{const r0=pp*lerp(.22,.85,a)*DPR,r1=r0+pp*.16*DPR,gm=bctx.createRadialGradient(ox*DPR,oy*DPR,r0,ox*DPR,oy*DPR,r1);gm.addColorStop(0,`rgba(0,0,0,${a})`);gm.addColorStop(1,'rgba(0,0,0,0)');bctx.fillStyle=gm;bctx.fillRect(0,0,buf.width,buf.height);}
+ bctx.globalCompositeOperation='source-over';c.setTransform(1,0,0,1,0,0);c.drawImage(buf,0,0);
+}
+function render(){
+ const cam=camAt(p);pintaNivel(ctx,cam.L,cam.cx,cam.cy,cam.f);
+ if(cam.k==='mix'){const ppu=S;ctx.setTransform(DPR*ppu,0,0,DPR*ppu,DPR*W/2,DPR*H/2);ctx.globalAlpha=cam.t;LV[cam.L2](ctx,envPara(cam.L2,0,0,1,ppu));ctx.globalAlpha=1;}
+ return cam;
+}
+
+/* ============================================================
+   INTERFAZ: medidor, estaciones por páginas, palabras
+   [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   ============================================================ */
+const ESTACIONES = [
+  {
+    "t": "La mata: cultivar sin arrasar",
+    "c": "La mata",
+    "pags": [
+      {
+        "s": [
+          "El ejemplo es menta piperita: Mentha × piperita{1}. No todas las plantas que huelen parecido son la misma especie.",
+          "Saber tradicional, no medicina."
+        ]
+      },
+      {
+        "s": [
+          "La menta prefiere suelo húmedo con buen drenaje y acepta sol o media sombra{1}.",
+          "Use un recipiente limpio con drenaje para contener sus [[rizoma|rizomas]]{1}. Nunca un envase de agroquímicos."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Aproveche compost maduro y cobertura orgánica para conservar humedad{1}. Riegue el suelo según su estado, sin encharcar.",
+          "Deje un rincón florecer: las flores alimentan polinizadores{1}."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Compare dos recipientes iguales: uno cubierto y otro sin cubrir. Anote el agua usada y el estado de las plantas.",
+          "Ejercicio: 2 L frente a 3 L para igual estado son 1 L menos, o 33 % de ahorro{7}."
+        ],
+        "k": "hacer",
+        "nota": "Ejemplo inventado de cálculo; no es una dosis ni un ahorro prometido."
+      },
+      {
+        "s": [
+          "La ubicación orienta, pero no prueba adaptación ni dice cuánta agua necesita esta mata."
+        ],
+        "k": "cuidado"
+      }
+    ]
+  },
+  {
+    "t": "La hoja: cuidar el aroma",
+    "c": "La hoja",
+    "pags": [
+      {
+        "s": [
+          "En la superficie están los [[tricoma|tricomas]]: algunos son pelos; otros son glándulas que fabrican y guardan aceite{2}.",
+          "El punto dorado abre una glándula, ampliada para poder entrar en ella."
+        ],
+        "k": "dice",
+        "nota": "Esquema sin escala; la densidad de puntos no es una medición."
+      },
+      {
+        "s": [
+          "No machaque ni pique las hojas antes de secar si el comprador quiere hoja entera{3}.",
+          "Al romper el tejido, el aceite se pierde más fácilmente{3}."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Mire con lupa una hoja sana de una planta identificada. No pruebe plantas desconocidas.",
+          "El olor sirve para comparar lotes; no certifica especie, pureza ni inocuidad."
+        ],
+        "k": "cuidado"
+      }
+    ]
+  },
+  {
+    "t": "La glándula: un depósito vivo",
+    "c": "La glándula",
+    "pags": [
+      {
+        "s": [
+          "Un [[tricoma|tricoma]] glandular peltado de menta tiene un disco de ocho células secretoras{2}.",
+          "Encima se acumula aceite bajo la [[cuticula|cutícula]]{2}."
+        ],
+        "k": "dice",
+        "nota": "Corte didáctico: abrimos la cubierta para mostrar el depósito; no es una foto."
+      },
+      {
+        "s": [
+          "Las células producen compuestos del aroma. Mentona y mentol forman parte del aceite de esta menta{2}.",
+          "Una glándula no contiene solo mentol. La composición cambia durante el desarrollo{2}."
+        ]
+      },
+      {
+        "s": [
+          "Guarde una muestra de hoja entera y otra triturada del mismo lote. Compare el aroma después de almacenarlas igual.",
+          "Es una comparación sensorial; no mide porcentaje de aceite{3}."
+        ],
+        "k": "hacer"
+      }
+    ]
+  },
+  {
+    "t": "El mentol: una parte del olor",
+    "c": "El mentol",
+    "pags": [
+      {
+        "s": [
+          "El [[mentol|mentol]] es una de las moléculas de la menta piperita; el aceite es una mezcla{2}.",
+          "Su fórmula es C₁₀H₂₀O: diez carbonos, veinte hidrógenos y un oxígeno{4}."
+        ],
+        "k": "dice",
+        "nota": "Las esferas y los colores son símbolos. Se omiten los hidrógenos del dibujo; no representa la forma tridimensional ni la estereoquímica."
+      },
+      {
+        "s": [
+          "La menta se usa para dar sabor y preparar bebidas{1}. También tiene usos digestivos tradicionales documentados{5}.",
+          "Saber tradicional, no medicina. No se ofrece tratamiento ni dosis."
+        ]
+      },
+      {
+        "s": [
+          "Las preparaciones de hoja pueden empeorar la acidez o el reflujo{5}.",
+          "El aceite concentrado puede irritar; no se aplique en la cara de bebés o niños pequeños{6}. No prepare dosis caseras de aceite."
+        ],
+        "k": "cuidado"
+      },
+      {
+        "s": [
+          "No confunda menta piperita con poleo: Mentha pulegium figura como dañina si se ingiere{1}.",
+          "Si no conoce la especie, no la coseche para consumir o vender."
+        ],
+        "k": "cuidado"
+      }
+    ]
+  },
+  {
+    "t": "La cosecha: guardar lo que vale",
+    "c": "Cosechar",
+    "pags": [
+      {
+        "s": [
+          "Volvemos desde la molécula hasta la mata.",
+          "Para hoja seca de menta piperita, FiBL propone cosechar con botones florales visibles, hasta el inicio de floración{3}."
+        ],
+        "k": "cuando",
+        "nota": "Guía de Kosovo: confirme el criterio del comprador y la respuesta de su cultivo; no copiamos su calendario."
+      },
+      {
+        "s": [
+          "Coseche cuando las hojas estén secas, después del rocío. Evite calor extremo, lluvia y viento fuerte{3}.",
+          "La guía indica corte a unos 10 cm sobre el suelo{3}. No generalice esta altura a otras especies."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Use herramienta y canasto limpios. No deje el material tocar el suelo, ni lo apriete en sacos{3}.",
+          "Proteja de sol y lluvia, separe hojas dañadas y lleve pronto al secadero{3}."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Para hojas de menta, FiBL da una relación orientativa de 6:1{3}.",
+          "Ejercicio: 6 kg frescos → cerca de 1 kg seco; 12 kg → cerca de 2 kg{7}. Pese su lote: el resultado puede cambiar."
+        ],
+        "k": "pensar",
+        "nota": "Pronóstico de la guía, no medición de su finca."
+      }
+    ]
+  },
+  {
+    "t": "Secar, guardar y vender bien",
+    "c": "Secar y vender",
+    "pags": [
+      {
+        "s": [
+          "Un techo protege de lluvia y sol directo; el aire debe entrar, atravesar las hojas y salir{3,8}.",
+          "Con marcos limpios y malla apta para alimentos, haga bandejas removibles. No use madera tratada ni malla contaminada."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "En el secadero de túnel de la guía: primera bandeja al menos a 50 cm del suelo; entre bandejas, al menos 40 cm{3}.",
+          "Marcos de 1–1,5 m² facilitan el manejo{3}. Ponga una capa delgada, sin montones."
+        ],
+        "k": "tam",
+        "nota": "Dimensiones del diseño FiBL; no son una capacidad en kg ni una certificación."
+      },
+      {
+        "s": [
+          "Para menta piperita, FiBL propone aire de secado entre 38 y 42 °C{3}.",
+          "Mida junto a las hojas con termómetro. Sin termómetro no sabe la temperatura. Más calor no garantiza más calidad."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "No fijamos un número de días: clima, carga y circulación cambian el secado.",
+          "La hoja seca se desmenuza y el tallo quiebra al doblarlo{8}; es una señal casera, no un ensayo de humedad ni de inocuidad."
+        ],
+        "k": "cuando"
+      },
+      {
+        "s": [
+          "Si aparece moho, olor extraño o condensación, separe el lote y no lo venda para consumo{3,8}.",
+          "Guarde hojas secas en envase limpio y bien cerrado, en sitio seco, fresco y oscuro{8}."
+        ],
+        "k": "cuidado"
+      },
+      {
+        "s": [
+          "Antes de sembrar más, acuerde con el comprador especie, hoja entera o cortada, humedad aceptada, empaque y controles{3}.",
+          "Rotule especie identificada, lote, fecha real y masa neta{3}. No anuncie curas."
+        ],
+        "k": "hacer"
+      },
+      {
+        "s": [
+          "Ejercicio: si pesa 1 000 g secos y retira 100 g no aptos, quedan 900 g vendibles{7}.",
+          "A 30 g por paquete: 900 ÷ 30 = 30 paquetes{7}. Anote trabajo, agua, energía y empaque; el ingreso no es la ganancia."
+        ],
+        "k": "pensar",
+        "nota": "Cuenta inventada para practicar; no garantiza rendimiento, precio ni autorización sanitaria."
+      }
+    ]
+  }
+];
+const GLOS = [["rizoma", "Rizoma", "Tallo subterráneo que puede extender la menta fuera del lugar de siembra{1}."], ["tricoma", "Tricoma", "Estructura de la superficie vegetal; el glandular peltado fabrica y guarda aceite{2}."], ["cuticula", "Cutícula", "Cubierta superficial: el aceite se acumula bajo ella en la glándula dibujada{2}."], ["mentol", "Mentol", "Molécula C₁₀H₂₀O que forma parte de una mezcla; no es toda la hoja ni todo su aceite{2,4}."], ["lote", "Lote", "Material identificado para seguir cosecha, secado y venta sin mezclarlo con otros{3}."]];
+
+const numero=(v,min,max)=>{if(v===null||String(v).trim()==='')return null;const n=Number(v);return Number.isFinite(n)&&n>=min&&n<=max?n:null;};
+const alt=numero(qs.get('alt'),0,6000),lat=numero(qs.get('lat'),-90,90),lon=numero(qs.get('lon'),-180,180);
+// Municipality and coordinates are accepted as context but neither stored nor displayed.
+const municipioPresente=!!qs.get('municipio')?.trim();
+const piso=alt===null?'desconocido':alt<1000?'calido':alt<2000?'templado':alt<3000?'frio':'revision';
+const contexto={piso,altitudDisponible:alt!==null,coordenadasDisponibles:lat!==null&&lon!==null,municipioDisponible:municipioPresente};
+const origen=alt===null?(lat!==null&&lon!==null?'Coordenadas sin altitud: piso no determinado.':qs.has('alt')?'Altitud inválida: piso no determinado.':'Sin altitud: ejemplo sin piso asignado.'):`Altitud indicada: orientación de piso ${piso==='revision'?'muy frío; revisión humana':piso==='calido'?'cálido':piso==='frio'?'frío':'templado'}.`;
+const consejo=piso==='calido'?'Piso cálido por altitud{9}. Vigile el secado del sustrato: el calor acelera la pérdida de agua de los recipientes{1}. La altura no certifica adaptación.':piso==='frio'?'Piso frío por altitud{9}. El piso no permite prometer tiempo de secado: mida temperatura y observe la humedad del lote{3}.':piso==='templado'?'Piso templado por altitud{9}. Pruebe la respuesta de la menta en un espacio pequeño antes de ampliar; esta guía no valida su adaptación local.':piso==='revision'?'Desde 3 000 m esta pieza exige revisión humana{9}. La altitud sola no delimita el páramo: no se propone abrir cultivo ni recolectar allí.':'No conocemos el piso. No lo inferimos del nombre municipal ni de coordenadas sin una fuente altimétrica.';
+ESTACIONES[0].pags[4].s.push(consejo);
+document.getElementById('origenPiso').textContent=origen;
+document.body.dataset.piso=piso;
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, ''); }
+
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuándo?', cuidado:'Cuidado', dice:'' };
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; } // todavía cargan
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = 'Escuchar: sin voz'; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  // si en 5 s la voz no arranca, el navegador no tiene con qué leer: se dice, no se cuelga
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    // en Android un cancel() anterior puede llegar tarde y cortar la frase nueva: se reintenta una vez
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ // cancela solo si algo suena, y espera a que Android lo asiente
+  let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {}
+  setTimeout(f, habla ? 250 : 0);
+}
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  if (conTitulo){ const P = estAct.pags[pagAct]; di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue); }
+  else { const P = estAct.pags[pagAct]; if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue(); }
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click',abreRepaso);
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; const prev = el._s; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = '';
+    el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } }
+    el.setAttribute('aria-label', str);
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+let anchoInicial = 0;
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  $('vEscala').textContent = ['Mata ilustrada','Hoja ampliada','Corte de glándula','Conexiones de mentol','Cosecha ilustrada','Secadero ilustrado'][cam.L];
+  $('vAumento').textContent = 'Sin escala física';
+  $('vRegla').textContent = 'No es una medición';
+  // estación más cercana
+  let st = 0; for (let i = 0; i < EST.length; i++){ if (p >= EST[i].a - 0.4) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const enCrom = false;
+  const cap = vis ? 'e' + st : enCrom ? 'c' : '';
+  $('vEstacion').textContent = `${st+1}/6 · ${e.c}`;
+  const lz = luzGlobal(p); $('vLuz').textContent = lz > 0.6 ? 'luz alta' : lz > 0.25 ? 'luz baja' : 'penumbra';
+  const nota = 'Esquemas: forma y color didácticos. Saber tradicional, no medicina.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else {
+      estAct = e; pagAct = 0;
+      $('fNum').textContent = cap === 'c' ? 'De paso, entre el núcleo y la hélice' : `Estación ${st+1} de 6`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = cap === 'c' ? 'De paso: nucleosomas' : `Estación ${st+1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => b.toggleAttribute('aria-current', false) || (i === st && b.setAttribute('aria-current', 'step'))); }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  $('girar').hidden = true;
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+function etqEstacion(st){return [
+ [['Hoja elegida',.055,-.065],['Cobertura del suelo',.18,.2]],
+ [['Glándula ampliada',.10,.02],['Nervadura',-.10,.015]],
+ [['Cutícula',.12,-.17],['Aceite',0,-.09],['Células secretoras',-.1,.04]],
+ [['Oxígeno + hidrógeno (OH)',.255,-.025]],
+ [['Canasto limpio',.145,.15],['Rebrote',-.12,.04]],
+ [['Aire entre bandejas',.24,-.08],['Envase y lote',.165,.31]]
+ ][st];}
+function etqCrom(){return [];}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(10,14,22,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(10,14,22,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [], rot = false;
+  if (cam.k === 'lvl'){
+    if (cap && cap[0] === 'e' && cam.L === [0,1,2,3,4,5][st]) lista = etqEstacion(st);
+    else if (cap === 'c' && cam.L === 7){ lista = etqCrom(); rot = true; }
+  }
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    let [txt, x, y] = it; if (rot && PORT){ const t = x; x = -y; y = t; }
+    x*=marco[cam.L];y=y*marco[cam.L]+desplazamiento[cam.L];
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){
+      ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break;
+      }
+    }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const L of [E.ln, E.halo]){ L.setAttribute('x1', ax.toFixed(1)); L.setAttribute('y1', ay.toFixed(1)); L.setAttribute('x2', lx.toFixed(1)); L.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [{"q": "¿Cómo contiene la menta sus rizomas?", "ops": [{"t": "En recipiente con drenaje"}, {"t": "Con suelo siempre inundado"}, {"t": "Quitando todas las raíces"}], "ok": 0, "si": "El recipiente con drenaje contiene la expansión.", "no": "Revise la estación y vuelva a intentar."}, {"q": "¿Qué protege mejor el aroma?", "ops": [{"t": "Machacar antes de secar"}, {"t": "Conservar la hoja entera"}, {"t": "Dejarla al sol directo"}], "ok": 1, "si": "La hoja entera conserva mejor el aceite.", "no": "Revise la estación y vuelva a intentar."}, {"q": "¿Dónde guarda aceite esta glándula?", "ops": [{"t": "Bajo su cutícula"}, {"t": "Solo en el tallo"}, {"t": "En una semilla"}], "ok": 0, "si": "El depósito está bajo la cutícula.", "no": "Revise la estación y vuelva a intentar."}, {"q": "¿El mentol representa todo el aceite?", "ops": [{"t": "Sí, es una sustancia única"}, {"t": "No: es parte de una mezcla"}, {"t": "Sí, en todas las aromáticas"}], "ok": 1, "si": "El aceite es una mezcla; no se generaliza a todas las plantas.", "no": "Revise la estación y vuelva a intentar."}, {"q": "¿Cuándo cosechar para secar?", "ops": [{"t": "Con hojas mojadas"}, {"t": "Después del rocío, con hojas secas"}, {"t": "En lluvia"}], "ok": 1, "si": "Las hojas secas evitan incorporar humedad superficial.", "no": "Revise la estación y vuelva a intentar."}, {"q": "¿900 g en paquetes de 30 g dan…?", "ops": [{"t": "9 paquetes"}, {"t": "30 paquetes"}, {"t": "300 paquetes"}], "ok": 1, "si": "900 ÷ 30 = 30; es una cuenta, no una promesa de cosecha.", "no": "Revise la estación y vuelva a intentar."}];
+let mini = {};
+function mini_limpia(){ mini = {}; }
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, bw: buf.width, bh: buf.height };
+  W = H = S = lado; DPR = 1; PORT = false; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  const cam = camAt(estP(i));
+  try { pintaNivel(x, cam.L, cam.cx, cam.cy, cam.f); } finally { ({ W, H, S, DPR, PORT } = g); buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya siguió el olor desde la mata hasta la venta.</p><p>Saber tradicional, no medicina. Identifique, cuide y pese su lote.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Subir a la mata</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80) / 3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else if (o.l){ b.textContent=o.l; }
+    else { b.textContent = o.t; }
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || (o.l ? 'La ' + o.l : o.t)));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) { window.scrollTo(0, y); } else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0; // auto: +1 baja, -1 sube
+const bBajar = $('bBajar');
+/* «Bajar» va de parada en parada y se detiene: quien lee despacio decide cuándo seguir */
+function paradas(){return EST.map((_,i)=>estP(i));}
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   INTERACCIÓN CON LA HÉLICE (dato = el gesto)
+   ============================================================ */
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) { bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[55, 'sawtooth', 0.32], [82.41, 'sawtooth', 0.2], [110.3, 'triangle', 0.35], [164.6, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? 'Sonido: sí' : 'Sonido: no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(){
+  if (!audio || !audio.on) return; const lz = luzGlobal(p); const t = audio.ac.currentTime;
+  audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz, t, 0.2);
+  const base = 55 * (0.84 + 0.16*lz); [1, 1.4983, 2.006, 2.993].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4));
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  encuadrar();
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false;
+  anchoInicial = F[0] * (W / S);
+
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? (mb + 14) + 'px' : '';
+  document.documentElement.style.setProperty('--girar-top', (mb + 10) + 'px');
+  mini_limpia();
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+const perf = { on: false, dts: [] };
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 60) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ // por estaciones, con transición suave y sin desenfoque en movimiento
+    let i = 0, best = 1e9; for (let k = 0; k < 6; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i);
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+  }
+  const antes = p;
+  if (RM){
+    if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; }
+    p = rmHacia;
+  } else {
+    const k = 1 - Math.exp(-dt * 7);
+    p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta;
+  }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (sucio){
+    const t0 = performance.now();
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){ // fundido entre dos estaciones, nunca a negro
+      p = rmDesde; cam = render(); ctx.setTransform(1,0,0,1,0,0);
+      bctx.setTransform(1,0,0,1,0,0); bctx.drawImage(cv, 0, 0);
+      p = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render();
+    actualizaUI(cam); sonido();
+    if (perf.on) perf.dts.push(now);
+    sucio = (RM && rmT < 1);
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+addEventListener('keydown', e => {
+  if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A')) return;
+  if (e.key === 'g' || e.key === 'G'){ giroObj += Math.PI/2; sucio = true; }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+
+redim();
+if (qs.has('p')){ const v = parseFloat(qs.get('p')); const pp = qs.get('p').startsWith('e') ? estP(+qs.get('p').slice(1)) : v; if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+if (qs.has('giro')){ giroObj = parseFloat(qs.get('giro')) * Math.PI / 180; giro = giroObj; }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el FPS del Pixel; no altera nada) */
+window.__descenso = {
+  T, SEGS, estP, camAt, contexto, vista: pp => camAt(pp).L,
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, GLOS }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); const med = dts[Math.floor(dts.length/2)], p95 = dts[Math.floor(dts.length*0.95)]; res({ cuadros: marcas.length, ms: marcas[marcas.length-1] - marcas[0], fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: med, p95Ms: p95, dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

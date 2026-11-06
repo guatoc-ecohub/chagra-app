@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — del potrero al suelo, y los días de descanso</title>
+<meta name="description" content="Un descenso ilustrado por los árboles, forrajes, ganado y suelo de distintos pisos térmicos de Colombia, con fuentes y ubicación opcional.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(20,15,11,.7); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a; --duda:#f1d27f;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#140e0a;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#140e0a;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#16301c}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;text-shadow:0 0 18px rgba(240,246,238,.95),0 0 4px rgba(240,246,238,.9)}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1d3a22;max-width:28rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1d3a22;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(240,246,240,.95),0 0 14px rgba(240,246,240,.8)}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .tiempo{margin-top:6px;padding-top:6px;border-top:1px solid var(--vidrio-borde);font-family:var(--sans);font-size:1rem;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+#medidor .tiempo .rot{color:var(--tinta-2)}
+#medidor .tiempo b{font-family:var(--mono);font-weight:600;font-size:1.05rem;color:var(--duda);white-space:nowrap}
+#medidor .tiempo b.ocupa{color:#f0b27a}
+#medidor .tiempo b.descansa{color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .estacion #vLuz.sube{color:var(--acento-tinta)}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+/* El selector: la misma tierra descansada o pisada; el mismo potrero con o sin árboles y descanso */
+#frase .manejo{display:flex;gap:6px;flex-wrap:wrap;margin:.2em 0 .5em}
+#frase .manejo .bc{min-height:40px;padding:6px 12px;white-space:normal;text-align:left}
+#frase .manejo .bc[aria-pressed="true"]{background:#e9dcc0;color:#1d140c;border-color:transparent;font-weight:600}
+#frase .efecto{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);margin:.1em 0 .5em}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(18,12,8,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(20,15,11,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(44,34,26,.85);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button.tiempo i{border-radius:2px}
+#riel button.sube i{border-style:dashed}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#18120d;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(8,6,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#18120d;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg h3{font-family:var(--sans);font-weight:700;font-size:1rem;color:var(--acento-tinta);margin:1.2em 0 .2em}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#231a13;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .tiempo{grid-column:1 / -1;justify-content:flex-start;gap:8px;margin-top:4px;padding-top:4px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 10px;font-size:.95rem}
+  #controles{gap:6px}
+  #bSonido .lbl{display:none}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 8px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+
+#ubicacion{position:fixed;z-index:5;left:16px;top:16px;width:min(26rem,calc(100vw - 32px));background:rgba(240,246,232,.96);color:#19351d;border:1px solid #678052;border-radius:14px;padding:10px 14px;font-size:.95rem;box-shadow:0 4px 20px #10201022}
+#ubicacion summary{cursor:pointer;font-weight:650;line-height:1.4}
+#ubicacion p{margin:.5em 0;line-height:1.4}
+#ubicacion select,#ubicacion input{font:inherit;max-width:100%;min-height:44px;border:1px solid #678052;border-radius:8px;padding:6px;background:#fff;color:#19351d}
+#ubicacion button{background:#294c2b;color:#fff;border-radius:9px;padding:8px 12px;min-height:44px;border:0;cursor:pointer}
+#ubicacion label{display:block;margin:6px 0}
+#titulo{top:125px}
+#medidor{top:16px}
+#seguirLeche{display:block;white-space:normal;width:100%;margin-top:10px}
+@media(max-width:640px){#medidor{top:auto;bottom:74px;display:none} #titulo{top:125px} #frase{max-height:46vh;overflow:auto} #ubicacion[open]{max-height:52vh;overflow:auto} }
+body[data-piso="limite"] #lienzo,body[data-piso="limite"] #etiquetas,body[data-piso="limite"] #riel,body[data-piso="limite"] #frase,body[data-piso="limite"] #controles{visibility:hidden}
+body[data-piso="limite"] #titulo .pista{display:none}
+body[data-piso="limite"]{background:linear-gradient(#bdcfbb,#e1e9d6)}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso ilustrado del silvopastoreo según el piso térmico, hasta el suelo y de vuelta al potrero" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<details id="ubicacion">
+ <summary id="origenPiso" aria-live="polite">Piso de ejemplo · Cálido</summary>
+ <p id="detallePiso">Elija un piso o use su ubicación. La altitud orienta; el clima y el suelo de su finca también cuentan.</p>
+ <label>Piso de ejemplo <select id="selectorPiso"><option value="calido">Cálido</option><option value="templado">Templado</option><option value="frio">Frío</option><option value="limite">Límite con el páramo</option></select></label>
+ <p>Permita usar la ubicación de este dispositivo para orientar el piso térmico. No se guarda ni se envía.</p>
+ <button id="usarUbicacion" type="button">Usar mi ubicación</button>
+ <p id="estadoUbicacion" role="status"></p>
+ <form id="alturaManual"><label>Altitud de su finca (m) <input id="alturaFinca" type="number" min="0" max="6000" step="any" required></label><button type="submit">Usar esta altitud</button></form>
+</details>
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p>Del potrero a la tierra que pisan las vacas, y los días en que descansa: por qué la sombra, el forraje y el descanso cuidan el suelo.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño y de tiempo">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">48,0 m</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 48 000 mm</b></div>
+  <div class="tiempo"><span class="rot">Tiempo:</span><b id="vTiempo">día 44 de descanso</b></div>
+  <div class="estacion"><span id="vEstacion">1/7 · El potrero</span><span id="vLuz">sobre el potrero</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 7</div>
+  <h2 id="fTit">El potrero</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón"><span aria-hidden="true">♪ </span><span class="lbl">Sonido: </span><span class="est">no</span></button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">El piso se orienta por altitud. Las especies y razas son ejemplos documentados, no un inventario de su finca. Choachí usa el respaldo municipal para Normando y sus cruces con criollo. Los forrajes de clima frío tienen evidencia regional; no se afirma su presencia en todas las veredas.</p>
+    <ol id="listaFuentes"></ol>
+    <p class="aviso">El hato, tamaños, calendario y subsuelo son ilustrativos. No se recomiendan cargas, días de descanso ni rendimientos. La tabla detallada está en <a href="FUENTES.md">FUENTES.md</a>.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+/* Ejemplos regionales documentados; no constituyen un inventario de finca. */
+window.SILVO_PISOS = {
+ fuentes: {
+  pisos:{titulo:'IGAC · Pisos térmicos',nota:'Tabla 1, página 4: límites de altitud. La clasificación por altura es orientativa.',url:'https://www.igac.gov.co/sites/default/files/listadomaestro/in-agr-pc05-01_v1_actualizacion_de_areas_homogeneas_de_tierras.pdf'},
+  choachi:{titulo:'Choachí · Plan municipal 2012–2015',nota:'Páginas 28 y 39: rango rural 1.500–3.600 m, pisos templado, frío y páramo; ganadería de doble propósito con Normando. Evidencia histórica, no censo actual.',url:'https://repositoriocdim.esap.edu.co/bitstreams/f09d7567-a911-4d74-81f5-f7f81d0a2dc5/download'},
+  cruces:{titulo:'Choachí · Diagnóstico EOT',nota:'Sección 5.4.2.1, página impresa 74: Normando y cruces con criollo. No identifica una raza criolla particular.',url:'https://repositoriocdim.esap.edu.co/bitstreams/9cbf1e04-3671-4890-a045-df2df7c6ecdd/download'},
+  alto:{titulo:'AGROSAVIA · Arreglos del trópico alto',nota:'Aliso, sauco y kikuyo en arreglos silvopastoriles de Obonuco. Evidencia regional, no inventario de Choachí.',url:'https://www.agrosavia.co/noticias/saf-obonuco'},
+  kikuyo:{titulo:'AGROSAVIA · Regla forrajera',nota:'Evaluación de kikuyo en municipios de Boyacá y Cundinamarca. No se extrapola una carga o calendario a esta finca.',url:'https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/84'},
+  lecheras:{titulo:'Agenda de investigación de la cadena láctea',nota:'Página 58: Holstein, Jersey y Normando en trópico alto; cebú y cruces en trópico bajo.',url:'https://repository.agrosavia.co/server/api/core/bitstreams/527b8cf7-a5ef-457a-904d-189a989e9fcc/content'},
+  criollas:{titulo:'AGROSAVIA · Germoplasma animal',nota:'Página 8: Romosinuano en planicies caribeñas y Blanco Orejinegro en montañas de clima medio.',url:'https://repository.agrosavia.co/server/api/core/bitstreams/e4eb125e-4827-4281-a04c-8c92351b34c8/content'},
+  gyr:{titulo:'AGROSAVIA · Genética bovina',nota:'Oferta de Gyr, Brahman y cruces Holstein × Gyr. La raza ilustrada no certifica composición genética.',url:'https://www.agrosavia.co/noticias/agrosavia-le-aporta-a-la-paz-y-a-la-productividad-de-la-ganader%C3%ADa-del-pa%C3%ADs'},
+  saman:{titulo:'AGROSAVIA · Samán',nota:'Samanea saman en alimentación bovina de doble propósito en el Caribe seco.',url:'https://www.agrosavia.co/productos-y-servicios/oferta-tecnol%C3%B3gica/l%C3%ADnea-pecuaria/ganader%C3%ADa-y-especies-menores/recomendaciones-protocolos-y-metodolog%C3%ADas/642-recomendaciones-de-consumo-de-frutos-de-arb%C3%B3reas-para-la-alimentaci%C3%B3n-bovina-doble-prop%C3%B3sito'},
+  calido:{titulo:'CIPAV · Forrajes leñosos',nota:'Uso forrajero de botón de oro, leucaena y matarratón. El botón de oro se utiliza también en zonas de montaña.',url:'https://cipav.org.co/boton-de-oro-el-arbusto-en-la-dieta-de-las-vacas-que-ayuda-al-medio-ambiente/'},
+  guinea:{titulo:'AGROSAVIA · Manual de forrajes tropicales',nota:'Sección 2.4.5: guinea, bajo el sinónimo Panicum maximum; crecimiento erecto en matojos.',url:'https://repository.agrosavia.co/server/api/core/bitstreams/1c18125f-5e93-4b4c-9171-52bbe8cb1227/content'},
+  estrella:{titulo:'Tropical Forages · Cynodon',nota:'Cynodon nlemfuensis: cubierta estolonífera tropical y subtropical. Ejemplo para clima medio; validar sitio y cultivar.',url:'https://tropicalforages.info/text/entities/cynodon_spp.htm'},
+  chachafruto:{titulo:'AGROSAVIA · Catálogo fotográfico de plantas',nota:'Ficha de Erythrina edulis: distribución 1.200–2.500 m, hoja trifoliada. Ejemplo del piso templado, no aptitud universal en todo su rango.',url:'https://repository.agrosavia.co/server/api/core/bitstreams/6c2ea591-b5f4-4314-89f0-4a9e0896c35d/content'},
+  oriente:{titulo:'Cundinamarca · Ganadería de Oriente',nota:'Transferencia de tecnología con productores de Choachí sobre Normando doble propósito.',url:'https://www.cundinamarca.gov.co/noticias/transferencia-tecnologica-impulsa-la-ganaderia-bovina-en-la-provincia-de-oriente'},
+  botanica:{titulo:'Tropical Forages · Morfología',nota:'Fichas de leucaena, guinea, estrella, kikuyo y botón de oro; nombres y formas contrastados en FUENTES.md.',url:'https://tropicalforages.info/text/entities/leucaena_leucocephala.htm'}
+ },
+ perfiles:{
+  calido:{nombre:'Cálido',arbol:'samán',arbusto:'leucaena',pasto:'guinea',pastoFactor:1,vaca:'Cebú',cita:'{saman,calido,guinea}',razas:'Gyr (lechero), cruces Holstein × Gyr; Brahman y Romosinuano (criollo){gyr,lecheras,criollas}',hoja:'La leucaena se dibuja con hojas bipinnadas; el guinea forma macollas.',local:'Ejemplo tropical colombiano; no representa un inventario municipal.'},
+  templado:{nombre:'Templado',arbol:'chachafruto',arbusto:'botón de oro',pasto:'estrella',pastoFactor:.5,vaca:'BON',cita:'{chachafruto,calido,estrella}',razas:'Blanco Orejinegro (BON, criollo de clima medio) y sus cruces{criollas}',hoja:'El botón de oro se dibuja con hojas anchas y flores amarillas; el estrella como cubierta baja con estolones.',local:'El chachafruto es un ejemplo de montaña, no una recomendación para la franja más baja del piso. En Choachí se prioriza Normando{choachi,cruces}.'},
+  frio:{nombre:'Frío',arbol:'aliso',arbusto:'sauco',pasto:'kikuyo',pastoFactor:.32,vaca:'Holstein',cita:'{alto,kikuyo}',razas:'Holstein y Jersey (lecheras); Normando (doble propósito){lecheras,oriente}',hoja:'El sauco se dibuja con hojas compuestas de folíolos grandes; el kikuyo como cubierta baja estolonífera.',local:'Kikuyo documentado en Cundinamarca; aliso y sauco tienen evidencia de trópico alto. No se afirma que cada especie esté en una finca de Choachí{kikuyo,alto}.'},
+  limite:{nombre:'Límite con el páramo',arbol:'vegetación por verificar',arbusto:'vegetación por verificar',pasto:'cubierta por verificar',pastoFactor:.2,vaca:'sin propuesta',cita:'{pisos,choachi}',razas:'Sin propuesta de ganado',hoja:'Revisión humana pendiente.',local:'La altitud sola no delimita el páramo. Se necesita juicio humano antes de proponer un sistema.'}
+ }
+};
+</script>
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso del silvopastoreo — del potrero a la tierra pisada o descansada.
+   Tres niveles anidados; cada uno vive dentro del anterior (portal).
+   La cámara la mueve solo quien mira: scroll, dedo, teclado o «Bajar».
+   En el nivel del pasto el scroll también mueve el TIEMPO: la hora del
+   día de ocupación y los días de descanso. Después se baja a la tierra y
+   se sube al potrero entero.
+   El motor (cámara, medidor, tarjetas, voz, palabras, fuentes, repaso)
+   es el del Descenso del café y del suelo.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const DATOS = window.SILVO_PISOS;
+const normaliza = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const municipio = normaliza(qs.get('municipio'));
+let esChoachi = municipio === 'choachi';
+let esCundinamarca = esChoachi || municipio === 'cundinamarca' || normaliza(qs.get('departamento')) === 'cundinamarca';
+const numero = (v, min, max) => v !== null && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const altURL = numero(qs.get('alt'), 0, 6000);
+const pisoDe = alt => alt < 1000 ? 'calido' : alt < 2000 ? 'templado' : alt < 3000 ? 'frio' : 'limite';
+let piso = altURL === null ? 'calido' : pisoDe(altURL);
+let perfil = DATOS.perfiles[piso];
+let altura = altURL, origen = altURL === null ? 'Piso de ejemplo' : 'Ubicación de la app';
+const semilla = numero(qs.get('semilla'), 0, 4294967295) ?? 20260929;
+const razaDibujada = () => (esChoachi && (piso === 'frio' || piso === 'templado') || esCundinamarca && piso === 'frio') ? 'Normando' : perfil.vaca;
+
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false, CX = 0, CY = 0;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+
+/* ---------- utilidades (las del café y el suelo) ---------- */
+function rng(seed){ let a = (seed + semilla) >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath(); }
+function linea(c, pts){ c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]); }
+function suave(c, pts){ c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length - 1; i++){ const mx = (pts[i][0]+pts[i+1][0])/2, my = (pts[i][1]+pts[i+1][1])/2; c.quadraticCurveTo(pts[i][0], pts[i][1], mx, my); } const z = pts[pts.length-1]; c.lineTo(z[0], z[1]); }
+/* cinta: polilínea con ancho variable (hoja, pata, raíz) */
+function cinta(c, pts, ancho){
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++){ const a = pts[Math.max(0,i-1)], b = pts[Math.min(n-1,i+1)]; let tx = b[0]-a[0], ty = b[1]-a[1]; const l = Math.hypot(tx,ty) || 1e-9; tx /= l; ty /= l; const w = ancho(i/(n-1)) / 2; L.push([pts[i][0] - ty*w, pts[i][1] + tx*w]); R.push([pts[i][0] + ty*w, pts[i][1] - tx*w]); }
+  c.moveTo(L[0][0], L[0][1]); for (let i = 1; i < n; i++) c.lineTo(L[i][0], L[i][1]); for (let i = n-1; i >= 0; i--) c.lineTo(R[i][0], R[i][1]); c.closePath();
+}
+/* grumos de tierra: polígonos irregulares agrupados por tono; se arman una vez en Path2D */
+function grumos(r, box, n, rMin, rMax, tonos, filtro){
+  const out = tonos.map(() => []);
+  for (let i = 0; i < n; i++){ const x = lerp(box[0], box[2], r()), y = lerp(box[1], box[3], r()); if (filtro && !filtro(x, y)) { r(); r(); continue; }
+    const rr = lerp(rMin, rMax, Math.pow(r(), 1.6)); const k = 5 + Math.floor(r()*4); const a0 = r()*6.28; const pts = [];
+    for (let j = 0; j < k; j++){ const a = a0 + j/k*6.283 + (r()-.5)*0.5; const d = rr*(0.65 + r()*0.45); pts.push([x + Math.cos(a)*d, y + Math.sin(a)*d*0.85]); }
+    out[Math.floor(r()*tonos.length)].push({ pts, bb: [x-rr, y-rr, x+rr, y+rr] }); }
+  return out;
+}
+function pintaGrumos(c, G, tonos, sombra){
+  if (!G._p){ G._p = G.map(T => { const P = new Path2D(); for (const g of T) roundPoly(P, g.pts); return P; }); G._t = new Path2D(); for (const P of G._p) G._t.addPath(P); }
+  if (sombra){ c.save(); c.translate(sombra*0.6, sombra); c.fillStyle = 'rgba(8,5,3,.5)'; c.fill(G._t); c.restore(); }
+  for (let t = 0; t < G.length; t++){ c.fillStyle = tonos[t]; c.fill(G._p[t]); }
+}
+
+/* ============================================================
+   NIVELES (F = ancho del cuadro de cada nivel, en metros)
+   Cada nivel dibuja en METROS relativos a su origen; la escala
+   a unidades del nivel la pone su función de dibujo.
+   ============================================================ */
+const LV = [
+  { F: 60,   par: -1, nom: 'potrero' },
+  { F: 1.2,  par: 0,  nom: 'pasto', k: 3.4 },
+  { F: 0.08, par: 1,  nom: 'suelo', k: 1.8 },
+];
+/* k = alcance: el nivel dibuja contenido hasta k veces su cuadro; el fundido del portal y el cambio de base usan ese umbral */
+const KIDS = [[1], [2], []];
+LV[0].O = [0, 0];
+function fijaPortal(L, x, y){ const l = LV[L], P = LV[l.par]; l.x = x; l.y = y; l.s = l.F / P.F; l.O = [P.O[0] + P.F*x, P.O[1] + P.F*y]; }
+
+/* ============================================================
+   EL TIEMPO: τ en días desde que las vacas entran al potrero del portal.
+   τ < 0: el último día del descanso anterior · 0..1: el día de ocupación
+   1..46: los 45 días de descanso. Lo mueve el scroll en las estaciones 4 y 5.
+   ============================================================ */
+let TAU = -1;
+const OCUPA = 1, DESCANSO = 45;                          // parámetros temporales del ejemplo; no son una prescripción
+const ALTO_ENTRA = 0.90, ALTO_SALE = 0.50;               // alturas del dibujo tropical; otros perfiles escalan su geometría
+/* cómo vuelve a crecer entre esas dos alturas: forma de ejemplo, no medida */
+const altoDescanso = d => ALTO_SALE + (ALTO_ENTRA - ALTO_SALE)*sstep(0, DESCANSO, d);
+
+
+/* ============================================================
+   NIVEL 0 · EL POTRERO (metros; y crece hacia abajo; el suelo en y ≈ 0)
+   El hato avanza hacia la izquierda: ayer → hoy → mañana.
+   ============================================================ */
+const M0 = 60;
+const gM = x => 0.22*Math.sin(x*0.071 + 0.6) + 0.09*Math.sin(x*0.23 + 1.3);
+/* franjas: d = días de descanso que llevan (−1: la de hoy, con las vacas) */
+const FRANJAS = [
+  { a: -66, b: -54, d: 34 }, { a: -54, b: -42, d: 20 }, { a: -42, b: -30, d: 12 }, { a: -30, b: -18, d: 38 },
+  { a: -18, b: -6, d: 26, }, { a: -6, b: 6, d: 44, nom: 'mañana' }, { a: 6, b: 18, d: -1, nom: 'hoy' },
+  { a: 18, b: 30, d: 1, nom: 'ayer' }, { a: 30, b: 42, d: 8 }, { a: 42, b: 54, d: 15 }, { a: 54, b: 66, d: 30 },
+];
+const altoFranja = F => F.d < 0 ? 0.64 : altoDescanso(F.d);
+const POSTES = [-54, -42, -30, -18, -6, 6, 30, 42, 54];
+const MATARRATON = [18, -66, 66];                          // la cerca viva
+const SAMANES = [
+  { x: 11.0, R: 7.2, hb: 6.6, ht: 13.0, s: 31 },           // el de las vacas de hoy
+  { x: -6.5, R: 8.2, hb: 6.8, ht: 13.4, s: 47 },           // el del potrero de mañana; bajo la orilla de su sombra, el portal
+  { x: -29, R: 7.6, hb: 6.4, ht: 12.4, s: 59 },
+  { x: 37, R: 8.0, hb: 6.6, ht: 12.8, s: 71 },
+  { x: -52, R: 8.4, hb: 6.8, ht: 13.2, s: 83 },
+];
+/* el sol está alto y un poco a la derecha: la sombra de cada copa cae corrida a la izquierda */
+const SOMBRA_DX = -0.8;
+const sombraDe = T => [T.x - T.R*1.02 + SOMBRA_DX, T.x + T.R*1.02 + SOMBRA_DX];
+const XP1 = sombraDe(SAMANES[1])[1] - 0.25;                // el portal del pasto: a la orilla derecha de la sombra del samán de mañana
+fijaPortal(1, XP1/M0, (gM(XP1) - 0.35)/M0);
+/* ---------- el fondo: cielo de tierra caliente, cordillera y potreros lejanos ---------- */
+let fondoN = null, fondoB = null;
+const SOL = [0.42, -0.62];
+function pintaFondo(c){
+  const g = c.createLinearGradient(0, -0.9, 0, 0.05); g.addColorStop(0, '#5f9fd0'); g.addColorStop(0.45, '#9cc6e3'); g.addColorStop(0.85, '#dbe7e2'); g.addColorStop(1, '#eef0e0');
+  c.fillStyle = g; c.fillRect(-1, -1, 2, 2);
+  const gs = c.createRadialGradient(SOL[0], SOL[1], 0, SOL[0], SOL[1], 0.7); gs.addColorStop(0, 'rgba(255,252,236,.95)'); gs.addColorStop(0.06, 'rgba(255,248,222,.75)'); gs.addColorStop(0.3, 'rgba(255,244,214,.18)'); gs.addColorStop(1, 'rgba(255,244,214,0)');
+  c.fillStyle = gs; c.fillRect(-1, -1, 2, 2);
+  c.fillStyle = '#fffdf2'; c.beginPath(); c.arc(SOL[0], SOL[1], 0.02, 0, 7); c.fill();
+  // cúmulos de tarde caliente
+  const rn = rng(5);
+  for (let i = 0; i < 9; i++){ const x = -0.95 + rn()*1.9, y = -0.55 + rn()*0.32, w = 0.07 + rn()*0.14;
+    for (let k = 0; k < 9; k++){ const gx = x + (k - 4)*w*0.17 + (rn()-.5)*w*0.1, gy = y - Math.sin(k/8*Math.PI)*w*0.28 + (rn()-.5)*0.01, rr = w*(0.22 + rn()*0.16);
+      const gc = c.createRadialGradient(gx - rr*0.2, gy - rr*0.3, 0, gx, gy, rr); gc.addColorStop(0, 'rgba(255,255,255,.8)'); gc.addColorStop(0.6, 'rgba(246,248,250,.45)'); gc.addColorStop(1, 'rgba(240,244,248,0)'); c.fillStyle = gc; c.fillRect(gx - rr, gy - rr, 2*rr, 2*rr); }
+    const gb = c.createLinearGradient(0, y, 0, y + w*0.2); gb.addColorStop(0, 'rgba(200,210,222,0)'); gb.addColorStop(1, 'rgba(190,200,214,.18)'); c.fillStyle = gb; c.fillRect(x - w, y, 2*w, w*0.2); }
+  // la cordillera, en capas de bruma
+  const capas = [['#a9c3d2', -0.018, 0.2, 5], ['#8fb0ac', 0.0, 0.13, 9], ['#6f9670', 0.012, 0.07, 17]];
+  capas.forEach(([col, base, amp, sd], k) => { const r = rng(sd); c.fillStyle = col; c.beginPath(); c.moveTo(-1, 0.4);
+    for (let x = -1; x <= 1.01; x += 0.012){ const y = base - amp*(0.5 + 0.5*Math.sin(x*(2.3 + k*1.9) + sd))*(0.55 + 0.45*Math.sin(x*9 + k*2)) - (r()-.5)*0.004*(3-k); c.lineTo(x, y); }
+    c.lineTo(1, 0.4); c.closePath(); c.fill();
+    if (k === 2){ const rr = rng(44); for (let i = 0; i < 70; i++){ const x = -1 + rr()*2, y = base - 0.004 + rr()*0.03; c.fillStyle = rr() < 0.5 ? 'rgba(160,190,110,.35)' : 'rgba(96,130,70,.35)'; c.beginPath(); c.ellipse(x, y, 0.012 + rr()*0.03, 0.003 + rr()*0.004, 0, 0, 7); c.fill(); } } });
+  const gz = c.createLinearGradient(0, -0.1, 0, 0.02); gz.addColorStop(0, 'rgba(236,242,236,0)'); gz.addColorStop(1, 'rgba(236,242,236,.55)'); c.fillStyle = gz; c.fillRect(-1, -0.1, 2, 0.13);
+  // los potreros que se alejan, con sus árboles aislados y cercas vivas
+  const gl = c.createLinearGradient(0, 0.004, 0, 0.06); gl.addColorStop(0, '#9fb772'); gl.addColorStop(1, '#6f8c45'); c.fillStyle = gl; c.beginPath(); c.moveTo(-1, 0.012); for (let x = -1; x <= 1.01; x += 0.04) c.lineTo(x, 0.009 + 0.003*Math.sin(x*7)); c.lineTo(1, 0.4); c.lineTo(-1, 0.4); c.closePath(); c.fill();
+  const ra = rng(12);
+  for (let fila = 0; fila < 3; fila++){ const y0 = 0.012 + fila*0.011, sc = 0.35 + fila*0.3, al = 0.4 + fila*0.2;
+    for (let x = -1; x < 1; x += 0.03 + ra()*0.08){ if (ra() < 0.35) continue; const R = 0.012*sc*(0.8 + ra()*0.6), h = 0.022*sc*(0.8 + ra()*0.4);
+      c.strokeStyle = `rgba(70,60,48,${al})`; c.lineWidth = 0.0016*sc; c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y0 - h*0.6); c.stroke();
+      c.fillStyle = `rgba(${58 + fila*6},${92 + fila*8},${50},${al})`; c.beginPath(); c.ellipse(x, y0 - h*0.75, R, R*0.42, 0, 0, 7); c.fill();
+      c.fillStyle = `rgba(${96 + fila*8},${130 + fila*8},${70},${al*0.8})`; c.beginPath(); c.ellipse(x + R*0.2, y0 - h*0.83, R*0.7, R*0.25, 0, 0, 7); c.fill(); }
+    // una línea de cerca viva
+    c.strokeStyle = `rgba(80,110,60,${al*0.7})`; c.lineWidth = 0.004*sc; c.beginPath(); for (let x = -1; x < 1; x += 0.01) c.lineTo(x, y0 - 0.004*sc - 0.002*Math.abs(Math.sin(x*80))); c.stroke(); }
+  const gh = c.createLinearGradient(0, -0.04, 0, 0.05); gh.addColorStop(0, 'rgba(250,244,220,0)'); gh.addColorStop(0.7, 'rgba(250,244,220,.18)'); gh.addColorStop(1, 'rgba(250,244,220,0)'); c.fillStyle = gh; c.fillRect(-1, -0.04, 2, 0.09);
+}
+function prepFondo(){
+  const res = Math.min(2600, Math.max(700, Math.round(S*DPR*1.3)));
+  const c1 = document.createElement('canvas'); c1.width = c1.height = res; const x1 = c1.getContext('2d');
+  x1.setTransform(res/2, 0, 0, res/2, res/2, res/2); pintaFondo(x1); fondoN = c1;
+  const rb = Math.max(220, Math.round(res/4)); const c2 = document.createElement('canvas'); c2.width = c2.height = rb; const x2 = c2.getContext('2d');
+  if (!qs.has('sinpost') && 'filter' in x2){ x2.filter = `blur(${Math.max(2, rb/110)}px)`; x2.drawImage(c1, 0, 0, rb, rb); x2.filter = 'none'; } else x2.drawImage(c1, 0, 0, rb, rb);
+  fondoB = c2;
+  fondoPasto = null;
+}
+
+/* ---------- el pasto guinea en macollas (nivel 0): masa de la mata y, encima, sus hojas ---------- */
+/* arma el pasto de una franja en tres filas de fondo; se guarda en Path2D por tono */
+function pastoFranja(F, alto, semilla, trad){
+  const r = rng(semilla);
+  alto *= perfil.pastoFactor;
+  const filas = [[-0.34, 0.86], [-0.17, 0.93], [0, 1]];
+  return filas.map(([dy, sc]) => {
+    const O = { masa: [new Path2D(), new Path2D()], tonos: [new Path2D(), new Path2D(), new Path2D()], espigas: new Path2D(), tallos: new Path2D() };
+    for (let x = F.a + 0.15 + r()*0.3; x < F.b - 0.1; x += (trad ? 0.5 : 0.38) + r()*0.22){
+      if (trad && r() < 0.36){ r(); continue; }             // sin descanso: calvas de tierra pelada (de ejemplo)
+      const y = gM(x) + dy, h = alto*sc*(0.82 + r()*0.3), ancho = h*(trad ? 0.8 : 0.5) + 0.12;
+      // la masa: una mata redondeada, con el borde de arriba hecho de puntas
+      const n = 9, pts = [[x - ancho*0.45, y + 0.02]];
+      for (let k = 0; k <= n; k++){ const u = k/n, a = (u - 0.5)*2.1; const rr = h*(0.72 + r()*0.32)*(1 - 0.35*Math.abs(u - 0.5)); pts.push([x + Math.sin(a)*ancho*0.62, y - Math.cos(a)*rr]); }
+      pts.push([x + ancho*0.45, y + 0.02]);
+      const m = O.masa[r() < 0.5 ? 0 : 1]; m.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length - 1; k++){ const q = pts[k], w = pts[k + 1]; m.quadraticCurveTo(q[0], q[1], (q[0] + w[0])/2, (q[1] + w[1])/2); } m.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]); m.closePath();
+      // las hojas que sobresalen de la masa: se ven de cerca
+      const nh = trad ? 5 : 9;
+      for (let i = 0; i < nh; i++){ const lado = r() < 0.5 ? -1 : 1, a0 = lado*(0.1 + r()*0.6), L = h*(0.8 + r()*0.4), cur = 0.6 + r()*1.1, w = 0.028*sc; const p = []; let px = x + (r()-.5)*0.1, py = y, a = a0;
+        for (let k = 0; k <= 7; k++){ p.push([px, py]); const t = k/7; a = a0 + lado*cur*t*t*1.3; px += Math.sin(a)*L/7; py -= Math.cos(a)*L/7; }
+        cinta(O.tonos[Math.floor(r()*3)], p, t => w*(t < 0.15 ? lerp(0.7, 1, t/0.15) : Math.pow(1 - t, 0.8))); }
+      if (piso === 'calido' && !trad && F.d >= 36 && r() < 0.5){ // espigas del pasto listo: la panícula abierta
+        const sx = x + (r()-.5)*0.1, sh = h*(1.15 + r()*0.2); O.tallos.moveTo(sx, y - h*0.5); O.tallos.quadraticCurveTo(sx + 0.03, y - sh*0.75, sx + 0.06, y - sh);
+        for (let k = 0; k < 6; k++){ const t = 0.72 + k*0.05, ex = sx + 0.06*t*t, ey = y - sh*t; const lado = k % 2 ? 1 : -1; O.espigas.moveTo(ex, ey); O.espigas.quadraticCurveTo(ex + lado*0.08, ey - 0.02, ex + lado*0.15, ey + 0.05); } }
+      if (!trad && F.d >= 0 && F.d < 4){ for (let k = 0; k < 5; k++){ const sx = x + (r()-.5)*0.2; O.tallos.moveTo(sx, y); O.tallos.lineTo(sx + (r()-.5)*0.05, y - h*(0.75 + r()*0.3)); } }
+    }
+    return O;
+  });
+}
+const PASTO0 = new Map();
+function pastoDe(F, trad){ const k = F.a + (trad ? 't' : ''); if (!PASTO0.has(k)) PASTO0.set(k, pastoFranja(F, trad ? 0.16 : altoFranja(F), 1000 + F.a*7 + (trad ? 5 : 0), trad)); return PASTO0.get(k); }
+function pintaPastoFila(c, F, fi, trad){
+  const P = pastoDe(F, trad)[fi], seco = trad ? 0.75 : F.d >= 0 && F.d < 6 ? 0.8 : F.d < 0 ? 0.35 : 0;
+  const lejos = (2 - fi)*0.13, tono = (a, b) => mix(mix(a, b, seco), '#a3b39a', lejos);
+  c.fillStyle = tono('#3e6a2b', '#6a7a3a'); c.fill(P.masa[0]);
+  c.fillStyle = tono('#4a7a33', '#7a8842'); c.fill(P.masa[1]);
+  const T3 = [['#437331', '#72843e'], ['#5c8c3c', '#8a9a4a'], ['#7da752', '#a6b264']];
+  for (let k = 0; k < 3; k++){ c.fillStyle = tono(T3[k][0], T3[k][1]); c.fill(P.tonos[k]); }
+  c.strokeStyle = tono('#b7a263', '#c9b57c'); c.lineWidth = 0.012; c.lineCap = 'round'; c.stroke(P.tallos);
+  c.strokeStyle = mix('#8a6a7e', '#b4a0a8', lejos); c.lineWidth = 0.01; c.stroke(P.espigas);
+}
+
+/* ---------- la leucaena: un seto tupido detrás del pasto, podado a 1–1,2 m {zapata2019} ---------- */
+const hojasLeuFranja = F => F.d < 0 ? 0.55 : F.d < 4 ? 0.28 : 0.3 + 0.7*sstep(0, 40, F.d);
+function leucaenaFranja(F, semilla){
+  const r = rng(semilla), f = hojasLeuFranja(F), y0 = x => gM(x) - 0.5;
+  const O = { tallos: new Path2D(), masa: [new Path2D(), new Path2D(), new Path2D(), new Path2D()], flores: new Path2D(), vainas: new Path2D() };
+  for (let x = F.a + 0.4; x < F.b - 0.3; x += 0.62 + r()*0.25){
+    const y = y0(x);
+    for (let k = 0; k < 3; k++){ const tx = x + (k - 1)*0.1 + (r()-.5)*0.06; O.tallos.moveTo(tx, y); O.tallos.quadraticCurveTo(tx + (r()-.5)*0.1, y - 0.6, tx + (r()-.5)*0.25, y - 1.1); }
+    // el follaje: muchas matitas pequeñas, finas, que se juntan en una copa redondeada
+    const cx = x + (r()-.5)*0.2, cy = y - 0.95 - 0.4*f, rx = 0.5 + 0.32*f, ry = 0.38 + 0.3*f, n = Math.round(16 + 46*f);
+    for (let i = 0; i < n; i++){ const a = r()*6.283, d = Math.sqrt(r()); const px = cx + Math.cos(a)*rx*d, py = cy + Math.sin(a)*ry*d*0.95; const R = 0.08 + r()*0.1;
+      const luz = clamp(0.5 - Math.sin(a)*d*0.45 + Math.cos(a)*d*0.15 + (r() - 0.5)*0.35, 0, 0.999);
+      const M = O.masa[Math.floor(luz*4)]; M.moveTo(px + R, py); M.ellipse(px, py, R, R*0.72, r()*3, 0, 7); }
+    if (f > 0.7 && r() < 0.5){ const fx = cx + (r()-.5)*rx, fy = cy - ry*0.7; O.flores.moveTo(fx + 0.035, fy); O.flores.arc(fx, fy, 0.035, 0, 7); }
+    if (f > 0.8 && r() < 0.4){ for (let k = 0; k < 4; k++){ const vx = cx - 0.2 + k*0.12, vy = cy + ry*0.6; O.vainas.moveTo(vx, vy); O.vainas.quadraticCurveTo(vx + 0.02, vy + 0.1, vx - 0.01, vy + 0.2); } }
+  }
+  return O;
+}
+const LEU0 = new Map();
+function pintaLeucaena(c, F, px, alfa){
+  if (alfa < 0.01) return;
+  if (!LEU0.has(F.a)) LEU0.set(F.a, leucaenaFranja(F, 500 + F.a*3));
+  const L = LEU0.get(F.a);
+  c.save(); c.globalAlpha *= alfa; c.lineCap = 'round';
+  c.strokeStyle = '#6a5c48'; c.lineWidth = Math.max(px, 0.03); c.stroke(L.tallos);
+  ['#4c6e2e', '#628a38', '#7ea447', '#9dbd5c'].forEach((col, k) => { c.fillStyle = col; c.fill(L.masa[k]); });
+  c.fillStyle = piso === 'templado' ? '#eac344' : '#efe9d0'; c.fill(L.flores);
+  c.strokeStyle = '#8a6a3c'; c.lineWidth = Math.max(px, 0.018); if (piso === 'calido') c.stroke(L.vainas);
+  c.restore();
+}
+
+/* ---------- el samán: copa ancha de sombrilla, masa de follaje fino; ramas que se abren desde un tronco corto ---------- */
+function armaSaman(T){
+  const r = rng(T.s + semilla), g = gM(T.x);
+  if (piso === 'frio'){ T = { ...T, R:T.R*.53, hb:T.hb*.68, ht:T.ht*1.18 }; }
+  if (piso === 'templado'){ T = { ...T, R:T.R*.76, hb:T.hb*.72, ht:T.ht*.88 }; }
+  const yTop = u => g - (T.hb + 1.0 + (T.ht - T.hb - 1.0)*Math.pow(Math.max(0, 1 - u*u), 0.5));
+  const yBot = u => g - (T.hb + 0.35*(1 - u*u));
+  const tonos = [0, 1, 2, 3, 4].map(() => new Path2D()), fino = [new Path2D(), new Path2D()];
+  const matas = [];
+  for (let i = 0; i < 620; i++){ const u = (r()*2 - 1)*0.99, v = Math.pow(r(), 0.7); const yb = yBot(u), yt = yTop(u); const x = T.x + u*T.R, y = lerp(yb - 0.3, yt + 0.55, v); const R = 0.55 + r()*0.65;
+    // la luz: arriba y hacia el sol (a la derecha) más clara; abajo, en su propia sombra
+    const luz = clamp(v*0.8 + u*0.18 + (r() - 0.5)*0.3 - (y > yb - 0.9 ? 0.35 : 0), 0, 0.999);
+    matas.push({ x, y, R, luz }); }
+  matas.sort((a, b) => a.luz - b.luz);
+  for (const m of matas){ const P = tonos[Math.floor(m.luz*5)]; const dx = m.luz*0.12, dy = -m.luz*0.1; P.moveTo(m.x + dx + m.R, m.y + dy); P.ellipse(m.x + dx, m.y + dy, m.R, m.R*0.78, 0, 0, 7); }
+  for (let i = 0; i < 1300; i++){ const u = (r()*2 - 1)*0.98, v = r(); const x = T.x + u*T.R, y = lerp(yBot(u) - 0.2, yTop(u) + 0.35, v); const R = 0.1 + r()*0.13; const P = fino[r() < 0.45 + v*0.25 ? 1 : 0]; P.moveTo(x + R, y); P.ellipse(x, y, R, R*0.6, r()*3, 0, 7); }
+  // tronco corto y grueso, y las ramas maestras que se abren como una sombrilla
+  const top = [T.x + 0.1, g - 2.8];
+  const tronco = [[T.x - 0.05, g + 0.08], [T.x - 0.02, g - 1.0], [T.x + 0.05, g - 2.0], top];
+  const ram = [];
+  const angs = [-1.1, -0.45, 0.2, 0.85, 1.3];
+  for (const a0 of angs){ const u = clamp(a0/1.5, -0.9, 0.9); const ex = T.x + u*T.R*0.62, ey = yBot(u) - 0.9;
+    const b0 = [top[0] + a0*0.12, top[1] + 0.3 - Math.abs(a0)*0.15];
+    const c1 = [lerp(b0[0], ex, 0.25), lerp(b0[1], ey, 0.55) - 0.2], c2 = [lerp(b0[0], ex, 0.65), ey + 0.9 - Math.abs(u)*0.4];
+    const pts = []; for (let k = 0; k <= 12; k++){ const t = k/12, it = 1 - t; pts.push([it*it*it*b0[0] + 3*it*it*t*c1[0] + 3*it*t*t*c2[0] + t*t*t*ex, it*it*it*b0[1] + 3*it*it*t*c1[1] + 3*it*t*t*c2[1] + t*t*t*ey]); }
+    const sec = []; for (const t of [0.5, 0.72, 0.9]){ const p = pts[Math.round(t*12)]; for (const s of [-1, 1]){ if (r() < 0.45) continue; const L = 1.4 + r()*2.0, aa = -Math.PI/2 + s*(0.35 + r()*0.5) + u*0.7; sec.push([[p[0], p[1]], [p[0] + Math.cos(aa)*L*0.5, p[1] + Math.sin(aa)*L*0.5 - 0.1], [p[0] + Math.cos(aa)*L, p[1] + Math.sin(aa)*L*0.8]]); } }
+    ram.push({ pts, w0: 0.62 - Math.abs(u)*0.12, sec }); }
+  return { tonos, fino, tronco, ram, g, yBot, yTop };
+}
+SAMANES.forEach(T => T.A = armaSaman(T));
+const TONOS_COPA = ['#20381a', '#2e4d22', '#40652b', '#587f36', '#7a9e48'];
+function pintaTronco(c, T, px, alfa){
+  const A = T.A; if (alfa < 0.01) return; c.save(); c.globalAlpha *= alfa; c.lineCap = 'round'; c.lineJoin = 'round';
+  const gt = c.createLinearGradient(T.x - 0.7, 0, T.x + 0.7, 0); gt.addColorStop(0, '#433a31'); gt.addColorStop(0.6, '#7a6a5a'); gt.addColorStop(1, '#52463a');
+  c.fillStyle = gt;
+  // raíces que asoman al pie, tronco y ramas maestras
+  c.beginPath(); c.moveTo(T.x - 1.3, A.g + 0.05); c.quadraticCurveTo(T.x - 0.55, A.g - 0.15, T.x - 0.42, A.g - 0.9); c.lineTo(T.x + 0.46, A.g - 0.9); c.quadraticCurveTo(T.x + 0.6, A.g - 0.15, T.x + 1.4, A.g + 0.05); c.closePath(); c.fill();
+  c.beginPath(); cinta(c, A.tronco, t => lerp(1.05, 0.9, t)); c.fill();
+  for (const rm of A.ram){ c.fillStyle = '#5d4f41'; c.beginPath(); cinta(c, rm.pts, t => lerp(rm.w0, 0.2, Math.pow(t, 0.7))); c.fill();
+    c.strokeStyle = 'rgba(160,140,115,.35)'; c.lineWidth = Math.max(px, rm.w0*0.18); c.beginPath(); suave(c, rm.pts.slice(0, 9).map(q => [q[0] + 0.05, q[1] - 0.06])); c.stroke(); }
+  c.strokeStyle = '#5d4f41'; c.lineWidth = Math.max(px, 0.13); c.beginPath(); for (const rm of A.ram) for (const s of rm.sec) suave(c, s); c.stroke();
+  if (px < 0.03){ c.strokeStyle = 'rgba(38,30,24,.4)'; c.lineWidth = Math.max(px, 0.02); const rr = rng(T.s + 3); c.beginPath(); for (let k = 0; k < 18; k++){ const x = T.x - 0.42 + rr()*0.85, y0 = A.g - rr()*0.5, L = 0.4 + rr()*1.8; c.moveTo(x, y0); c.quadraticCurveTo(x + (rr()-.5)*0.08, y0 - L*0.5, x + (rr()-.5)*0.05, y0 - L); } c.stroke(); }
+  c.restore();
+}
+function pintaCopa(c, T, px, alfa){
+  const A = T.A; if (alfa < 0.01) return; c.save(); c.globalAlpha *= alfa;
+  for (let k = 0; k < 5; k++){ c.fillStyle = TONOS_COPA[k]; c.fill(A.tonos[k]); }
+  // textura fina de folíolos, que aparece al acercarse
+  const aT = clamp((0.08 - px)/0.05, 0, 1);
+  if (aT > 0.01){ c.globalAlpha *= aT*0.8; c.fillStyle = 'rgba(20,38,16,.55)'; c.fill(A.fino[0]); c.fillStyle = 'rgba(150,188,98,.45)'; c.fill(A.fino[1]); }
+  c.restore();
+}
+/* la sombra bajo la copa: a ras de suelo, sobre el pasto y las patas; las vacas que están debajo se oscurecen aparte */
+function pintaSombra(c, T, alfa){
+  if (alfa < 0.01) return;
+  const g = T.A.g, [x0, x1] = sombraDe(T);
+  c.save(); c.globalAlpha *= alfa;
+  const gx = c.createLinearGradient(x0, 0, x1, 0); gx.addColorStop(0, 'rgba(10,26,12,0)'); gx.addColorStop(0.14, 'rgba(10,26,12,1)'); gx.addColorStop(0.86, 'rgba(10,26,12,1)'); gx.addColorStop(1, 'rgba(10,26,12,0)');
+  c.fillStyle = gx; const n = 8, alto = 1.1;
+  for (let i = 0; i < n; i++){ const y1 = g + 0.05 - alto*i/n, y2 = g + 0.05 - alto*(i + 1)/n; c.globalAlpha = alfa*0.62*Math.pow(1 - i/n, 1.3); c.fillRect(x0, y2, x1 - x0, y1 - y2 + 0.001); }
+  c.restore();
+}
+const bajoCopa = x => { let s = 0; for (const T of SAMANES){ const [a, b] = sombraDe(T); s = Math.max(s, sstep(a, a + 1.2, x)*(1 - sstep(b - 1.2, b, x))); } return s; };
+
+/* ---------- las vacas: de perfil, mirando a la derecha; en metros, el suelo en y = 0 ---------- */
+const PELAJES = [
+  { luz: '#f0ede6', base: '#d8d3c9', sombra: '#a19b8f', oscuro: '#3b3733', hocico: '#4a4540', oreja: '#caa89a' },
+  { luz: '#c98252', base: '#a65b31', sombra: '#6b361b', oscuro: '#2f1f16', hocico: '#704a3a', oreja: '#b8765a' },
+  { luz: '#f4f1ea', base: '#e3ded4', sombra: '#a8a296', oscuro: '#26231f', hocico: '#3a3531', oreja: '#caa89a', manchas: '#2a2723' },
+  { luz: '#c9c0b3', base: '#aaa094', sombra: '#736a60', oscuro: '#2f2b27', hocico: '#3f3a35', oreja: '#b09080' },
+];
+const OSCURO_SOMBRA = '#1c2419';
+function pelajeEn(P, s){ if (s < 0.02) return P; const o = {}; for (const k in P) o[k] = mix(P[k], OSCURO_SOMBRA, s*0.22); return o; }
+/* una pata: puntos de su eje (arriba → casco) con su ancho en cada punto */
+function pata(c, pts, ws, col, P, px){
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++){ const a = pts[Math.max(0, i-1)], b = pts[Math.min(n-1, i+1)]; let tx = b[0]-a[0], ty = b[1]-a[1]; const l = Math.hypot(tx, ty) || 1e-9; tx /= l; ty /= l; const w = ws[i]/2; L.push([pts[i][0] - ty*w, pts[i][1] + tx*w]); R.push([pts[i][0] + ty*w, pts[i][1] - tx*w]); }
+  c.fillStyle = col; c.beginPath(); c.moveTo(L[0][0], L[0][1]); for (let i = 1; i < n; i++){ const m = [(L[i-1][0] + L[i][0])/2, (L[i-1][1] + L[i][1])/2]; c.quadraticCurveTo(L[i-1][0], L[i-1][1], m[0], m[1]); } c.lineTo(L[n-1][0], L[n-1][1]); c.lineTo(R[n-1][0], R[n-1][1]); for (let i = n-2; i >= 0; i--){ const m = [(R[i+1][0] + R[i][0])/2, (R[i+1][1] + R[i][1])/2]; c.quadraticCurveTo(R[i+1][0], R[i+1][1], m[0], m[1]); } c.lineTo(R[0][0], R[0][1]); c.closePath(); c.fill();
+  // el casco partido y la pezuña de atrás
+  const z = pts[n-1], hw = ws[n-1]*0.62;
+  c.fillStyle = P.oscuro; c.beginPath(); c.moveTo(z[0] - hw, z[1] - 0.065); c.quadraticCurveTo(z[0], z[1] - 0.08, z[0] + hw, z[1] - 0.06); c.lineTo(z[0] + hw*1.25, z[1] + 0.004); c.lineTo(z[0] - hw*1.05, z[1] + 0.004); c.closePath(); c.fill();
+  if (px < 0.01){ c.strokeStyle = 'rgba(120,110,100,.6)'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(z[0] + hw*0.1, z[1] - 0.05); c.lineTo(z[0] + hw*0.15, z[1]); c.stroke();
+    const f = pts[n-2]; c.fillStyle = P.oscuro; c.beginPath(); c.ellipse(f[0] - ws[n-2]*0.55, f[1] + 0.01, 0.018, 0.012, 0, 0, 7); c.fill(); }
+}
+function patas(pose, paso){
+  const s = Math.sin(paso), s2 = Math.sin(paso + Math.PI), k = pose === 'camina' ? 1 : pose === 'come' ? 0.2 : 0;
+  const del = (x, sw) => [[x, -0.78], [x + 0.01 + sw*0.05, -0.56], [x + 0.02 + sw*0.12, -0.38], [x + 0.02 + sw*0.19, -0.12], [x + 0.035 + sw*0.21, -0.03], [x + 0.045 + sw*0.21, 0]];
+  const tra = (x, sw) => [[x, -0.9], [x - 0.07 + sw*0.02, -0.64], [x - 0.12 + sw*0.06, -0.44], [x - 0.05 + sw*0.15, -0.13], [x - 0.035 + sw*0.17, -0.03], [x - 0.03 + sw*0.17, 0]];
+  return { dCerca: del(0.55, s*k), dLejos: del(0.45, s2*k), tCerca: tra(-0.7, s2*k), tLejos: tra(-0.6, s*k) };
+}
+const W_DEL = [0.2, 0.17, 0.12, 0.095, 0.09, 0.1], W_TRA = [0.34, 0.2, 0.13, 0.095, 0.09, 0.1];
+function cuerpoDePie(c, abajo){
+  c.moveTo(-0.99, -1.3);
+  c.bezierCurveTo(-0.84, -1.35, -0.66, -1.36, -0.55, -1.32);             // la cadera
+  c.bezierCurveTo(-0.2, -1.27, 0.2, -1.3, 0.42, -1.34);
+  if (piso === 'calido') c.bezierCurveTo(0.48, -1.54, 0.66, -1.56, 0.76, -1.4);
+  else c.bezierCurveTo(0.5, -1.34, 0.65, -1.36, 0.76, -1.35);                 // la giba del cebú
+  if (abajo){ c.bezierCurveTo(0.95, -1.24, 1.07, -0.98, 1.12, -0.66); c.lineTo(1.02, -0.43); c.bezierCurveTo(0.98, -0.3, 0.86, -0.34, 0.8, -0.46); c.bezierCurveTo(0.78, -0.55, 0.76, -0.62, 0.72, -0.66); }
+  else { c.bezierCurveTo(0.88, -1.41, 1.02, -1.37, 1.13, -1.27); c.lineTo(1.03, -1.02); c.bezierCurveTo(1.0, -0.8, 0.94, -0.6, 0.86, -0.5); c.bezierCurveTo(0.8, -0.52, 0.76, -0.6, 0.72, -0.66); }  // cuello y papada
+  c.bezierCurveTo(0.66, -0.72, 0.58, -0.76, 0.5, -0.74);
+  c.bezierCurveTo(0.25, -0.6, -0.2, -0.56, -0.5, -0.68);                 // la barriga
+  c.bezierCurveTo(-0.62, -0.74, -0.7, -0.84, -0.8, -0.88);
+  c.bezierCurveTo(-0.98, -0.92, -1.06, -1.12, -0.99, -1.3); c.closePath();
+}
+function cuerpoEchada(c){
+  c.moveTo(-0.98, -0.9);
+  c.bezierCurveTo(-0.6, -0.98, 0.05, -0.9, 0.38, -0.95);
+  c.bezierCurveTo(0.46, -1.13, 0.63, -1.15, 0.72, -1.0);
+  c.bezierCurveTo(0.86, -1.02, 0.98, -1.02, 1.04, -0.98); c.lineTo(0.96, -0.72);
+  c.bezierCurveTo(0.9, -0.5, 0.8, -0.3, 0.64, -0.2);
+  c.bezierCurveTo(0.5, -0.06, 0.2, -0.02, -0.2, -0.03);
+  c.bezierCurveTo(-0.6, -0.03, -0.95, -0.06, -1.08, -0.3);
+  c.bezierCurveTo(-1.16, -0.5, -1.1, -0.8, -0.98, -0.9); c.closePath();
+}
+/* la cabeza: de la nuca (pol) al hocico (hoc); perfil de frente larga, hocico ancho, carrillo y oreja caída */
+function cabeza(c, P, pol, hoc, px, cuerno){
+  const dx = hoc[0] - pol[0], dy = hoc[1] - pol[1], L = Math.hypot(dx, dy), a = Math.atan2(dy, dx);
+  c.save(); c.translate(pol[0], pol[1]); c.rotate(a);
+  if (cuerno){ c.fillStyle = '#d9cdb4'; c.beginPath(); c.moveTo(-0.03, -0.1); c.quadraticCurveTo(-0.1, -0.2, -0.04, -0.26); c.quadraticCurveTo(0.0, -0.18, 0.04, -0.11); c.closePath(); c.fill(); }
+  const g = c.createLinearGradient(0, -0.14, 0, 0.16); g.addColorStop(0, P.luz); g.addColorStop(0.5, P.base); g.addColorStop(1, P.sombra);
+  c.fillStyle = g; c.beginPath();
+  c.moveTo(-0.05, -0.11); c.bezierCurveTo(L*0.2, -0.135, L*0.55, -0.115, L*0.86, -0.085);
+  c.bezierCurveTo(L*0.97, -0.075, L*1.04, -0.03, L*1.02, 0.02); c.bezierCurveTo(L*1.0, 0.07, L*0.94, 0.09, L*0.88, 0.085);
+  c.bezierCurveTo(L*0.7, 0.09, L*0.55, 0.12, L*0.4, 0.165); c.bezierCurveTo(L*0.22, 0.2, 0.05, 0.19, -0.06, 0.1); c.closePath(); c.fill();
+  // el hocico oscuro y húmedo
+  c.fillStyle = P.hocico; c.beginPath(); c.moveTo(L*0.86, -0.08); c.bezierCurveTo(L*0.97, -0.075, L*1.04, -0.03, L*1.02, 0.02); c.bezierCurveTo(L*1.0, 0.07, L*0.94, 0.09, L*0.88, 0.085); c.quadraticCurveTo(L*0.84, 0.0, L*0.86, -0.08); c.fill();
+  if (px < 0.012){ c.fillStyle = 'rgba(16,12,10,.85)'; c.beginPath(); c.ellipse(L*0.975, -0.025, 0.022, 0.012, 0.5, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,.22)'; c.lineWidth = Math.max(px, 0.005); c.beginPath(); c.arc(L*0.93, -0.01, 0.05, -1.4, 0.1); c.stroke();
+    c.strokeStyle = rgba(P.sombra.length === 7 ? P.sombra : '#777777', 0.6); c.lineWidth = Math.max(px, 0.006); c.beginPath(); c.moveTo(L*0.42, 0.05); c.quadraticCurveTo(L*0.6, 0.06, L*0.8, 0.05); c.stroke(); }
+  // el ojo, con su ceja
+  c.fillStyle = '#1b1612'; c.beginPath(); c.ellipse(L*0.24, -0.055, 0.03, 0.021, 0.15, 0, 7); c.fill();
+  if (px < 0.012){ c.fillStyle = 'rgba(255,255,255,.75)'; c.beginPath(); c.arc(L*0.24 + 0.009, -0.062, 0.007, 0, 7); c.fill();
+    c.strokeStyle = rgba(P.sombra.length === 7 ? P.sombra : '#777777', 0.8); c.lineWidth = Math.max(px, 0.006); c.beginPath(); c.arc(L*0.24, -0.05, 0.045, -2.7, -0.5); c.stroke(); }
+  // la oreja del cebú: larga y caída hacia atrás
+  c.fillStyle = P.sombra; c.beginPath(); c.ellipse(-0.05, 0.1, 0.22, 0.072, 1.2, 0, 7); c.fill();
+  c.fillStyle = P.oreja; c.beginPath(); c.ellipse(-0.045, 0.105, 0.16, 0.04, 1.2, 0, 7); c.fill();
+  c.restore();
+}
+/* V: { x, y, dir, pose: 'come' | 'mira' | 'camina' | 'echada', pel, paso, esc, sombra, s } */
+function vaca(c, V, px){
+  if (piso === 'limite') return;
+  const raza = razaDibujada();
+  const pel = raza === 'Holstein' ? 2 : raza === 'Normando' ? 2 : raza === 'BON' ? 0 : V.pel;
+  const colores = raza === 'Normando' ? { ...PELAJES[2], manchas:'#8a492b' } : raza === 'BON' ? {...PELAJES[0], oreja:'#242320'} : PELAJES[pel];
+  const P = pelajeEn(colores, V.sombra || 0), e = V.esc || 1;
+  c.save(); c.translate(V.x, V.y); c.scale(V.dir*e, e); px /= e;
+  c.lineJoin = 'round';
+  c.fillStyle = 'rgba(20,24,12,.28)'; c.beginPath(); c.ellipse(-0.1, 0.01, 1.15, 0.06, 0, 0, 7); c.fill();
+  if (V.pose === 'echada'){
+    const g = c.createLinearGradient(0, -1.1, 0, 0); g.addColorStop(0, P.luz); g.addColorStop(0.5, P.base); g.addColorStop(1, P.sombra);
+    pata(c, [[0.5, -0.24], [0.7, -0.14], [0.88, -0.09], [0.98, -0.05], [1.03, 0]], [0.16, 0.13, 0.1, 0.09, 0.1], P.sombra, P, px);
+    c.fillStyle = g; c.beginPath(); cuerpoEchada(c); c.fill();
+    if (P.manchas){ c.save(); c.beginPath(); cuerpoEchada(c); c.clip(); c.fillStyle = P.manchas; const r = rng(V.s || 3); for (let i = 0; i < 5; i++){ c.beginPath(); c.ellipse(-0.9 + r()*1.7, -0.2 - r()*0.7, 0.18 + r()*0.2, 0.12 + r()*0.14, r()*3, 0, 7); c.fill(); } c.restore(); }
+    c.fillStyle = rgba(P.sombra.length === 7 ? P.sombra : '#777777', 0.45); c.beginPath(); c.ellipse(-0.58, -0.42, 0.34, 0.28, -0.3, 0, 7); c.fill();
+    pata(c, [[-0.42, -0.14], [-0.22, -0.1], [-0.02, -0.07], [0.08, -0.04], [0.12, 0]], [0.13, 0.11, 0.09, 0.085, 0.09], P.sombra, P, px);
+    c.strokeStyle = P.sombra; c.lineWidth = 0.035; c.lineCap = 'round'; c.beginPath(); c.moveTo(-1.02, -0.72); c.quadraticCurveTo(-1.3, -0.3, -1.1, -0.04); c.stroke();
+    cabeza(c, P, [0.98, -1.0], [1.3, -0.74], px, V.cuerno);
+    c.restore(); return;
+  }
+  const abajo = V.pose === 'come';
+  const L = patas(V.pose, V.paso || 0);
+  pata(c, L.dLejos, W_DEL, P.sombra, P, px); pata(c, L.tLejos, W_TRA, P.sombra, P, px);
+  // la cola
+  c.strokeStyle = P.base; c.lineWidth = 0.04; c.lineCap = 'round'; c.beginPath(); c.moveTo(-0.99, -1.29); c.bezierCurveTo(-1.09, -1.05, -1.07, -0.7, -1.06, -0.4); c.stroke();
+  c.fillStyle = P.oscuro; c.beginPath(); c.ellipse(-1.06, -0.32, 0.04, 0.11, 0, 0, 7); c.fill();
+  pata(c, L.dCerca, W_DEL, P.base, P, px); pata(c, L.tCerca, W_TRA, P.base, P, px);
+  const g = c.createLinearGradient(0, -1.56, 0, -0.56); g.addColorStop(0, P.luz); g.addColorStop(0.42, P.base); g.addColorStop(1, P.sombra);
+  c.fillStyle = g; c.beginPath(); cuerpoDePie(c, abajo); c.fill();
+  c.save(); c.beginPath(); cuerpoDePie(c, abajo); c.clip();
+  if (P.manchas){ c.fillStyle = P.manchas; const r = rng(V.s || 3); for (let i = 0; i < 6; i++){ c.beginPath(); c.ellipse(-0.9 + r()*1.8, -0.72 - r()*0.68, 0.16 + r()*0.2, 0.12 + r()*0.15, r()*3, 0, 7); c.fill(); } }
+  // volumen: la paleta, la cadera y la sombra de la barriga
+  const gs = c.createRadialGradient(0.42, -1.02, 0.02, 0.42, -1.0, 0.42); gs.addColorStop(0, 'rgba(255,250,236,.2)'); gs.addColorStop(1, 'rgba(255,250,236,0)'); c.fillStyle = gs; c.fillRect(-0.2, -1.5, 1.2, 1);
+  const gh = c.createRadialGradient(-0.68, -1.18, 0.02, -0.68, -1.15, 0.36); gh.addColorStop(0, 'rgba(255,250,236,.18)'); gh.addColorStop(1, 'rgba(255,250,236,0)'); c.fillStyle = gh; c.fillRect(-1.1, -1.5, 0.9, 0.8);
+  const gb = c.createLinearGradient(0, -0.95, 0, -0.56); gb.addColorStop(0, 'rgba(20,16,12,0)'); gb.addColorStop(1, 'rgba(20,16,12,.22)'); c.fillStyle = gb; c.fillRect(-1.1, -0.95, 2.3, 0.4);
+  c.restore();
+  if (px < 0.02){ c.strokeStyle = rgba(P.sombra.length === 7 ? P.sombra : '#777777', 0.55); c.lineWidth = Math.max(px, 0.01); c.beginPath(); c.moveTo(-0.55, -0.72); c.quadraticCurveTo(-0.62, -0.98, -0.55, -1.2); c.moveTo(0.3, -0.66); c.quadraticCurveTo(0.36, -0.9, 0.3, -1.1); if (abajo){ c.moveTo(0.86, -0.5); c.quadraticCurveTo(0.9, -0.42, 0.97, -0.44); } c.stroke(); }
+  // la ubre
+  c.strokeStyle = rgba(P.oscuro.length === 7 ? P.oscuro : '#333333', 0.35); c.lineWidth = Math.max(px, 0.012); c.beginPath(); cuerpoDePie(c, abajo); c.stroke();
+  c.fillStyle = mix('#d9a99b', P.sombra, 0.25); c.beginPath(); c.ellipse(-0.47, -0.6, 0.11, 0.07, 0, 0, 7); c.fill();
+  if (px < 0.01){ c.strokeStyle = '#c28f82'; c.lineWidth = Math.max(px, 0.018); c.lineCap = 'round'; c.beginPath(); for (const tx of [-0.54, -0.4]){ c.moveTo(tx, -0.54); c.lineTo(tx, -0.49); } c.stroke(); }
+  if (abajo) cabeza(c, P, [1.1, -0.64], [1.32, -0.08], px, V.cuerno);
+  else cabeza(c, P, [1.12, -1.26], [1.46, -0.92], px, V.cuerno);
+  c.restore();
+}
+/* el hato de hoy (12 vacas en la franja de hoy) y el de «sin árboles, sin descanso» (3 repartidas) */
+const HATO = [
+  { x: 9.8, dir: -1, pose: 'echada', pel: 0, fila: 1 }, { x: 13.0, dir: 1, pose: 'echada', pel: 1, fila: 2, cuerno: 1 },
+  { x: 16.9, dir: -1, pose: 'come', pel: 2, fila: 2, s: 4 }, { x: 11.4, dir: -1, pose: 'mira', pel: 0, fila: 2 },
+  { x: 7.3, dir: -1, pose: 'come', pel: 3, fila: 1 }, { x: 17.6, dir: 1, pose: 'mira', pel: 0, fila: 0 },
+  { x: 14.6, dir: 1, pose: 'echada', pel: 3, fila: 0 }, { x: 8.6, dir: 1, pose: 'come', pel: 1, fila: 0, cuerno: 1 },
+  { x: 12.1, dir: -1, pose: 'come', pel: 0, fila: 0 }, { x: 15.2, dir: -1, pose: 'echada', pel: 2, fila: 1, s: 8 },
+  { x: 10.6, dir: 1, pose: 'mira', pel: 0, fila: 1 }, { x: 6.8, dir: -1, pose: 'come', pel: 1, fila: 2 },
+];
+const HATO_TRAD = [ { x: 23, dir: -1, pose: 'come', pel: 0, fila: 1 }, { x: 8, dir: 1, pose: 'mira', pel: 1, fila: 2 }, { x: 15.5, dir: -1, pose: 'come', pel: 3, fila: 1 } ];
+const FILAS = [[-0.34, 0.86], [-0.17, 0.93], [0, 1]];
+function pintaVacas(c, lista, fila, px, alfa, conSombra){
+  if (alfa < 0.01) return;
+  c.save(); c.globalAlpha *= alfa;
+  for (const v of lista){ if (v.fila !== fila) continue; const [dy, sc] = FILAS[fila]; vaca(c, { ...v, y: gM(v.x) + dy, esc: sc, sombra: conSombra ? bajoCopa(v.x) : 0 }, px); }
+  c.restore();
+}
+
+/* ---------- postes de la cerca eléctrica, la cerca viva y el bebedero ---------- */
+function pintaCercas(c, px, alfa){
+  c.save(); c.globalAlpha *= alfa; c.lineCap = 'round';
+  for (const x of POSTES){ const y = gM(x);
+    for (const [dy, sc] of [[-0.34, 0.86], [0, 1]]){ c.strokeStyle = sc < 1 ? '#8c7d68' : '#6d5d49'; c.lineWidth = Math.max(px, 0.07*sc); c.beginPath(); c.moveTo(x, y + dy); c.lineTo(x, y + dy - 1.15*sc); c.stroke();
+      c.fillStyle = '#e8c547'; for (const h of [0.55, 0.95]){ c.beginPath(); c.arc(x + 0.045*sc, y + dy - h*sc, 0.035*sc, 0, 7); c.fill(); } }
+    c.strokeStyle = 'rgba(214,214,204,.75)'; c.lineWidth = Math.max(px*0.6, 0.012); c.beginPath(); for (const h of [0.55, 0.95]){ c.moveTo(x + 0.05, y - h); c.lineTo(x + 0.04, y - 0.34 - h*0.86); } c.stroke(); }
+  // la cerca viva: matarratón en estacón que retoña {chagra}
+  for (const x of (piso === 'calido' ? MATARRATON : [])){ const y = gM(x), r = rng(x*13 + 7);
+    c.strokeStyle = '#7b6a55'; c.lineWidth = Math.max(px, 0.14); c.beginPath(); c.moveTo(x, y); c.lineTo(x + 0.03, y - 2.2); c.stroke();
+    c.lineWidth = Math.max(px, 0.05); c.beginPath(); for (let k = 0; k < 7; k++){ const a = -Math.PI/2 + (k - 3)*0.34; c.moveTo(x + 0.03, y - 2.1); c.quadraticCurveTo(x + Math.cos(a)*0.8, y - 2.5 + Math.sin(a)*0.5, x + Math.cos(a)*1.7, y - 2.9 + Math.sin(a)*0.9); } c.stroke();
+    for (let k = 0; k < 70; k++){ const a = -Math.PI/2 + (r() - 0.5)*2.2, d = 0.4 + r()*1.5; const R = 0.1 + r()*0.12, luz = clamp(0.5 - Math.sin(a)*0.3 + (r()-.5)*0.4, 0, 1); c.fillStyle = mix('#4f7a32', '#98bb5c', luz); c.beginPath(); c.ellipse(x + Math.cos(a)*d*1.1, y - 2.7 + Math.sin(a)*d*0.75, R, R*0.7, a, 0, 7); c.fill(); }
+    c.fillStyle = '#d9a4c8'; for (let k = 0; k < 10; k++){ c.beginPath(); c.arc(x - 1 + r()*2, y - 3.1 - r()*0.8, 0.05, 0, 7); c.fill(); } }
+  // el bebedero de la franja de hoy: agua en cada potrero {chara2019}
+  { const x = 7.9, y = gM(x) - 0.2; c.fillStyle = '#6f7a80'; c.beginPath(); c.moveTo(x - 0.8, y - 0.55); c.lineTo(x + 0.8, y - 0.55); c.lineTo(x + 0.7, y); c.lineTo(x - 0.7, y); c.closePath(); c.fill(); c.fillStyle = '#a9ccdc'; c.fillRect(x - 0.76, y - 0.56, 1.52, 0.07); }
+  c.restore();
+}
+
+/* ---------- el corte de la tierra bajo el potrero ---------- */
+const TIERRA0 = (() => { const r = rng(401); const tonos = ['#3a2a1c', '#443222', '#4d3827', '#33251a', '#56402b'];
+  const grumo = grumos(r, [-70, 0.1, 70, 12], 2600, 0.05, 0.22, tonos, (x, y) => y > gM(x) + 0.08);
+  const raices = new Path2D(), gruesas = new Path2D();
+  for (let x = -70; x < 70; x += 0.3){ const y = gM(x) + 0.02; for (let k = 0; k < 4; k++){ let px = x + (r()-.5)*0.2, py = y, a = Math.PI/2 + (r()-.5)*1.2; raices.moveTo(px, py); const L = 0.25 + r()*0.45; for (let s = 0; s < L; s += 0.06){ a = lerp(a, Math.PI/2, 0.15) + (r()-.5)*0.5; px += Math.cos(a)*0.06; py += Math.sin(a)*0.06; raices.lineTo(px, py); } } }
+  for (const T of SAMANES){ for (let k = 0; k < 7; k++){ let px = T.x + (k - 3)*0.5, py = gM(T.x) + 0.1, a = Math.PI/2 + (k - 3)*0.35; gruesas.moveTo(px, py); for (let s = 0; s < 4 + r()*3; s += 0.3){ a = lerp(a, Math.PI/2 + (k - 3)*0.4, 0.2) + (r()-.5)*0.3; px += Math.cos(a)*0.3; py += Math.sin(a)*0.3; gruesas.lineTo(px, py); } } }
+  return { tonos, grumo, raices, gruesas }; })();
+function pintaTierra0(c, v, px){
+  const x0 = v[0] - 1, x1 = v[2] + 1; if (v[3] < -0.8) return;
+  const g = c.createLinearGradient(0, 0, 0, 10); g.addColorStop(0, '#2e2016'); g.addColorStop(0.08, '#3d2b1d'); g.addColorStop(0.3, '#5a412a'); g.addColorStop(1, '#6d5234');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, gM(x0)); for (let x = x0; x <= x1; x += Math.max(0.2, (x1 - x0)/160)) c.lineTo(x, gM(x)); c.lineTo(x1, Math.max(v[3], 1) + 1); c.lineTo(x0, Math.max(v[3], 1) + 1); c.closePath(); c.fill();
+  pintaGrumos(c, TIERRA0.grumo, TIERRA0.tonos, Math.max(px*1.5, 0.02));
+  c.strokeStyle = 'rgba(232,222,196,.55)'; c.lineWidth = Math.max(px*0.8, 0.012); c.lineCap = 'round'; c.stroke(TIERRA0.raices);
+  c.strokeStyle = 'rgba(120,96,70,.9)'; c.lineWidth = Math.max(px, 0.09); c.stroke(TIERRA0.gruesas);
+  const go = c.createLinearGradient(0, 0, 0, 0.5); go.addColorStop(0, 'rgba(14,9,6,.5)'); go.addColorStop(1, 'rgba(14,9,6,0)'); c.fillStyle = go; c.fillRect(x0, gM(0) - 0.4, x1 - x0, 1.2);
+}
+
+/* ---------- el potrero entero (nivel 0) ---------- */
+const TRAD = { obj: 0, a: 0, vis: 0 };                    // «sin árboles, sin descanso»: 0..1
+const aTrad = () => TRAD.vis*TRAD.a;
+function dibujaPotrero(c, env){
+  const z = 1/env.f;
+  const tb = sstep(1.8, 4.5, z);
+  c.save(); const k = 1 - Math.pow(z, -0.7); c.translate(env.cx*k, env.cy*k*0.4); const sb = Math.pow(z, 0.25)/z; c.scale(sb, sb);
+  if (tb < 1 && fondoN) c.drawImage(fondoN, -1, -1, 2, 2);
+  if (tb > 0 && fondoB){ c.globalAlpha = tb; c.drawImage(fondoB, -1, -1, 2, 2); c.globalAlpha = 1; }
+  c.restore();
+  c.save(); c.scale(1/M0, 1/M0);
+  const v = env.view.map(q => q*M0), px = env.px*M0, T = aTrad();
+  pintaTierra0(c, v, px);
+  { const x0 = v[0] - 1, x1 = v[2] + 1, paso = Math.max(0.2, (x1 - x0)/160);
+    c.fillStyle = mix('#4a6630', '#7d7045', T); c.beginPath(); c.moveTo(x0, gM(x0) - 0.42); for (let x = x0; x <= x1; x += paso) c.lineTo(x, gM(x) - 0.42); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, gM(x) + 0.01); c.closePath(); c.fill(); }
+  const vis = FRANJAS.filter(F => F.b > v[0] - 3 && F.a < v[2] + 3);
+  const arb = SAMANES.filter(Tr => Tr.x + Tr.R + 2 > v[0] && Tr.x - Tr.R - 2 < v[2]);
+  for (const Tr of arb) pintaTronco(c, Tr, px, 1 - T);
+  for (const F of vis) pintaLeucaena(c, F, px, 1 - T);
+  pintaCercas(c, px, 1 - T*0.85);
+  for (let fi = 0; fi < 3; fi++){
+    if (T < 0.99) { c.save(); c.globalAlpha = 1 - T; for (const F of vis) pintaPastoFila(c, F, fi, false); c.restore(); }
+    if (T > 0.01) { c.save(); c.globalAlpha = T; for (const F of vis) pintaPastoFila(c, F, fi, true); c.restore(); }
+    pintaVacas(c, HATO, fi, px, 1 - T, true); pintaVacas(c, HATO_TRAD, fi, px, T, false);
+  }
+  for (const Tr of arb) pintaSombra(c, Tr, 1 - T);
+  for (const Tr of arb) if (v[1] < gM(Tr.x) - Tr.hb + 1) pintaCopa(c, Tr, px, 1 - T);
+  if (T > 0.01){ const gr = c.createLinearGradient(0, -6, 0, 0.2); gr.addColorStop(0, 'rgba(255,236,190,0)'); gr.addColorStop(1, `rgba(255,236,190,${0.22*T})`); c.fillStyle = gr; c.fillRect(v[0], -6, v[2] - v[0], 6.4); }
+  const gl = c.createLinearGradient(0, v[1], 0, 0); gl.addColorStop(0, 'rgba(255,248,220,.08)'); gl.addColorStop(1, 'rgba(255,248,220,0)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2] - v[0], Math.min(0, v[3]) - v[1]);
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 1 · EL PASTO BAJO LA ORILLA DE LA SOMBRA  (1 unidad = 1,2 m)
+   Dibuja en metros relativos al portal; y = 0 queda 35 cm sobre el suelo.
+   ============================================================ */
+const M1 = 1.2;
+const g1 = x => gM(XP1 + x) - gM(XP1) + 0.35;
+const X_ORILLA = sombraDe(SAMANES[1])[1] - XP1 - 0.55;     // a la izquierda de aquí, la sombra es plena; a la derecha, sol
+let fondoPasto = null;
+function prepFondoPasto(){
+  const res = Math.min(1600, Math.max(500, Math.round(S*DPR*0.6)));
+  const c = document.createElement('canvas'); c.width = c.height = res; const x = c.getContext('2d');
+  x.setTransform(res/8, 0, 0, res/8, res/2, res*0.62);              // cubre x ∈ [−4; 4] m; y ∈ [−4,96; 3,04] m
+  const hz = g1(0) - 0.5;                                              // el horizonte, a la altura de los ojos
+  const g = x.createLinearGradient(0, -3.2, 0, hz); g.addColorStop(0, '#9fbfd0'); g.addColorStop(0.55, '#d2e0d6'); g.addColorStop(1, '#e6ead8');
+  x.fillStyle = g; x.fillRect(-4.1, -5.1, 8.2, 8.2);
+  // la copa del samán, arriba y a la derecha, fuera de foco
+  x.fillStyle = gradSombra(x, -4.1, 4.1, 0.95, '40,66,30'); x.fillRect(-4.1, -5.1, 8.2, 3.2);
+  const r = rng(77); for (let i = 0; i < 110; i++){ const bx = -4 + r()*8, by = -5 + r()*2.4; const R = 0.3 + r()*0.5; const gg = x.createRadialGradient(bx, by, 0, bx, by, R); gg.addColorStop(0, bajoCopa(XP1 + bx) > 0.5 ? 'rgba(30,54,26,.8)' : 'rgba(120,160,90,.4)'); gg.addColorStop(1, 'rgba(30,54,26,0)'); x.fillStyle = gg; x.fillRect(bx - R, by - R, 2*R, 2*R); }
+  // el potrero lejano: la franja de hoy con el hato, la leucaena y otros árboles
+  x.fillStyle = '#8fae63'; x.beginPath(); x.moveTo(-4.1, hz); for (let q = -4.1; q <= 4.1; q += 0.1) x.lineTo(q, hz - 0.03 + 0.02*Math.sin(q*3)); x.lineTo(4.1, 3.1); x.lineTo(-4.1, 3.1); x.closePath(); x.fill();
+  x.fillStyle = 'rgba(96,130,62,.85)'; x.beginPath(); x.moveTo(-4.1, hz + 0.02); for (let q = -4.1; q <= 4.1; q += 0.05) x.lineTo(q, hz - 0.2 - 0.06*Math.abs(Math.sin(q*4.1)) - 0.03*Math.sin(q*11)); x.lineTo(4.1, hz + 0.02); x.closePath(); x.fill();
+    // sombra: todo lo que queda bajo la copa, más oscuro
+  x.fillStyle = gradSombra(x, -4.1, 4.1, 0.42, '12,28,14'); x.fillRect(-4.1, -5.1, 8.2, 8.2);
+  const c2 = document.createElement('canvas'); c2.width = c2.height = Math.round(res/3); const x2 = c2.getContext('2d');
+  if (!qs.has('sinpost') && 'filter' in x2){ x2.filter = `blur(${Math.max(2, res/180)}px)`; x2.drawImage(c, 0, 0, c2.width, c2.height); x2.filter = 'none'; } else x2.drawImage(c, 0, 0, c2.width, c2.height);
+  fondoPasto = c2;
+}
+/* las macollas del nivel 1: posición fija; la altura depende del tiempo */
+const MAC1 = (() => { const r = rng(1101), out = [];
+  [[-0.12, 0.93, 26], [-0.06, 0.97, 30], [0, 1, 34]].forEach(([dy, sc, n], fila) => {
+    for (let x = -3.4 + r()*0.2; x < 3.45; x += 0.36 + r()*0.14) out.push({ x, dy, sc, n, fila, s: Math.floor(r()*1e6), vari: 0.92 + r()*0.16, espiga: r() < 0.4 });
+  });
+  return out; })();
+/* el paso del tiempo, visto por una macolla: cuánto la comió la vaca (0..1) */
+function comidoEn(x, tau){
+  if (tau <= 0) return 0; if (tau >= OCUPA) return 1;
+  const xc = hocicoX(tau); const e = clamp((x - xc + 0.15)/0.3, 0, 1);
+  return Math.max(e, sstep(21/24, 1, tau));
+}
+/* la vaca del día de ocupación: por dónde va su hocico (m), según la hora */
+function hocicoX(tau){ const h = tau*24;
+  if (h < 1.5) return lerp(3.8, 1.6, h/1.5);
+  if (h < 21) return lerp(1.6, -1.6, (h - 1.5)/19.5);
+  return lerp(-1.6, -4.2, (h - 21)/3); }
+function altoMac(m, tau){
+  if (tau <= 0) return ALTO_ENTRA*m.vari;
+  if (tau <= OCUPA) return lerp(ALTO_ENTRA*m.vari, ALTO_SALE*m.vari, comidoEn(m.x, tau));
+  return altoDescanso(tau - OCUPA)*m.vari;
+}
+const CACHE_MAC = new Map();
+function armaMacolla(m, alto, comido, rebrote){
+  const key = m.s + '|' + Math.round(alto*100) + '|' + Math.round(comido*6) + '|' + Math.round(rebrote*6);
+  let P = CACHE_MAC.get(key); if (P) return P;
+  if (CACHE_MAC.size > 900) CACHE_MAC.clear();
+  alto = Math.round(alto*100)/100 * perfil.pastoFactor; comido = Math.round(comido*6)/6;
+  const r = rng(m.s), y = g1(m.x) + m.dy;
+  P = { tonos: [new Path2D(), new Path2D(), new Path2D(), new Path2D()], nervio: new Path2D(), cortes: new Path2D(), tallos: new Path2D(), espiga: new Path2D() };
+  if(piso!=='calido'){
+    // Cubierta estolonífera: los brotes salen de nudos de un tallo rastrero.
+    const iz=m.x-.3*m.sc, de=m.x+.3*m.sc;
+    P.tonos[0].moveTo(m.x+.34*m.sc,y);P.tonos[0].ellipse(m.x,y-.035*m.sc,.34*m.sc,.055*m.sc,0,0,7);
+    P.tallos.moveTo(iz,y); P.tallos.quadraticCurveTo(m.x,y-.018*m.sc,de,y);
+    for(let j=0;j<7;j++){
+      const x=lerp(iz,de,j/6), h=alto*m.sc*(.5+r()*.4);
+      for(const lado of [-1,1]){
+        const pts=[[x,y],[x+lado*h*.2,y-h*.5],[x+lado*h*.65,y-h*.8]];
+        cinta(P.tonos[j%4],pts,t=>.024*m.sc*(1-t));suave(P.nervio,pts);
+      }
+      P.tallos.moveTo(x,y);P.tallos.lineTo(x,y+.015*m.sc);
+    }
+    CACHE_MAC.set(key,P);return P;
+  }
+  for (let i = 0; i < m.n; i++){
+    const lado = r() < 0.5 ? -1 : 1, bx = m.x + (r()-.5)*0.1*m.sc, a0 = lado*(0.04 + r()*0.45), L = alto*m.sc*(0.62 + r()*0.45), curva = 0.35 + r()*1.1, w = 0.021*m.sc*(0.7 + r()*0.5), tono = r();
+    const cortada = comido > 0 && r() < 0.2 + 0.8*comido && L > ALTO_SALE*0.75;
+    const Lr = cortada ? Math.min(L, ALTO_SALE*m.sc*(0.62 + r()*0.25) + (L - ALTO_SALE*0.7)*(1 - comido)) : L;
+    const pts = []; let px = bx, py = y, a = a0;
+    for (let k = 0; k <= 9; k++){ pts.push([px, py]); const t = k/9; a = a0 + lado*curva*t*t*1.3*(Lr/Math.max(L, 1e-6)); px += Math.sin(a)*Lr/9; py -= Math.cos(a)*Lr/9; }
+    const ancho = cortada ? (t => w*(t < 0.12 ? lerp(0.7, 1, t/0.12) : lerp(1, 0.7, t))) : (t => w*(t < 0.12 ? lerp(0.7, 1, t/0.12) : Math.pow(1 - t, 0.75)));
+    cinta(P.tonos[Math.min(3, Math.floor(tono*4))], pts, ancho);
+    suave(P.nervio, pts.slice(0, cortada ? 10 : 8));
+    if (cortada){ const z = pts[pts.length - 1], zz = pts[pts.length - 2]; const dx = z[0] - zz[0], dy = z[1] - zz[1], l = Math.hypot(dx, dy) || 1; P.cortes.moveTo(z[0] - dy/l*w*0.4, z[1] + dx/l*w*0.4); P.cortes.lineTo(z[0] + dy/l*w*0.4, z[1] - dx/l*w*0.4); }
+  }
+  // tallos viejos cortados que quedan del pastoreo: se van tapando al rebrotar
+  if (rebrote > 0 && rebrote < 1){ for (let k = 0; k < 7; k++){ const sx = m.x + (r()-.5)*0.12; P.tallos.moveTo(sx, y); P.tallos.lineTo(sx + (r()-.5)*0.05, y - ALTO_SALE*m.sc*(0.55 + r()*0.3)); } }
+  if (piso === 'calido' && m.espiga && alto > 0.84 && comido === 0){ const sx = m.x + 0.02, sh = alto*m.sc*1.22; P.espiga.moveTo(sx, y); P.espiga.quadraticCurveTo(sx + 0.04, y - sh*0.6, sx + 0.07, y - sh);
+    for (let k = 0; k < 9; k++){ const t = 0.72 + k*0.032, ex = sx + 0.07*t*t, ey = y - sh*t, lado = k % 2 ? 1 : -1, L = 0.14 - k*0.008; P.espiga.moveTo(ex, ey); P.espiga.quadraticCurveTo(ex + lado*L*0.6, ey - 0.02, ex + lado*L, ey + 0.06);
+      for (let q = 1; q <= 4; q++){ const u = q/5; P.espiga.moveTo(ex + lado*L*u, ey + 0.06*u*u - 0.004); P.espiga.lineTo(ex + lado*L*u + 0.006, ey + 0.06*u*u + 0.012); } } }
+  CACHE_MAC.set(key, P); return P;
+}
+const TONOS_P1 = ['#3a6628', '#4f7f35', '#699a42', '#86b456'];
+function pintaMacollas(c, fila, tau, px, v){
+  for (const m of MAC1){ if (m.fila !== fila || m.x < v[0] - 0.4 || m.x > v[2] + 0.4) continue;
+    const alto = altoMac(m, tau), com = tau > 0 && tau <= OCUPA ? comidoEn(m.x, tau) : 0, reb = tau > OCUPA ? sstep(0, 18, tau - OCUPA) : 0;
+    const P = armaMacolla(m, alto, com, tau > OCUPA ? 0.001 + reb*0.998 : 0);
+    const lejos = (2 - fila)*0.1;
+    for (let k = 0; k < 4; k++){ c.fillStyle = mix(TONOS_P1[k], '#a9b8a0', lejos); c.fill(P.tonos[k]); }
+    c.strokeStyle = piso === 'calido' ? 'rgba(214,232,170,.45)' : 'rgba(214,232,170,.15)'; c.lineWidth = Math.max(px*0.8, 0.0014); c.stroke(P.nervio);
+    c.strokeStyle = '#d6c27a'; c.lineWidth = Math.max(px, 0.003); c.stroke(P.cortes);
+    c.strokeStyle = rgba('#b9a36a', 1 - reb); c.lineWidth = Math.max(px, 0.004); c.stroke(P.tallos);
+    c.strokeStyle = '#8f6c86'; c.lineWidth = Math.max(px*0.8, 0.0022); c.stroke(P.espiga);
+  }
+}
+/* la leucaena de cerca: tocones podados a ~1 m {zapata2019} con rebrotes y hojas bipinnadas */
+const LEU1 = (() => { const r = rng(1301), tocones = [];
+  for (let x = -3.3; x < 3.4; x += 0.92 + r()*0.12){ const base = g1(x) - 0.13, alto = 1.0 + r()*0.08;
+    const brotes = []; for (let k = 0; k < 6; k++){ const a0 = -Math.PI/2 + (k - 2.5)*0.42 + (r()-.5)*0.2; const L = 0.45 + r()*0.45; const cae = k === 0 || k === 5 ? 1 : r() < 0.35 ? 1 : 0;
+      const pts = []; let px = x + (r()-.5)*0.05, py = base - alto, a = a0; for (let s = 0; s <= 8; s++){ pts.push([px, py]); a += cae ? 0.16*Math.sign(Math.cos(a0) || 1) : (r()-.5)*0.08; px += Math.cos(a)*L/8; py += Math.sin(a)*L/8; }
+      brotes.push(pts); }
+    const hojas = []; for (const b of brotes){ for (let k = 2; k < b.length; k += 1){ if (r() < 0.25) continue; const p = b[k], q = b[k - 1]; const ta = Math.atan2(p[1] - q[1], p[0] - q[0]); for (const lado of [-1, 1]){ if (r() < 0.3) continue;
+          hojas.push({ x: p[0], y: p[1], a: ta + lado*(0.7 + r()*0.5) + 0.35, L: 0.13 + r()*0.08, orden: r() }); } } }
+    hojas.sort((a, b) => a.orden - b.orden);
+    tocones.push({ x, base, alto, brotes, hojas });
+  }
+  return tocones; })();
+/* una hoja bipinnada: raquis, pinnas en pares y folíolos diminutos */
+function hojaLeu(P, h){
+  if (piso !== 'calido'){
+    const ca = Math.cos(h.a), sa = Math.sin(h.a);
+    P.raquis.moveTo(h.x,h.y); P.raquis.lineTo(h.x+ca*h.L,h.y+sa*h.L);
+    if(piso==='templado'){
+      const contorno=[[0,0],[.23,-.2],[.25,-.42],[.53,-.24],[.85,-.4],[1,0],[.85,.4],[.53,.24],[.25,.42],[.23,.2]];
+      for(let j=0;j<contorno.length;j++){const [u,v]=contorno[j],x=h.x+(ca*u-sa*v)*h.L,y=h.y+(sa*u+ca*v)*h.L;if(j===0)P.folio.moveTo(x,y);else P.folio.lineTo(x,y);}P.folio.closePath();return;
+    }
+    P.folio.moveTo(h.x+ca*h.L,h.y+sa*h.L);P.folio.ellipse(h.x+ca*h.L*.9,h.y+sa*h.L*.9,h.L*.2,h.L*.08,h.a,0,7);
+    const pares = 3;
+    for(let k=0;k<pares;k++) for(const lado of [-1,1]){
+      const u=h.L*(.35+k*.22), x=h.x+ca*u, y=h.y+sa*u;
+      P.folio.moveTo(x,y); P.folio.ellipse(x-sa*lado*h.L*.2,y+ca*lado*h.L*.2,h.L*.23,h.L*.09,h.a+lado*.7,0,7);
+    }
+    return;
+  }
+  const ca = Math.cos(h.a), sa = Math.sin(h.a), punto = (u, v) => [h.x + ca*u - sa*v, h.y + sa*u + ca*v];
+  const r = rng(Math.floor(h.orden*1e6));
+  P.raquis.moveTo(h.x, h.y); const z = punto(h.L, 0); P.raquis.lineTo(z[0], z[1]);
+  for (let k = 1; k <= 5; k++){ const u = h.L*k/5.6; for (const lado of [-1, 1]){ const pa = lado*(1.05 - k*0.05), cL = 0.055 + (k < 3 ? 0.012 : 0) - (k === 5 ? 0.015 : 0);
+      const cp = Math.cos(pa), sp = Math.sin(pa), pin = (s, t) => { const uu = u + cp*s - sp*t, vv = sp*s + cp*t; return punto(uu, vv); };
+      const a0 = pin(0, 0), a1 = pin(cL, 0); P.raquis.moveTo(a0[0], a0[1]); P.raquis.lineTo(a1[0], a1[1]);
+      for (let q = 1; q <= 9; q++){ const s = cL*q/9.5, fl = 0.0085*(1 - q/14) , fw = 0.0024; for (const ll of [-1, 1]){ const b0 = pin(s, 0), b1 = pin(s + fw*0.4, ll*fl), b2 = pin(s + fw*1.6, ll*fl*0.8), b3 = pin(s + fw*1.2, 0);
+          P.folio.moveTo(b0[0], b0[1]); P.folio.quadraticCurveTo(b1[0], b1[1], b2[0], b2[1]); P.folio.quadraticCurveTo(b1[0] + (b3[0] - b0[0])*0.5, b1[1] + (b3[1] - b0[1])*0.5, b3[0], b3[1]); P.folio.closePath(); } } } }
+}
+/* las hojas se arman UNA vez, en 20 grupos por orden de caída; cada cuadro pinta los grupos que quedan (medido: armarlas por cuadro costaba cientos de ms) */
+function hojasPiso(){ const todas = []; for (const t of LEU1) for (const h of t.hojas) todas.push(h); todas.sort((a, b) => a.orden - b.orden);
+  const G = []; for (let g = 0; g < 20; g++){ const P = { raquis: new Path2D(), folio: new Path2D(), masa: new Path2D() };
+    for (const h of todas.slice(Math.floor(todas.length*g/20), Math.floor(todas.length*(g + 1)/20))){ hojaLeu(P, h); P.masa.moveTo(h.x + h.L*0.6, h.y); P.masa.ellipse(h.x + Math.cos(h.a)*h.L*0.5, h.y + Math.sin(h.a)*h.L*0.5, h.L*0.55, 0.05, h.a, 0, 7); }
+    G.push(P); }
+  return G; }
+let LEU1_G = hojasPiso();
+function refrescarHojasPiso(){LEU1_G = hojasPiso();}
+function fLeu(x, tau){
+  if (tau <= 0) return 1;
+  if (tau <= OCUPA) return 1 - 0.6*comidoEn(x, tau);
+  return lerp(0.4, 1, sstep(0, 40, tau - OCUPA));
+}
+function pintaLeucaena1(c, tau, px){
+  c.lineCap = 'round';
+  for (const t of LEU1){ // el tocón podado y los rebrotes
+    c.strokeStyle = '#7a6a55'; c.lineWidth = Math.max(px, 0.03); c.beginPath(); c.moveTo(t.x, t.base); c.lineTo(t.x + 0.01, t.base - t.alto); c.stroke();
+    c.fillStyle = '#9b8a70'; c.beginPath(); c.ellipse(t.x + 0.01, t.base - t.alto, 0.018, 0.007, 0.2, 0, 7); c.fill();
+    c.strokeStyle = '#6f7f45'; c.lineWidth = Math.max(px, 0.008); c.beginPath(); for (const b of t.brotes) suave(c, b); c.stroke(); }
+  if(piso==='templado' && tau<=0){
+    for(const t of LEU1){const b=t.brotes[0],q=b[b.length-1];c.fillStyle='#e4bd39';c.beginPath();c.arc(q[0],q[1]-.04,.035,0,7);c.fill();c.fillStyle='#9a6829';c.beginPath();c.arc(q[0],q[1]-.04,.012,0,7);c.fill();}
+  }
+  // qué tanta hoja queda: el promedio de lo comido en los tocones que se ven
+  let f = 0; for (const t of LEU1) f += fLeu(t.x, tau); f /= LEU1.length;
+  const n = Math.round(f*20);
+  for (let g = 0; g < n; g++){ const P = LEU1_G[g];
+    if (px > 0.004){ c.fillStyle = '#5f8a3a'; c.fill(P.masa); continue; }
+    c.strokeStyle = '#5f7a3a'; c.lineWidth = Math.max(px*0.8, 0.0012); c.stroke(P.raquis); c.fillStyle = '#6f9a42'; c.fill(P.folio);
+    c.save(); c.translate(0.002, -0.002); c.fillStyle = 'rgba(170,205,110,.55)'; c.fill(P.folio); c.restore(); }
+}
+/* las huellas de las pezuñas, en el borde del corte */
+const HUELLAS = [-2.6, -2.27, -1.95, -1.62, -1.3, -0.98, -0.66, -0.34, -0.02, 0.3, 0.63, 0.95, 1.27, 1.6, 1.93, 2.25, 2.58].map((x, i) => ({ x: x + (i % 2 ? 0.05 : -0.04), w: 0.09 + (i % 3)*0.01 }));
+function pintaHuellas(c, tau, px){
+  if (tau <= 0) return;
+  const xc = tau <= OCUPA ? hocicoX(tau) : -9, fade = 1 - sstep(OCUPA + 1, OCUPA + 25, tau);   // se tapan con el rebrote: de ejemplo
+  if (fade <= 0) return;
+  for (const hl of HUELLAS){ if (hl.x < xc + 0.7) continue; const y = g1(hl.x);
+    c.fillStyle = `rgba(28,18,11,${0.85*fade})`; c.beginPath(); c.ellipse(hl.x, y + 0.004, hl.w*0.5, 0.024, 0, 0, Math.PI); c.fill();
+    c.strokeStyle = `rgba(120,96,70,${0.5*fade})`; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.moveTo(hl.x - hl.w*0.55, y - 0.004); c.lineTo(hl.x - hl.w*0.35, y - 0.012); c.moveTo(hl.x + hl.w*0.55, y - 0.004); c.lineTo(hl.x + hl.w*0.35, y - 0.012); c.stroke(); }
+}
+/* la boñiga: cae al final del día (x = −0,55 m) y los escarabajos la entierran en el descanso (el ritmo es de ejemplo) */
+const BONIGA = { x: 0.45, cae: 21.5/24 };
+function pintaBoniga(c, tau, px){
+  if (tau < BONIGA.cae) return;
+  const d = tau - OCUPA, k = 1 - 0.8*sstep(2, 40, d), fresca = 1 - sstep(OCUPA, OCUPA + 3, tau), y = g1(BONIGA.x);
+  const rx = 0.15*k + 0.03, ry = 0.05*k + 0.008;
+  // los montoncitos de tierra que sacan los escarabajos
+  const hay = sstep(1.2, 4, d)*(1 - sstep(30, 44, d));
+  if (hay > 0.01){ c.fillStyle = `rgba(92,66,42,${hay})`; for (const [dx, s] of [[-0.19, 1], [0.2, 0.8], [-0.1, 0.6], [0.26, 0.5]]){ c.beginPath(); c.ellipse(BONIGA.x + dx, y - 0.004, 0.022*s, 0.012*s, 0, Math.PI, 2*Math.PI); c.fill(); } }
+  const g = c.createRadialGradient(BONIGA.x - rx*0.3, y - ry*0.8, 0.005, BONIGA.x, y - ry*0.3, rx);
+  g.addColorStop(0, mix('#6f6a42', '#8a7a5a', 1 - fresca)); g.addColorStop(1, mix('#3d3a1d', '#5e4f36', 1 - fresca));
+  c.fillStyle = g; c.beginPath(); c.ellipse(BONIGA.x, y + 0.004, rx, ry, 0, Math.PI, 2*Math.PI); c.fill();
+  if (fresca > 0.05){ c.strokeStyle = `rgba(255,255,230,${0.35*fresca})`; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.ellipse(BONIGA.x - rx*0.2, y - ry*0.55, rx*0.45, ry*0.3, 0, Math.PI*1.1, Math.PI*1.8); c.stroke(); }
+  c.strokeStyle = 'rgba(40,34,18,.45)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); for (const s of [0.35, 0.65]){ c.ellipse(BONIGA.x, y - ry*s*0.4, rx*(1 - s*0.5), ry*(1 - s)*0.9, 0, Math.PI, 2*Math.PI); } c.stroke();
+  // los escarabajos del estiércol {giraldo2011}
+  const esc = sstep(OCUPA + 0.15, OCUPA + 1.2, tau)*(1 - sstep(OCUPA + 16, OCUPA + 22, tau));
+  if (esc > 0.01){ c.globalAlpha = esc; for (const [dx, dy, a] of [[-0.12, -0.02, 0.3], [0.05, -0.045, -0.4], [0.17, -0.006, 2.8], [-0.2, 0.0, 0.1]]) escarabajo(c, BONIGA.x + dx*k + dx*0.1, y + dy*k, a, px); c.globalAlpha = 1; }
+}
+function escarabajo(c, x, y, a, px){
+  c.save(); c.translate(x, y); c.rotate(a);
+  c.strokeStyle = '#1a1512'; c.lineWidth = Math.max(px, 0.0018); c.beginPath(); for (const s of [-1, 1]) for (const u of [-0.005, 0.001, 0.006]){ c.moveTo(u, 0); c.lineTo(u + 0.004, s*0.011); c.lineTo(u + 0.008, s*0.013); } c.stroke();
+  const g = c.createLinearGradient(-0.009, -0.007, 0.009, 0.007); g.addColorStop(0, '#2c2a22'); g.addColorStop(0.45, '#4b4a2e'); g.addColorStop(0.55, '#6b6232'); g.addColorStop(1, '#16140f');
+  c.fillStyle = g; c.beginPath(); c.ellipse(-0.001, 0, 0.0095, 0.0068, 0, 0, 7); c.fill();
+  c.fillStyle = '#1e1b15'; c.beginPath(); c.ellipse(0.0098, 0, 0.0042, 0.0052, 0, 0, 7); c.fill();
+  c.strokeStyle = 'rgba(255,240,200,.35)'; c.lineWidth = Math.max(px*0.6, 0.0008); c.beginPath(); c.moveTo(-0.008, 0); c.lineTo(0.007, 0); c.stroke();
+  c.restore();
+}
+/* la hojarasca bajo el samán: folíolos y alguna vaina */
+const HOJA1 = (() => { const r = rng(1401), f = [], vainas = []; for (let i = 0; i < 230; i++){ const x = -3.4 + r()*6.8; f.push([x, r(), 0.012 + r()*0.012, (r()-.5)*0.8, r()]); } for (const x of [-0.25, 1.15, -1.6, 2.3]) vainas.push([x, 0.08 + r()*0.05, (r()-.5)*0.5]); return { f, vainas }; })();
+function pintaHojarasca1(c, px){
+  for (const [x, u, L, a, t] of HOJA1.f){ const y = g1(x) - 0.003 - u*0.012; c.fillStyle = t < 0.5 ? '#8a6c40' : t < 0.8 ? '#a4834f' : '#6f7a3c'; c.beginPath(); c.ellipse(x, y, L*0.5, L*0.2, a*0.4, 0, 7); c.fill(); }
+  for (const [x, L, a] of HOJA1.vainas){ const y = g1(x) - 0.01; c.save(); c.translate(x, y); c.rotate(a*0.3); const g = c.createLinearGradient(0, -0.012, 0, 0.012); g.addColorStop(0, '#5a3a22'); g.addColorStop(1, '#2e1e14'); c.fillStyle = g; c.beginPath(); c.moveTo(-L, 0); c.quadraticCurveTo(0, -0.03, L, -0.004); c.quadraticCurveTo(0, 0.004, -L, 0); c.fill(); c.restore(); }
+}
+/* el corte de la tierra en el nivel 1 */
+const TIERRA1 = (() => { const r = rng(1501), tonos = ['#35261a', '#3e2c1e', '#473322', '#2f2117', '#503a27'];
+  const grumo = grumos(r, [-3.7, -0.05, 3.7, 2.6], 9500, 0.004, 0.02, tonos, (x, y) => y > g1(x) + 0.006);
+  const raices = new Path2D();
+  for (const m of MAC1){ if (m.fila !== 2) continue; for (let k = 0; k < 16; k++){ let px = m.x + (r()-.5)*0.08, py = g1(m.x) + 0.004, a = Math.PI/2 + (r()-.5)*1.4; raices.moveTo(px, py); const L = 0.12 + r()*0.4; for (let s = 0; s < L; s += 0.012){ a = lerp(a, Math.PI/2, 0.05) + (r()-.5)*0.35; px += Math.cos(a)*0.012; py += Math.sin(a)*0.012; raices.lineTo(px, py); if (r() < 0.05){ const q = [px, py]; let bx = px, by = py, ba = a + (r() < .5 ? 1 : -1)*0.9; raices.moveTo(bx, by); for (let j = 0; j < 6; j++){ ba += (r()-.5)*0.3; bx += Math.cos(ba)*0.01; by += Math.sin(ba)*0.01; raices.lineTo(bx, by); } raices.moveTo(q[0], q[1]); } } } }
+  const leu = []; for (const t of LEU1){ let px = t.x, py = g1(t.x) + 0.01, a = Math.PI/2 + (r()-.5)*0.2; const pts = [[px, py]]; for (let s = 0; s < 1.8; s += 0.05){ a = lerp(a, Math.PI/2, 0.1) + (r()-.5)*0.15; px += Math.cos(a)*0.05; py += Math.sin(a)*0.05; pts.push([px, py]); } leu.push(pts); }
+  return { tonos, grumo, raices, leu }; })();
+function pintaTierra1(c, v, px){
+  const x0 = v[0] - 0.1, x1 = v[2] + 0.1; if (v[3] < g1(0) - 0.05) return;
+  const y0 = g1(0), g = c.createLinearGradient(0, y0, 0, y0 + 1.6); g.addColorStop(0, '#2c1f15'); g.addColorStop(0.12, '#3a2a1c'); g.addColorStop(0.45, '#56402a'); g.addColorStop(1, '#6a5033');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, g1(x0)); for (let x = x0; x <= x1; x += Math.max(0.01, (x1 - x0)/120)) c.lineTo(x, g1(x)); c.lineTo(x1, Math.max(v[3], y0) + 0.2); c.lineTo(x0, Math.max(v[3], y0) + 0.2); c.closePath(); c.fill();
+  pintaGrumos(c, TIERRA1.grumo, TIERRA1.tonos, Math.max(px*1.5, 0.0015));
+  c.lineCap = 'round';
+  c.strokeStyle = 'rgba(236,226,200,.72)'; c.lineWidth = Math.max(px*0.8, 0.0016); c.stroke(TIERRA1.raices);
+  for (const L of TIERRA1.leu){ c.strokeStyle = '#8e7657'; c.lineWidth = Math.max(px, 0.014); c.beginPath(); suave(c, L); c.stroke(); c.strokeStyle = 'rgba(200,176,140,.5)'; c.lineWidth = Math.max(px, 0.005); c.beginPath(); suave(c, L.map(q => [q[0] - 0.002, q[1]])); c.stroke(); }
+  // la capa de arriba, más oscura, con la materia orgánica
+  const go = c.createLinearGradient(0, y0, 0, y0 + 0.12); go.addColorStop(0, 'rgba(12,8,5,.45)'); go.addColorStop(1, 'rgba(12,8,5,0)'); c.fillStyle = go; c.fillRect(x0, y0 - 0.02, x1 - x0, 0.16);
+  // el túnel del escarabajo, que el nivel 2 muestra de cerca
+  const P = LV[2]; if (TAU > OCUPA + 2){ const a = sstep(OCUPA + 2, OCUPA + 8, TAU); c.strokeStyle = `rgba(18,11,6,${0.8*a})`; c.lineWidth = Math.max(px, 0.009); c.beginPath(); const tx = P.x*M1 + TUNEL.x; c.moveTo(tx, g1(tx)); c.quadraticCurveTo(tx + 0.006, g1(tx) + 0.02, tx - 0.004, g1(tx) + 0.035 + TUNEL.fondo); c.stroke(); }
+}
+/* la vaca del día de ocupación, y dos del hato atrás, fuera de foco */
+function pintaVaca1(c, tau, px){
+  if (tau <= 0 || tau >= OCUPA) return;
+  const h = tau*24, xc = hocicoX(tau), come = h >= 1.5 && h < 21;
+  const xb = xc + (come ? 1.32 : 1.46);
+  // una compañera del hato, más atrás y más chica por la distancia
+  { const x2 = xb + 1.9, s2 = bajoCopa(XP1 + x2); vaca(c, { x: x2, y: g1(x2) - 0.16, dir: -1, pose: come ? 'come' : 'camina', pel: 1, esc: 0.84, paso: xc*6 + 1, sombra: 0.35 + s2*0.5, cuerno: 1 }, px); }
+  vaca(c, { x: xb, y: g1(xb) - 0.015, dir: -1, pose: come ? 'come' : 'camina', pel: 2, s: 4, paso: xc*5.5, sombra: bajoCopa(XP1 + xb)*0.9 }, px);
+}
+/* la sombra del samán en el nivel 1: pasa sobre el pasto a la derecha de su orilla */
+/* un degradado horizontal que sigue la sombra real de las copas (bajoCopa), sin costuras */
+function gradSombra(c, x0, x1, alfa, rgb){
+  const g = c.createLinearGradient(x0, 0, x1, 0), n = 40;
+  for (let k = 0; k <= n; k++){ const x = lerp(x0, x1, k/n); g.addColorStop(k/n, `rgba(${rgb},${(alfa*bajoCopa(XP1 + x)).toFixed(3)})`); }
+  return g;
+}
+function pintaSombra1(c, v){
+  const top = v[1] - 0.1; c.fillStyle = gradSombra(c, v[0] - 0.1, v[2] + 0.1, 0.4, '10,24,12'); c.fillRect(v[0] - 0.1, top, v[2] - v[0] + 0.2, g1(0) + 0.02 - top);
+}
+
+
+function dibujaPasto(c, env){
+  c.save(); c.scale(1/M1, 1/M1);
+  const v = env.view.map(q => q*M1), px = env.px*M1, tau = TAU;
+  if (!fondoPasto) prepFondoPasto();
+  c.drawImage(fondoPasto, -4, -0.62*8, 8, 8);
+  pintaTierra1(c, v, px);
+  // el piso entre las macollas
+  { const x0 = v[0] - 0.2, x1 = v[2] + 0.2, paso = Math.max(0.01, (x1 - x0)/120); const gp = c.createLinearGradient(0, g1(0) - 0.13, 0, g1(0)); gp.addColorStop(0, 'rgba(60,76,40,0)'); gp.addColorStop(0.5, 'rgba(60,76,40,.75)'); gp.addColorStop(1, '#3f4a2a'); c.fillStyle = gp; c.beginPath(); c.moveTo(x0, g1(x0) - 0.13); for (let x = x0; x <= x1; x += paso) c.lineTo(x, g1(x) - 0.13); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, g1(x) + 0.002); c.closePath(); c.fill(); }
+  pintaLeucaena1(c, tau, px);
+  pintaMacollas(c, 0, tau, px, v);
+  pintaMacollas(c, 1, tau, px, v);
+  pintaHojarasca1(c, px);
+  pintaHuellas(c, tau, px);
+  pintaVaca1(c, tau, px);
+  pintaBoniga(c, tau, px);
+  pintaMacollas(c, 2, tau, px, v);
+  pintaSombra1(c, v);
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 2 · LA TIERRA BAJO LA BOÑIGA  (1 unidad = 8 cm)
+   Metros relativos al portal: el portal está 3,5 cm bajo la superficie.
+   ============================================================ */
+const M2 = 0.08, X2 = 0.43, HONDO2 = 0.035;
+fijaPortal(2, X2/M1, (g1(X2) + HONDO2)/M1);
+const sup2 = x => g1(X2 + x) - g1(X2) - HONDO2 + 0.0012*Math.sin(x*310) + 0.0008*Math.sin(x*820 + 1);
+const TUNEL = { x: 0.018, fondo: 0.036 };                 // el túnel del escarabajo, con la bola de boñiga al fondo
+/* PIS (0..1): la misma tierra pisada. Los factores salen de las fuentes (ver «Cuentas hechas»):
+   hilos del hongo: 1 − 0,279 con pastoreo pesado (carbono de los microbios, 0–10 cm) {lai2020} */
+const PIS = { obj: 0, a: 0, vis: 0 };
+const aPis = () => PIS.vis*PIS.a;
+const kHongo = () => 1 - aPis()*0.279;
+const cuantos = (n, k) => Math.round(n*k);
+function hundido(x){ return aPis()*0.011*Math.max(0, 1 - Math.pow((x + 0.035)/0.034, 2)); }   // la huella de una pezuña, a la izquierda
+const MIGAS2 = (() => {
+  const r = rng(2101), tonos = ['#3e2b1d', '#473220', '#523a27', '#37271b', '#5b412b'], out = tonos.map(() => []);
+  for (let i = 0, n = 0; i < 14000 && n < 2600; i++){
+    const x = -0.078 + r()*0.156, y = -0.04 + r()*0.12, R = lerp(0.0007, 0.0034, Math.pow(r(), 2.1)), t = Math.floor(r()*tonos.length), a0 = r()*6.28, k = 13;
+    if (y < sup2(x) + R*0.7) continue;
+    if (Math.hypot(x - TUNEL.x - 0.002, (y - sup2(TUNEL.x) - 0.02)*0.5) < 0.006 + R) continue;
+    const pts = []; for (let j = 0; j < k; j++){ const a = a0 + j/k*6.283; const d = R*(0.58 + r()*0.5)*(j % 3 === 0 ? 0.82 : 1); pts.push([x + Math.cos(a)*d, y + Math.sin(a)*d*0.88]); }
+    const poros = []; if (R > 0.002) for (let q = 0; q < 2; q++) poros.push([x + (r()-.5)*R, y + (r()-.5)*R*0.8, R*(0.035 + r()*0.04)]);
+    out[t].push({ x, y, R, pts, poros }); n++;
+  }
+  // la capa aplastada de la tierra pisada: láminas planas y apretadas (dibujo de ejemplo)
+  const lam = []; for (let i = 0; i < 700; i++){ const x = -0.08 + r()*0.16, y = sup2(x) + 0.0015 + Math.pow(r(), 1.3)*0.018, L = 0.002 + r()*0.006; lam.push([x, y, L, 0.0006 + r()*0.0008, r()]); }
+  return { tonos, g: out, lam };
+})();
+function trazosMigas(G, dx, dy){
+  const P = { sombra: new Path2D(), tono: G.map(() => new Path2D()), brillo: new Path2D() };
+  G.forEach((L, t) => { for (const m of L){ roundPoly(P.sombra, m.pts.map(q => [q[0] + m.R*dx, q[1] + m.R*dy])); roundPoly(P.tono[t], m.pts);
+    for (const [px, py, pr] of (m.poros || [])){ P.brillo.moveTo(px + pr, py); P.brillo.arc(px, py, pr, 0, 7); } } });
+  return P;
+}
+const RAIZ2 = (() => { const r = rng(2201), out = [];
+  for (let i = 0; i < 7; i++){ let x = -0.07 + i*0.022 + (r()-.5)*0.01, y = sup2(x), a = Math.PI/2 + (r()-.5)*0.6; if (Math.abs(x - TUNEL.x) < 0.007) x += 0.012; const pts = [[x, y - 0.004]];
+    for (let s = 0; s < 0.14; s += 0.002){ a = lerp(a, Math.PI/2, 0.04) + (r()-.5)*0.18; x += Math.cos(a)*0.002; y += Math.sin(a)*0.002; pts.push([x, y]); }
+    const lat = []; for (let k = 6; k < pts.length - 4; k += 3){ if (r() < 0.55) continue; const p = pts[k]; let bx = p[0], by = p[1], ba = (r() < .5 ? -1 : 1)*(0.5 + r()*0.6) + Math.PI/2; const q = [[bx, by]]; for (let j = 0; j < 8 + r()*10; j++){ ba += (r()-.5)*0.3; bx += Math.cos(ba)*0.0015; by += Math.sin(ba)*0.0015; q.push([bx, by]); } lat.push(q); }
+    const pelos = []; for (const l of lat){ for (let k = Math.max(1, l.length - 6); k < l.length; k++){ const p = l[k]; for (let j = 0; j < 3; j++){ const aa = r()*6.28, ll = 0.0005 + r()*0.0009; pelos.push([p[0], p[1], p[0] + Math.cos(aa)*ll, p[1] + Math.sin(aa)*ll]); } } }
+    out.push({ pts, lat, pelos, w: 0.0007 + r()*0.0005 }); }
+  return out; })();
+const HIFAS2 = (() => { const r = rng(2301), out = [];
+  for (let i = 0; i < 26; i++){ const R = RAIZ2[i % RAIZ2.length], p0 = R.pts[5 + Math.floor(r()*(R.pts.length - 10))]; let x = p0[0], y = p0[1], a = r()*6.28; const pts = [[x, y]];
+    for (let s = 0; s < 0.02 + r()*0.05; s += 0.0012){ a += (r()-.5)*0.5; x += Math.cos(a)*0.0012; y += Math.sin(a)*0.0012; if (y < sup2(x) + 0.001) a = Math.abs(a); pts.push([x, y]); }
+    out.push(pts); }
+  return out; })();
+const LOMBRIZ2 = (() => { const r = rng(2401), pts = []; let x = -0.034, y = -0.026, a = 0.12; for (let i = 0; i < 26; i++){ pts.push([x, y]); a += (r()-.5)*0.25; x += Math.cos(a)*0.0022; y += Math.sin(a)*0.0022; } return { pts, w: 0.0036 }; })();
+const NODULOS2 = (() => { const pts = []; let x = 0.056, y = -0.034, a = Math.PI*0.62; for (let i = 0; i < 40; i++){ pts.push([x, y]); a += 0.006; x += Math.cos(a)*0.0022; y += Math.sin(a)*0.0022; } const n = [[pts[12], 0.0021, 1], [pts[16], 0.0017, -1], [pts[22], 0.0024, 1], [pts[27], 0.0015, -1]]; return { pts, n }; })();
+function dibujaSuelo(c, env){
+  c.save(); c.scale(1/M2, 1/M2);
+  const v = env.view.map(q => q*M2), px = env.px*M2, A = aPis();
+  const x0 = v[0] - 0.01, x1 = v[2] + 0.01, paso = Math.max(0.0005, (x1 - x0)/160);
+  // el aire: las bases del pasto y la hojarasca, fuera de foco
+  const ga = c.createLinearGradient(0, -0.09, 0, -0.03); ga.addColorStop(0, '#9fb07a'); ga.addColorStop(1, '#5d6a3a'); c.fillStyle = ga; c.fillRect(x0, v[1] - 0.01, x1 - x0, 0.12);
+  const rb = rng(2501); for (let i = 0; i < 30; i++){ const x = -0.09 + rb()*0.18, w = 0.002 + rb()*0.004; c.fillStyle = rb() < 0.6 ? 'rgba(60,96,40,.55)' : 'rgba(150,140,90,.45)'; c.fillRect(x, -0.12, w, 0.1); }
+  // la tierra
+  const gt = c.createLinearGradient(0, -0.04, 0, 0.08); gt.addColorStop(0, '#2a1d13'); gt.addColorStop(0.3, '#35251a'); gt.addColorStop(1, '#3f2d1f');
+  c.fillStyle = gt; c.beginPath(); c.moveTo(x0, sup2(x0) + hundido(x0)); for (let x = x0; x <= x1; x += paso) c.lineTo(x, sup2(x) + hundido(x)); c.lineTo(x1, v[3] + 0.02); c.lineTo(x0, v[3] + 0.02); c.closePath(); c.fill();
+  if (!MIGAS2.P) MIGAS2.P = trazosMigas(MIGAS2.g, 0.05, 0.09);
+  c.save(); c.beginPath(); c.moveTo(x0, sup2(x0) + hundido(x0)); for (let x = x0; x <= x1; x += paso) c.lineTo(x, sup2(x) + hundido(x)); c.lineTo(x1, v[3] + 0.02); c.lineTo(x0, v[3] + 0.02); c.closePath(); c.clip();
+  c.fillStyle = 'rgba(8,5,3,.35)'; c.fill(MIGAS2.P.sombra);
+  for (let t = 0; t < MIGAS2.tonos.length; t++){ c.fillStyle = MIGAS2.tonos[t]; c.fill(MIGAS2.P.tono[t]); }
+  c.fillStyle = 'rgba(24,15,10,.35)'; c.fill(MIGAS2.P.brillo);
+  // raíces del pasto: finas, con sus pelos cerca de la punta
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const R of RAIZ2){ c.strokeStyle = '#d7c8a4'; c.lineWidth = Math.max(px, R.w); c.beginPath(); suave(c, R.pts); c.stroke(); c.strokeStyle = 'rgba(250,244,226,.6)'; c.lineWidth = Math.max(px*0.7, R.w*0.4); c.beginPath(); suave(c, R.pts.map(q => [q[0] - R.w*0.15, q[1]])); c.stroke();
+    c.strokeStyle = '#cdbd98'; c.lineWidth = Math.max(px, R.w*0.45); c.beginPath(); for (const l of R.lat) suave(c, l); c.stroke();
+    c.strokeStyle = 'rgba(240,232,210,.45)'; c.lineWidth = Math.max(px*0.5, 0.00005); c.beginPath(); for (const p of R.pelos){ c.moveTo(p[0], p[1]); c.lineTo(p[2], p[3]); } c.stroke(); }
+  // la raíz de la leucaena, con sus nódulos
+  if (piso === 'calido'){
+  c.strokeStyle = '#8f7658'; c.lineWidth = Math.max(px, 0.0026); c.beginPath(); suave(c, NODULOS2.pts); c.stroke();
+  c.strokeStyle = 'rgba(210,186,150,.5)'; c.lineWidth = Math.max(px, 0.0009); c.beginPath(); suave(c, NODULOS2.pts.map(q => [q[0], q[1] - 0.0005])); c.stroke();
+  for (const [p, R, s] of NODULOS2.n){ const x = p[0] + s*0.0012, y = p[1] + 0.0014*s; const g = c.createRadialGradient(x - R*0.3, y - R*0.4, R*0.1, x, y, R); g.addColorStop(0, '#f0cdb4'); g.addColorStop(0.6, '#c69478'); g.addColorStop(1, '#86594a'); c.fillStyle = g; c.beginPath(); c.arc(x, y, R, 0, 7); c.fill(); }
+  }
+  // los hilos del hongo (de dibujo: más gruesos y de otro color)
+  c.strokeStyle = 'rgba(206,212,255,.9)'; c.lineWidth = Math.max(px*1.3, 0.00011); c.beginPath(); for (const h of HIFAS2.slice(0, cuantos(HIFAS2.length, kHongo()))) suave(c, h); c.stroke();
+  // la lombriz en su camino
+  { const w = LOMBRIZ2; c.strokeStyle = 'rgba(12,7,4,.55)'; c.lineWidth = w.w*1.25; c.beginPath(); suave(c, w.pts); c.stroke();
+    c.strokeStyle = '#a86a5c'; c.lineWidth = w.w; c.beginPath(); suave(c, w.pts); c.stroke();
+    c.strokeStyle = 'rgba(80,40,34,.5)'; c.lineWidth = Math.max(px*0.6, w.w*0.1); for (let k = 1; k < w.pts.length - 1; k++){ const p = w.pts[k], q = w.pts[k + 1]; const a = Math.atan2(q[1] - p[1], q[0] - p[0]) + Math.PI/2; c.beginPath(); c.moveTo(p[0] + Math.cos(a)*w.w*0.45, p[1] + Math.sin(a)*w.w*0.45); c.lineTo(p[0] - Math.cos(a)*w.w*0.45, p[1] - Math.sin(a)*w.w*0.45); c.stroke(); }
+    const p = w.pts[7]; c.fillStyle = 'rgba(214,150,132,.85)'; c.beginPath(); c.ellipse(p[0], p[1], w.w*1.5, w.w*0.62, Math.atan2(w.pts[8][1] - p[1], w.pts[8][0] - p[0]), 0, 7); c.fill();
+    c.strokeStyle = 'rgba(255,235,225,.35)'; c.lineWidth = w.w*0.2; c.beginPath(); suave(c, w.pts.map(q => [q[0], q[1] - w.w*0.22])); c.stroke(); }
+  // el túnel del escarabajo y la bola de boñiga que enterró {giraldo2011}
+  { const tx = TUNEL.x, ty = sup2(tx), fondo = ty + TUNEL.fondo; const tap = A;
+    c.strokeStyle = 'rgba(16,10,6,.95)'; c.lineWidth = 0.0085; c.beginPath(); c.moveTo(tx, ty - 0.001); c.quadraticCurveTo(tx + 0.006, ty + 0.016, tx - 0.003, fondo); c.stroke();
+    c.strokeStyle = 'rgba(70,50,32,.8)'; c.lineWidth = 0.0012; c.beginPath(); c.moveTo(tx - 0.0045, ty); c.quadraticCurveTo(tx + 0.0015, ty + 0.016, tx - 0.0075, fondo); c.stroke();
+    const g = c.createRadialGradient(tx - 0.006, fondo - 0.002, 0.001, tx - 0.004, fondo + 0.002, 0.0075); g.addColorStop(0, '#6d6440'); g.addColorStop(1, '#2f2a16'); c.fillStyle = g; c.beginPath(); c.ellipse(tx - 0.004, fondo + 0.002, 0.0072, 0.0064, 0, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(220,210,170,.25)'; c.lineWidth = Math.max(px, 0.0004); c.beginPath(); c.arc(tx - 0.005, fondo, 0.004, 3.6, 5); c.stroke();
+    if (tap > 0.01){ c.fillStyle = `rgba(42,29,19,${tap})`; c.beginPath(); c.ellipse(tx + 0.001, ty + 0.008, 0.0055, 0.011, 0.1, 0, 7); c.fill(); } }
+  // la tierra pisada: la capa de arriba se aplasta y casi no quedan huecos (dibujo de ejemplo; la cifra, en la tarjeta)
+  if (A > 0.01){ c.globalAlpha = A;
+    const gp = c.createLinearGradient(0, -0.036, 0, -0.012); gp.addColorStop(0, 'rgba(40,28,19,.96)'); gp.addColorStop(0.8, 'rgba(46,32,22,.9)'); gp.addColorStop(1, 'rgba(46,32,22,0)');
+    c.fillStyle = gp; c.beginPath(); c.moveTo(x0, sup2(x0) + hundido(x0)); for (let x = x0; x <= x1; x += paso) c.lineTo(x, sup2(x) + hundido(x)); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, sup2(x) + 0.02); c.closePath(); c.fill();
+    for (const [x, y, L, h, t] of MIGAS2.lam){ c.fillStyle = mix('#35271b', '#4a3624', t); c.beginPath(); c.ellipse(x, y + hundido(x)*0.8, L*0.8, h*0.6, (t - 0.5)*0.1, 0, 7); c.fill(); }
+    c.strokeStyle = 'rgba(18,12,8,.35)'; c.lineWidth = Math.max(px, 0.00025); c.beginPath(); for (let k = 0; k < 6; k++){ const yy = 0.003 + k*0.0028; c.moveTo(x0, sup2(x0) + yy + hundido(x0)*0.8); for (let x = x0; x <= x1; x += 0.001) c.lineTo(x, sup2(x) + yy + hundido(x)*0.8*(1 - k/7) + 0.0004*Math.sin(x*60 + k*1.7)); } c.stroke();
+    c.globalAlpha = 1; }
+  c.restore();
+  // la superficie: hojarasca menuda y, al pisar, el agua que se queda en la huella
+  const rh = rng(2601); c.lineCap = 'round'; for (let i = 0; i < 70; i++){ const x = -0.085 + rh()*0.17, y = sup2(x) + hundido(x) - 0.0002, L = 0.0008 + rh()*0.0018, a = (rh()-.5)*0.5, cu = (rh()-.5)*0.0006; c.strokeStyle = rh() < 0.6 ? '#6b5434' : '#8f7447'; c.lineWidth = 0.00022 + rh()*0.0002; c.beginPath(); c.moveTo(x - Math.cos(a)*L, y - Math.sin(a)*L); c.quadraticCurveTo(x, y + cu - 0.0003, x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); }
+  c.fillStyle = 'rgba(90,64,40,.95)'; c.beginPath(); c.ellipse(TUNEL.x + 0.009, sup2(TUNEL.x + 0.009) - 0.0006, 0.0045, 0.0022, 0, Math.PI, 2*Math.PI); c.fill();
+  if (A > 0.01){ // el agua que se queda en el fondo de la huella: solo donde la superficie baja del nivel del agua
+    let fondoY = -1; for (let x = -0.07; x <= 0; x += 0.0005) fondoY = Math.max(fondoY, sup2(x) + hundido(x)); const wl = fondoY - 0.0035;
+    c.fillStyle = `rgba(150,172,180,${0.6*A})`; c.beginPath(); let dentro = false;
+    for (let x = -0.075; x <= 0.005; x += 0.0005){ const y = sup2(x) + hundido(x); if (y > wl){ if (!dentro){ c.moveTo(x, wl); dentro = true; } c.lineTo(x, y); } else if (dentro){ c.lineTo(x, wl); c.closePath(); dentro = false; } }
+    if (dentro){ c.lineTo(0.005, wl); c.closePath(); } c.fill();
+    c.strokeStyle = `rgba(230,240,245,${0.5*A})`; c.lineWidth = Math.max(px, 0.0003); c.beginPath(); c.moveTo(-0.05, wl + 0.0002); c.lineTo(-0.02, wl + 0.0002); c.stroke(); }
+  const gs = c.createLinearGradient(0, v[1], 0, v[3]); gs.addColorStop(0, 'rgba(255,236,200,.04)'); gs.addColorStop(1, 'rgba(0,0,0,.16)'); c.fillStyle = gs; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  c.restore();
+}
+const DIB = [dibujaPotrero, dibujaPasto, dibujaSuelo];
+
+/* ============================================================
+   GUION DE CÁMARA (X, Y en metros; Z = ancho del cuadro)
+   Estaciones: 0 potrero · 1 sombra · 2 pasto · 3 ocupación (el tiempo corre
+   en horas) · 4 descanso (el tiempo corre en días) · 5 suelo · 6 leche y carne
+   ============================================================ */
+function K(L, x, y, f){ const l = LV[L]; return { X: l.O[0] + l.F*x, Y: l.O[1] + l.F*y, Z: l.F*f }; }
+/* cuadro de un nivel dado en metros de ese nivel: centro (xm, ym) y ANCHO VISIBLE wm */
+function Km(L, xm, ym, wm){ const l = LV[L], z = wm*S/W; return K(L, xm/l.F, ym/l.F, z/l.F); }
+let SEGS = [], T = 0, EST = [], PARADAS = [];
+function guion(){
+  const P = PORT, a = W/H;
+  // el suelo cae a esta fracción del alto de la pantalla
+  const cy0 = (w, f) => -(f - 0.5)*w/a;
+  const e0 = Km(0, P ? 7 : 2, P ? cy0(24, 0.5) : cy0(48, 0.72), P ? 24 : 48);
+  const e1 = Km(0, P ? 13 : 12, P ? cy0(10, 0.5) : cy0(20, 0.66), P ? 10 : 20);
+  const e2 = Km(1, P ? 0.1 : 0.15, g1(0) + (P ? cy0(1.0, 0.56) : cy0(2.2, 0.74)), P ? 1.0 : 2.2);
+  const e3 = Km(1, P ? 0.5 : 0.95, g1(0) + (P ? cy0(1.6, 0.56) : cy0(4.2, 0.74)), P ? 1.6 : 4.2);
+  const e4 = Km(1, P ? 0.35 : 0.3, g1(0) + (P ? cy0(1.1, 0.56) : cy0(2.4, 0.74)), P ? 1.1 : 2.4);
+  const e5 = Km(2, P ? 0.012 : 0.004, sup2(0) + (P ? cy0(0.038, 0.14) : cy0(0.08, 0.2)), P ? 0.038 : 0.08);
+  const e6 = Km(0, P ? 8 : 3, P ? cy0(30, 0.5) : cy0(60, 0.72), P ? 30 : 60);
+  const b = (A, k) => ({ ...A, Z: A.Z*k });
+  SEGS = [
+    { k:'hold', A:e0, B:b(e0, 0.95), w:1.0, st:0, card:'e0' },
+    { k:'move', A:b(e0, 0.95), B:e1, w:1.3 },
+    { k:'hold', A:e1, B:b(e1, 0.94), w:1.35, st:1, card:'e1' },
+    { k:'move', A:b(e1, 0.94), B:e2, w:1.9 },
+    { k:'hold', A:e2, B:b(e2, 0.95), w:1.35, st:2, card:'e2' },
+    { k:'move', A:b(e2, 0.95), B:e3, w:0.9, dias:[-1, 0] },
+    { k:'hold', A:e3, B:b(e3, 0.98), w:2.8, st:3, card:'e3', dias:[0, OCUPA] },
+    { k:'move', A:b(e3, 0.98), B:e4, w:0.5 },
+    { k:'hold', A:e4, B:b(e4, 0.97), w:3.4, st:4, card:'e4', dias:[OCUPA, OCUPA + DESCANSO] },
+    { k:'move', A:b(e4, 0.97), B:e5, w:1.8 },
+    { k:'hold', A:e5, B:b(e5, 0.95), w:1.7, st:5, card:'e5', sel:'suelo' },
+    { k:'move', A:b(e5, 0.95), B:e6, w:2.6, card:'sube', sube:true },
+    { k:'hold', A:e6, B:b(e6, 0.97), w:2.2, st:6, card:'e6', sel:'potrero' },
+  ];
+  let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; } T = acc;
+  EST = SEGS.filter(s => s.st !== undefined);
+  PARADAS = [0];
+  for (const s of SEGS){ if (s === SEGS[0]) continue;
+    if (s.st !== undefined){ if (s.dias) PARADAS.push(s.a + s.w*0.12, (s.a + s.b)/2, s.b - s.w*0.06); else PARADAS.push(s === SEGS[SEGS.length-1] ? T : (s.a + s.b)/2); }
+    else if (s.card) PARADAS.push(s.a + s.w*0.55); }
+}
+const estP = i => i === 0 ? 0 : i === EST.length - 1 ? T : (EST[i].a + EST[i].b)/2;
+const inicioSubida = () => SEGS.find(s => s.sube).a;
+const segSel = k => SEGS.find(s => s.sel === k);
+/* el tiempo en cada punto del recorrido: corre solo dentro de los tramos con días */
+function tauDe(p){
+  let t = -1;
+  for (const s of SEGS){ if (!s.dias) continue;
+    if (p <= s.a) return t;
+    if (p >= s.b){ t = s.dias[1]; continue; }
+    const u = (p - s.a)/s.w, e = s.k === 'hold' ? clamp((u - 0.08)/0.84, 0, 1) : u;
+    return lerp(s.dias[0], s.dias[1], e); }
+  return t;
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let s = SEGS[SEGS.length-1], i = SEGS.length - 1;
+  for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ s = SEGS[j]; i = j; break; } }
+  const u = clamp((p - s.a)/s.w, 0, 1); const A = s.A, B = s.B;
+  if (s.k === 'hold') return { X: A.X, Y: A.Y, Z: A.Z*Math.pow(B.Z/A.Z, u), seg: s, i, u };
+  const e = u*u*(3 - 2*u);
+  const Z = A.Z*Math.pow(B.Z/A.Z, e);
+  let X, Y;
+  if (Math.abs(Math.log(B.Z/A.Z)) > 0.05){ const k = (A.Z - Z)/(A.Z - B.Z); X = A.X + (B.X - A.X)*k; Y = A.Y + (B.Y - A.Y)*k; }
+  else { X = lerp(A.X, B.X, e); Y = lerp(A.Y, B.Y, e); }
+  return { X, Y, Z, seg: s, i, u };
+}
+function anchoVista(cam){ return cam.Z * W / S; }
+
+/* ============================================================
+   RENDER (el de los descensos del café y del suelo)
+   ============================================================ */
+const PERF = [0, 0, 0];
+function envPara(L, cx, cy, f, ppu){ return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - CX/ppu, cy - CY/ppu, cx + (W - CX)/ppu, cy + (H - CY)/ppu] }; }
+function baseDe(cam){
+  let L = 0;
+  for (;;){ let nx = -1;
+    for (const k of KIDS[L]){ const l = LV[k]; if (cam.Z/l.F > l.k/0.92) continue; const lx = (cam.X - l.O[0])/l.F, ly = (cam.Y - l.O[1])/l.F; if (Math.abs(lx) < 0.75 && Math.abs(ly) < 0.75){ nx = k; break; } }
+    if (nx < 0) return L; L = nx; }
+}
+function pintaNivel(c, L, cx, cy, f){
+  const ppu = S/f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(CX - cx*ppu), DPR*(CY - cy*ppu));
+  let t0 = performance.now(); DIB[L](c, envPara(L, cx, cy, f, ppu)); PERF[L] += performance.now() - t0;
+  for (const k of KIDS[L]){
+    const P = LV[k]; const pp = P.s*ppu*P.k; const a = sstep(0.28*S, 0.92*S, pp); if (a <= 0) continue;
+    const ox = CX + (P.x - cx)*ppu, oy = CY + (P.y - cy)*ppu;
+    if (ox + pp*1.3 < 0 || ox - pp*1.3 > W || oy + pp*1.3 < 0 || oy - pp*1.3 > H) continue;
+    const ppu2 = ppu*P.s, cx2 = (cx - P.x)/P.s, cy2 = (cy - P.y)/P.s, f2 = f/P.s;
+    const cubre = a >= 0.999; const dst = cubre ? c : bctx;
+    if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+    dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*(CX - cx2*ppu2), DPR*(CY - cy2*ppu2));
+    t0 = performance.now(); DIB[k](dst, envPara(k, cx2, cy2, f2, ppu2)); PERF[k] += performance.now() - t0;
+    if (cubre) continue;
+    bctx.setTransform(1,0,0,1,0,0);
+    bctx.globalCompositeOperation = 'destination-in';
+    const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+    const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+    gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+    bctx.globalCompositeOperation = 'source-over';
+    c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+  }
+}
+let camR = null;
+function aPantalla(L, x, y){ const l = LV[L]; const X = l.O[0] + l.F*x, Y = l.O[1] + l.F*y; return [CX + (X - camR.X)*S/camR.Z, CY + (Y - camR.Y)*S/camR.Z]; }
+function luzProf(Z){ return clamp((Math.log10(Z) + 1.3)/3.1, 0, 1); }
+/* hondura del centro de la vista bajo la superficie del potrero, en metros (negativa: sobre la tierra) */
+function hondura(cam){ return cam.Y - gM(cam.X); }
+
+let pRender = 0;
+function render(){
+  const cam = camAt(pRender); camR = cam; TAU = tauDe(pRender);
+  const L = baseDe(cam), l = LV[L];
+  pintaNivel(ctx, L, (cam.X - l.O[0])/l.F, (cam.Y - l.O[1])/l.F, cam.Z/l.F);
+  ctx.setTransform(1,0,0,1,0,0);
+  const lz = luzProf(cam.Z);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, `rgba(10,8,4,${0.08 + 0.3*(1 - lz)})`);
+  ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.seg.k === 'move'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  cam.L = L;
+  return cam;
+}
+
+/* ============================================================
+   FUENTES: cada frase o cifra de la pieza lleva la clave de una de estas.
+   Cada ficha dice solo lo que su resumen (o su texto, donde se leyó) dice.
+   ============================================================ */
+const FUENTES = Object.entries(DATOS.fuentes).map(([k, f]) => [k, `<b>${f.titulo}.</b> ${f.nota} <a href="${f.url}" target="_blank" rel="noopener noreferrer">Leer fuente</a>`]);
+const NUM_F = new Map(FUENTES.map(([k], i) => [k, i + 1]));
+
+/* ============================================================
+   TEXTOS: [[clave|texto]] = palabra del glosario · {clave,clave} = fuentes
+   ============================================================ */
+const SEL = {
+ suelo:{nom:['Descansada','Pisada'],rotulo:'La misma tierra',txt:['Estructura ilustrada: migas, huecos y raíces.','Pisoteo ilustrado: menos huecos; no representa un porcentaje medido.']},
+ potrero:{nom:['Con árboles y descanso','Sin árboles, sin descanso'],rotulo:'El mismo potrero',txt:['Árboles, arbustos y pasto del piso elegido; hato de ejemplo.','Comparación ilustrada; el número de vacas no es una carga recomendada.']}
+};
+function paginasPiso(){
+ const P=perfil, raza=esChoachi && (piso==='templado'||piso==='frio') ? 'Normando y cruces Normando × criollo: doble propósito{choachi}' : P.razas;
+ return [
+ {t:'El potrero',c:'El potrero',pags:[{s:[`Piso ${P.nombre.toLowerCase()}: ${P.arbol}, ${P.arbusto} y ${P.pasto}${P.cita}.`, `Ganado: ${raza}.`],nota:'Ejemplo ilustrado del piso. La selección para una finca requiere verificar clima, suelo y disponibilidad local.'},{s:[esChoachi ? 'Choachí reúne zonas templadas, frías y de páramo; no se toma la altitud de la cabecera como la de su finca{choachi}.' : 'La altitud permite orientar el piso; los límites no sustituyen una evaluación del sitio{pisos}.', P.local]}]},
+ {t:'El árbol y su sombra',c:'La sombra',pags:[{s:[`En este dibujo, la copa es de ${P.arbol}${P.cita}.`, 'Las formas y tamaños son ilustrativos; no se calcula aquí el efecto sobre la producción.']}]},
+ {t:'El pasto bajo el árbol',c:'El pasto',pags:[{s:[`El forraje arbustivo es ${P.arbusto}; la cubierta es ${P.pasto}${P.cita}.`,P.hoja],nota:'La altura del dibujo no es una regla de entrada o salida del ganado.'}]},
+ {t:'El día de ocupación',c:'Ocupación',tiempo:true,pags:[{s:['El hato entra a la franja de ejemplo.','El reloj describe la animación: no prescribe una duración de ocupación para su finca.']}]},
+ {t:'Los días de descanso',c:'Descanso',tiempo:true,pags:[{s:['La franja queda sin ganado y el forraje vuelve a crecer en el dibujo.','El calendario es ilustrativo. La recuperación depende del forraje y del sitio; aquí no se recomienda un número de días.']}]},
+ {t:'La tierra, descansada o pisada',c:'El suelo',sel:'suelo',pags:[{sel:0,s:['Vemos una representación de raíces, migas, huecos y vida del suelo.','Toque Pisada para comparar las dos ilustraciones.'],nota:'Colores, tiempos y proporciones del subsuelo son didácticos.'}]},
+ {t:'Del potrero al mundo de la leche',c:'La leche',sel:'potrero',pags:[{sel:0,s:[`Volvemos al piso ${P.nombre.toLowerCase()}, con ${P.arbol}, ${P.arbusto} y ${P.pasto}${P.cita}.`,'La leche continúa esta historia en Chagra.'],nota:'El dibujo no pronostica litros, ganancia de peso ni carga por hectárea.'}]}
+ ];
+}
+const ESTACIONES = paginasPiso();
+const PASO_SUBE = {t:'De vuelta al potrero',c:'Subida',pags:[{s:['Volvemos a mirar el conjunto: árboles, forraje y ganado del piso elegido.']}]};
+const GLOS = [
+ ['sspi','Sistema silvopastoril','Sistema que integra árboles o arbustos, pastos y ganado{alto}.'],
+ ['franja','Franja','Parte del potrero que ocupa el hato en la ilustración.'],
+ ['descanso','Descanso','Tiempo sin pastoreo durante el cual se recupera el forraje. El calendario mostrado es de ejemplo.']
+];
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => { if (!GLOS.some(g => g[0] === k)) throw new Error('palabra sin glosario: ' + k); return `<button type="button" class="t" data-g="${k}">${v}</button>`; })
+            .replace(/\{([\w,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(k => { const n = NUM_F.get(k); if (!n) throw new Error('fuente sin ficha: ' + k); return `<a href="#f${n}" data-f>${n}</a>`; }).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\w,]+\}/g, ''); }
+
+$('listaFuentes').innerHTML = FUENTES.map(([k, h], i) => `<li id="f${i + 1}">${h}</li>`).join('');
+for (const sp of document.querySelectorAll('#fuentes [data-n]')){ const n = NUM_F.get(sp.dataset.n); if (!n) throw new Error('fuente sin ficha: ' + sp.dataset.n); sp.innerHTML = `<a href="#f${n}" data-f>${n}</a>`; }
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar' };
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+const estadoSel = k => k === 'suelo' ? PIS : TRAD;
+function pintaSel(){ const m = $('selBtns'); if (!m || !estAct.sel) return; const E = estadoSel(estAct.sel);
+  for (const b of m.children) b.setAttribute('aria-pressed', String(+b.dataset.sel === E.obj)); $('efecto').innerHTML = marca(SEL[estAct.sel].txt[E.obj]); }
+function ponSel(key, k){ const E = estadoSel(key); if (k === E.obj) return; E.obj = k; if (RM) E.a = k; pintaSel(); sucio = true; $('anuncio').textContent = SEL[key].rotulo + ': ' + SEL[key].nom[k].toLowerCase(); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.sel !== undefined && estAct.sel) ponSel(estAct.sel, P.sel);
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  if (estAct.sel) h += `<div class="manejo" role="group" aria-label="${SEL[estAct.sel].rotulo}" id="selBtns">${SEL[estAct.sel].nom.map((n, k) => `<button type="button" class="bc" data-sel="${k}" aria-pressed="false">${n}</button>`).join('')}</div><p class="efecto" id="efecto"></p>`;
+  if (P.extra) h += marca(P.extra);
+  if (estAct === ESTACIONES[6]) h += '<button type="button" class="bc prim" id="seguirLeche">Seguir al mundo de la leche</button>';
+  $('fCuerpo').innerHTML = h;
+  pintaSel();
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red (la del café) ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue);
+  else if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  if(e.target.closest('#seguirLeche')){ if(window.parent !== window) window.parent.postMessage({tipo:'chagra:navegar',vista:'descenso_leche'}, '*'); else window.location.assign('../leche/index.html'+window.location.search); return; }
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); return; }
+  const m = e.target.closest && e.target.closest('[data-sel]'); if (m && estAct.sel){ ponSel(estAct.sel, +m.dataset.sel); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = '';
+    el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? '\u00a0' : ch; el.appendChild(s); } }
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'µm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){
+  if (x < 10) return '×' + fmt3(x);
+  const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2);
+  return '×' + miles(Math.round(r));
+}
+function fmtRegla(m){
+  const mm = m*1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  return 'mide cerca de 1 mm';
+}
+function fmtHondo(h){ if (h < 0.005) return 'sobre el potrero'; const cm = h*100; return 'a ' + (cm < 1 ? fmt3(cm*10) + ' mm' : (cm < 10 ? fmt3(cm) : Math.round(cm)) + ' cm') + ' de hondo'; }
+/* el tiempo, siempre continuo: último día del descanso anterior → horas de ocupación → días de descanso */
+function fmtTiempo(t){
+  const etapa = t <= 0 ? 'antes de entrar' : t <= OCUPA ? 'ocupación' : 'descanso';
+  return {s: etapa + ' · ejemplo', c: etapa === 'ocupación' ? 'ocupa' : 'descansa'};
+}
+const NOTAS = ['Tamaños y calendario ilustrativos.', 'Tamaños y calendario ilustrativos.', 'Subsuelo didáctico.'];
+let anchoInicial = 0, ultCard = '', ultEst = -1;
+function cardDe(p){
+  for (let i = 0; i < SEGS.length; i++){ const s = SEGS[i]; if (s.k !== 'hold' || !s.card) continue; if (p >= s.a - 0.25 && p <= s.b + 0.2) return { c: s.card, st: s.st }; }
+  const s = SEGS.find(q => q.card === 'sube'); if (s && p >= s.a + 0.35 && p <= s.b - 0.45) return { c: 'sube', st: -1 };
+  return null;
+}
+function estacionDe(p){ let st = 0; for (let i = 0; i < EST.length; i++){ if (p >= EST[i].a - 0.4) st = i; } return st; }
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial/ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+  const ti = fmtTiempo(TAU), vT = $('vTiempo'); rueda(vT, ti.s); if (vT._c !== ti.c){ vT._c = ti.c; vT.className = ti.c; }
+  const st = estacionDe(pRender), e = ESTACIONES[st];
+  $('vEstacion').textContent = `${st + 1}/${ESTACIONES.length} · ${e.c}`;
+  const sub = cam.seg.sube && cam.seg.k === 'move', vl = $('vLuz'); const tl = sub ? '↑ subiendo' : fmtHondo(hondura(cam));
+  if (vl._s !== tl){ vl._s = tl; vl.textContent = tl; vl.classList.toggle('sube', sub); }
+  const nota = NOTAS[cam.L] || NOTAS[0]; if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  const cd = cardDe(pRender), key = cd ? cd.c : '';
+  if (key !== ultCard){ ultCard = key; detenVoz();
+    if (!cd){ fr.classList.remove('ver'); }
+    else {
+      estAct = cd.c === 'sube' ? PASO_SUBE : ESTACIONES[cd.st]; pagAct = 0;
+      $('fNum').textContent = cd.c === 'sube' ? 'De paso, subiendo' : `Estación ${cd.st + 1} de ${ESTACIONES.length}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = cd.c === 'sube' ? 'De paso: subiendo' : `Estación ${cd.st + 1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, pRender);
+  $('titulo').style.visibility = pRender > 0.65 ? 'hidden' : 'visible';
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cd);
+}
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; if (e.tiempo) b.classList.add('tiempo'); if (i === ESTACIONES.length - 1) b.classList.add('sube'); b.innerHTML = `<i></i><span>${i + 1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i + 1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+const m0 = (txt, x, y) => [txt, 0, x/M0, y/M0];
+const m1 = (txt, x, y) => [txt, 1, x/M1, y/M1];
+const m2 = (txt, x, y) => [txt, 2, x/M2, y/M2];
+/* un hueco de verdad entre migas, para rotularlo */
+const HUECO2 = (() => { const todas = MIGAS2.g.flat(); let best = null, d0 = -1;
+  for (let x = -0.03; x <= 0.0; x += 0.0008) for (let y = sup2(0) + 0.006; y <= sup2(0) + 0.024; y += 0.0008){ let dm = 1e9; for (const m of todas){ const d = Math.hypot(m.x - x, m.y - y) - m.R; if (d < dm) dm = d; } if (dm > d0){ d0 = dm; best = [x, y]; } }
+  return best; })();
+function etqEstacion(st){
+  const A = aPis(), Tt = aTrad(), tau = TAU;
+  if (st === 0){ const T1 = SAMANES[0], T2 = SAMANES[1];
+    return [m0(perfil.arbol, T2.x - 2.5, gM(T2.x) - 11.2), m0(perfil.arbusto, -1.2, gM(-1.2) - 1.55), m0(perfil.pasto, 1.9, gM(1.9) - 0.5), m0('las vacas de hoy', 16.2, gM(16.2) - 1.0), m0(piso === 'calido' ? 'cerca viva' : 'lindero', 18, gM(18) - 2.8), m0('agua', 7.9, gM(7.9) - 0.62), m0('cerca eléctrica', 6, gM(6) - 1.05)]; }
+  if (st === 1){ const T1 = SAMANES[0];
+    return [m0('bajo la copa: más fresco', 9.8, gM(9.8) - 0.85), m0('al sol', 17.6, gM(17.6) - 1.3), m0(perfil.arbol, T1.x + 0.1, gM(T1.x) - 2.6), m0(razaDibujada(), 11.4, gM(11.4) - 1.4), m0(perfil.arbusto, 20.5, gM(20.5) - 1.5)]; }
+  if (st === 2){ const t = LEU1[2], h = t.hojas[5] || t.hojas[0];
+    return [m1(perfil.pasto, 0.28, g1(0.28) - 0.62), m1(perfil.arbusto, t.x + 0.01, t.base - t.alto), m1('hoja de ' + perfil.arbusto, h.x + Math.cos(h.a)*h.L*0.5, h.y + Math.sin(h.a)*h.L*0.5), m1('hojarasca', 0.35, g1(0.35) - 0.012), m1('raíces del pasto', 0.62, g1(0.62) + 0.12), m1('orilla de la sombra', X_ORILLA + 0.02, g1(0) - 0.97)]; }
+  if (st === 3){ const xc = hocicoX(clamp(tau, 0.001, 0.999)), out = [];
+    if (tau > 0.06 && tau < 0.875) out.push(m1('vaca comiendo', xc + 0.25, g1(xc) - 0.35));
+    if (tau > 0.12) out.push(m1('pasto comido', xc + 0.9, g1(xc + 0.9) - 0.42));
+    const hl = HUELLAS.filter(q => q.x >= xc + 0.7)[0]; if (hl) out.push(m1('pisada', hl.x, g1(hl.x) + 0.012));
+    if (tau > 0.1 && tau < 0.85) out.push(m1('pasto sin comer', xc - 0.5, g1(xc - 0.5) - 0.72));
+    if (tau >= BONIGA.cae) out.push(m1('boñiga', BONIGA.x, g1(BONIGA.x) - 0.04));
+    return out; }
+  if (st === 4){ const out = [m1('el pasto rebrota', 0.25, g1(0.25) - altoMac(MAC1.find(m => m.fila === 2 && m.x > 0.1), tau)*0.75), m1('el arbusto rebrota', LEU1[2].x, LEU1[2].base - LEU1[2].alto - 0.06)];
+    const d = tau - OCUPA;
+    if (d > 1.2 && d < 12) out.push(m1('escarabajos del estiércol', BONIGA.x + 0.05, g1(BONIGA.x) - 0.045));
+    else if (d < 30) out.push(m1('boñiga', BONIGA.x, g1(BONIGA.x) - 0.03));
+    return out; }
+  if (st === 5){ const mg = MIGAS2.g.flat().reduce((b, m) => (!b || Math.hypot(m.x + 0.045, m.y - sup2(0) - 0.022) < Math.hypot(b.x + 0.045, b.y - sup2(0) - 0.022)) ? m : b, null);
+    const R = RAIZ2[1], hf = HIFAS2.slice(0, cuantos(HIFAS2.length, kHongo()))[3], fondo = sup2(TUNEL.x) + TUNEL.fondo;
+    if (A > 0.5) return [m2('capa aplastada', 0.03, sup2(0.03) + 0.006), m2('agua en la pisada', -0.045, sup2(-0.045) + hundido(-0.045) - 0.001), hf ? m2('hilo del hongo', hf[Math.floor(hf.length/2)][0], hf[Math.floor(hf.length/2)][1]) : null, m2('raíz del pasto', R.pts[30][0], R.pts[30][1])];
+    return [m2('miga', mg.x, mg.y), HUECO2 ? m2('hueco', HUECO2[0], HUECO2[1]) : null, m2('raíz del pasto', R.pts[30][0], R.pts[30][1]), hf ? m2('hilo del hongo', hf[Math.floor(hf.length/2)][0], hf[Math.floor(hf.length/2)][1]) : null, m2('túnel del escarabajo', TUNEL.x + 0.004, sup2(TUNEL.x) + 0.014), m2('boñiga enterrada', TUNEL.x - 0.004, fondo + 0.002), m2('lombriz', LOMBRIZ2.pts[16][0], LOMBRIZ2.pts[16][1]), piso === 'calido' ? m2('nódulos', NODULOS2.n[2][0][0], NODULOS2.n[2][0][1]) : null]; }
+  if (st === 6){ const T2 = SAMANES[1];
+    if (Tt > 0.5) return [m0('sin sombra', 12, gM(12) - 3), m0('pasto bajo y calvas', 3, gM(3) - 0.2), m0('pocas vacas, repartidas', 15.5, gM(15.5) - 1.2)];
+    return [m0('sombra', T2.x - 3, gM(T2.x) - 0.9), m0(perfil.arbusto, 22.5, gM(22.5) - 1.5), m0('franjas con cerca', 6, gM(6) - 1.05), m0('12 vacas en una franja', 13.0, gM(13.0) - 1.2)]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(18,12,8,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(18,12,8,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel', 'titulo', 'ubicacion']) { const el = $(id); if (id === 'titulo' && el.style.visibility === 'hidden') continue; o.push(el.getBoundingClientRect()); } if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentroR = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const chocaR = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+const NIVEL_EST = [0, 0, 1, 1, 1, 2, 0];
+function etiquetas(cam, cd){
+  let lista = [];
+  if (cd && cd.c !== 'sube' && cam.seg.k === 'hold' && cam.L === NIVEL_EST[cd.st]) lista = etqEstacion(cd.st).filter(Boolean);
+  const tap = lista.length ? tapados() : [], ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    const [txt, L, x, y] = it; const [ax, ay] = aPantalla(L, x, y);
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentroR(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => chocaR(caja, r)) || ocupado.some(r => chocaR(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break;
+      } }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const Ln of [E.ln, E.halo]){ Ln.setAttribute('x1', ax.toFixed(1)); Ln.setAttribute('y1', ay.toFixed(1)); Ln.setAttribute('x2', lx.toFixed(1)); Ln.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+ {q:'¿Qué orienta el piso de su finca?',ops:[{t:'Su altitud'},{t:'El color de la vaca'},{t:'El dibujo'}],ok:0,si:'La altitud orienta; el sitio también cuenta.',no:'Revise el origen del piso en la parte superior.'},
+ {q:'¿El calendario del dibujo prescribe días de descanso?',ops:[{t:'Sí, siempre'},{t:'No: es un ejemplo'},{t:'Solo con lluvia'}],ok:1,si:'El descanso se verifica en la finca.',no:'El calendario es ilustrativo.'}
+];
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, CX, CY, bw: buf.width, bh: buf.height, camR, pR: pRender, tau: TAU };
+  W = H = S = lado; DPR = 1; PORT = false; CX = CY = lado/2; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  try { const pp = estP(i); TAU = tauDe(pp); const cam = camAt(pp); camR = cam; const L = baseDe(cam), l = LV[L]; pintaNivel(x, L, (cam.X - l.O[0])/l.F, (cam.Y - l.O[1])/l.F, cam.Z/l.F); }
+  finally { ({ W, H, S, DPR, PORT, CX, CY, camR } = g); pRender = g.pR; TAU = g.tau; buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó del potrero a la tierra, pasó un día de ocupación y 45 de descanso, y volvió.</p><p>Mañana mida su pasto al entrar y al salir, y meta una varilla en una franja descansada y en la entrada del corral.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver al potrero</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Qp = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Qp.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80)/3)*Math.min(2, devicePixelRatio || 1));
+  Qp.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else { b.textContent = o.t; }
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Qp.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Qp.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Qp.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Qp.q].concat(Qp.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara y el tiempo
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight*(1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY/maxScroll(), 0, 1)*T; }
+function irA(pp){ const y = pp/T*maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let p = 0, pObj = 0, vel = 0, sucio = true;
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = PARADAS.find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto/T*maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && e.target === bBajar)) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[49, 'sawtooth', 0.32], [73.4, 'sawtooth', 0.2], [98.1, 'triangle', 0.35], [146.8, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.querySelector('.est').textContent = audio.on ? 'sí' : 'no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){ if (!audio || !audio.on) return; const lz = luzProf(cam.Z); const t = audio.ac.currentTime; audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz, t, 0.2); const base = 49*(0.84 + 0.16*lz); [1, 1.4983, 2.002, 2.996].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4)); }
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W; CX = W/2; CY = H/2;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  guion();
+  anchoInicial = anchoVista(camAt(0));
+  prepFondo();
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? Math.max(120, $('ubicacion').getBoundingClientRect().bottom + 16) + 'px' : '125px';
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const u = pObj/T; redim(); const pp = u*T; window.scrollTo(0, u*maxScroll()); pObj = pp; p = pp; rmHacia = null; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt)/1000); tAnt = now;
+  if (auto && !RM){ let y = scrollY + auto*(maxScroll()/T)*(T/95)*dt; const yM = metaAuto/T*maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  const antes = p;
+  if (RM){
+    let meta = PARADAS[0], best = 1e9; for (const q of PARADAS){ const d = Math.abs(q - pObj); if (d < best){ best = d; meta = q; } }
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+    if (rmT < 1){ rmT = Math.min(1, rmT + dt/0.9); sucio = true; }
+    p = rmHacia;
+  } else {
+    const k = 1 - Math.exp(-dt*7);
+    p += (pObj - p)*k; if (Math.abs(pObj - p) < 1e-5) p = pObj;
+  }
+  vel = dt > 0 ? (p - antes)/dt : 0;
+  // los dos selectores: cada uno se ve solo en su estación; al tocar, cambia con su propia lentitud
+  const s5 = segSel('suelo');
+  const vp = sstep(s5.a - 1.2, s5.a - 0.3, p)*(1 - sstep(s5.b + 0.2, s5.b + 1.0, p)); if (Math.abs(vp - PIS.vis) > 1e-3){ PIS.vis = vp; sucio = true; }
+  const vt = sstep(inicioSubida() + 0.3, inicioSubida() + 1.4, p); if (Math.abs(vt - TRAD.vis) > 1e-3){ TRAD.vis = vt; sucio = true; }
+  const kk = RM ? 1 : 1 - Math.exp(-dt*2.2);
+  for (const E of [PIS, TRAD]){ if (Math.abs(E.obj - E.a) > 1e-3){ E.a += (E.obj - E.a)*kk; if (Math.abs(E.obj - E.a) < 2e-3) E.a = E.obj; sucio = true; } }
+  if (p !== antes) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      pRender = rmDesde; cam = render(); bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); bctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = buf.width; copia.height = buf.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      pRender = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else { pRender = p; cam = render(); }
+    actualizaUI(cam); sonido(cam);
+    sucio = RM && rmT < 1;
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+redim();
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+if (qs.has('pis')){ PIS.obj = PIS.a = qs.get('pis') === '1' ? 1 : 0; }
+if (qs.has('trad')){ TRAD.obj = TRAD.a = qs.get('trad') === '1' ? 1 : 0; }
+function mostrarOrigen(){
+ document.body.dataset.piso=piso;
+ const alt=altura===null ? '' : ` · Su finca, a ${altura.toLocaleString('es-CO')} m`;
+ document.getElementById('origenPiso').textContent=`${origen}${alt} · ${perfil.nombre}${esChoachi ? ' · Choachí' : esCundinamarca ? ' · Cundinamarca' : ''}`;
+ document.getElementById('selectorPiso').value=piso;
+ document.getElementById('alturaFinca').value=altura===null ? '' : altura;
+ document.getElementById('detallePiso').textContent=piso==='limite' ? 'Límite con el páramo: se necesita revisión humana del sitio y su delimitación. No se propone un potrero aquí.' : 'Piso orientado por altitud (IGAC). Ejemplos documentados; confirme adaptación local con asistencia técnica.';
+ document.querySelector('#titulo p').textContent=piso==='limite' ? 'El páramo necesita protección y revisión humana. La altitud sola no delimita este ecosistema.' : `Un descenso entre ${perfil.arbol}, ${perfil.arbusto} y ${perfil.pasto}. Ganado de ejemplo: ${razaDibujada()}.`;
+}
+function cambiarPiso(k, alt=null, fuente='Piso de ejemplo'){
+ ubicacionPendiente=false; piso=k; perfil=DATOS.perfiles[k]; altura=alt; origen=fuente;
+ PASTO0.clear(); LEU0.clear(); CACHE_MAC.clear(); mini={};
+ SAMANES.forEach(T=>T.A=armaSaman(T));
+ refrescarHojasPiso();
+ ESTACIONES.splice(0,ESTACIONES.length,...paginasPiso());
+ fondoPasto=null; prepFondo(); ultCard=''; ultEst=-1; sucio=true;
+ mostrarOrigen();
+}
+document.getElementById('selectorPiso').addEventListener('change',e=>cambiarPiso(e.target.value));
+document.getElementById('alturaManual').addEventListener('submit',e=>{e.preventDefault();const alt=numero(document.getElementById('alturaFinca').value,0,6000);if(alt!==null){cambiarPiso(pisoDe(alt),alt,'Altitud indicada por usted');document.getElementById('ubicacion').open=false;}});
+let ubicacionPendiente=false;
+document.getElementById('usarUbicacion').addEventListener('click',()=>{
+ const estado=document.getElementById('estadoUbicacion');
+ if(!navigator.geolocation){estado.textContent='Este navegador no ofrece ubicación. Indique la altitud o elija un piso de ejemplo.';return;}
+ estado.textContent='Esperando su permiso de ubicación…'; ubicacionPendiente=true;
+ const seleccionInicial=piso;
+ navigator.geolocation.getCurrentPosition(pos=>{
+ if(!ubicacionPendiente||piso!==seleccionInicial)return; ubicacionPendiente=false;
+ const alt=numero(pos.coords.altitude,0,6000);
+ if(alt===null){estado.textContent='El dispositivo entregó coordenadas sin altitud. Indique los metros de su finca; seguimos con un piso de ejemplo.';return;}
+ esChoachi=false;esCundinamarca=false;cambiarPiso(pisoDe(alt),alt,'Altitud del dispositivo (aproximada)');estado.textContent='La ubicación del dispositivo puede ser distinta de la finca.';document.getElementById('ubicacion').open=false;
+ },err=>{if(!ubicacionPendiente)return;ubicacionPendiente=false;estado.textContent=err.code===1?'Permiso de ubicación no concedido. Elija un piso de ejemplo o indique su altitud.':'No se pudo obtener la ubicación. Elija un piso de ejemplo o indique su altitud.';},{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+});
+mostrarOrigen();
+if(altURL===null){
+ document.getElementById('ubicacion').open=true;
+ const lat=numero(qs.get('lat'),-90,90),lon=numero(qs.get('lon'),-180,180);
+ if(lat!==null&&lon!==null) document.getElementById('estadoUbicacion').textContent='La app entregó coordenadas sin altitud. Indique los metros de la finca o elija un piso de ejemplo.';
+ else if(qs.has('alt')) document.getElementById('estadoUbicacion').textContent='La altitud de la URL no es válida. Elija un piso de ejemplo o indique la altitud.';
+}
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el medidor; no altera nada) */
+window.__descenso = {
+  get T(){ return T; }, get SEGS(){ return SEGS; }, get PARADAS(){ return PARADAS; }, estP, camAt, tauDe,
+  anchoVista: pp => anchoVista(camAt(pp)), base: pp => baseDe(camAt(pp)), tiempo: pp => fmtTiempo(tauDe(pp)).s,
+  fijar(pp){ window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  sel(key, k){ ponSel(key, k); estadoSel(key).a = k; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  get piso(){return piso;}, get perfil(){return perfil;},
+  textos(){ return { ESTACIONES, PASO_SUBE, GLOS, FUENTES, SEL }; },
+  perf(pp, n){ window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; pRender = pp; for (let i = 0; i < 3; i++) PERF[i] = 0; const t0 = performance.now(); for (let i = 0; i < n; i++){ render(); } const tot = performance.now() - t0; ctx.getImageData(0, 0, 1, 1); return { total: (performance.now() - t0)/n, sinGPU: tot/n, porNivel: PERF.map(x => +(x/n).toFixed(1)) }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0)/ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1)/((marcas[marcas.length-1] - marcas[0])/1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

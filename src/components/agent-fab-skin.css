@@ -1,0 +1,81 @@
+/* ============================================================================
+   agent-fab-skin.css — PIEL POR TEMA del FAB del agente (el colibrí flotante),
+   Fase 2 de la integración de temas (operador 2026-06-25).
+
+   El FAB hoy es una FOTO fija (avatar colibrí) idéntica en todos los temas. El
+   operador pidió que cambie de piel por tema (me dio latitud). Solución limpia:
+   conservamos el AVATAR que el usuario eligió en su preferencia
+   (chagra:agent-avatar-type) — NO lo tocamos — y retiñimos solo la CHROME del
+   botón (plinto/borde/glow) para que combine con el tema activo. Así la piel
+   cambia por tema sin pisar la preferencia del usuario ni el contenido del
+   avatar.
+
+   GATE (innegociable): TODO va scopeado bajo `.fvh-skin.chagra-fab` — la clase
+   `fvh-skin` SOLO se aplica con la flag VITE_FINCA_VIVA_HOME_PERFIL ON (dev).
+   Con la flag OFF (prod), la clase NO se monta → estos overrides no aplican y
+   el FAB queda EXACTO como hoy (plinto navy + glow esmeralda biopunk). Por eso
+   usamos !important: vencen los estilos inline del componente, pero solo bajo
+   `.fvh-skin` → seguro y reversible.
+
+   Los 4 temas leen --c-* / --t-accent-rgb (index.css/themes.css). biopunk-base
+   y verde-vivo conservan el look vivo; nature/minimalista van a su plinto claro.
+
+   Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro).
+   ========================================================================== */
+
+/* Separación de la tinta del avatar: clara en la piel oscura y sutil en las
+   pieles claras. El componente consume este token desde su filter inline. */
+.chagra-fab {
+  --chagra-fab-rim: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="nature"] .chagra-fab,
+[data-theme="minimalista"] .chagra-fab,
+[data-theme="verde-vivo"] .chagra-fab {
+  --chagra-fab-rim: rgb(var(--t-bg-rgb, 255 255 255) / 0.30);
+}
+
+/* Plinto + borde del FAB por el acento del tema. El plinto es un radial sutil
+   de la superficie del tema; el borde, el acento. */
+.fvh-skin.chagra-fab {
+  /* operador 2026-08-24 (repetido): SIN disco/fondo negro — el compai flota
+     libre. Solo una sombra suave en el personaje para legibilidad sobre
+     fondos variados; nada de plinto oscuro ni burbuja. */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 3px 6px rgb(var(--scrim-bg, 0 0 0) / 0.45));
+}
+
+/* Hover: el plinto se realza con un toque más del acento del tema. */
+.fvh-skin.chagra-fab.is-hover {
+  box-shadow: none !important;
+  filter: drop-shadow(0 4px 10px rgb(var(--scrim-bg, 0 0 0) / 0.55));
+}
+
+/* "Respuesta lista": anillo ámbar de aviso (igual semántica en todos los temas
+   para que el aviso sea reconocible; el ámbar ya retiñe vía --c-amber-400). */
+.fvh-skin.chagra-fab.is-ready {
+  border-color: rgb(var(--c-amber-400, 251 191 36) / 0.8) !important;
+}
+
+/* ============================================================================
+   Menú del gesto de interacción (#66/#70, 2026-07-30) — AgentFabMenu.jsx.
+   SIN scope de .fvh-skin: se ve igual en todos los temas y en prod (la flag
+   VITE_FINCA_VIVA_HOME_PERFIL no gobierna el gesto, solo la piel del plinto).
+   ========================================================================== */
+.agt-fab-menu-item:hover,
+.agt-fab-menu-item:focus-visible {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.18);
+  outline: none;
+}
+.agt-fab-menu-item:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--t-accent-rgb, 16 185 129) / 0.6);
+}
+.agt-fab-menu-item:active {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agt-fab-menu-item { transition: none !important; }
+}

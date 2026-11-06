@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f1c30" />
+    <title>Una conversación con la guacamaya · Chagra</title>
+    <style>body { margin: 0; background: #0f1c30; }</style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      // Entrada suelta (vozChagra del build, sin sesión): la misma ventana de voz que abre la app
+      // para la guacamaya. Aquí no hay agente montado, así que la pregunta se deja en el prefill
+      // que AgentScreen consume al montarse y se sigue a la app (#/agente); si falta sesión, la
+      // app pide login y la pregunta espera en sessionStorage.
+      import { createElement } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import VentanaGuacamaya from './VentanaGuacamaya.jsx';
+      import { PREFILL_KEY } from '../../services/agentPrefill.js';
+      const alAgente = () => { window.location.href = '/#/agente'; };
+      const navegar = (vista, datos) => {
+        try { if (datos && datos.prefilledPrompt) sessionStorage.setItem(PREFILL_KEY, datos.prefilledPrompt); } catch (_) { /* sin almacenamiento: la app abre sin prefill */ }
+        window.location.href = vista && vista !== 'agente' ? `/#/${vista}` : '/#/agente';
+      };
+      createRoot(document.getElementById('root')).render(createElement(VentanaGuacamaya, { navegar, onCerrar: alAgente }));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — los biopreparados, del patio de la finca a la hoja</title>
+<meta name="description" content="Una sola toma, sin cortes, desde el patio de una finca donde se preparan el biol y el caldo bordelés, con sus cantidades y su tiempo, hasta la hoja de café donde actúa el cobre y la espora de roya que no deja germinar. Con la seguridad de la etiqueta, cada cifra con su fuente (FAO, Cenicafé, Universidad de California, FAO y OMS, y otras), palabras, lectura en voz alta y repaso.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(12,16,24,.66); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#0b0d1e;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#0b0d1e;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#17311d}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1f3d24;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1f3d24;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(236,244,240,.95),0 0 14px rgba(236,244,240,.8)}
+
+#titulo{background:rgba(236,244,240,.96);border-radius:16px;padding:12px 16px 14px}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline}
+.rueda{line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+#frase .leyenda{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:.5em;font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase .leyenda b{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.05em;margin-right:.35em}
+#frase .luz{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);margin-top:.5em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#frase .luz .barra{flex:0 0 6rem;height:5px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+#frase .luz .barra i{display:block;height:100%;background:#f2e3a0;width:100%}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(10,14,22,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(12,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(30,36,50,.8);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+#frase .herr{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5em}
+#frase .herr .bc{min-height:40px;padding:6px 12px}
+#frase .herr .bc[aria-pressed="true"]{border-color:var(--acento);background:rgba(167,201,87,.18)}
+#frase .estado{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--acento-tinta);margin:.45em 0 .1em;min-height:1.4em}
+#frase a.tel{font-family:var(--mono);font-size:1.3rem;color:var(--acento-tinta);text-decoration:none;border-bottom:2px solid var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#12151f;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(5,7,14,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#12151f;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#fuentes code{font-family:var(--mono);font-size:.9em}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#1a1e2b;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op .letra{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:#10131c;width:100%;aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.solo-ancho{display:inline-block}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 9px}
+  #controles{gap:6px}
+  .solo-ancho{display:none}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 8px} #bSonido{font-size:0;min-width:44px;padding:0} #bSonido::before{content:"♪";font-size:1.15rem} #bSonido[aria-pressed="true"]{border-color:var(--acento)} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+/* ---------- propios de esta pieza ---------- */
+#controles .btn{padding:10px 14px}
+body.inicio #riel span{opacity:0!important}
+#lugar{margin-top:6px;font-size:1rem;color:var(--tinta-2);font-family:var(--sans)}
+#frase .dosis{display:flex;align-items:center;gap:10px;margin:.5em 0 .1em;font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase .dosis .barra{flex:1;height:14px;border-radius:7px;background:rgba(170,215,240,.35);overflow:hidden;display:flex}
+#frase .dosis .barra i{display:block;height:100%;background:#8a5a2b}
+@media (max-width:640px){
+  #controles .btn{padding:10px 7px;font-size:.95rem}
+  #controles{gap:4px}
+  #controles #bSonido{font-size:0;min-width:44px;padding:0}
+  #controles #bSonido::before{content:"♪";font-size:1.15rem}
+  #lugar{grid-column:1 / -1;margin-top:2px}
+}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo desde el patio de una finca, donde se preparan el biol y el caldo bordelés, hasta una espora de roya sobre el envés de una hoja de café cubierta de cobre" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p>Del patio de la finca al biol y al caldo que se preparan, y a la hoja donde actúan.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño y de tiempo">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">4,00 m</span></div>
+  <div class="fila"><span class="rot" id="vTiempoRot">Tiempo</span><span class="val pq rueda" id="vAumento">—</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 4 000 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/10 · La finca</span><span id="vLuz"></span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+  <div id="lugar"></div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 10</div>
+  <h2 id="fTit">La finca</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón">Sonido: no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso"><b>Esto no reemplaza al técnico ni a la etiqueta.</b> Las cantidades de esta pieza son las de las guías citadas, no una receta probada en su finca. Si el producto es comprado, lo que diga su etiqueta manda. En el café, cuándo aplicar lo decide el conteo de hojas con roya y el técnico de su zona.</p>
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>. Los colores del cobre, del biol y de los microbios son <b>de dibujo</b>. El corte de la caneca, la lupa, las burbujas, las gotas sobre la hoja y los granitos de cobre son <b>ilustraciones</b>: no cuentan ni miden nada. Las horas del tubito de la espora son <b>de ejemplo</b>, dentro de lo que dice la fuente. Las etiquetas dibujadas en los bultos son de ejemplo: la de su producto es la que vale.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>FAO e IPES (2010).</b> <em>Biopreparados para el manejo sostenible de plagas y enfermedades en la agricultura urbana y periurbana.</em> Guía «¿Cómo hacerlo?». Primera edición, noviembre de 2010. FAO, Oficina Regional para América Latina y el Caribe, e IPES. openknowledge.fao.org/handle/20.500.14283/as435s — <b>Ficha 3, «Biol»</b> (pp. 55–56; validada por la Universidad Nacional Agraria La Molina en huertos de Lima y Junín, Perú): recipiente no metálico de 200 litros con tapa hermética; 40 kg de estiércol de cuy, ganado lechero u otro; 160 litros de agua de lluvia o reposada, agregada poco a poco mezclando; 5 litros de melaza de caña y 1 litro de leche; tapar para una fermentación anaeróbica (sin oxígeno), con un tubo de la tapa a una botella o balde con agua donde burbujean los gases, con la manguera siempre bajo el agua; reposo de 60 días en ambiente fresco y con sombra; filtrar y ventilar una semana; abono foliar, estimulante de floración y fruto; en hortalizas, dosis de 30 % a 50 %; 150 litros diluidos al 50 % rinden para media hectárea; se conserva hasta 4 meses en recipientes cerrados, en lugar fresco y ventilado. <b>Ficha 9, «Caldo bordelés»</b> (pp. 64–65; validada en huertas urbanas de Rosario, Argentina): para 100 litros, 1 kg de sulfato de cobre, 1 kg de cal viva y 100 litros de agua, en recipientes plásticos de 10 y de 100 litros; el sulfato en 10 litros, en una bolsita de arpillera atada al borde, removiendo; la cal viva apagada en 10 litros, dejada enfriar y completada a 90 litros (o 1 kg de cal hidratada directo en 90 litros); echar el cobre sobre la cal, removiendo, «y no a la inversa»; colar con tela para no tapar el pulverizador; preventivo, no cura lo ya atacado; mojar bien el cultivo; repetir cada 15 días con calor y mucha humedad; 100 litros rinden para 2 500 m²; usar de inmediato, dentro de las 24 horas; el cobre y la cal se pueden guardar por separado.</li>
+      <li id="f2"><b>Broome JC, Donaldson DR (2010).</b> <em>Bordeaux Mixture.</em> Pest Notes, Publication 7481. University of California, Statewide Integrated Pest Management Program — cal fresca; al apagar la cal viva el agua puede llegar a hervir, así que se echa de a poco, con gafas y revolviendo con un palo; el apagado toma de media hora a dos horas; al mezclar cal, proteger ojos, nariz y boca con respirador para polvo; recipiente de plástico u otro que no se corroa; la mezcla es muy corrosiva para el metal; revolver sin parar al mezclar y agitar la bomba al aplicar; aplicar el mismo día, porque se daña al quedarse quieta; lavar el equipo tres veces al terminar; rotular las soluciones y guardarlas lejos de los niños, porque son muy tóxicas y corrosivas. En esta guía se echa primero el cobre al agua y después la cal: el orden contrario al de la FAO.</li>
+      <li id="f3"><b>Rivillas Osorio CA, Serna Giraldo CA, Cristancho Ardila MA, Gaitán Bustamante AL (2011).</b> <em>La roya del cafeto en Colombia: impacto, manejo y costos del control.</em> Boletín Técnico Cenicafé 36: 1–51. doi:10.38141/10781/036 — esporas de unas 30 × 20 µm; para germinar necesitan agua sobre la hoja, poca o ninguna luz y entre 16 y 28 °C, y en 6 a 12 horas sacan de uno a cuatro tubos que crecen hasta los estomas; los fungicidas de cobre, incluido el caldo bordelés, son protectores: inhiben la germinación, no atraviesan la cutícula y deben aplicarse antes; la primera lluvia se lleva el 50 % del cobre; las hojas nuevas y el follaje lavado piden nuevas aspersiones; el fungicida debe quedar homogéneo en todo el follaje; muestreo de 60 árboles y Tabla 4 (protector como opción con hasta 10 % de hojas con roya; por encima, casi siempre sistémico). Leído por el descenso de la roya de esta casa el 2026-09-29.</li>
+      <li id="f4"><b>Kearney TE, Larkin MJ, Frost JP, Levett PN (1993).</b> <em>Survival of pathogenic bacteria during mesophilic anaerobic digestion of animal waste.</em> Journal of Applied Bacteriology 75: 215–219. doi:10.1111/j.1365-2672.1993.tb02768.x — (resumen) en un biodigestor de estiércol a 28 °C, con 24 días de retención, <i>Escherichia coli</i> tardó en promedio 76,9 días en bajar a la décima parte (T90) y <i>Campylobacter jejuni</i> 438,6 días.</li>
+      <li id="f5"><b>Ballabio C, Panagos P, Lugato E, Huang JH y otros (2018).</b> <em>Copper distribution in European topsoils: An assessment based on LUCAS soil survey.</em> Science of the Total Environment 636: 282–298. doi:10.1016/j.scitotenv.2018.04.268 — (resumen) 21 682 muestras de suelo de 25 países de la Unión Europea; promedio de 16,85 mg de cobre por kg; los viñedos, donde el cobre se usa por tradición como fungicida, tienen el promedio más alto: 49,26 mg/kg.</li>
+      <li id="f6"><b>Bustillo Pardey AE (2004).</b> <em>¿Cómo participa el hongo Beauveria bassiana en el manejo integrado de la broca del café?</em> Brocarta 37. Cenicafé. doi:10.38141/10785/037 — el hongo no se debe mezclar con ningún fungicida, entre ellos el oxicloruro de cobre, «ya que estos matan todas las esporas».</li>
+      <li id="f7"><b>FAO y OMS (2020).</b> <em>Guidelines for personal protection when handling and applying pesticides.</em> Roma. ISBN 978-92-5-132072-3 (FAO) y 978-92-4-000022-3 (OMS). CC BY-NC-SA 3.0 IGO — guantes de nitrilo, largos, nunca de cuero ni de tela; nunca comer, beber ni fumar al preparar o aplicar; no aplicar con lluvia, con viento de más de 3 m/s ni con más de 30 °C; ojos: agua limpia por lo menos 15 minutos; los envases no se lavan en la quebrada. Leída y anotada para el curso de bioseguridad de esta casa el 2026-09-23.</li>
+      <li id="f8"><b>PubChem (Institutos Nacionales de Salud de EE. UU.),</b> sección «GHS Classification», que agrega las notificaciones del inventario de la Agencia Europea de Sustancias Químicas. Cal viva (CID 14778): daño grave a los ojos; pictograma de corrosión. Sulfato de cobre pentahidratado (CID 24463): daño o irritación de ojos y tóxico para la vida del agua; pictogramas de corrosión y de medio ambiente. Consultado el 2026-09-30.</li>
+      <li id="f9"><b>Comunidad Andina (2019).</b> Resolución 2075, <em>Manual Técnico Andino para el Registro y Control de Plaguicidas Químicos de Uso Agrícola</em> — la etiqueta debe traer la leyenda «en caso de ingestión no induzca el vómito» y un teléfono de emergencia de 24 horas. Leída para el curso de bioseguridad de esta casa el 2026-09-23.</li>
+      <li id="f10"><b>Ministerio de Salud y Protección Social.</b> <em>Línea Nacional de Toxicología</em>: 018000 916012, gratuita, 24 horas, los 365 días; con el Consejo Colombiano de Seguridad. minsalud.gov.co.</li>
+      <li id="f11"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §4.2 «Prokaryotic Cells». OpenStax (CC BY 4.0) — las células de las bacterias miden de 0,1 a 5,0 µm de diámetro.</li>
+      <li id="f12"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §4.1 «Studying Cells». OpenStax (CC BY 4.0) — una micra (µm) es la millonésima parte de un metro.</li>
+      <li id="f13"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §30.4 «Leaves». OpenStax (CC BY 4.0) — estomas por donde pasan los gases de la hoja.</li>
+      <li id="f14"><b>Morais H, Medri ME, Marur CJ, Caramori PH, Ribeiro AMA, Gomes JC (2004).</b> <em>Modifications on leaf anatomy of Coffea arabica caused by shade of pigeonpea (Cajanus cajan).</em> Brazilian Archives of Biology and Technology 47: 863–871. doi:10.1590/S1516-89132004000600005 — estomas en el envés del café, de 22,5 a 35 µm de largo.</li>
+      <li id="f15"><b>Revisión de literatura de esta casa (2026-09-23),</b> para el curso «Del 15-15-15 a la agroecología» — búsqueda en Crossref y Europe PMC: no se halló metaanálisis ni revisión revisada por pares sobre el biol o el supermagro, solo literatura gris y un borrador sin revisar; las recetas de biol no coinciden entre documentos; no se halló fuente para mezclar el biol con caldos minerales; <i>E. coli</i> y otros microbios del estiércol sobreviven meses, así que el biol de estiércol no va sobre lo que se come crudo; recomendación: probar en un pedazo y comparar.</li>
+      <li id="f16"><b>IGAC.</b> <em>Actualización de áreas homogéneas de tierras</em>, tabla 1, p. 4: pisos térmicos por altitud. Los límites (cálido por debajo de 1 000 m, templado por debajo de 2 000, frío por debajo de 3 000; desde ahí, límite con el páramo) se heredan del descenso del silvopastoreo de esta casa. Son orientativos: la altura sola no delimita el páramo.</li>
+    </ol>
+    <p class="aviso"><b>Cuentas hechas con esas cifras.</b> 1 kg de sulfato en 100 litros es un caldo al 1 % [1]. Si 100 litros alcanzan para 2 500 m², una hectárea (10 000 m²) necesitaría unos 400 litros [1]. De 30 a 50 partes de biol en cada 100: en una bomba de 20 litros (tamaño de ejemplo) son de 6 a 10 litros de biol [1]. En los viñedos europeos hay casi tres veces el cobre promedio: 49,26 ÷ 16,85 ≈ 2,9 [5]. Tras 60 días de biol todavía no se cumplen los 76,9 del T90 de <i>E. coli</i> medido a 28 °C [1, 4].</p>
+    <p class="aviso"><b>Donde las fuentes no coinciden.</b> La FAO pide echar el cobre sobre la cal «y no a la inversa» [1]; la Universidad de California echa primero el cobre al agua y después la cal [2]. Aquí se dibuja el orden de la FAO, y la pieza dice que la otra guía lo hace al revés. Las dos piden revolver sin parar y usar el caldo el mismo día. La prueba del clavo o del machete para saber si el caldo quedó ácido no está en ninguna de las fuentes leídas: por eso no aparece.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso de los biopreparados — una sola toma.
+   Arriba, el patio de la finca: el biol y el caldo bordelés se
+   preparan EN EL TIEMPO (el desplazamiento mueve los días y los
+   pasos). Abajo, la hoja de café donde actúan, por escalas, hasta
+   la espora de la roya rodeada de cobre.
+   El motor (cámara por portales, medidor, tarjetas, voz, palabras,
+   fuentes y repaso) es el del Descenso del café y de la roya.
+   Nada se mueve sin el dato que da la persona: el desplazamiento.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath(); }
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function rrect(c, x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+function texto(c, s, x, y, tam, col, peso, alin){ c.save(); c.translate(x, y); const k = tam/20; c.scale(k, k); c.font = `${peso || 600} 20px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif`; c.textAlign = alin || 'center'; c.textBaseline = 'middle'; c.fillStyle = col; c.fillText(s, 0, 0); c.restore(); }
+
+/* ============================================================
+   EL PISO DE LA FINCA, por la URL (?alt=&municipio=&lat=&lon=)
+   Igual que el silvopastoreo. Aquí la altura cambia solo dos
+   cosas de lo que se enseña: en tierra caliente, el aviso del
+   calor para fumigar; y cerca del páramo, no se propone fumigar.
+   ============================================================ */
+const normaliza = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+const numero = (v, min, max) => v !== null && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const altCruda = numero(qs.get('alt'), 0, 6000);
+const altURL = altCruda === null ? null : Math.round(altCruda); // se clasifica con la misma cifra que se muestra
+const pisoDe = alt => alt < 1000 ? 'calido' : alt < 2000 ? 'templado' : alt < 3000 ? 'frio' : 'limite';
+const PISO = altURL === null ? null : pisoDe(altURL);
+const NOM_PISO = { calido:'tierra caliente', templado:'clima templado', frio:'tierra fría', limite:'límite con el páramo' };
+const muniCrudo = (qs.get('municipio') || '').replace(/[<>&"]/g, '').slice(0, 40).trim();
+const LAT = numero(qs.get('lat'), -90, 90), LON = numero(qs.get('lon'), -180, 180);
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   0 patio (1 unidad = 1,4 m) · 1 hoja · 2 venas · 3 estomas · 4 espora
+   ============================================================ */
+const F = [1.4, 0.14, 0.006, 5e-4, 1e-4];
+const GY = 0.30;                       // el suelo, al frente
+const MS = 2 / 1.4, MX = 1.2, MY = GY - 0.265*MS;   // la mata de café, con la geometría del descenso de la roya
+const PORTAL = [
+  { x: MX + MS*(-0.062), y: MY + MS*0.018, s: F[1]/F[0] },
+  { x: 0.105, y: 0.045, s: F[2]/F[1] },
+  { x:-0.050, y: 0.080, s: F[3]/F[2] },
+  null, // se fija junto a los estomas: el que está más cerca del centro
+  null
+];
+
+/* ============================================================
+   GUION DE CÁMARA
+   caja = lo que la cámara encuadra, en unidades del nivel.
+   tiempo = el desplazamiento dentro de la parada mueve un proceso.
+   ============================================================ */
+const SEGS = [
+  { k:'hold', L:0, st:0, w:1.1, caja:[-0.82,-0.74,1.58,0.36], ancha:true },
+  { k:'pan', w:0.9 },
+  { k:'hold', L:0, st:1, w:1.8, caja:[-0.80,-0.40,-0.18,0.34], tiempo:true },
+  { k:'pan', w:0.5 },
+  { k:'hold', L:0, st:2, w:2.4, caja:[-0.80,-0.58,-0.14,0.34], tiempo:true },
+  { k:'pan', w:0.9 },
+  { k:'hold', L:0, st:3, w:1.6, caja:[-0.62,-0.42,1.06,0.34], tiempo:true },
+  { k:'pan', w:0.9 },
+  { k:'hold', L:0, st:4, w:2.4, caja:[0.10,-0.34,0.76,0.34], tiempo:true },
+  { k:'pan', w:0.8 },
+  { k:'hold', L:0, st:5, w:1.3, caja:[-0.20,-0.24,0.14,0.08] },
+  { k:'pan', w:0.9 },
+  { k:'hold', L:0, st:6, w:1.8, caja:[0.74,-0.46,1.56,0.34], tiempo:true },
+  { k:'zoom', L:0, e:'both', w:1.4 },
+  { k:'hold', L:1, st:7, w:1.6, caja:[-0.5,-0.3,0.5,0.3], desde0:true, tiempo:true },
+  { k:'zoom', L:1, e:'both', w:1.3 },
+  { k:'zoom', L:2, e:'both', w:1.1, desde0:true },
+  { k:'hold', L:3, st:8, w:1.3, caja:[-0.32,-0.22,0.32,0.22], desde0:true },
+  { k:'zoom', L:3, e:'both', w:1.3 },
+  { k:'hold', L:4, st:9, w:2.6, caja:[-0.50,-0.26,0.18,0.24], desde0:true, tiempo:true },
+];
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc;
+const EST = SEGS.filter(s => s.k === 'hold');
+const NEST = EST.length;
+const EESP = 9;
+const estP = i => { const h = EST[i]; if (i === 0) return 0; if (i === NEST - 1) return h.a + 0.72*(h.b - h.a); return h.tiempo ? h.a + 0.9*(h.b - h.a) : (h.a + h.b) / 2; };
+const easeF = { '':u=>u, 'in':u=>2*u*u-u*u*u, 'out':u=>{const v=1-u; return 1-(2*v*v-v*v*v);}, 'both':u=>u*u*(3-2*u) };
+/* avance del proceso dentro de una parada (0..1); fuera de ella, 0 antes y 1 después */
+function uDe(st, pp){ const h = EST[st]; return clamp((pp - h.a) / (h.b - h.a), 0, 1); }
+
+/* la zona libre de la pantalla: a la derecha de la tarjeta (ancho) o encima de ella (teléfono) */
+function zonaLibre(ancha){
+  if (PORT) return [0.04, 0.17, 0.90, 0.54];
+  return ancha ? [0.30, 0.20, 0.97, 0.90] : [0.44, 0.22, 0.97, 0.90];
+}
+function encuadra(caja, ancha){
+  const z = zonaLibre(ancha);
+  const bw = caja[2] - caja[0], bh = caja[3] - caja[1];
+  const ppu = Math.min((z[2] - z[0])*W / bw, (z[3] - z[1])*H / bh);
+  const f = S / ppu;
+  const sx = (z[0] + z[2]) / 2 * W, sy = (z[1] + z[3]) / 2 * H;
+  return { cx: (caja[0] + caja[2]) / 2 - (sx - W/2) / ppu, cy: (caja[1] + caja[3]) / 2 - (sy - H/2) / ppu, f };
+}
+const camHold = s => encuadra(s.caja, s.ancha);
+function camAt(pp){
+  pp = clamp(pp, 0, T);
+  let i = SEGS.length - 1; for (let k = 0; k < SEGS.length; k++){ if (pp <= SEGS[k].b){ i = k; break; } }
+  const s = SEGS[i], u = clamp((pp - s.a) / s.w, 0, 1);
+  if (s.k === 'hold'){
+    const m = camHold(s);
+    if (s.desde0){ const k = sstep(0.0, 0.4, u); return { L:s.L, cx: m.cx*k, cy: m.cy*k, f: Math.exp(lerp(0, Math.log(m.f), k)), seg:s, u }; }
+    return { L:s.L, cx:m.cx, cy:m.cy, f:m.f, seg:s, u };
+  }
+  if (s.k === 'pan'){
+    const A = camHold(SEGS[i-1]), B = camHold(SEGS[i+1]); const k = easeF.both(u);
+    return { L:SEGS[i-1].L, cx: lerp(A.cx, B.cx, k), cy: lerp(A.cy, B.cy, k), f: Math.exp(lerp(Math.log(A.f), Math.log(B.f), k)), seg:s, u };
+  }
+  // zoom al portal del nivel
+  const prev = SEGS[i-1]; const A = prev.k === 'hold' ? camHold(prev) : { cx:0, cy:0, f:1 };
+  const P = PORTAL[s.L]; const uu = easeF[s.e](u);
+  const f = A.f * Math.pow(P.s / A.f, uu);
+  const k = (A.f - f) / (A.f - P.s);
+  return { L:s.L, cx: A.cx + (P.x - A.cx)*k, cy: A.cy + (P.y - A.cy)*k, f, seg:s, u };
+}
+function anchoVista(cam){ return F[cam.L] * cam.f * (W / S); }
+
+/* ============================================================
+   ESTADO que mueve la persona con los botones (y solo ella)
+   ============================================================ */
+const ESTADO = { manguera: true, dosis: 30, lluvia: false, viento: false, calor: false, caldo: true, llovio: false, entro: false };
+
+/* ============================================================
+   EL TIEMPO DE CADA PROCESO, leído del desplazamiento
+   ============================================================ */
+function biolEstado(pp){
+  const u1 = uDe(1, pp), u2 = uDe(2, pp), u3 = uDe(3, pp);
+  return {
+    estiercol: sstep(0.04, 0.26, u1), agua: sstep(0.26, 0.62, u1), melaza: sstep(0.62, 0.8, u1), leche: sstep(0.8, 0.95, u1),
+    tapa: pp >= EST[2].a ? sstep(0.0, 0.08, u2) * (1 - sstep(0.0, 0.12, u3)) : 0,
+    dia: pp < EST[2].a ? 0 : pp < EST[3].a ? 60 * sstep(0.1, 0.92, u2) : 60 + 7 * sstep(0.05, 0.45, u3),
+    colado: sstep(0.35, 0.55, u3), bomba: sstep(0.55, 0.85, u3)
+  };
+}
+function caldoEstado(pp){
+  const u = uDe(4, pp);
+  return { u, calAgua: sstep(0.02, 0.1, u), calViva: sstep(0.1, 0.2, u), vapor: sstep(0.12, 0.2, u) * (1 - sstep(0.3, 0.42, u)), completar: sstep(0.3, 0.42, u),
+    bolsa: sstep(0.42, 0.5, u), disuelve: sstep(0.5, 0.62, u), vierte: sstep(0.66, 0.84, u), azul: sstep(0.7, 0.88, u), colar: sstep(0.9, 1.0, u) };
+}
+const horasEsp = pp => 12 * sstep(EST[EESP].a + 0.3*(EST[EESP].b - EST[EESP].a), EST[EESP].b - 0.25, pp);
+
+/* ============================================================
+   NIVEL 0 · EL PATIO DE LA FINCA  (1 unidad = 1,4 m)
+   ============================================================ */
+/* la mata de café: la misma geometría del descenso de la roya (sin roya) */
+const M = (() => {
+  const r = rng(11);
+  const hojas = [], cerezas = [], ramas = [];
+  const suelo = 0.265, tope = -0.255, nodos = 15;
+  for (let n = 0; n < nodos; n++){
+    const t = n / (nodos-1);
+    const y = lerp(suelo - 0.06, tope + 0.04, t);
+    const largo = lerp(0.25, 0.05, Math.pow(t, 0.9)) * (0.9 + r()*0.2);
+    const frente = n % 2 === 1;
+    for (const lado of [-1, 1]){
+      const L = frente ? largo * 0.45 : largo;
+      const dir = frente ? lado * 0.35 : lado;
+      const caida = 0.10 + r()*0.08;
+      const pts = [];
+      for (let i = 0; i <= 12; i++){ const u = i/12; pts.push([dir*L*u, y - 0.01*u + caida*L*u*u]); }
+      ramas.push({ pts, z: frente ? (lado > 0 ? 1 : -1) : 0, w: lerp(0.0055, 0.0025, t) });
+      const nh = Math.max(2, Math.round(L / 0.028));
+      for (let h = 1; h <= nh; h++){
+        const u = h / (nh + 0.3);
+        const bx = dir*L*u, by = y - 0.01*u + caida*L*u*u;
+        for (const s2 of [-1, 1]){
+          const ang = Math.atan2(caida*2*L*u, dir*L) + s2 * (0.9 + r()*0.5) * (dir >= 0 ? 1 : -1) * -1;
+          const len = lerp(0.068, 0.045, t) * (0.8 + r()*0.35) * (1 - u*0.25);
+          hojas.push({ x: bx, y: by, a: ang + (r()-.5)*0.4, l: len, w: 0.36 + r()*0.08, z: (frente ? (lado>0?1:-1) : 0) + (r()-.5)*0.6, luz: r(), env: r() < 0.12, moj: r() });
+        }
+        if (h < nh && r() < 0.55 && t < 0.8){
+          const nc = 3 + Math.floor(r()*6);
+          for (let c = 0; c < nc; c++){ const q = r(); cerezas.push({ x: bx + (r()-.5)*0.014, y: by + 0.004 + r()*0.01, r: 0.0055 + r()*0.0015, col: q < 0.45 ? '#b3261e' : q < 0.62 ? '#d2452c' : q < 0.8 ? '#7f9b3a' : '#c9a83a', z: r() }); }
+        }
+      }
+    }
+  }
+  hojas.sort((a,b) => a.z - b.z);
+  return { hojas, cerezas, ramas, suelo, tope };
+})();
+function hojaPath(c, len, wid, ond){
+  c.beginPath(); c.moveTo(0, 0);
+  const n = 18;
+  for (let i = 1; i <= n; i++){ const u = i/n; const w = wid*len*Math.pow(Math.sin(Math.PI*Math.pow(u,0.85)), 0.95) * (1 + (ond||0)*Math.sin(u*22)); c.lineTo(u*len, -w*0.5); }
+  for (let i = n-1; i >= 1; i--){ const u = i/n; const w = wid*len*Math.pow(Math.sin(Math.PI*Math.pow(u,0.85)), 0.95) * (1 + (ond||0)*Math.sin(u*19+1)); c.lineTo(u*len, w*0.5); }
+  c.closePath();
+}
+
+/* fondo lejano (cielo, cordilleras, cafetales y guamos): se pinta una vez, desenfocado por la distancia */
+const FONDO = { x0:-2.6, y0:-2.2, x1:2.6, y1:0.16 };
+let bgImg = null;
+function pintaFondo(c){
+  const g = c.createLinearGradient(0, FONDO.y0, 0, 0.0);
+  g.addColorStop(0, '#5aa6dd'); g.addColorStop(0.55, '#a9d6ef'); g.addColorStop(1, '#e4f1e6');
+  c.fillStyle = g; c.fillRect(FONDO.x0, FONDO.y0, FONDO.x1 - FONDO.x0, FONDO.y1 - FONDO.y0);
+  const sx = 1.35, sy = -1.25;
+  const gs = c.createRadialGradient(sx, sy, 0, sx, sy, 1.3); gs.addColorStop(0, 'rgba(255,250,225,.95)'); gs.addColorStop(0.06, 'rgba(255,246,210,.7)'); gs.addColorStop(0.3, 'rgba(255,240,200,.16)'); gs.addColorStop(1, 'rgba(255,240,200,0)');
+  c.fillStyle = gs; c.fillRect(FONDO.x0, FONDO.y0, FONDO.x1 - FONDO.x0, FONDO.y1 - FONDO.y0);
+  c.fillStyle = '#fffbe9'; c.beginPath(); c.arc(sx, sy, 0.05, 0, 7); c.fill();
+  // nubes altas
+  const rn = rng(303); for (let i = 0; i < 9; i++){ const x = -2.4 + rn()*4.8, y = -1.9 + rn()*0.9, w = 0.3 + rn()*0.5; for (let k = 0; k < 6; k++){ c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(x + (k - 2.5)*w*0.18, y + Math.sin(k*1.7)*0.02, w*0.2, 0.05 + rn()*0.03, 0, 0, 7); c.fill(); } }
+  const capas = [ ['#9dbccc', -0.30, 0.34, 5, 1.1], ['#83a99a', -0.18, 0.26, 9, 1.8], ['#648f67', -0.08, 0.18, 17, 2.6] ];
+  capas.forEach(([col, base, amp, sd, fr], k) => { const r = rng(sd); c.fillStyle = col; c.beginPath(); c.moveTo(FONDO.x0, 0.2);
+    for (let x = FONDO.x0; x <= FONDO.x1 + 0.01; x += 0.02){ const y = base - amp*(0.5 + 0.5*Math.sin(x*fr + sd)) * (0.6 + 0.4*Math.sin(x*fr*2.7 + k)) - (r()-.5)*0.01*(3-k); c.lineTo(x, y); }
+    c.lineTo(FONDO.x1, 0.2); c.closePath(); c.fill(); });
+  // bruma
+  const gb = c.createLinearGradient(0, -0.3, 0, 0.02); gb.addColorStop(0, 'rgba(235,245,240,0)'); gb.addColorStop(1, 'rgba(235,245,240,.5)'); c.fillStyle = gb; c.fillRect(FONDO.x0, -0.3, FONDO.x1 - FONDO.x0, 0.35);
+  // ladera con cafetal y guamos de sombrío
+  c.fillStyle = '#5d8a45'; c.beginPath(); c.moveTo(FONDO.x0, 0.0); for (let x = FONDO.x0; x <= FONDO.x1; x += 0.05) c.lineTo(x, -0.035 - 0.03*Math.sin(x*1.3 + 1)); c.lineTo(FONDO.x1, 0.2); c.lineTo(FONDO.x0, 0.2); c.closePath(); c.fill();
+  const rg = rng(404);
+  for (let i = 0; i < 16; i++){ const x = FONDO.x0 + 0.1 + i*0.33 + (rg() - .5)*0.12, y = -0.05 - 0.03*Math.sin(x*1.3 + 1), R = 0.09 + rg()*0.07;
+    c.fillStyle = 'rgba(70,58,44,.6)'; c.fillRect(x - 0.005, y - R*0.6, 0.01, R*0.7);
+    for (let k = 0; k < 16; k++){ const a = rg()*Math.PI, d = rg(); const px = x + Math.cos(a)*R*1.25*d, py = y - R*0.75 - Math.sin(a)*R*0.5*d; const rr = R*(0.22 + rg()*0.2);
+      c.fillStyle = `rgba(${58 + (1-d)*24|0},${96 + (1-d)*34|0},${62 + (1-d)*12|0},.9)`; c.beginPath(); c.ellipse(px, py, rr*1.3, rr*0.8, 0, 0, 7); c.fill(); } }
+  for (let row = 0; row < 3; row++) for (let i = 0; i < 60; i++){ const x = FONDO.x0 + i*0.088 + (row % 2)*0.04 + (rg() - .5)*0.02, y = -0.02 + row*0.035, R = 0.03 + row*0.008;
+    const g2 = c.createRadialGradient(x + R*0.3, y - R*0.5, R*0.1, x, y, R*1.1); g2.addColorStop(0, '#6a9650'); g2.addColorStop(1, '#274a2a');
+    c.fillStyle = g2; c.beginPath(); c.ellipse(x, y, R*0.8, R, 0, 0, 7); c.fill(); }
+}
+function prepFondo(){
+  const res = Math.min(2400, Math.max(900, Math.round(S * 1.1)));
+  const w = FONDO.x1 - FONDO.x0, h = FONDO.y1 - FONDO.y0;
+  const c1 = document.createElement('canvas'); c1.width = res; c1.height = Math.round(res * h / w); const x1 = c1.getContext('2d');
+  x1.setTransform(res / w, 0, 0, res / w, -FONDO.x0 * res / w, -FONDO.y0 * res / w); pintaFondo(x1);
+  const c2 = document.createElement('canvas'); c2.width = c1.width; c2.height = c1.height; const x2 = c2.getContext('2d');
+  if ('filter' in x2){ x2.filter = `blur(${Math.max(1, res/900)}px)`; x2.drawImage(c1, 0, 0); x2.filter = 'none'; } else x2.drawImage(c1, 0, 0);
+  bgImg = c2;
+}
+
+/* piedritas y matas de pasto del patio: nítidas, solo las que se ven */
+const PATIO = (() => { const r = rng(515), a = []; for (let i = 0; i < 420; i++){ const y = 0.02 + Math.pow(r(), 0.8)*0.9; a.push({ x: -1.9 + r()*3.8, y, t: r() < 0.35 ? 'pasto' : 'piedra', s: 0.004 + r()*0.012 * (0.5 + y), a: r()*6.28, k: r() }); } return a; })();
+function pintaSuelo(c, env){
+  const v = env.view;
+  const g = c.createLinearGradient(0, 0.0, 0, 1.2); g.addColorStop(0, '#7f9c55'); g.addColorStop(0.1, '#8c7b56'); g.addColorStop(0.35, '#7a6443'); g.addColorStop(1, '#5a4630');
+  c.fillStyle = g; c.fillRect(v[0] - 0.1, 0.0, v[2] - v[0] + 0.2, Math.max(0.1, v[3] + 0.1));
+  // borde de pasto entre la ladera y el patio
+  c.fillStyle = 'rgba(96,130,66,.85)'; c.beginPath(); c.moveTo(v[0] - 0.1, 0.0); for (let x = v[0] - 0.1; x <= v[2] + 0.1; x += 0.02) c.lineTo(x, 0.04 + 0.012*Math.sin(x*9) + 0.008*Math.sin(x*23)); c.lineTo(v[2] + 0.1, 0.0); c.closePath(); c.fill();
+  for (const q of PATIO){ if (q.x < v[0] - 0.03 || q.x > v[2] + 0.03 || q.y < v[1] - 0.03 || q.y > v[3] + 0.03) continue; if (q.s < env.px*0.7) continue;
+    if (q.t === 'pasto'){ c.strokeStyle = mix('#5b7d38', '#9bbd5c', q.k); c.lineWidth = Math.max(env.px, q.s*0.18); c.lineCap = 'round'; c.beginPath(); for (let j = -2; j <= 2; j++){ c.moveTo(q.x + j*q.s*0.25, q.y); c.quadraticCurveTo(q.x + j*q.s*0.4, q.y - q.s*1.2, q.x + j*q.s*0.9, q.y - q.s*(1.6 + q.k)); } c.stroke(); }
+    else { c.fillStyle = mix('#6d5a3e', '#b3a283', q.k); c.beginPath(); c.ellipse(q.x, q.y, q.s, q.s*0.55, q.a*0.2, 0, 7); c.fill(); c.fillStyle = 'rgba(255,245,220,.25)'; c.beginPath(); c.ellipse(q.x - q.s*0.25, q.y - q.s*0.2, q.s*0.4, q.s*0.2, 0, 0, 7); c.fill(); } }
+}
+function sombra(c, x, y, rx, ry, a){ const g = c.createRadialGradient(x, y, 0, x, y, rx); g.addColorStop(0, `rgba(25,20,12,${a})`); g.addColorStop(1, 'rgba(25,20,12,0)'); c.save(); c.translate(x, y); c.scale(1, ry/rx); c.translate(-x, -y); c.fillStyle = g; c.beginPath(); c.arc(x, y, rx, 0, 7); c.fill(); c.restore(); }
+
+/* la enramada de guadua: el biol reposa a la sombra y en fresco [FAO e IPES] */
+function pintaEnramada(c, env){
+  sombra(c, -0.52, GY + 0.03, 0.55, 0.08, 0.4);
+  const poste = (x, y0, y1) => { const g = c.createLinearGradient(x - 0.014, 0, x + 0.014, 0); g.addColorStop(0, '#8a7a3c'); g.addColorStop(0.5, '#cdbb72'); g.addColorStop(1, '#7c6b31'); c.fillStyle = g; c.fillRect(x - 0.014, y0, 0.028, y1 - y0);
+    c.strokeStyle = 'rgba(80,66,30,.8)'; c.lineWidth = Math.max(env.px, 0.004); for (let y = y0 + 0.09; y < y1; y += 0.14){ c.beginPath(); c.moveTo(x - 0.015, y); c.lineTo(x + 0.015, y); c.stroke(); } };
+  poste(-0.92, -0.60, GY + 0.02); poste(-0.14, -0.57, GY + 0.02);
+  // techo de teja de barro, visto un poco desde abajo
+  c.fillStyle = '#6b3c26'; c.beginPath(); c.moveTo(-1.02, -0.585); c.lineTo(-0.04, -0.555); c.lineTo(-0.04, -0.525); c.lineTo(-1.02, -0.555); c.closePath(); c.fill();
+  c.fillStyle = '#a4523a'; c.beginPath(); c.moveTo(-1.04, -0.60); c.lineTo(-0.02, -0.57); c.lineTo(-0.1, -0.66); c.lineTo(-0.98, -0.69); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(70,30,18,.55)'; c.lineWidth = Math.max(env.px, 0.004);
+  for (let i = 0; i <= 22; i++){ const u = i/22; const xa = lerp(-1.04, -0.02, u), ya = lerp(-0.60, -0.57, u), xb = lerp(-0.98, -0.1, u), yb = lerp(-0.69, -0.66, u); c.beginPath(); c.moveTo(xa, ya); c.lineTo(xb, yb); c.stroke(); }
+  c.strokeStyle = 'rgba(255,220,190,.25)'; for (let i = 0; i < 22; i++){ const u = (i + 0.5)/22; c.beginPath(); c.moveTo(lerp(-1.04, -0.02, u), lerp(-0.60, -0.57, u)); c.lineTo(lerp(-0.98, -0.1, u), lerp(-0.69, -0.66, u)); c.stroke(); }
+}
+
+/* --- la caneca del biol: plástico de 200 litros, nunca de metal [FAO e IPES] --- */
+const CAN = { x0:-0.75, x1:-0.35, y0:-0.32, y1:GY };
+const VENT = { x0:-0.70, x1:-0.40, y0:-0.25, y1:0.26 }; // el corte de dibujo
+const TUBO_FIN = { x:-0.262, y:0.225 };
+const BOT = { cx:-0.262, w:0.10, y0:0.07, y1:GY };
+const BURB = (() => { const r = rng(606), a = []; for (let i = 0; i < 70; i++) a.push({ x: r(), f: r(), s: 0.004 + r()*0.01, v: 0.6 + r()*0.8 }); return a; })();
+const GRUMOS = (() => { const r = rng(707), a = []; for (let i = 0; i < 420; i++) a.push({ x: r(), y: r(), s: 0.006 + r()*0.018, k: r() }); return a; })();
+function nivelBiol(b){ return lerp(VENT.y1 - 0.02, VENT.y0 + 0.07, b.agua) - 0.02*b.melaza - 0.01*b.leche; }
+function pintaCaneca(c, env, pp){
+  const b = biolEstado(pp), px = env.px;
+  const verCorte = pp > EST[1].a - 0.5 && pp < EST[3].b + 0.2;
+  sombra(c, -0.55, GY + 0.005, 0.26, 0.035, 0.5);
+  // cuerpo
+  const g = c.createLinearGradient(CAN.x0, 0, CAN.x1, 0);
+  g.addColorStop(0, '#163b72'); g.addColorStop(0.18, '#2f6cc0'); g.addColorStop(0.34, '#5a95e0'); g.addColorStop(0.55, '#2c65b6'); g.addColorStop(1, '#122f5e');
+  rrect(c, CAN.x0, CAN.y0, CAN.x1 - CAN.x0, CAN.y1 - CAN.y0, 0.03); c.fillStyle = g; c.fill();
+  for (const yb of [-0.11, 0.09]){ c.fillStyle = 'rgba(8,24,52,.35)'; c.fillRect(CAN.x0, yb - 0.012, CAN.x1 - CAN.x0, 0.024); c.fillStyle = 'rgba(180,215,255,.25)'; c.fillRect(CAN.x0, yb - 0.012, CAN.x1 - CAN.x0, 0.004); }
+  // el corte de dibujo: lo de adentro
+  if (verCorte){
+    c.save(); rrect(c, VENT.x0, VENT.y0, VENT.x1 - VENT.x0, VENT.y1 - VENT.y0, 0.02); c.clip();
+    const gi = c.createLinearGradient(VENT.x0, 0, VENT.x1, 0); gi.addColorStop(0, '#0b1f3a'); gi.addColorStop(0.5, '#173a66'); gi.addColorStop(1, '#0b1f3a'); c.fillStyle = gi; c.fillRect(VENT.x0, VENT.y0, 1, 1);
+    const yl = nivelBiol(b);
+    const fondo = VENT.y1, ancho = VENT.x1 - VENT.x0;
+    // el montón de estiércol en el fondo: se deshace a medida que entra el agua
+    const hMonton = 0.12 * b.estiercol * (1 - 0.85*b.agua);
+    if (b.agua > 0.01){
+      const turbio = clamp(0.25 + 0.55*b.agua*b.estiercol + 0.15*b.melaza + (b.dia/60)*0.1, 0, 1);
+      const gl = c.createLinearGradient(0, yl, 0, fondo); gl.addColorStop(0, mix('#9fb9c4', '#7a5a2e', turbio)); gl.addColorStop(1, mix('#5d6e66', '#3a2713', turbio));
+      c.fillStyle = gl; c.fillRect(VENT.x0, yl, ancho, fondo - yl);
+      // partículas finas en suspensión (no piedras): muchas y pequeñas
+      const n = Math.round(GRUMOS.length * b.agua);
+      for (let i = 0; i < n; i++){ const q = GRUMOS[i]; const x = VENT.x0 + q.x*ancho, y = lerp(yl + 0.01, fondo - 0.005, q.y) + Math.sin(b.dia*0.3 + q.k*9)*0.004;
+        c.fillStyle = q.k < 0.5 ? 'rgba(52,34,14,.55)' : 'rgba(170,140,80,.4)'; c.fillRect(x, y, 0.002 + q.s*0.12, 0.0012 + q.s*0.05); }
+    }
+    if (hMonton > 0.003){
+      const g2 = c.createLinearGradient(0, fondo - hMonton, 0, fondo); g2.addColorStop(0, '#5a3b1a'); g2.addColorStop(1, '#2e1d0c');
+      c.fillStyle = g2; c.beginPath(); c.moveTo(VENT.x0, fondo);
+      for (let i = 0; i <= 30; i++){ const u = i/30; c.lineTo(VENT.x0 + u*ancho, fondo - hMonton*(0.55 + 0.45*Math.sin(Math.PI*u)) - 0.004*Math.sin(u*37)); }
+      c.lineTo(VENT.x1, fondo); c.closePath(); c.fill();
+      // fibras de pasto sin digerir: lo que hace que el estiércol se lea como estiércol
+      c.lineCap = 'round';
+      for (let i = 0; i < 70; i++){ const q = GRUMOS[i]; const x = VENT.x0 + q.x*ancho, y = fondo - q.y*hMonton*0.9; const a = q.k*3.1, L = 0.006 + q.s*0.35;
+        c.strokeStyle = q.k < 0.6 ? 'rgba(170,140,70,.75)' : 'rgba(110,85,40,.8)'; c.lineWidth = Math.max(px, 0.0018); c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L*0.4); c.stroke(); }
+    }
+    if (b.agua > 0.01){
+      // la melaza: un chorro oscuro y brillante que se abre en nube al entrar
+      if (b.melaza > 0 && b.melaza < 1){ c.strokeStyle = 'rgba(58,24,4,.9)'; c.lineWidth = 0.008; c.beginPath(); c.moveTo(-0.555, VENT.y0); c.lineTo(-0.555, yl); c.stroke(); c.strokeStyle = 'rgba(255,190,110,.5)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.moveTo(-0.557, VENT.y0); c.lineTo(-0.557, yl); c.stroke(); }
+      if (b.melaza > 0){ const R = 0.03 + 0.1*b.melaza; const gm = c.createRadialGradient(-0.555, yl + 0.03, 0, -0.555, yl + 0.03, R); gm.addColorStop(0, `rgba(60,25,5,${0.55*(1 - 0.7*b.melaza)})`); gm.addColorStop(1, 'rgba(60,25,5,0)'); c.fillStyle = gm; c.fillRect(-0.555 - R, yl, 2*R, 2*R); }
+      // la leche: una nube blanca que se reparte
+      if (b.leche > 0){ const R = 0.03 + 0.12*b.leche; const gk = c.createRadialGradient(-0.5, yl + 0.035, 0, -0.5, yl + 0.035, R); gk.addColorStop(0, `rgba(250,248,238,${0.8*(1 - 0.75*b.leche)})`); gk.addColorStop(1, 'rgba(250,248,238,0)'); c.fillStyle = gk; c.fillRect(-0.5 - R, yl, 2*R, 2*R);
+        if (b.leche < 1){ c.strokeStyle = 'rgba(250,248,238,.85)'; c.lineWidth = 0.006; c.beginPath(); c.moveTo(-0.5, VENT.y0); c.lineTo(-0.5, yl); c.stroke(); } }
+      // burbujas de la fermentación: las mueve el paso de los días
+      if (b.dia > 0.5 && b.dia <= 60.5){ const fase = b.dia * 0.37;
+        for (const q of BURB){ const y = fondo - ((q.f + fase*q.v) % 1) * (fondo - yl); const x = VENT.x0 + 0.02 + q.x*(ancho - 0.04) + Math.sin(fase*3 + q.f*9)*0.005;
+          c.strokeStyle = 'rgba(235,225,195,.6)'; c.lineWidth = Math.max(px, 0.0022); c.beginPath(); c.arc(x, y, q.s*0.55, 0, 7); c.stroke(); } }
+      if (b.dia > 3){ c.fillStyle = `rgba(96,70,32,${clamp(b.dia/60, 0, 0.9)})`; c.fillRect(VENT.x0, yl - 0.004, ancho, 0.012); }
+      c.strokeStyle = 'rgba(210,230,240,.55)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.moveTo(VENT.x0, yl); c.lineTo(VENT.x1, yl); c.stroke();
+      // el biol colado se va: baja el nivel
+      if (b.colado > 0){ c.fillStyle = '#0b1f3a'; c.fillRect(VENT.x0, yl - 0.01, ancho, (fondo - yl) * b.colado*0.9); }
+    }
+    c.restore();
+    c.strokeStyle = 'rgba(255,255,255,.75)'; c.setLineDash([0.012, 0.008]); c.lineWidth = Math.max(px*1.2, 0.003); rrect(c, VENT.x0, VENT.y0, VENT.x1 - VENT.x0, VENT.y1 - VENT.y0, 0.02); c.stroke(); c.setLineDash([]);
+  }
+  // borde de arriba y tapa
+  c.fillStyle = '#123463'; c.beginPath(); c.ellipse(-0.55, CAN.y0, 0.2, 0.022, 0, 0, 7); c.fill();
+  if (b.tapa > 0.5){
+    c.fillStyle = '#1f4f97'; c.beginPath(); c.ellipse(-0.55, CAN.y0 - 0.006, 0.206, 0.025, 0, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(190,220,255,.4)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.ellipse(-0.55, CAN.y0 - 0.008, 0.19, 0.018, 0, Math.PI, 2*Math.PI); c.stroke();
+    c.fillStyle = '#0d223f'; c.fillRect(-0.475, CAN.y0 - 0.03, 0.022, 0.03); // el racor de la manguera
+  } else {
+    c.fillStyle = '#081a33'; c.beginPath(); c.ellipse(-0.55, CAN.y0, 0.185, 0.017, 0, 0, 7); c.fill();
+    // la tapa, recostada al lado
+    c.save(); c.translate(-0.79, GY - 0.12); c.rotate(-0.12); c.fillStyle = '#1f4f97'; c.beginPath(); c.ellipse(0, 0, 0.022, 0.12, 0, 0, 7); c.fill(); c.strokeStyle = 'rgba(190,220,255,.35)'; c.lineWidth = Math.max(px, 0.003); c.stroke(); c.restore();
+  }
+  // la manguera y la botella: solo con la caneca tapada
+  if (b.tapa > 0.5) pintaTrampa(c, env, b);
+  else pintaBotella(c, env, null);
+}
+function pintaBotella(c, env, b){
+  const px = env.px, x0 = BOT.cx - BOT.w/2, x1 = BOT.cx + BOT.w/2;
+  sombra(c, BOT.cx, GY + 0.004, 0.07, 0.012, 0.35);
+  const yAgua = 0.145;
+  // agua
+  c.save(); rrect(c, x0, BOT.y0 + 0.05, BOT.w, GY - BOT.y0 - 0.05, 0.02); c.clip();
+  const ga = c.createLinearGradient(0, yAgua, 0, GY); ga.addColorStop(0, 'rgba(160,210,235,.55)'); ga.addColorStop(1, 'rgba(90,150,190,.7)'); c.fillStyle = ga; c.fillRect(x0, yAgua, BOT.w, GY - yAgua);
+  if (b && b.dia > 0.5 && b.dia <= 60.5 && ESTADO.manguera){ const fase = b.dia * 0.9;
+    for (let i = 0; i < 14; i++){ const f = ((i*0.137 + fase) % 1); const y = TUBO_FIN.y - f*(TUBO_FIN.y - yAgua); const x = TUBO_FIN.x + Math.sin(f*12 + i)*0.008;
+      c.fillStyle = 'rgba(245,252,255,.75)'; c.beginPath(); c.arc(x, y, 0.004 + (i%3)*0.002, 0, 7); c.fill(); } }
+  c.restore();
+  // el plástico de la botella
+  c.strokeStyle = 'rgba(235,245,250,.85)'; c.lineWidth = Math.max(px*1.2, 0.003);
+  c.beginPath(); c.moveTo(BOT.cx - 0.017, BOT.y0); c.lineTo(BOT.cx - 0.017, BOT.y0 + 0.02); c.quadraticCurveTo(x0, BOT.y0 + 0.04, x0, BOT.y0 + 0.07); c.lineTo(x0, GY - 0.01); c.quadraticCurveTo(x0, GY, x0 + 0.01, GY);
+  c.lineTo(x1 - 0.01, GY); c.quadraticCurveTo(x1, GY, x1, GY - 0.01); c.lineTo(x1, BOT.y0 + 0.07); c.quadraticCurveTo(x1, BOT.y0 + 0.04, BOT.cx + 0.017, BOT.y0 + 0.02); c.lineTo(BOT.cx + 0.017, BOT.y0); c.stroke();
+  c.fillStyle = 'rgba(235,245,250,.12)'; c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(x0 + 0.014, BOT.y0 + 0.09); c.lineTo(x0 + 0.014, GY - 0.03); c.stroke();
+  c.strokeStyle = 'rgba(210,235,250,.7)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.moveTo(x0, yAgua); c.lineTo(x1, yAgua); c.stroke();
+}
+function pintaTrampa(c, env, b){
+  const px = env.px;
+  pintaBotella(c, env, b);
+  // la manguera: de la tapa a la botella; su punta bajo el agua, o afuera si la persona la saca
+  const finY = ESTADO.manguera ? TUBO_FIN.y : 0.10;
+  const pts = [[-0.464, CAN.y0 - 0.03], [-0.44, -0.46], [-0.30, -0.46], [TUBO_FIN.x, BOT.y0 - 0.05], [TUBO_FIN.x, finY]];
+  const traza = () => { c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); c.bezierCurveTo(pts[1][0], pts[1][1], pts[2][0], pts[2][1], pts[3][0], pts[3][1]); c.lineTo(pts[4][0], pts[4][1]); };
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(20,50,30,.55)'; c.lineWidth = 0.016; traza(); c.stroke();
+  c.strokeStyle = 'rgba(150,200,160,.85)'; c.lineWidth = 0.011; traza(); c.stroke();
+  c.strokeStyle = 'rgba(240,255,240,.6)'; c.lineWidth = Math.max(px, 0.003); traza(); c.stroke();
+  // si la manguera sale del agua, entra aire: flechas
+  if (!ESTADO.manguera && b.dia > 0.5){ c.strokeStyle = '#ffd36b'; c.lineWidth = Math.max(px*1.5, 0.005); for (let k = 0; k < 3; k++){ const y = finY + 0.012 + k*0.001, x = TUBO_FIN.x - 0.06 + k*0.02; c.beginPath(); c.moveTo(x, y + 0.03); c.lineTo(TUBO_FIN.x - 0.004, finY + 0.004); c.stroke(); } }
+}
+/* la lupa: un dibujo de los microbios que fermentan sin aire; no cuenta ni nombra ninguno */
+const MICROBIOS = (() => { const r = rng(808), a = []; for (let i = 0; i < 60; i++){ const q = r(); a.push({ x: (r() - .5)*2, y: (r() - .5)*2, a: r()*6.28, t: q < 0.55 ? 'bacilo' : q < 0.85 ? 'coco' : 'gas', l: 1 + r()*2, k: r() }); } return a; })();
+const LUPA = { x:-0.26, y:-0.30, r:0.14, ancho: 20e-6 };
+function pintaLupa(c, env, pp){
+  const b = biolEstado(pp); const vis = sstep(EST[2].a + 0.1, EST[2].a + 0.5, pp) * (1 - sstep(EST[2].b - 0.1, EST[2].b + 0.3, pp));
+  if (vis <= 0.01) return;
+  const px = env.px, R = LUPA.r, k = (2*R) / (LUPA.ancho*1e6); // unidades por micra, dentro de la lupa
+  c.save(); c.globalAlpha = vis;
+  c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = Math.max(px*1.2, 0.003); c.setLineDash([0.01, 0.008]); c.beginPath(); c.moveTo(LUPA.x - R*0.7, LUPA.y + R*0.7); c.lineTo(-0.45, -0.05); c.stroke(); c.setLineDash([]);
+  c.beginPath(); c.arc(LUPA.x, LUPA.y, R, 0, 7); c.save(); c.clip();
+  const g = c.createRadialGradient(LUPA.x - R*0.3, LUPA.y - R*0.3, 0, LUPA.x, LUPA.y, R); g.addColorStop(0, '#b98d4c'); g.addColorStop(1, '#5a3a18'); c.fillStyle = g; c.fillRect(LUPA.x - R, LUPA.y - R, 2*R, 2*R);
+  const fase = b.dia * 0.05;
+  for (const m of MICROBIOS){ const x = LUPA.x + ((m.x + 1 + fase*(0.3 + m.k*0.4)) % 2 - 1)*R, y = LUPA.y + m.y*R + Math.sin(fase*6 + m.k*9)*R*0.02; const a = m.a + fase*(m.k - 0.5);
+    if (m.t === 'gas'){ c.strokeStyle = 'rgba(255,248,225,.8)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.arc(x, y, (0.6 + m.k)*k, 0, 7); c.stroke(); c.fillStyle = 'rgba(255,248,225,.15)'; c.fill(); continue; }
+    c.save(); c.translate(x, y); c.rotate(a);
+    const col = mix('#e7d3a1', '#c99a52', m.k);
+    if (m.t === 'bacilo'){ const L = m.l*k, Wd = 0.55*k; rrect(c, -L/2, -Wd/2, L, Wd, Wd/2); c.fillStyle = col; c.fill(); c.strokeStyle = 'rgba(70,40,10,.7)'; c.lineWidth = Math.max(px, Wd*0.12); c.stroke(); }
+    else { c.fillStyle = col; c.beginPath(); c.arc(0, 0, 0.45*k, 0, 7); c.fill(); c.strokeStyle = 'rgba(70,40,10,.7)'; c.lineWidth = Math.max(px, 0.06*k); c.stroke(); }
+    c.restore(); }
+  c.restore();
+  c.strokeStyle = '#f1ead8'; c.lineWidth = Math.max(px*2, 0.008); c.beginPath(); c.arc(LUPA.x, LUPA.y, R, 0, 7); c.stroke();
+  c.strokeStyle = 'rgba(40,30,20,.6)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.arc(LUPA.x, LUPA.y, R + 0.005, 0, 7); c.stroke();
+  // regla de la lupa: 5 micras
+  const rx = LUPA.x - R*0.55, ry = LUPA.y + R*0.72; c.strokeStyle = '#fff'; c.lineWidth = Math.max(px*1.5, 0.004); c.beginPath(); c.moveTo(rx, ry); c.lineTo(rx + 5*k, ry); c.stroke();
+  texto(c, '5 µm', rx + 2.5*k, ry - 0.016, 0.022, '#fff');
+  c.restore();
+}
+
+/* --- el banco con los bultos, las gafas, los guantes y el respirador --- */
+function pictograma(c, x, y, r, tipo, px){
+  c.save(); c.translate(x, y); c.rotate(Math.PI/4); c.fillStyle = '#fff'; c.fillRect(-r, -r, 2*r, 2*r); c.strokeStyle = '#d0202a'; c.lineWidth = r*0.22; c.strokeRect(-r*0.89, -r*0.89, r*1.78, r*1.78); c.restore();
+  c.save(); c.translate(x, y); c.fillStyle = '#111'; c.strokeStyle = '#111'; c.lineWidth = Math.max(px, r*0.08);
+  if (tipo === 'corrosivo'){ // dos gotas que caen sobre una mano y una tabla
+    c.beginPath(); c.moveTo(-r*0.45, -r*0.6); c.lineTo(-r*0.55, -r*0.25); c.lineTo(-r*0.35, -r*0.25); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(r*0.35, -r*0.6); c.lineTo(r*0.25, -r*0.25); c.lineTo(r*0.45, -r*0.25); c.closePath(); c.fill();
+    c.fillRect(-r*0.75, r*0.05, r*0.6, r*0.14); c.fillRect(r*0.1, r*0.05, r*0.65, r*0.14); c.fillRect(-r*0.75, r*0.38, r*1.5, r*0.1); }
+  else { // medio ambiente: un árbol seco y un pez
+    c.beginPath(); c.moveTo(-r*0.35, r*0.35); c.lineTo(-r*0.35, -r*0.45); c.moveTo(-r*0.35, -r*0.15); c.lineTo(-r*0.6, -r*0.4); c.moveTo(-r*0.35, -r*0.05); c.lineTo(-r*0.1, -r*0.3); c.stroke();
+    c.beginPath(); c.ellipse(r*0.25, r*0.25, r*0.28, r*0.12, 0, 0, 7); c.fill(); c.beginPath(); c.moveTo(r*0.5, r*0.25); c.lineTo(r*0.68, r*0.13); c.lineTo(r*0.68, r*0.37); c.closePath(); c.fill();
+    c.fillRect(-r*0.7, r*0.46, r*1.4, r*0.06); }
+  c.restore();
+}
+function pintaBanco(c, env){
+  const px = env.px, top = GY - 0.32;
+  sombra(c, -0.03, GY + 0.004, 0.16, 0.02, 0.4);
+  c.fillStyle = '#6a4a2c'; for (const x of [-0.15, 0.08]) c.fillRect(x, top + 0.02, 0.022, GY - top - 0.02);
+  const gt = c.createLinearGradient(0, top, 0, top + 0.035); gt.addColorStop(0, '#b98a58'); gt.addColorStop(1, '#7a5634'); c.fillStyle = gt; c.fillRect(-0.17, top, 0.29, 0.035);
+  c.strokeStyle = 'rgba(60,40,20,.45)'; c.lineWidth = Math.max(px, 0.002); for (let i = 0; i < 4; i++){ c.beginPath(); c.moveTo(-0.17, top + 0.008 + i*0.007); c.bezierCurveTo(-0.05, top + 0.004 + i*0.008, 0.02, top + 0.012 + i*0.006, 0.12, top + 0.007 + i*0.007); c.stroke(); }
+  // bulto de cal viva (papel)
+  const cx0 = -0.155, cw = 0.11, ch = 0.17, cy1 = top;
+  c.fillStyle = '#ece6d6'; c.beginPath(); c.moveTo(cx0, cy1); c.lineTo(cx0 + 0.006, cy1 - ch); c.quadraticCurveTo(cx0 + cw/2, cy1 - ch - 0.012, cx0 + cw - 0.006, cy1 - ch); c.lineTo(cx0 + cw, cy1); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(120,110,90,.6)'; c.lineWidth = Math.max(px, 0.002); c.stroke();
+  c.fillStyle = 'rgba(160,150,125,.25)'; c.fillRect(cx0 + 0.004, cy1 - ch*0.5, cw - 0.008, 0.004);
+  texto(c, 'CAL VIVA', cx0 + cw/2, cy1 - ch + 0.035, 0.019, '#2a2a2a', 800);
+  texto(c, 'etiqueta de ejemplo', cx0 + cw/2, cy1 - ch + 0.056, 0.0085, '#555', 500);
+  pictograma(c, cx0 + cw/2, cy1 - 0.055, 0.026, 'corrosivo', px);
+  // bolsa de sulfato de cobre, con los cristales azules
+  const sx0 = -0.03, sw = 0.09, sh = 0.13;
+  c.fillStyle = 'rgba(240,244,248,.95)'; c.beginPath(); c.moveTo(sx0, top); c.lineTo(sx0 + 0.004, top - sh); c.lineTo(sx0 + sw - 0.004, top - sh); c.lineTo(sx0 + sw, top); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(120,130,140,.6)'; c.stroke();
+  const rc = rng(919); for (let i = 0; i < 60; i++){ const x = sx0 + 0.008 + rc()*(sw - 0.016), y = top - 0.004 - rc()*0.03; c.fillStyle = mix('#1f6fd1', '#5fb6f0', rc()); c.beginPath(); c.moveTo(x, y - 0.003); c.lineTo(x + 0.003, y); c.lineTo(x, y + 0.003); c.lineTo(x - 0.003, y); c.closePath(); c.fill(); }
+  texto(c, 'SULFATO', sx0 + sw/2, top - sh + 0.022, 0.015, '#10355f', 800); texto(c, 'DE COBRE', sx0 + sw/2, top - sh + 0.039, 0.015, '#10355f', 800);
+  texto(c, 'etiqueta de ejemplo', sx0 + sw/2, top - sh + 0.055, 0.0075, '#555', 500);
+  pictograma(c, sx0 + sw*0.3, top - 0.058, 0.017, 'corrosivo', px); pictograma(c, sx0 + sw*0.72, top - 0.058, 0.017, 'ambiente', px);
+  // gafas, guantes de nitrilo y respirador, en el borde del banco
+  const gy = top - 0.012;
+  c.strokeStyle = '#2f3b44'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(0.068, gy - 0.004); c.quadraticCurveTo(0.09, gy - 0.03, 0.118, gy - 0.004); c.stroke();
+  for (const x of [0.078, 0.106]){ c.fillStyle = 'rgba(190,225,240,.55)'; c.beginPath(); c.ellipse(x, gy, 0.013, 0.009, 0, 0, 7); c.fill(); c.strokeStyle = '#2f3b44'; c.lineWidth = Math.max(px, 0.003); c.stroke(); }
+  c.fillStyle = '#3f63c9'; c.save(); c.translate(0.02, top - 0.005); c.rotate(-0.08); rrect(c, 0, -0.012, 0.075, 0.014, 0.006); c.fill(); for (let f = 0; f < 4; f++){ rrect(c, 0.07, -0.014 + f*0.004, 0.018, 0.004, 0.002); c.fill(); } c.restore();
+  // respirador de media cara, colgado de un clavo del poste: dos filtros redondos y su correa
+  const rx = -0.14, ry = top - 0.215;
+  c.strokeStyle = '#2d2f33'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.moveTo(rx - 0.028, ry - 0.004); c.quadraticCurveTo(rx, ry - 0.06, rx + 0.028, ry - 0.004); c.stroke();
+  c.fillStyle = '#6f7b85'; c.beginPath(); c.arc(rx, ry - 0.045, 0.004, 0, 7); c.fill();
+  const gr = c.createLinearGradient(rx - 0.025, 0, rx + 0.025, 0); gr.addColorStop(0, '#9aa4ad'); gr.addColorStop(0.5, '#dfe4e8'); gr.addColorStop(1, '#8a949c');
+  c.fillStyle = gr; c.beginPath(); c.moveTo(rx - 0.018, ry - 0.018); c.quadraticCurveTo(rx, ry - 0.03, rx + 0.018, ry - 0.018); c.lineTo(rx + 0.024, ry + 0.012); c.quadraticCurveTo(rx, ry + 0.034, rx - 0.024, ry + 0.012); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(40,45,50,.7)'; c.lineWidth = Math.max(px, 0.0015); c.stroke();
+  for (const s of [-1, 1]){ const fx = rx + s*0.026, fy = ry + 0.006; c.fillStyle = '#b0457f'; c.beginPath(); c.arc(fx, fy, 0.012, 0, 7); c.fill(); c.strokeStyle = '#5b2140'; c.lineWidth = Math.max(px, 0.0018); c.stroke();
+    c.strokeStyle = 'rgba(255,220,240,.5)'; for (let k = -1; k <= 1; k++){ c.beginPath(); c.moveTo(fx - 0.007, fy + k*0.004); c.lineTo(fx + 0.007, fy + k*0.004); c.stroke(); } }
+  c.fillStyle = '#4b535a'; c.beginPath(); c.arc(rx, ry + 0.018, 0.005, 0, 7); c.fill();
+}
+
+/* --- los dos recipientes del caldo: A de 10 litros (el cobre) y B de 100 (la cal) [FAO e IPES] --- */
+const BA = { cx:0.24, w:0.19, h:0.20 };
+const BB = { cx:0.55, w:0.34, h:0.42 };
+function recipiente(c, R, colTop, colLiq, nivel, px){
+  const x0 = R.cx - R.w/2, x1 = R.cx + R.w/2, yT = GY - R.h, ins = R.w*0.08;
+  sombra(c, R.cx, GY + 0.004, R.w*0.62, R.w*0.08, 0.45);
+  const g = c.createLinearGradient(x0, 0, x1, 0); g.addColorStop(0, mix(colTop, '#000000', 0.35)); g.addColorStop(0.3, colTop); g.addColorStop(0.5, mix(colTop, '#ffffff', 0.25)); g.addColorStop(1, mix(colTop, '#000000', 0.45));
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, yT); c.lineTo(x1, yT); c.lineTo(x1 - ins, GY); c.lineTo(x0 + ins, GY); c.closePath(); c.fill();
+  c.fillStyle = mix(colTop, '#000000', 0.2); c.fillRect(x0 - 0.004, yT - 0.006, R.w + 0.008, 0.014);
+  // la boca vista desde arriba: el líquido
+  c.fillStyle = mix(colTop, '#000000', 0.55); c.beginPath(); c.ellipse(R.cx, yT, R.w/2, R.w*0.075, 0, 0, 7); c.fill();
+  if (nivel > 0.01){ c.fillStyle = colLiq; c.beginPath(); c.ellipse(R.cx, yT + 0.004 + (1 - nivel)*R.w*0.03, R.w/2 - 0.008, R.w*0.062, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.18)'; c.beginPath(); c.ellipse(R.cx - R.w*0.15, yT + 0.002 + (1 - nivel)*R.w*0.03, R.w*0.16, R.w*0.02, 0, 0, 7); c.fill(); }
+  c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.ellipse(R.cx, yT, R.w/2, R.w*0.075, 0, Math.PI, 2*Math.PI); c.stroke();
+}
+function pintaCaldo(c, env, pp){
+  const e = caldoEstado(pp), px = env.px, u = e.u;
+  const hecho = pp > EST[4].b;
+  // colores: agua clara, lechada de cal, caldo azul celeste (de dibujo)
+  const agua = 'rgba(150,195,215,.9)', lechada = '#e9ece6', caldo = '#7fc3dc';
+  const colB = hecho ? caldo : e.azul > 0 ? mix('#e9ece6', '#7fc3dc', e.azul) : e.calViva > 0 ? lechada : agua;
+  const nivB = hecho ? 1 : lerp(0.12 * e.calAgua, 0.9, e.completar) + 0.1*e.vierte;
+  // A se levanta y se inclina para verter sobre B
+  const inc = e.vierte > 0 && e.vierte < 1 ? Math.sin(Math.PI*e.vierte) : 0;
+  const colA = e.disuelve > 0 ? mix('#a6cfe0', '#1e7fd0', e.disuelve) : agua;
+  const nivA = hecho ? 0 : (u < 0.42 ? 0 : 0.85) * (1 - e.vierte);
+  recipiente(c, BB, '#e3e1d9', colB, nivB, px);
+  // el vapor: la cal viva calienta el agua hasta poderla hacer hervir [UC IPM]
+  if (e.vapor > 0.01){ for (let i = 0; i < 9; i++){ const t = (i/9 + u*6) % 1; const x = BB.cx + Math.sin(i*2.3 + u*20)*0.06 + (i - 4)*0.012; const y = GY - BB.h - 0.02 - t*0.26;
+    c.fillStyle = `rgba(255,255,255,${0.45*e.vapor*(1 - t)})`; c.beginPath(); c.ellipse(x, y, 0.03 + t*0.04, 0.02 + t*0.02, 0, 0, 7); c.fill(); } }
+  // la cal viva que se echa de a poco
+  if (e.calViva > 0 && e.calViva < 1){ for (let i = 0; i < 12; i++){ const t = (i/12 + e.calViva*3) % 1; c.fillStyle = 'rgba(245,244,236,.95)'; c.beginPath(); c.arc(BB.cx - 0.05 + (i%4)*0.02, GY - BB.h - 0.12 + t*0.11, 0.006, 0, 7); c.fill(); } }
+  // el palo de revolver: se mueve con el desplazamiento
+  if (u > 0.05 && !hecho || (hecho && pp < EST[5].b)){ const a = Math.sin(u*40)*0.18; c.save(); c.translate(BB.cx + 0.03, GY - BB.h + 0.02); c.rotate(-0.35 + a); c.fillStyle = '#8c6239'; c.fillRect(-0.007, -0.28, 0.014, 0.3); c.restore(); }
+  // A: sobre un bloque cuando va a verter
+  c.save();
+  const lev = sstep(0.62, 0.68, u) * (1 - sstep(0.86, 0.92, u));
+  const ax = lerp(0, 0.1, lev), ay = lerp(0, -0.26, lev);
+  c.translate(BA.cx + ax, GY + ay); c.rotate(inc*0.95); c.translate(-BA.cx, -GY);
+  recipiente(c, BA, '#3c8a4c', colA, nivA, px);
+  // la bolsita de arpillera colgada de un palo atravesado en la boca
+  if (e.bolsa > 0 && e.vierte < 0.05){ const yT = GY - BA.h; c.fillStyle = '#8b6a3e'; c.fillRect(BA.cx - BA.w*0.6, yT - 0.012, BA.w*1.2, 0.01);
+    c.strokeStyle = '#5b4526'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.moveTo(BA.cx, yT - 0.008); c.lineTo(BA.cx, yT + 0.02); c.stroke();
+    const tam = lerp(0.035, 0.018, e.disuelve); c.fillStyle = '#b89563'; c.beginPath(); c.ellipse(BA.cx, yT + 0.03, tam*0.8, tam, 0, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(80,60,30,.6)'; for (let k = -2; k <= 2; k++){ c.beginPath(); c.moveTo(BA.cx + k*tam*0.3, yT + 0.03 - tam*0.9); c.lineTo(BA.cx + k*tam*0.3, yT + 0.03 + tam*0.9); c.stroke(); }
+    if (e.disuelve < 1){ c.fillStyle = 'rgba(40,120,220,.8)'; c.beginPath(); c.ellipse(BA.cx, yT + 0.035, tam*0.45, tam*0.5, 0, 0, 7); c.fill(); } }
+  c.restore();
+  // el chorro de A a B
+  if (inc > 0.3){ const sx = BA.cx + 0.1 + BA.w*0.45, sy = GY - 0.26 - BA.h + 0.02; c.strokeStyle = 'rgba(40,130,215,.85)'; c.lineWidth = 0.012 + 0.006*inc; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(sx, sy); c.quadraticCurveTo(sx + 0.06, sy, BB.cx - 0.03, GY - BB.h + 0.01); c.stroke(); }
+  // colar con tela: una tela sobre la boca de B
+  if (e.colar > 0 && !hecho){ c.fillStyle = `rgba(236,226,200,${0.8*e.colar})`; c.beginPath(); c.ellipse(BB.cx, GY - BB.h - 0.005, BB.w*0.47, BB.w*0.06, 0, 0, 7); c.fill(); }
+}
+
+/* --- la bomba de espalda (20 litros, tamaño de ejemplo) --- */
+const BOMBA = { cx:0.86, w:0.16, h:0.30 };
+function pintaBomba(c, env, pp){
+  const px = env.px, b = biolEstado(pp);
+  const x0 = BOMBA.cx - BOMBA.w/2, y0 = GY - BOMBA.h - 0.02;
+  sombra(c, BOMBA.cx, GY + 0.004, 0.12, 0.02, 0.45);
+  // contenido: biol diluido en la parada de la dosis; caldo en la parada de la mata
+  let frac = 0, col = null;
+  if (pp >= EST[3].a && pp < EST[4].a){ frac = b.bomba; col = mix('#b7d6e4', '#7a4f25', ESTADO.dosis / 100 * 1.3); }
+  else if (pp >= EST[6].a - 0.3){ frac = 0.85 * (1 - 0.6*sstep(0.3, 1, uDe(6, pp))); col = '#7fc3dc'; }
+  c.save(); rrect(c, x0, y0, BOMBA.w, BOMBA.h, 0.03); c.clip();
+  c.fillStyle = 'rgba(236,240,232,.92)'; c.fillRect(x0, y0, BOMBA.w, BOMBA.h);
+  if (frac > 0.01 && col){ const yl = GY - 0.02 - frac*(BOMBA.h - 0.03); const gl = c.createLinearGradient(0, yl, 0, GY); gl.addColorStop(0, col); gl.addColorStop(1, mix(col.startsWith('#') ? col : '#7a4f25', '#000000', 0.25)); c.fillStyle = gl; c.fillRect(x0, yl, BOMBA.w, GY - yl); c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.moveTo(x0, yl); c.lineTo(x0 + BOMBA.w, yl); c.stroke(); }
+  const gs = c.createLinearGradient(x0, 0, x0 + BOMBA.w, 0); gs.addColorStop(0, 'rgba(0,0,0,.18)'); gs.addColorStop(0.35, 'rgba(255,255,255,.18)'); gs.addColorStop(1, 'rgba(0,0,0,.25)'); c.fillStyle = gs; c.fillRect(x0, y0, BOMBA.w, BOMBA.h);
+  c.restore();
+  c.strokeStyle = 'rgba(90,100,90,.8)'; c.lineWidth = Math.max(px, 0.003); rrect(c, x0, y0, BOMBA.w, BOMBA.h, 0.03); c.stroke();
+  // marcas de litros
+  c.strokeStyle = 'rgba(60,70,60,.7)'; for (let l = 5; l <= 20; l += 5){ const y = GY - 0.02 - (l/20)*(BOMBA.h - 0.03); c.beginPath(); c.moveTo(x0 + BOMBA.w - 0.03, y); c.lineTo(x0 + BOMBA.w - 0.008, y); c.stroke(); texto(c, String(l), x0 + BOMBA.w - 0.045, y, 0.014, '#37423a', 700); }
+  texto(c, '20 L', BOMBA.cx - 0.02, y0 + 0.03, 0.018, '#37423a', 800);
+  // tapa, palanca, correas, lanza
+  c.fillStyle = '#c9412d'; c.beginPath(); c.ellipse(BOMBA.cx - 0.02, y0 - 0.004, 0.035, 0.012, 0, 0, 7); c.fill();
+  c.strokeStyle = '#3a3a3a'; c.lineWidth = 0.008; c.beginPath(); c.moveTo(x0 - 0.005, y0 + 0.08); c.lineTo(x0 - 0.03, y0 + 0.02); c.lineTo(x0 - 0.06, y0 + 0.04); c.stroke();
+  c.strokeStyle = '#2d2d2d'; c.lineWidth = 0.012; c.beginPath(); c.moveTo(x0 + 0.03, y0 + 0.02); c.quadraticCurveTo(x0 + 0.04, y0 + 0.15, x0 + 0.03, GY - 0.03); c.stroke();
+  const rociando = pp >= EST[6].a - 0.2 && pp <= EST[6].b + 0.4;
+  const lx0 = x0 + BOMBA.w, ly0 = GY - 0.06;
+  const [lx1, ly1] = rociando ? [1.02, -0.19] : [x0 + BOMBA.w + 0.02, y0 - 0.14];
+  c.strokeStyle = '#222'; c.lineWidth = 0.006; c.beginPath(); c.moveTo(lx0 - 0.01, ly0); c.quadraticCurveTo(lx0 + 0.05, ly0 + 0.03, (lx0 + lx1)/2, (ly0 + ly1)/2 + 0.08); c.stroke();
+  c.strokeStyle = '#7a7f84'; c.lineWidth = 0.007; c.beginPath(); c.moveTo((lx0 + lx1)/2, (ly0 + ly1)/2 + 0.08); c.lineTo(lx1, ly1); c.stroke();
+  c.fillStyle = '#c9412d'; c.beginPath(); c.arc(lx1, ly1, 0.008, 0, 7); c.fill();
+  // el rocío: solo si se puede fumigar [FAO y OMS]
+  const puede = !ESTADO.lluvia && !ESTADO.viento && !ESTADO.calor && PISO !== 'limite';
+  if (rociando && puede && pp < EST[6].b + 0.3){ const u = uDe(6, pp); const r = rng(1234);
+    const gc = c.createRadialGradient(lx1, ly1, 0, lx1, ly1, 0.3); gc.addColorStop(0, 'rgba(215,245,255,.8)'); gc.addColorStop(1, 'rgba(200,240,255,0)');
+    c.fillStyle = gc; c.beginPath(); c.moveTo(lx1, ly1); c.arc(lx1, ly1, 0.3, -0.25 - 0.45, -0.25 + 0.45); c.closePath(); c.fill();
+    for (let i = 0; i < 160; i++){ const t = (r() + u*5) % 1; const a = -0.25 + (r() - .5)*0.8; const d = t*0.3; const x = lx1 + Math.cos(a)*d, y = ly1 + Math.sin(a)*d + t*t*0.03;
+      c.fillStyle = `rgba(215,245,255,${0.85*(1 - t)})`; c.beginPath(); c.arc(x, y, 0.003 + t*0.006, 0, 7); c.fill(); } }
+  // la lluvia y el viento, si la persona los pone
+  if (pp >= EST[6].a - 0.2 && pp <= EST[6].b + 0.4){
+    if (ESTADO.lluvia){ c.strokeStyle = 'rgba(200,225,245,.55)'; c.lineWidth = Math.max(px, 0.002); const r = rng(55); for (let i = 0; i < 140; i++){ const x = env.view[0] + r()*(env.view[2] - env.view[0]), y = env.view[1] + r()*(env.view[3] - env.view[1]); c.beginPath(); c.moveTo(x, y); c.lineTo(x - 0.006, y + 0.04); c.stroke(); } }
+    if (ESTADO.viento){ c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = Math.max(px*1.3, 0.004); c.lineCap = 'round'; for (let i = 0; i < 5; i++){ const y = -0.4 + i*0.1, x = 0.78 + (i%2)*0.1; c.beginPath(); c.moveTo(x, y); c.bezierCurveTo(x + 0.12, y - 0.02, x + 0.22, y + 0.03, x + 0.34, y); c.stroke(); } }
+    if (ESTADO.calor){ const g = c.createRadialGradient(1.1, -0.6, 0, 1.1, -0.6, 0.9); g.addColorStop(0, 'rgba(255,190,90,.35)'); g.addColorStop(1, 'rgba(255,190,90,0)'); c.fillStyle = g; c.fillRect(env.view[0], env.view[1], env.view[2] - env.view[0], env.view[3] - env.view[1]); }
+  }
+}
+/* el biol colado: una garrafa junto a la caneca */
+function pintaGarrafa(c, env, pp){
+  const b = biolEstado(pp); if (b.colado <= 0.01 || pp > EST[4].a + 0.3) return;
+  const x = -0.19 + 0.0, y1 = GY, w = 0.09, h = 0.16, px = env.px;
+  c.save(); c.globalAlpha = b.colado;
+  sombra(c, x, GY + 0.004, 0.06, 0.012, 0.35);
+  rrect(c, x - w/2, y1 - h, w, h, 0.02); c.fillStyle = 'rgba(240,240,232,.9)'; c.fill(); c.strokeStyle = 'rgba(120,120,110,.7)'; c.lineWidth = Math.max(px, 0.002); c.stroke();
+  const yl = y1 - h*0.8; c.fillStyle = '#6e4a22'; c.fillRect(x - w/2 + 0.004, yl, w - 0.008, y1 - yl - 0.004);
+  c.fillStyle = '#c9412d'; c.fillRect(x - 0.012, y1 - h - 0.018, 0.024, 0.02);
+  texto(c, 'biol', x, y1 - h*0.45, 0.018, '#f3ead8', 800);
+  c.restore();
+}
+
+/* la mata de café en el patio, con la hoja elegida en su portal */
+function pintaMata(c, env, pp){
+  const v = env.view;
+  if (MX + 0.5 < v[0] || MX - 0.5 > v[2]) return;
+  sombra(c, MX + 0.01, GY + 0.01, 0.34, 0.05, 0.45);
+  c.save(); c.translate(MX, MY); c.scale(MS, MS);
+  const sol = [0.17, -0.27];
+  const mojado = pp >= EST[6].a + 0.4*(EST[6].b - EST[6].a) && !ESTADO.lluvia && PISO !== 'limite' ? sstep(EST[6].a + 0.4*(EST[6].b - EST[6].a), EST[6].b, pp) : 0;
+  c.lineCap = 'round';
+  const gt = c.createLinearGradient(-0.01, 0, 0.01, 0); gt.addColorStop(0, '#4c3d2c'); gt.addColorStop(1, '#8a7456');
+  c.strokeStyle = gt; c.lineWidth = 0.012; c.beginPath(); c.moveTo(0.002, M.suelo + 0.01); c.quadraticCurveTo(-0.006, 0, 0, M.tope); c.stroke();
+  const pintaRamas = (zsel) => { for (const b of M.ramas){ if ((b.z < 0) !== zsel) continue; c.strokeStyle = b.z < 0 ? '#4d4a33' : '#6b5c3f'; c.lineWidth = b.w; c.beginPath(); c.moveTo(b.pts[0][0], b.pts[0][1]); for (const q of b.pts) c.lineTo(q[0], q[1]); c.stroke(); } };
+  pintaRamas(true);
+  for (const h of M.hojas){
+    c.save(); c.translate(h.x, h.y); c.rotate(h.a);
+    const lit = clamp(0.35 + 0.65*Math.cos(Math.atan2(sol[1]-h.y, sol[0]-h.x) - h.a - Math.PI/2) * 0.5 + h.luz*0.3, 0, 1);
+    const prof = clamp((h.z + 1.3) / 2.6, 0, 1);
+    const g = c.createLinearGradient(0, -h.l*h.w*0.5, 0, h.l*h.w*0.5);
+    if (h.env){ g.addColorStop(0, mix('#7fa35a', '#a8c47e', lit)); g.addColorStop(1, mix('#5f8744', '#86a862', lit)); }
+    else { g.addColorStop(0, mix('#2f5a2c', '#a7c957', lit*0.75*prof + 0.05)); g.addColorStop(0.55, mix('#274b25', '#3a6b35', 0.4 + prof*0.6)); g.addColorStop(1, mix('#1d3a1d', '#3a6b35', prof*0.5)); }
+    c.fillStyle = g; hojaPath(c, h.l, h.w, 0.03); c.fill();
+    c.strokeStyle = h.env ? 'rgba(220,232,190,.55)' : 'rgba(190,220,140,.28)'; c.lineWidth = Math.max(0.0012, h.l*0.018); c.beginPath(); c.moveTo(0, 0); c.lineTo(h.l*0.96, 0); c.stroke();
+    if (!h.env && lit > 0.55){ c.strokeStyle = `rgba(245,255,220,${(lit-0.55)*0.9})`; c.lineWidth = h.l*0.03; c.beginPath(); c.moveTo(h.l*0.2, -h.l*h.w*0.18); c.quadraticCurveTo(h.l*0.5, -h.l*h.w*0.3, h.l*0.8, -h.l*h.w*0.12); c.stroke(); }
+    // gotitas del caldo sobre las hojas ya rociadas
+    if (mojado > 0 && h.moj < mojado*0.9){ const r = rng(Math.floor(h.moj*1e5)); for (let k = 0; k < 4; k++){ c.fillStyle = 'rgba(140,210,230,.8)'; c.beginPath(); c.arc(h.l*(0.2 + r()*0.6), (r() - .5)*h.l*h.w*0.4, h.l*0.035, 0, 7); c.fill(); } }
+    c.restore();
+  }
+  pintaRamas(false);
+  for (const q of M.cerezas){ const g = c.createRadialGradient(q.x - q.r*0.35, q.y - q.r*0.35, q.r*0.1, q.x, q.y, q.r); g.addColorStop(0, 'rgba(255,240,220,.9)'); g.addColorStop(0.25, q.col); g.addColorStop(1, mix(q.col, '#2a1410', 0.45));
+    c.fillStyle = g; c.beginPath(); c.arc(q.x, q.y, q.r, 0, 7); c.fill(); }
+  c.restore();
+  // la hoja elegida: la misma geometría del nivel 1, puesta en su portal
+  const P = PORTAL[0];
+  c.save(); c.translate(P.x, P.y); c.scale(P.s, P.s); hojaElegida(c, 0.5, env.px / P.s); gotasHoja(c, env.px / P.s, pp, null); c.restore();
+}
+
+function dibujaPatio(c, env){
+  const pp = env.pp;
+  if (bgImg) c.drawImage(bgImg, FONDO.x0, FONDO.y0, FONDO.x1 - FONDO.x0, FONDO.y1 - FONDO.y0);
+  pintaSuelo(c, env);
+  pintaEnramada(c, env);
+  pintaCaneca(c, env, pp);
+  pintaGarrafa(c, env, pp);
+  pintaBanco(c, env);
+  pintaCaldo(c, env, pp);
+  pintaMata(c, env, pp);
+  pintaBomba(c, env, pp);
+  pintaLupa(c, env, pp);
+  // luz de la mañana
+  const gl = c.createRadialGradient(1.35, -1.25, 0, 1.35, -1.25, 2.6); gl.addColorStop(0, 'rgba(255,245,200,.14)'); gl.addColorStop(1, 'rgba(255,245,200,0)');
+  c.fillStyle = gl; c.fillRect(env.view[0], env.view[1], env.view[2] - env.view[0], env.view[3] - env.view[1]);
+}
+
+/* ============================================================
+   NIVEL 1 · LA HOJA DE CAFÉ, MOJADA DE CALDO  (1 unidad = 14 cm)
+   ============================================================ */
+const HOJA = { rot: -0.34, len: 0.92, wid: 0.38 };
+let teselaAreolas = null, teselaEstomas = null;
+function prepTeselas(){
+  const r = rng(5);
+  const t = document.createElement('canvas'); t.width = t.height = 256; const c = t.getContext('2d');
+  const sites = []; for (let i = 0; i < 26; i++) sites.push([r()*256, r()*256]);
+  const all = []; for (const s of sites) for (let dx = -256; dx <= 256; dx += 256) for (let dy = -256; dy <= 256; dy += 256) all.push([s[0]+dx, s[1]+dy]);
+  const pol = voronoi(all, [-256,-256,512,512], 80);
+  c.strokeStyle = 'rgba(235,242,215,.55)'; c.lineWidth = 3; c.lineJoin = 'round';
+  for (const p of pol){ if (!inView(p.bb, [0,0,256,256], 30)) continue; c.beginPath(); p.p.forEach((q,i)=> i? c.lineTo(q[0],q[1]) : c.moveTo(q[0],q[1])); c.closePath(); c.stroke(); }
+  teselaAreolas = t;
+  const e = document.createElement('canvas'); e.width = e.height = 128; const d = e.getContext('2d');
+  d.fillStyle = '#dce6c4'; d.fillRect(0,0,128,128);
+  for (let i = 0; i < 44; i++){ const x = r()*128, y = r()*128, a = r()*3; d.save(); d.translate(x,y); d.rotate(a);
+    d.fillStyle = 'rgba(150,175,110,.9)'; d.beginPath(); d.ellipse(0,0,3.4,2.6,0,0,7); d.fill();
+    d.fillStyle = 'rgba(40,70,40,.9)'; d.beginPath(); d.ellipse(0,0,1.8,0.6,0,0,7); d.fill(); d.restore(); }
+  teselaEstomas = e;
+}
+function hojaElegida(c, detalle, px){
+  c.save(); c.rotate(HOJA.rot); c.translate(-HOJA.len/2, 0);
+  const L = HOJA.len;
+  c.strokeStyle = '#5d7c3f'; c.lineWidth = 0.02; c.lineCap = 'round'; c.beginPath(); c.moveTo(-0.08, 0.006); c.lineTo(0.01, 0); c.stroke();
+  hojaPath(c, L, HOJA.wid, 0.025);
+  const g = c.createLinearGradient(0, -0.2, L, 0.2); g.addColorStop(0, '#5d8a3e'); g.addColorStop(0.55, '#7ea95a'); g.addColorStop(1, '#9dbd70');
+  c.fillStyle = g; c.fill();
+  if (detalle > 0.3){
+    c.save(); hojaPath(c, L, HOJA.wid, 0.025); c.clip();
+    const gl = c.createRadialGradient(L*0.75, -0.25, 0, L*0.75, -0.25, 0.8); gl.addColorStop(0, 'rgba(232,239,217,.45)'); gl.addColorStop(1, 'rgba(232,239,217,0)'); c.fillStyle = gl; c.fillRect(-0.1, -0.5, L+0.2, 1);
+    if (teselaAreolas && px < 0.004){ const pat = c.createPattern(teselaAreolas, 'repeat'); const tam = 0.012; pat.setTransform && pat.setTransform(new DOMMatrix([tam/256,0,0,tam/256,0,0])); c.globalAlpha = clamp((0.004 - px)/0.003, 0, 0.75); c.fillStyle = pat; c.fillRect(-0.1, -0.5, L+0.2, 1); c.globalAlpha = 1; }
+    c.strokeStyle = 'rgba(215,228,189,.85)'; c.lineCap = 'round';
+    for (let i = 1; i <= 9; i++){ const u = 0.08 + i*0.088; if (u > 0.9) break;
+      const w = HOJA.wid*L*Math.pow(Math.sin(Math.PI*Math.pow(u,0.85)), 0.95)*0.5;
+      for (const s of [-1, 1]){ c.lineWidth = Math.max(px*1.2, 0.0055*(1-u*0.5)); c.beginPath(); c.moveTo(u*L, 0); c.quadraticCurveTo(u*L + 0.07, s*w*0.55, u*L + 0.1, s*w*0.9); c.stroke(); } }
+    c.restore();
+  }
+  c.strokeStyle = '#d7e2bd'; c.lineWidth = 0.014; c.lineCap = 'round'; c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(L*0.5, 0.004, L*0.97, 0); c.stroke();
+  c.strokeStyle = 'rgba(255,255,240,.5)'; c.lineWidth = 0.004; c.beginPath(); c.moveTo(0.02, -0.003); c.quadraticCurveTo(L*0.5, 0.0, L*0.95, -0.002); c.stroke();
+  c.restore();
+}
+/* gotas de caldo sobre la hoja (coordenadas de la hoja): tamaños de dibujo */
+const GOTAS = (() => { const r = rng(1717), a = []; let n = 0;
+  while (a.length < 70 && n < 3000){ n++; const u = 0.06 + r()*0.88, s = (r() - .5); const w = HOJA.wid*HOJA.len*Math.pow(Math.sin(Math.PI*Math.pow(u,0.85)), 0.95)*0.5;
+    const lx = u*HOJA.len - HOJA.len/2, ly = s*2*w*0.85; const cr = Math.cos(HOJA.rot), sr = Math.sin(HOJA.rot);
+    a.push({ x: lx*cr - ly*sr, y: lx*sr + ly*cr, r: 0.006 + Math.pow(r(), 2)*0.022, k: r(), t: r() }); }
+  return a; })();
+function gotasHoja(c, px, pp, view){
+  const u6 = uDe(6, pp); if (u6 < 0.45 || ESTADO.lluvia && pp < EST[7].a) return;
+  const aparecen = sstep(0.45, 1, u6), seca = pp >= EST[7].a ? sstep(0.25, 0.9, uDe(7, pp)) : 0;
+  for (const g of GOTAS){ if (g.t > aparecen) continue; if (view && (g.x + g.r < view[0] || g.x - g.r > view[2] || g.y + g.r < view[1] || g.y - g.r > view[3])) continue;
+    const r = g.r * lerp(1, 0.7, seca*(0.5 + g.k*0.5));
+    // lo que queda al secar: una manchita azul pálida
+    c.fillStyle = `rgba(120,190,215,${0.35 + 0.25*seca})`; c.beginPath(); c.arc(g.x, g.y, g.r*0.95, 0, 7); c.fill();
+    if (seca < 0.98){ const a = 1 - seca*(0.6 + g.k*0.4);
+      const gg = c.createRadialGradient(g.x - r*0.3, g.y - r*0.35, r*0.05, g.x, g.y, r); gg.addColorStop(0, `rgba(235,250,255,${0.9*a})`); gg.addColorStop(0.35, `rgba(140,205,230,${0.55*a})`); gg.addColorStop(1, `rgba(40,110,150,${0.7*a})`);
+      c.fillStyle = gg; c.beginPath(); c.arc(g.x, g.y, r, 0, 7); c.fill();
+      c.fillStyle = `rgba(255,255,255,${0.85*a})`; c.beginPath(); c.ellipse(g.x - r*0.35, g.y - r*0.4, r*0.22, r*0.13, -0.6, 0, 7); c.fill(); }
+    else { c.strokeStyle = 'rgba(70,150,190,.55)'; c.lineWidth = Math.max(px, g.r*0.08); c.beginPath(); c.arc(g.x, g.y, g.r*0.95, 0, 7); c.stroke(); } }
+}
+const BOKEH = (() => { const r = rng(21), a = []; for (let i = 0; i < 34; i++){ const q = r(); a.push({ x: -1 + r()*2, y: -1 + r()*2, r: 0.08 + r()*0.2, col: q < 0.35 ? '#bfe3f5' : q < 0.7 ? '#3a6b35' : q < 0.85 ? '#a7c957' : '#23421f', a: 0.25 + r()*0.45 }); } return a; })();
+function dibujaHoja(c, env){
+  const g = c.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, '#b4dbef'); g.addColorStop(0.45, '#7fae7a'); g.addColorStop(1, '#2d4f2c');
+  c.fillStyle = g; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  for (const b of BOKEH){ const gg = c.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); gg.addColorStop(0, rgba(b.col, b.a)); gg.addColorStop(0.7, rgba(b.col, b.a*0.6)); gg.addColorStop(1, rgba(b.col, 0)); c.fillStyle = gg; c.fillRect(b.x-b.r, b.y-b.r, b.r*2, b.r*2); }
+  c.strokeStyle = 'rgba(60,50,35,.35)'; c.lineWidth = 0.05; c.beginPath(); c.moveTo(-1.2, -0.55); c.quadraticCurveTo(-0.2, -0.35, 1.2, -0.62); c.stroke();
+  hojaElegida(c, 1, env.px);
+  gotasHoja(c, env.px, env.pp, env.view);
+}
+
+/* ============================================================
+   NIVEL 2 · VENAS DEL ENVÉS  (1 unidad = 6 mm)
+   ============================================================ */
+const AREOLAS = (() => { const r = rng(31); const sites = jitterSites(r, [-1.15,-1.15,1.15,1.15], 0.085, 0.9); return voronoi(sites, [-1.2,-1.2,1.2,1.2], 0.085); })();
+const COBRE2 = (() => { const r = rng(2020), a = []; for (let i = 0; i < 500; i++) a.push({ x: -1.2 + r()*2.4, y: -1.2 + r()*2.4, s: 0.002 + r()*0.004 }); return a; })();
+function dibujaVenas(c, env){
+  c.fillStyle = '#c9d6ae'; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  const v = env.view;
+  let pat = null; if (teselaEstomas){ pat = c.createPattern(teselaEstomas, 'repeat'); const tam = 0.083; pat.setTransform && pat.setTransform(new DOMMatrix([tam/128,0,0,tam/128,0,0])); }
+  c.fillStyle = pat || '#dce6c4';
+  c.beginPath(); for (const a of AREOLAS){ if (!inView(a.bb, v, 0.05)) continue; roundPoly(c, shrink(a.p, a.c, 0.86)); } c.fill();
+  c.strokeStyle = 'rgba(120,150,85,.35)'; c.lineWidth = 0.006; c.stroke();
+  c.lineCap = 'round';
+  c.strokeStyle = '#b9ca95'; c.lineWidth = 0.05; c.beginPath(); c.moveTo(-1.2, -0.62); c.bezierCurveTo(-0.3, -0.42, 0.3, -0.52, 1.2, -0.2); c.stroke();
+  c.strokeStyle = 'rgba(240,246,226,.7)'; c.lineWidth = 0.012; c.beginPath(); c.moveTo(-1.2, -0.635); c.bezierCurveTo(-0.3, -0.435, 0.3, -0.535, 1.2, -0.215); c.stroke();
+  // el cobre seco, en polvito azul (de dibujo)
+  if (env.pp >= EST[6].b){ c.fillStyle = 'rgba(60,150,190,.55)'; for (const q of COBRE2){ if (q.x < v[0] || q.x > v[2] || q.y < v[1] || q.y > v[3]) continue; c.beginPath(); c.arc(q.x, q.y, Math.max(env.px*0.8, q.s), 0, 7); c.fill(); } }
+  const gl = c.createRadialGradient(0.3, -0.6, 0, 0.3, -0.6, 1.6); gl.addColorStop(0, 'rgba(250,255,230,.28)'); gl.addColorStop(1, 'rgba(90,120,60,.18)'); c.fillStyle = gl; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+}
+
+/* ============================================================
+   NIVEL 3 · ESTOMAS DEL ENVÉS, CON COBRE  (1 unidad = 500 µm)
+   ============================================================ */
+const EPI = (() => {
+  const r = rng(41);
+  const sites = jitterSites(r, [-1.1,-1.1,1.1,1.1], 0.075, 0.95);
+  const cel = voronoi(sites, [-1.15,-1.15,1.15,1.15], 0.075);
+  const vena = (x) => -0.36 + 0.18*Math.sin(x*1.3 + 0.4);
+  const est = []; let tries = 0;
+  while (est.length < 230 && tries < 6000){ tries++; const x = -1.05 + r()*2.1, y = -1.05 + r()*2.1;
+    if (Math.abs(y - vena(x)) < 0.07) continue;
+    if (est.some(e => (e.x-x)*(e.x-x) + (e.y-y)*(e.y-y) < 0.075*0.075)) continue;
+    est.push({ x, y, a: r()*Math.PI, ap: 0.55 + r()*0.3, k: r() }); }
+  return { cel, est, vena };
+})();
+const VCEL = (() => { const r = rng(43), out = []; for (let row = -2; row < 2; row++){ let x = -1.3 + r()*0.06; while (x < 1.3){ const L = 0.05 + r()*0.06; out.push({ x0: x, x1: x + L, row, t: r(), dy: (r() - .5)*0.002 }); x += L; } } return out; })();
+function estoma(c, e, px){
+  c.save(); c.translate(e.x, e.y); c.rotate(e.a);
+  const L = 0.031, Wd = 0.025;
+  c.fillStyle = '#dde7c7'; c.strokeStyle = 'rgba(111,154,74,.55)'; c.lineWidth = Math.max(px, 0.0025);
+  c.beginPath(); c.ellipse(0, 0, L*0.78, Wd*0.95, 0, 0, 7); c.fill(); c.stroke();
+  const ap = e.ap * 0.0042;
+  for (const s of [-1, 1]){
+    c.beginPath(); c.ellipse(0, s*(ap + Wd*0.2), L*0.5, Wd*0.22, 0, 0, 7);
+    const g = c.createLinearGradient(0, s*ap, 0, s*(ap + Wd*0.42)); g.addColorStop(0, '#b8cf8e'); g.addColorStop(1, '#9fbb74');
+    c.fillStyle = g; c.fill(); c.strokeStyle = 'rgba(80,120,55,.9)'; c.lineWidth = Math.max(px, 0.002); c.stroke();
+    if (px < 0.004){ c.fillStyle = 'rgba(70,140,60,.75)'; for (let i = -2; i <= 2; i++){ c.beginPath(); c.arc(i*L*0.17, s*(ap + Wd*0.2 + (i%2)*0.0015), 0.0019, 0, 7); c.fill(); } }
+  }
+  const gp = c.createRadialGradient(0, 0, 0, 0, 0, L*0.4); gp.addColorStop(0, '#0e2216'); gp.addColorStop(0.6, '#1f3b2a'); gp.addColorStop(1, 'rgba(31,59,42,.3)');
+  c.fillStyle = gp; c.beginPath(); c.ellipse(0, 0, L*0.36, ap*0.95 + 0.0008, 0, 0, 7); c.fill();
+  c.restore();
+}
+/* el estoma del portal: el sano más cerca del centro */
+const EST_P = (() => { let b = EPI.est[0], d = 1e9; for (const e of EPI.est){ const dd = e.x*e.x + e.y*e.y; if (dd < d){ d = dd; b = e; } } return b; })();
+PORTAL[3] = { x: EST_P.x, y: EST_P.y, s: F[4]/F[3] };
+const s3 = PORTAL[3].s;
+const COBRE3 = (() => { const r = rng(3030), a = []; for (let i = 0; i < 900; i++) a.push({ x: -1.15 + r()*2.3, y: -1.15 + r()*2.3, s: 0.0025 + r()*0.006, k: r(), a: r()*6, lav: r() < 0.5 }); return a; })();
+const ESP3 = (() => { const r = rng(3131), a = []; for (let i = 0; i < 9; i++) a.push({ x: -1 + r()*2, y: -1 + r()*2, a: r()*6.28, t: r() }); return a; })();
+function granito(c, x, y, rr, k, col){ c.fillStyle = col || mix('#2f86a8', '#7cc7d8', k); c.beginPath(); for (let j = 0; j < 5; j++){ const a = j/5*6.283 + k*3; const d = rr*(0.7 + 0.3*Math.sin(j*2.3 + k*9)); j ? c.lineTo(x + Math.cos(a)*d, y + Math.sin(a)*d) : c.moveTo(x + Math.cos(a)*d, y + Math.sin(a)*d); } c.closePath(); c.fill(); }
+function dibujaEstomas(c, env){
+  c.fillStyle = '#cfdcb4'; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  const v = env.view, px = env.px;
+  for (const q of EPI.cel){ if (!inView(q.bb, v, 0.04)) continue;
+    const t = (Math.sin(q.s[0]*37.1 + q.s[1]*19.3) + 1) * 0.5;
+    c.fillStyle = mix('#e8efd9', '#dfe8cc', t); c.beginPath(); roundPoly(c, shrink(q.p, q.c, 0.965)); c.fill(); }
+  c.strokeStyle = 'rgba(160,185,125,.9)'; c.lineWidth = Math.max(px*1.2, 0.0035); c.lineJoin = 'round';
+  c.beginPath(); for (const q of EPI.cel){ if (!inView(q.bb, v, 0.04)) continue; roundPoly(c, shrink(q.p, q.c, 0.965)); } c.stroke();
+  c.save(); c.beginPath(); for (let x = -1.2; x <= 1.2; x += 0.02) c.lineTo(x, EPI.vena(x) - 0.044); for (let x = 1.2; x >= -1.2; x -= 0.02) c.lineTo(x, EPI.vena(x) + 0.044); c.closePath();
+  c.fillStyle = '#c3d3a4'; c.fill(); c.clip();
+  c.strokeStyle = 'rgba(150,178,112,.85)'; c.lineWidth = Math.max(px*1.1, 0.003); c.lineJoin = 'round';
+  for (const q of VCEL){ if (q.x1 < v[0] - 0.05 || q.x0 > v[2] + 0.05) continue;
+    const g = 0.0026, n = 5, pts = [];
+    for (let i = 0; i <= n; i++){ const x = lerp(q.x0 + g, q.x1 - g, i/n); pts.push([x, EPI.vena(x) + q.row*0.022 + g + q.dy]); }
+    for (let i = n; i >= 0; i--){ const x = lerp(q.x0 + g, q.x1 - g, i/n); pts.push([x, EPI.vena(x) + (q.row + 1)*0.022 - g + q.dy]); }
+    c.beginPath(); roundPoly(c, pts); c.fillStyle = mix('#e6eed6', '#d6e2bd', q.t); c.fill(); c.stroke(); }
+  c.restore();
+  for (const e of EPI.est){ if (e.x < v[0]-0.05 || e.x > v[2]+0.05 || e.y < v[1]-0.05 || e.y > v[3]+0.05) continue; estoma(c, e, px); }
+  // cobre seco: granitos azules (tamaño y color de dibujo)
+  for (const q of COBRE3){ if (q.x < v[0] || q.x > v[2] || q.y < v[1] || q.y > v[3]) continue; granito(c, q.x, q.y, Math.max(px*0.9, q.s), q.k); }
+  // esporas de roya que cayeron: unas 30 µm [Cenicafé]
+  for (const s of ESP3){ if (s.x < v[0] - 0.05 || s.x > v[2] + 0.05 || s.y < v[1] - 0.05 || s.y > v[3] + 0.05) continue; espora(c, s.x, s.y, s.a, 30e-6/F[3], px, 1, s.t); }
+  const gl = c.createLinearGradient(-1, -1, 1, 1); gl.addColorStop(0, 'rgba(255,255,235,.16)'); gl.addColorStop(1, 'rgba(60,90,50,.14)'); c.fillStyle = gl; c.fillRect(-1.3,-1.3,2.6,2.6);
+}
+
+/* ============================================================
+   NIVEL 4 · LA ESPORA, EL ESTOMA Y EL COBRE  (1 unidad = 100 µm)
+   Vista desde abajo del envés: la misma epidermis del nivel 3.
+   ============================================================ */
+const a3 = (x, y) => [(x - PORTAL[3].x) / s3, (y - PORTAL[3].y) / s3];
+const ESP4 = { x: -0.30, y: 0.06, a: 0.35 };
+const L_ESP4 = 30e-6 / F[4];
+const COBRE4 = (() => { const r = rng(4040), a = []; for (let i = 0; i < 260; i++){ const x = -1.3 + r()*2.6, y = -1.3 + r()*2.6; a.push({ x, y, s: 0.008 + r()*0.02, k: r(), lav: r() < 0.5 }); } return a; })();
+function tuboEsp(){ const x0 = ESP4.x + Math.cos(ESP4.a)*L_ESP4*0.42, y0 = ESP4.y + Math.sin(ESP4.a)*L_ESP4*0.42; const pts = []; for (let i = 0; i <= 40; i++){ const u = i/40; pts.push([lerp(x0, 0, u) + 0.02*Math.sin(u*9)*(1 - u), lerp(y0, 0, u) + 0.015*Math.sin(u*7 + 1)*(1 - u)]); } return pts; }
+const TUBO = tuboEsp();
+function trazo(c, pts){ c.beginPath(); pts.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.stroke(); }
+function dibujaEspora(c, env){
+  const px = env.px, v = env.view, pp = env.pp;
+  c.fillStyle = '#cfdcb4'; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  for (const q of EPI.cel){ const pts = q.p.map(p => a3(p[0], p[1])); const cc = a3(q.c[0], q.c[1]); let x0 = 9, x1 = -9, y0 = 9, y1 = -9; for (const p of pts){ x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); }
+    if (!inView([x0, y0, x1, y1], v, 0.05)) continue;
+    const t = (Math.sin(q.s[0]*37.1 + q.s[1]*19.3) + 1) * 0.5;
+    c.beginPath(); roundPoly(c, shrink(pts, cc, 0.975)); c.fillStyle = mix('#e8efd9', '#dfe8cc', t); c.fill(); c.strokeStyle = 'rgba(160,185,125,.9)'; c.lineWidth = Math.max(px, 0.012); c.stroke(); }
+  // el estoma del portal y sus vecinos, a esta escala
+  for (const e of EPI.est){ const [x, y] = a3(e.x, e.y); if (x < v[0] - 0.3 || x > v[2] + 0.3 || y < v[1] - 0.3 || y > v[3] + 0.3) continue;
+    c.save(); c.translate(x, y); c.scale(1/s3, 1/s3); estoma(c, { x:0, y:0, a:e.a, ap:e.ap }, px*s3); c.restore(); }
+  const enEsp = pp >= EST[EESP].a - 0.3;
+  const lav = ESTADO.llovio;
+  // el hongo que ya entró (botón), visto a través de la epidermis
+  if (enEsp && ESTADO.entro){ c.save(); c.globalAlpha = 0.6; c.lineCap = 'round'; const r = rng(515);
+    for (let j = 0; j < 7; j++){ let x = 0, y = 0, h = j*0.9; const pts = [[x, y]]; for (let k = 0; k < 18; k++){ h += (r() - .5)*0.9; x += Math.cos(h)*0.03; y += Math.sin(h)*0.03; pts.push([x, y]); }
+      c.strokeStyle = 'rgba(120,60,10,.5)'; c.lineWidth = 0.02; trazo(c, pts); c.strokeStyle = '#f0b25a'; c.lineWidth = 0.011; trazo(c, pts); }
+    c.restore(); }
+  // el cobre: granitos azules sobre la cutícula (de dibujo); la lluvia se lleva la mitad [Cenicafé]
+  const hayCobre = enEsp ? ESTADO.caldo : pp >= EST[6].b;
+  if (hayCobre){ for (const q of COBRE4){ if (lav && q.lav) continue; if (q.x < v[0] - 0.03 || q.x > v[2] + 0.03 || q.y < v[1] - 0.03 || q.y > v[3] + 0.03) continue; granito(c, q.x, q.y, q.s, q.k); c.fillStyle = 'rgba(230,250,255,.5)'; c.beginPath(); c.arc(q.x - q.s*0.3, q.y - q.s*0.3, q.s*0.25, 0, 7); c.fill(); } }
+  // la capa de agua: la espora solo germina mojada [Cenicafé]
+  c.fillStyle = 'rgba(170,215,240,.18)'; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  const gw = c.createRadialGradient(ESP4.x, ESP4.y, 0, ESP4.x, ESP4.y, 0.6); gw.addColorStop(0, 'rgba(230,248,255,.28)'); gw.addColorStop(1, 'rgba(230,248,255,0)'); c.fillStyle = gw; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  // el tubito: crece si no hay cobre (horas de ejemplo, de 6 a 12)
+  const bloquea = enEsp && ESTADO.caldo;
+  const h = enEsp && !bloquea ? horasEsp(pp) : 0;
+  const L1 = sstep(3.5, 10, h), ap = sstep(9.6, 11, h);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  if (L1 > 0){ const n = Math.max(2, Math.round(L1*TUBO.length)); const pts = TUBO.slice(0, n);
+    c.strokeStyle = 'rgba(110,50,6,.55)'; c.lineWidth = 0.034; trazo(c, pts); c.strokeStyle = '#f4b867'; c.lineWidth = 0.022; trazo(c, pts); }
+  if (ap > 0){ c.fillStyle = '#eea552'; c.beginPath(); c.ellipse(0, 0, 0.05*ap, 0.03*ap, 0, 0, 7); c.fill(); c.strokeStyle = 'rgba(110,50,6,.7)'; c.lineWidth = Math.max(px, 0.006); c.stroke(); }
+  espora(c, ESP4.x, ESP4.y, ESP4.a, L_ESP4, px, 1, 0.4);
+}
+
+/* la espora de la roya: riñón de 30 × 20 µm, lisa por un lado y áspera por el otro [Cenicafé] */
+function esporaPath(c, L){
+  const W = L * 0.667;
+  c.beginPath(); c.moveTo(-L*0.5, W*0.05);
+  c.bezierCurveTo(-L*0.56, -W*0.72, L*0.56, -W*0.72, L*0.5, W*0.05);
+  c.bezierCurveTo(L*0.46, W*0.5, L*0.2, W*0.56, 0, W*0.26);
+  c.bezierCurveTo(-L*0.2, W*0.56, -L*0.46, W*0.5, -L*0.5, W*0.05);
+  c.closePath();
+}
+const ESP_SPR = [];
+function prepEsporas(){ ESP_SPR.length = 0; for (let k = 0; k <= 5; k++){ const cv2 = document.createElement('canvas'); cv2.width = 160; cv2.height = 120; const x = cv2.getContext('2d'); x.translate(80, 62); esporaVector(x, 0, 0, 0, 136, 0.5, 1, k/5); ESP_SPR.push(cv2); } }
+function espora(c, x, y, a, L, px, alfa, tono){
+  if (L / px < 200 && ESP_SPR.length){ const sp = ESP_SPR[Math.round(clamp(tono === undefined ? 0.5 : tono, 0, 1)*5)], k = L/136;
+    c.save(); c.translate(x, y); c.rotate(a); if (alfa !== undefined) c.globalAlpha *= alfa; c.drawImage(sp, -80*k, -62*k, 160*k, 120*k); c.restore(); return; }
+  esporaVector(c, x, y, a, L, px, alfa, tono);
+}
+function esporaVector(c, x, y, a, L, px, alfa, tono){
+  c.save(); c.translate(x, y); c.rotate(a); if (alfa !== undefined) c.globalAlpha *= alfa;
+  const W = L * 0.667, t = tono === undefined ? 0.5 : tono;
+  esporaPath(c, L);
+  const g = c.createLinearGradient(0, -W*0.5, 0, W*0.45);
+  g.addColorStop(0, mix('#fbc44f', '#f6b23e', t)); g.addColorStop(0.55, mix('#f09424', '#e8861c', t)); g.addColorStop(1, mix('#c8661a', '#b95a14', t));
+  c.fillStyle = g; c.fill();
+  if (L / px > 12){
+    const r = rng(Math.floor(t*9973) + 5); c.save(); esporaPath(c, L); c.clip();
+    for (let i = 0; i < 40; i++){ c.fillStyle = r() < .5 ? 'rgba(255,230,170,.16)' : 'rgba(160,80,10,.1)'; c.beginPath(); c.arc((r() - .5)*L*0.95, (r() - .6)*W*0.85, L*(0.012 + r()*0.022), 0, 7); c.fill(); }
+    const gb = c.createRadialGradient(-L*0.12, -W*0.28, 0, -L*0.12, -W*0.28, L*0.4); gb.addColorStop(0, 'rgba(255,240,200,.35)'); gb.addColorStop(1, 'rgba(255,240,200,0)'); c.fillStyle = gb; c.fillRect(-L, -W, 2*L, 2*W);
+    c.restore();
+    c.strokeStyle = 'rgba(110,52,8,.75)'; c.lineWidth = Math.max(px*0.8, L*0.018); esporaPath(c, L); c.stroke();
+    if (L / px > 28){ const rb = rng(Math.floor(t*7919) + 3); c.fillStyle = 'rgba(150,72,12,.55)';
+      for (let i = 0; i < 70; i++){ const u = 0.03 + rb()*0.94; const bx = lerp(-L*0.49, L*0.49, u); const by = -W*0.53*Math.pow(Math.sin(Math.PI*u), 0.9) + W*0.05 + rb()*W*0.12;
+        c.beginPath(); c.arc(bx, by, L*(0.004 + rb()*0.004), 0, 7); c.fill(); } }
+  }
+  c.restore();
+}
+
+/* ============================================================
+   REGISTRO DE NIVELES Y RENDER
+   ============================================================ */
+const LV = [dibujaPatio, dibujaHoja, dibujaVenas, dibujaEstomas, dibujaEspora];
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu){ const hw = W/2/ppu, hh = H/2/ppu; return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - hw, cy - hh, cx + hw, cy + hh], pp: p }; }
+function pintaNivel(c, L, cx, cy, f){
+  const ppu = S / f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(W/2 - cx*ppu), DPR*(H/2 - cy*ppu));
+  LV[L](c, envPara(L, cx, cy, f, ppu));
+  const P = PORTAL[L];
+  if (!P) return;
+  const pp = P.s * ppu;
+  const a = sstep(0.28*S, 0.92*S, pp);
+  if (a <= 0) return;
+  const ppu2 = ppu * P.s;
+  const ox = W/2 + (P.x - cx)*ppu, oy = H/2 + (P.y - cy)*ppu;
+  const cx2 = (cx - P.x) / P.s, cy2 = (cy - P.y) / P.s, f2 = f / P.s;
+  const cubre = a >= 0.999;
+  const dst = cubre ? c : bctx;
+  if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+  dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*ox, DPR*oy);
+  LV[L+1](dst, envPara(L+1, cx2, cy2, f2, ppu2));
+  if (cubre) return;
+  bctx.setTransform(1,0,0,1,0,0);
+  bctx.globalCompositeOperation = 'destination-in';
+  const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+  const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+  gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+  bctx.globalCompositeOperation = 'source-over';
+  c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+}
+function luzGlobal(pp){ return Math.exp(-1.6 * Math.max(0, pp - EST[7].a + 1) / (T - EST[7].a + 1)); }
+function render(){
+  const cam = camAt(p);
+  ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle = '#0b0d1e'; ctx.fillRect(0, 0, cv.width, cv.height);
+  pintaNivel(ctx, cam.L, cam.cx, cam.cy, cam.f);
+  ctx.setTransform(1,0,0,1,0,0);
+  const lz = luzGlobal(p);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, `rgba(3,5,12,${0.1 + 0.36*(1 - lz)})`);
+  ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.seg.k === 'zoom'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k);
+    ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+
+/* ============================================================
+   TEXTOS: estaciones por páginas, palabras, fuentes
+   [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   ============================================================ */
+const lugarTxt = (() => {
+  if (!PISO) return null;
+  const donde = muniCrudo ? `${muniCrudo}, ` : '';
+  return `${donde}${miles(Math.round(altURL))} m: ${NOM_PISO[PISO]}`;
+})();
+const pagLugar = PISO
+  ? { s:[`Su finca, según la app: ${lugarTxt}{16}.`, PISO === 'calido' ? 'En tierra caliente, esta pieza le recuerda el calor antes de fumigar{7}.' : PISO === 'limite' ? 'Tan alto, cerca del páramo, esta pieza no propone fumigar sin revisión humana.' : 'A esta altura, las cantidades de las guías no cambian: son las mismas en todo el recorrido{1}.'], nota:'La altura orienta; el clima de su finca también cuenta{16}.' }
+  : { s:['No sabemos dónde queda su finca: este es un patio de ejemplo.', 'Si abre esta página desde la app con su ubicación, se ajusta un aviso para tierra caliente{7,16}.'] };
+const pagPiso6 = PISO === 'calido'
+  ? { k:'cuidado', s:['Su finca está en tierra caliente{16}.', 'Espere a que el calor baje de 30 grados para fumigar{7}.'] }
+  : PISO === 'limite'
+  ? { k:'cuidado', s:['Su finca está cerca del páramo{16}.', 'Allí nacen aguas: esta pieza no propone echar cobre sin que lo revise una persona que conozca el lugar.'], nota:'La altura sola no delimita el páramo{16}.' }
+  : null;
+
+const ESTACIONES = [
+  { t:'El patio de la finca', c:'La finca', pags:[
+    { s:['En este patio se preparan dos cosas para las matas{1}.', 'El [[biol|biol]]: un abono líquido que [[fermentacion|fermenta]] sin aire{1}.', 'Y el [[bordeles|caldo bordelés]]: cobre con cal, contra los hongos{1,2}.'] },
+    { s:['Vamos a verlos prepararse en el tiempo: días para el biol, horas para el caldo{1,2}.', 'Después bajaremos a la hoja del café, donde actúan.'] },
+    pagLugar,
+    { k:'tam', s:['El recuadro de arriba dice cuánto mide de ancho lo que usted ve.', 'Abajo le dice cuánto tiempo va pasando en cada preparación.'] },
+    { k:'cuidado', s:['Las cantidades son las de las guías citadas, no una receta probada en su finca{1}.', 'Si el producto es comprado, manda su etiqueta.'] } ] },
+  { t:'Lo que lleva el biol', c:'El biol: lo que lleva', h:'tiempo', pags:[
+    { s:['La guía de la FAO hace 150 litros de biol con esto{1}:', 'una caneca de plástico de 200 litros, con tapa que cierre bien{1}.', 'De metal no sirve{1}.'] },
+    { s:['Primero, 40 kilos de estiércol de ganado de leche, de cuy u otro{1}.', 'Después, 160 litros de agua de lluvia o reposada, poco a poco y revolviendo{1}.'] },
+    { s:['Al final, 5 litros de [[melaza|melaza]] de caña y 1 litro de leche, revolviendo{1}.'], nota:'Deslice despacio: lo que ve dentro de la caneca es un corte de dibujo.' },
+    { k:'hacer', s:['¿Qué estiércol hay en su finca?', 'Anote cuánto tiene antes de conseguir la caneca.'] } ] },
+  { t:'El biol fermenta sin aire', c:'El biol fermenta', h:'manguera', pags:[
+    { s:['La caneca se tapa bien, para que fermente sin aire{1}.', 'De la tapa sale una manguera a una botella con agua{1}.', 'Los gases de la fermentación salen por ahí, burbujeando{1}.'] },
+    { s:['La punta de la manguera tiene que quedar bajo el agua{1}.', 'Así salen los gases y no entra aire{1}.'] },
+    { k:'cuando', s:['La guía lo deja 60 días, en un lugar fresco y con sombra{1}.', 'Deslice: los días pasan en el recuadro de arriba.'] },
+    { k:'tam', s:['En la lupa, un dibujo de [[bacteria|bacterias]] y burbujas de gas.', 'Una bacteria mide de 0,1 a 5 [[micra|micras]]{11}.', 'Una micra es la milésima parte de un milímetro{12}.'], nota:'La lupa no dice qué microbios hay en su biol: nadie los ha contado aquí.' },
+    { k:'cuidado', s:['El estiércol trae microbios que enferman a la gente{4}.', 'En un biodigestor a 28 grados, a la [[ecoli|E. coli]] le tomó 77 días bajar a la décima parte{4}.', 'El biol reposa 60: no eche biol de estiércol sobre lo que se come crudo{4,15}.'] } ] },
+  { t:'Colar el biol y medir la dosis', c:'Colar y medir', h:'dosis', pags:[
+    { s:['A los 60 días, el biol se cuela y se deja airear una semana{1}.', 'En recipiente cerrado, fresco y aireado, dura hasta 4 meses{1}.'] },
+    { k:'cuando', s:['En hortalizas, la guía da de 30 a 50 partes de biol en cada 100 de mezcla{1}.', 'En una bomba de 20 litros son de 6 a 10 litros de biol; el resto, agua{1}.'], nota:'La bomba de 20 litros es un tamaño de ejemplo.' },
+    { s:['150 litros diluidos a la mitad alcanzan para media hectárea{1}.'] },
+    { k:'pensar', s:['Ningún estudio revisado por otros científicos ha medido bien el biol{15}.', 'Y las recetas cambian de una guía a otra{15}.', 'Es saber campesino: úselo como ayuda, no como única comida de la mata{15}.'] },
+    { k:'hacer', s:['Échelo en un pedazo del cultivo y deje otro igual sin biol{15}.', 'Compare los dos en la cosecha.'] } ] },
+  { t:'El caldo bordelés se prepara', c:'El caldo', h:'tiempo', pags:[
+    { s:['Para 100 litros: 1 kilo de [[sulfato|sulfato de cobre]], 1 kilo de [[cal|cal viva]] y agua{1}.', 'Es un caldo al 1 por ciento: 1 kilo en 100 litros.'] },
+    { s:['Todo en recipientes de plástico{1}: el caldo corroe el metal{2}.', 'En un tanque de 100 litros, la cal viva se apaga en 10 litros de agua{1}.'] },
+    { k:'cuidado', s:['Al mojarse, la cal viva calienta el agua hasta poderla hacer hervir{2}.', 'Échela de a poco, con gafas, revolviendo con un palo{2}.', 'Apagarla toma de media hora a dos horas{2}.'] },
+    { s:['Ya fría, se completa a 90 litros{1}.', 'O se usa [[calhidratada|cal hidratada]]: 1 kilo directo en los 90 litros{1}.'] },
+    { s:['En un balde de 10 litros se disuelve el cobre{1}.', 'Va en una bolsita de [[arpillera|arpillera]] colgada del borde, para que no se asiente{1}.', 'Revuelva sin parar{1}.'] },
+    { s:['Luego se echa el cobre sobre la cal, revolviendo{1}.', 'La guía de la FAO pide no hacerlo al revés{1}.', 'Otra guía, de la Universidad de California, sí echa la cal sobre el cobre{2}.'], nota:'Las dos fuentes no coinciden en el orden. Aquí se dibuja el de la FAO.' },
+    { k:'cuando', s:['Cuélelo con una tela, para que no tape la bomba{1}.', 'Úselo el mismo día: mezclado se daña{1,2}.', 'El cobre y la cal sí se pueden guardar por separado{1}.'] },
+    { k:'tam', s:['100 litros alcanzan para 2.500 metros cuadrados{1}.', 'Una hectárea necesitaría unos 400 litros.'] } ] },
+  { t:'La etiqueta y su cuerpo', c:'La etiqueta', pags:[
+    { s:['Antes de abrir un bulto, lea su etiqueta.', 'La cal viva puede dañar gravemente los ojos{8}.', 'El sulfato de cobre les hace daño a los ojos y a los peces{8}.'], nota:'Las etiquetas dibujadas en los bultos son de ejemplo.' },
+    { k:'cuidado', s:['Al mezclar la cal, cúbrase ojos, nariz y boca: gafas y [[respirador|respirador]] para polvo{2}.', 'Guantes de [[nitrilo|nitrilo]], largos; nunca de cuero ni de tela{7}.'] },
+    { k:'cuidado', s:['Nunca coma, beba ni fume mientras prepara o fumiga{7}.', 'Guarde el cobre y la cal rotulados y lejos de los niños{2}.'] },
+    { s:['La etiqueta de un plaguicida trae un teléfono de emergencias de 24 horas{9}.', 'Y dice: «en caso de ingestión, no induzca el vómito»{9}.'] },
+    { k:'cuidado', s:['Si le cae en los ojos: agua limpia, despacio, por lo menos 15 minutos{7}.', 'Línea Nacional de Toxicología, gratis, las 24 horas{10}.'], extra:'tel' } ] },
+  { t:'A la mata', c:'A la mata', h:'clima', pags:[
+    ...(pagPiso6 && PISO === 'limite' ? [pagPiso6] : []),
+    { s:['El caldo se echa hasta mojar bien la mata{1}.', 'Tiene que quedar parejo en todo el follaje{3}.', 'Agite la bomba mientras fumiga, para que no se tape{2}.'] },
+    { k:'cuidado', s:['No fumigue con lluvia{7}.', 'Ni con viento de más de 3 metros por segundo{7}.', 'Ni con más de 30 grados{7}.'] },
+    ...(pagPiso6 && PISO === 'calido' ? [pagPiso6] : []),
+    { k:'cuando', s:['En el café, Cenicafé cuenta hojas con roya en 60 árboles del lote{3}.', 'Con menos de 10 de cada 100, un [[protector|protector]] como el cobre es una opción{3}.', 'Con más, casi siempre recomienda un [[sistemico|sistémico]]{3}.'] },
+    { k:'cuando', s:['En huertas, la guía de la FAO repite el caldo cada 15 días con calor y mucha humedad{1}.'] },
+    { k:'cuidado', s:['Al terminar, lave la bomba tres veces{2}.', 'No lave baldes, bomba ni envases en la quebrada{7}: el cobre le hace daño a la vida del agua{8}.'] } ] },
+  { t:'La hoja mojada de caldo', c:'La hoja', h:'tiempo', pags:[
+    { s:['Esta hoja de café acaba de recibir el caldo.', 'Las gotas se secan y el cobre queda encima de la hoja{3}.', 'Deslice: las gotas se van secando.'], nota:'Las gotas y su color son de dibujo.' },
+    { s:['El cobre no entra: se queda por fuera de la [[cuticula|cutícula]], la piel de la hoja{3}.'] },
+    { s:['La primera lluvia se lleva la mitad del cobre{3}.', 'Las lluvias que siguen se llevan más{3}.', 'Y las hojas nuevas nacen sin caldo{3}.'] },
+    { k:'pensar', s:['El biol también se echa por la hoja{1}.', 'La guía dice que ayuda a florecer y a cuajar frutos{1}.', 'Eso no lo ha medido bien ningún estudio revisado{15}.'] },
+    { k:'tam', s:['La hoja de ejemplo es de café, porque de ella hay medidas de Cenicafé{3}.'] } ] },
+  { t:'El envés, con cobre', c:'El envés', pags:[
+    { s:['Por debajo, el [[enves|envés]], con sus [[estoma|estomas]]{13,14}.', 'Por los estomas entra y sale el aire de la hoja{13}.', 'Y por ahí entra la [[roya|roya]]{3}.'] },
+    { s:['Los granitos azules son el cobre del caldo, ya seco.', 'Los granos anaranjados son [[espora|esporas]] de roya que cayeron{3}.'], nota:'El tamaño y el color del cobre son de dibujo.' },
+    { k:'tam', s:['Cada estoma del café mide de 22 a 35 micras de largo{14}.', 'Una espora de roya mide unas 30 de largo y 20 de ancho{3}.'] } ] },
+  { t:'La espora y el cobre', c:'La espora', h:'espora', pags:[
+    { s:['Una espora de roya cayó cerca de un estoma.', 'Con agua, poca luz y entre 16 y 28 grados, germina{3}.', 'En 6 a 12 horas le sale un [[tubito|tubito]] que busca el estoma{3}.'] },
+    { s:['Con cobre alrededor, la espora no germina{3}.', 'Si el hongo ya entró, el cobre no lo alcanza{3}.', 'Por eso el caldo sirve antes, no después{3}.'] },
+    { k:'hacer', s:['Pruebe con los botones: quite el caldo, haga llover o deje entrar al hongo.', '¿Qué le pasa a la espora?'] },
+    { k:'cuidado', s:['El cobre no se va: se queda en el suelo{5}.', 'Donde se usa por años, como en los viñedos de Europa, el suelo tiene casi tres veces más cobre{5}.'] },
+    { k:'cuidado', s:['El cobre mata las esporas del hongo [[beauveria|Beauveria]], que controla la broca{6}.', 'No los mezcle{6}.', 'Tampoco hay fuente que diga si el biol y el caldo se pueden mezclar{15}.'] },
+    { k:'hacer', s:['Esta semana, cuente hojas con roya en unas ramas de su lote{3}.', 'Con ese número, pregúntele al técnico de su zona.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso-todo>Repaso completo</button></p>` } ] },
+];
+
+const GLOS = [
+  ['biol', 'Biol', 'Abono líquido que se hace fermentando estiércol con agua, melaza y leche en una caneca tapada, sin aire{1}. Se echa por la hoja, diluido{1}. La ciencia todavía no lo ha medido bien{15}.'],
+  ['fermentacion', 'Fermentación', 'El trabajo de unos microbios que cambian lo que comen. En el biol pasa sin aire (sin oxígeno){1}.'],
+  ['melaza', 'Melaza', 'El jarabe espeso y oscuro de la caña. La guía de la FAO le echa 5 litros al biol{1}.'],
+  ['bacteria', 'Bacteria', 'Un ser vivo de una sola célula, sin núcleo. Mide de 0,1 a 5 micras{11}.'],
+  ['micra', 'Micra (µm)', 'La milésima parte de un milímetro{12}.'],
+  ['ecoli', 'E. coli', '<i>Escherichia coli</i>: una bacteria del estiércol. Algunas enferman a la gente. En un biodigestor a 28 grados tardó 77 días en bajar a la décima parte{4}.'],
+  ['bordeles', 'Caldo bordelés', 'Un caldo de sulfato de cobre, cal y agua{1,2}. Protege a la planta de hongos antes de que entren; no cura lo ya atacado{1,3}.'],
+  ['sulfato', 'Sulfato de cobre', 'Cristales azules que traen el cobre del caldo{2}. Le hace daño a los ojos y a los peces{8}.'],
+  ['cal', 'Cal viva', 'Óxido de calcio. Al mojarse se calienta tanto que el agua puede hervir{2}, y puede dañar gravemente los ojos{8}.'],
+  ['calhidratada', 'Cal hidratada', 'Cal que ya viene apagada (hidróxido de calcio). Se echa directo en el agua{1,2}.'],
+  ['arpillera', 'Arpillera', 'Tela gruesa y rala, como la de un costal. En el caldo sirve de bolsita para disolver el cobre{1}.'],
+  ['respirador', 'Respirador para polvo', 'Una mascarilla que filtra el polvo y la niebla. La guía de California lo pide al mezclar la cal{2}.'],
+  ['nitrilo', 'Nitrilo', 'Un material parecido al caucho que aguanta los químicos. Los guantes de nitrilo sirven para preparar y aplicar{7}.'],
+  ['protector', 'Fungicida protector', 'El que se queda por encima de la hoja y no deja germinar al hongo, como el cobre{3}. No cura lo que ya entró{3}.'],
+  ['sistemico', 'Fungicida sistémico', 'El que entra a la hoja y se mueve por dentro{3}.'],
+  ['cuticula', 'Cutícula', 'La capa de encima de la hoja, como una piel. El cobre no la atraviesa{3}.'],
+  ['enves', 'Envés', 'La cara de abajo de la hoja. La de arriba se llama haz.'],
+  ['estoma', 'Estoma', 'Huequito de la hoja que se abre y se cierra; por ahí entra y sale el aire{13}. En el café mide de 22 a 35 micras{14}.'],
+  ['roya', 'Roya', 'La enfermedad que causa el hongo <i>Hemileia vastatrix</i> en las hojas del café{3}.'],
+  ['espora', 'Espora', 'La semillita del hongo, con la que se riega. La de la roya mide unas 30 por 20 micras{3}. «Semillita» es una comparación.'],
+  ['tubito', 'Tubito (tubo germinativo)', 'Lo que le sale a la espora al germinar. Crece hasta encontrar un estoma{3}.'],
+  ['beauveria', 'Beauveria', '<i>Beauveria bassiana</i>: un hongo que ataca a la broca del café. El cobre mata sus esporas{6}.'],
+];
+
+const PREG = [
+  { q:'¿Qué son el biol y el caldo bordelés?', ops:[{ t:'Dos venenos de fábrica' }, { t:'Un abono fermentado y un caldo de cobre con cal' }, { t:'Dos clases de melaza' }], ok:1, si:'Eso es: el biol abona por la hoja y el caldo protege de los hongos.', no:'Esa no. Mire lo que hay en el patio.' },
+  { q:'¿En qué recipiente se hace el biol?', ops:[{ t:'En una caneca de metal' }, { t:'En una caneca de plástico con tapa' }, { t:'En un hueco en la tierra' }], ok:1, si:'Eso es: plástico, con tapa que cierre bien.', no:'Esa no. La guía dice que de metal no sirve.' },
+  { q:'¿Para qué va la punta de la manguera bajo el agua?', ops:[{ t:'Para regar la botella' }, { t:'Para enfriar el biol' }, { t:'Para que salgan los gases y no entre aire' }], ok:2, si:'Eso es: el biol fermenta sin aire.', no:'Esa no. Mire las burbujas.' },
+  { q:'Bomba de 20 litros, biol al 30 por ciento. ¿Cuánto biol lleva?', ops:[{ t:'2 litros' }, { t:'6 litros' }, { t:'20 litros' }], ok:1, si:'Eso es: 6 litros de biol y 14 de agua.', no:'Esa no. 30 de cada 100.' },
+  { q:'¿Cuándo se usa el caldo bordelés?', ops:[{ t:'El mismo día' }, { t:'A la semana' }, { t:'Cuando se ponga verde' }], ok:0, si:'Eso es: mezclado se daña. El cobre y la cal se guardan por separado.', no:'Esa no. El caldo mezclado no se guarda.' },
+  { q:'¿Qué se pone para mezclar la cal viva?', ops:[{ t:'Una gorra' }, { t:'Nada: es natural' }, { t:'Gafas, respirador y guantes de nitrilo' }], ok:2, si:'Eso es: la cal viva puede dañar gravemente los ojos.', no:'Esa no. La cal viva quema los ojos.' },
+  { q:'¿Cuándo NO se fumiga?', ops:[{ t:'Con lluvia, viento fuerte o más de 30 grados' }, { t:'En una mañana fresca y quieta' }, { t:'Cuando la mata está seca' }], ok:0, si:'Eso es: con lluvia, viento o calor, el caldo no queda donde debe.', no:'Esa no. Piense en el clima.' },
+  { q:'Llovió después de fumigar. ¿Qué pasó con el cobre?', ops:[{ t:'Quedó igual' }, { t:'Se fue la mitad' }, { t:'Se volvió más fuerte' }], ok:1, si:'Eso es: la primera lluvia se lleva la mitad.', no:'Esa no. El agua lava la hoja.' },
+  { q:'¿Por dónde entra la roya a la hoja?', ops:[{ t:'Por los estomas del envés' }, { t:'Por la raíz' }, { t:'Por las cerezas' }], ok:0, si:'Eso es: por los huequitos del envés.', no:'Esa no. Busque los huequitos del envés.' },
+  { q:'¿Cuándo sirve el caldo contra la roya?', ops:[{ t:'Cuando la mancha ya tiene polvo' }, { t:'Antes de que la espora germine' }, { t:'Da igual el momento' }], ok:1, si:'Eso es: el cobre protege por fuera. Lo que ya entró, no lo alcanza.', no:'Esa no. El cobre se queda por fuera de la hoja.' },
+];
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/<[^>]+>/g, '').replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, ''); }
+
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+if (lugarTxt){ $('lugar').textContent = 'Su finca: ' + lugarTxt; } else { $('lugar').textContent = 'Patio de ejemplo'; }
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0, estIdx = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuánto y cuándo?', cuidado:'Con cuidado' };
+function herrHTML(h){
+  const b = (k, txt, on) => `<button type="button" class="bc tg" data-tg="${k}" aria-pressed="${on}">${txt}</button>`;
+  if (h === 'manguera') return `<div class="herr" role="group" aria-label="La manguera">` + b('manguera', ESTADO.manguera ? 'Manguera bajo el agua' : 'Manguera fuera del agua', ESTADO.manguera) + `</div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'dosis') return `<div class="herr" role="group" aria-label="Dosis del biol">` + [30, 50].map(d => `<button type="button" class="bc tg" data-dosis="${d}" aria-pressed="${ESTADO.dosis === d}">${d} %</button>`).join('') + `</div><div class="dosis" aria-hidden="true"><span>biol</span><span class="barra"><i style="width:${ESTADO.dosis}%"></i></span><span>agua</span></div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'clima') return `<div class="herr" role="group" aria-label="El clima al fumigar">` + b('lluvia', ESTADO.lluvia ? 'Llueve' : 'Sin lluvia', ESTADO.lluvia) + b('viento', ESTADO.viento ? 'Viento fuerte' : 'Sin viento', ESTADO.viento) + b('calor', ESTADO.calor ? 'Más de 30 °C' : 'Fresco', ESTADO.calor) + `</div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'espora') return `<div class="herr" role="group" aria-label="El caldo sobre la hoja">` + b('caldo', ESTADO.caldo ? 'Con caldo' : 'Sin caldo', ESTADO.caldo) + b('llovio', ESTADO.llovio ? 'Ya llovió' : 'No ha llovido', ESTADO.llovio) + b('entro', ESTADO.entro ? 'El hongo ya entró' : 'El hongo no ha entrado', ESTADO.entro) + `</div><p class="estado" id="estadoTxt"></p>`;
+  return '';
+}
+function estadoTexto(h){
+  if (h === 'manguera'){ const d = Math.round(biolEstado(p).dia); if (ESTADO.manguera) return `Salen los gases y no entra aire. Día ${Math.min(d, 60)} de 60.`; return 'Con la punta fuera del agua, entra aire a la caneca: la guía pide que no entre.'; }
+  if (h === 'dosis'){ const l = 20 * ESTADO.dosis / 100; return `En una bomba de 20 litros: ${String(l).replace('.', ',')} litros de biol y ${String(20 - l).replace('.', ',')} de agua.`; }
+  if (h === 'clima'){ if (PISO === 'limite') return 'Cerca del páramo: esta pieza no propone fumigar sin revisión humana.'; const no = []; if (ESTADO.lluvia) no.push('llueve'); if (ESTADO.viento) no.push('hace viento fuerte'); if (ESTADO.calor) no.push('pasa de 30 grados'); return no.length ? 'No fumigue: ' + no.join(', ') + '.' : 'Se puede fumigar: sin lluvia, sin viento fuerte y fresco.'; }
+  if (h === 'espora'){
+    if (!ESTADO.caldo) return ESTADO.entro ? 'Sin caldo: la espora germina, y el hongo que ya entró sigue adentro.' : `Sin caldo: la espora germina. Horas con la hoja mojada: ${Math.round(horasEsp(p))} de 12 (ejemplo).`;
+    let t = 'Con caldo: la espora no germina.'; if (ESTADO.llovio) t += ' La lluvia se llevó la mitad del cobre.'; if (ESTADO.entro) t += ' Pero el hongo que ya entró sigue adentro: el cobre no pasa la cutícula.';
+    return t;
+  }
+  return '';
+}
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra === 'tel') h += `<p><a class="tel" href="tel:018000916012" aria-label="Llamar a la Línea Nacional de Toxicología, cero uno ocho mil, nueve uno seis, cero uno dos">01 8000 916 012</a></p>`;
+  else if (P.extra) h += P.extra;
+  if (estAct.h === 'dosis' ? P.k === 'cuando' : (estAct.h && estAct.h !== 'tiempo' && !['cuidado', 'tam', 'cuando', 'pensar'].includes(P.k))) h += herrHTML(estAct.h);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const et = $('estadoTxt'); if (et){ et._s = estadoTexto(estAct.h); et.textContent = et._s; }
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo){ di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue); }
+  else { if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue(); }
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras, fuentes y repaso ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click', () => abreRepaso(estIdx, false));
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso-todo]'); if (r){ abreRepaso(0, true); return; }
+  const tg = e.target.closest && e.target.closest('[data-tg],[data-dosis]');
+  if (tg){ const k = tg.dataset.tg, d = tg.dataset.dosis, sel = k ? `[data-tg="${k}"]` : `[data-dosis="${d}"]`;
+    if (k) ESTADO[k] = !ESTADO[k]; else ESTADO.dosis = +d;
+    pintaPagina(); sucio = true; const b = $('fCuerpo').querySelector(sel); if (b) b.focus(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? '\u00a0' : ch; el.appendChild(s); } }
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const milesE = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){ const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6],['nm',1e-9]]; for (const [u, k] of U){ if (m >= k*0.9999 || u === 'nm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } } }
+function fmtAumento(x){ if (x < 10) return '×' + fmt3(x); const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2); return '×' + milesE(Math.round(r)); }
+function fmtRegla(m){
+  const mm = m * 1000;
+  if (mm >= 100) return 'mide ' + milesE(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1 / mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / q) * q; }
+  return `caben ${milesE(r)} en 1 mm`;
+}
+/* el reloj de cada proceso, en el renglón del tiempo */
+function tiempoDe(st){
+  const b = biolEstado(p), c = caldoEstado(p);
+  if (st === 1){ const pasos = ['caneca vacía', 'estiércol', 'agua', 'melaza', 'leche', 'lista']; const k = b.leche >= 1 ? 5 : b.leche > 0 ? 4 : b.melaza > 0 ? 3 : b.agua > 0 ? 2 : b.estiercol > 0 ? 1 : 0; return ['Paso', pasos[k]]; }
+  if (st === 2) return ['Día', `${Math.round(b.dia)} de 60`];
+  if (st === 3) return ['Día', b.dia <= 60.5 ? '60' : `60 + ${Math.round(b.dia - 60)}`];
+  if (st === 4){ const pasos = ['agua', 'cal viva', 'cal apagándose', 'completar 90 L', 'cobre en la bolsita', 'cobre sobre la cal', 'colar', 'úselo hoy']; const k = c.colar >= 1 ? 7 : c.colar > 0 ? 6 : c.vierte > 0 ? 5 : c.bolsa > 0 ? 4 : c.completar > 0 ? 3 : c.vapor > 0 ? 2 : c.calViva > 0 ? 1 : 0; return ['Paso', pasos[k]]; }
+  if (st === 6) return ['Clima', PISO === 'limite' ? 'revisión humana' : (!ESTADO.lluvia && !ESTADO.viento && !ESTADO.calor) ? 'se puede' : 'no fumigue'];
+  if (st === 7) return ['Gotas', uDe(7, p) < 0.3 ? 'frescas' : uDe(7, p) < 0.9 ? 'secándose' : 'secas'];
+  if (st === 9) return ['Horas', ESTADO.caldo ? 'no germina' : `${Math.round(horasEsp(p))} de 12`];
+  return ['Tiempo', '—'];
+}
+let anchoInicial = 0, ultCap = '';
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+  let st = 0; for (let i = 0; i < EST.length; i++){ if (p >= EST[i].a - 0.45) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const cap = vis ? 'e' + st : '';
+  $('vEstacion').textContent = `${st+1}/${NEST} · ${e.c}`;
+  const au = fmtAumento(anchoInicial / ancho); if ($('vLuz')._s !== au){ $('vLuz')._s = au; $('vLuz').textContent = au; }
+  const [rot, val] = tiempoDe(st); $('vTiempoRot').parentElement.style.display = val === '—' ? 'none' : ''; if ($('vTiempoRot').textContent !== rot) $('vTiempoRot').textContent = rot; rueda($('vAumento'), val);
+  const nota = st >= 7 ? 'Tamaños aproximados. Colores de dibujo.' : 'Tamaños aproximados. Corte y lupa de dibujo.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else { estAct = e; pagAct = 0; estIdx = st;
+      $('fNum').textContent = `Estación ${st+1} de ${NEST}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = `Estación ${st+1}: ${estAct.t}`; }
+  }
+  [...riel.children].forEach((b, i) => { if (i === st) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  const et = $('estadoTxt'); if (et && estAct.h){ const t = estadoTexto(estAct.h); if (et._s !== t){ et._s = t; et.textContent = t; } }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  document.body.classList.toggle('inicio', p < 0.65);
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena ---------- */
+const LVL_EST = [0, 0, 0, 0, 0, 0, 0, 1, 3, 4];
+function etqEstacion(st){
+  const b = biolEstado(p), c = caldoEstado(p);
+  if (st === 0) return [['Caneca del biol', -0.55, -0.15], ['Recipientes del caldo', 0.45, GY - 0.3], ['Bomba de espalda', BOMBA.cx, GY - 0.2], ['Mata de café', MX, MY - 0.2]];
+  if (st === 1){ const yl = nivelBiol(b); const o = [['Caneca de plástico, 200 L', -0.55, CAN.y0 - 0.01]];
+    if (b.estiercol > 0) o.push(['Estiércol, 40 kg', -0.6, VENT.y1 - 0.02]);
+    if (b.agua > 0.2) o.push(['Agua, 160 L', -0.46, (yl + VENT.y1)/2]);
+    if (b.melaza > 0) o.push(['Melaza, 5 L', -0.55, yl + 0.04]);
+    if (b.leche > 0) o.push(['Leche, 1 L', -0.5, yl + 0.02]);
+    return o; }
+  if (st === 2) return [['Manguera', -0.37, -0.46], ['Botella con agua', BOT.cx, 0.2], ['Lupa (dibujo)', LUPA.x, LUPA.y - LUPA.r*0.6], ['Tapa bien cerrada', -0.62, CAN.y0 - 0.01]];
+  if (st === 3) return [b.colado > 0.3 ? ['Biol colado', -0.19, GY - 0.1] : null, ['Bomba: biol + agua', BOMBA.cx, GY - 0.12]];
+  if (st === 4){ const o = [['A: el cobre, 10 L', BA.cx, GY - BA.h*0.5], ['B: la cal, 100 L', BB.cx, GY - BB.h*0.45]]; if (c.bolsa > 0 && c.vierte < 0.05) o.push(['Bolsita de arpillera', BA.cx, GY - BA.h + 0.03]); if (c.vapor > 0.2) o.push(['Calor: el agua puede hervir', BB.cx, GY - BB.h - 0.12]); return o; }
+  if (st === 5){ const top = GY - 0.32; return [['Cal viva', -0.15, top - 0.03], ['Sulfato de cobre', 0.056, top - 0.02], ['Gafas', 0.118, top - 0.012], ['Guantes de nitrilo', 0.028, top - 0.004], ['Respirador', -0.114, top - 0.21]]; }
+  if (st === 6){ const o = [['Bomba con caldo', BOMBA.cx, GY - 0.15]]; if (!ESTADO.lluvia && !ESTADO.viento && !ESTADO.calor && PISO !== 'limite') o.push(['Rocío del caldo', 1.08, -0.2]); return o; }
+  if (st === 7){ const a = GOTAS.filter(g => g.t < 0.8).sort((x, y) => y.r - x.r)[0]; const b2 = GOTAS.filter(g => g.t < 0.8 && Math.abs(g.x - a.x) > 0.2).sort((x, y) => y.r - x.r)[0]; return [a ? ['Gota de caldo', a.x, a.y] : null, b2 ? [uDe(7, p) > 0.5 ? 'Cobre seco' : 'Gota de caldo', b2.x, b2.y] : null]; }
+  if (st === 8){ const e = EPI.est.filter(q => Math.abs(q.x) < 0.25 && Math.abs(q.y) < 0.2)[0]; const s = ESP3.filter(q => Math.abs(q.x) < 0.3 && Math.abs(q.y) < 0.25)[0]; const g = COBRE3.filter(q => Math.abs(q.x + 0.1) < 0.05 && Math.abs(q.y - 0.1) < 0.05)[0];
+    return [e ? ['Estoma', e.x, e.y] : null, s ? ['Espora de roya', s.x, s.y] : null, g ? ['Cobre', g.x, g.y] : null]; }
+  if (st === 9){ const o = [['Espora', ESP4.x, ESP4.y + 0.08], ['Estoma', 0.03, 0.05]]; if (ESTADO.caldo){ const g = COBRE4.filter(q => !(ESTADO.llovio && q.lav) && Math.abs(q.x + 0.05) < 0.1 && q.y > 0.15 && q.y < 0.3)[0]; if (g) o.push(['Cobre', g.x, g.y]); }
+    else { const h = horasEsp(p); const L1 = sstep(3.5, 10, h); if (L1 > 0.3){ const q = TUBO[Math.max(1, Math.round(L1*TUBO.length)) - 1]; o.push(['Tubito', q[0], q[1]]); } }
+    if (ESTADO.entro) o.push(['Hongo adentro', 0.2, -0.1]); return o; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(10,14,22,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(10,14,22,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); if ($('titulo').style.visibility !== 'hidden' && p < 0.3) o.push($('titulo').getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  if (cap && cap[0] === 'e' && cam.L === LVL_EST[st] && cam.seg.k === 'hold') lista = etqEstacion(st);
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break;
+      } }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const L of [E.ln, E.halo]){ L.setAttribute('x1', ax.toFixed(1)); L.setAttribute('y1', ay.toFixed(1)); L.setAttribute('x2', lx.toFixed(1)); L.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: una pregunta por estación, o todas; se juega tocando, sin puntaje ---------- */
+let rq = 0, rTodo = false, rIni = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const lista = rTodo ? PREG : [PREG[rIni]];
+  const puntos = '<div class="puntos" aria-hidden="true">' + lista.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= lista.length){
+    cu.innerHTML = puntos + (rTodo
+      ? `<div class="fin"><p>Ya bajó del patio de la finca hasta la espora y el cobre.</p><p>Antes de preparar, lea la etiqueta y tenga a mano gafas y guantes.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Subir al patio</button></div></div>`
+      : `<div class="fin"><p>Listo el repaso de esta estación.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Todas las preguntas</button><button type="button" class="bc prim" id="rSubir">Seguir el recorrido</button></div></div>`);
+    $('rOtra').addEventListener('click', () => { rq = 0; rTodo = true; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); if (rTodo) irA(0); });
+    return;
+  }
+  const Q = lista[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === lista.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op'; b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(i, todo){ rq = 0; rTodo = !!todo; rIni = clamp(i || 0, 0, PREG.length - 1); abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara y el tiempo
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) { window.scrollTo(0, y); } else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function paradas(){ return EST.map((_, i) => estP(i)); }
+function rotuloBajar(){ const t = pObj >= T - 0.01 || pObj >= estP(NEST - 1) - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= estP(NEST - 1) - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) { bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[55, 'sawtooth', 0.32], [82.41, 'sawtooth', 0.2], [110.3, 'triangle', 0.35], [164.6, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? 'Sonido: sí' : 'Sonido: no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(){
+  if (!audio || !audio.on) return; const lz = luzGlobal(p); const t = audio.ac.currentTime;
+  audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz, t, 0.2);
+  const base = 55 * (0.84 + 0.16*lz); [1, 1.4983, 2.006, 2.993].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4));
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  anchoInicial = anchoVista(camAt(0));
+  prepFondo();
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? (mb + 14) + 'px' : '';
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 110) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){
+    let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i);
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+  }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      p = rmDesde; cam = render(); ctx.setTransform(1,0,0,1,0,0);
+      bctx.setTransform(1,0,0,1,0,0); bctx.drawImage(cv, 0, 0);
+      p = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render();
+    actualizaUI(cam); sonido();
+    sucio = (RM && rmT < 1);
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+prepTeselas();
+prepEsporas();
+redim();
+if (qs.has('p')){ const raw = qs.get('p'); const pp = raw.startsWith('e') ? estP(clamp(+raw.slice(1), 0, NEST - 1)) : parseFloat(raw); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas; no altera nada) */
+window.__descenso = {
+  T, SEGS, estP, camAt, NEST, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  estacion(){ return estIdx; },
+  repaso(i, todo){ abreRepaso(i, todo); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, GLOS, PREG }; },
+  estado(){ return Object.assign({}, ESTADO); },
+  poner(o){ Object.assign(ESTADO, o); pintaPagina(); sucio = true; },
+  piso(){ return { alt: altURL, piso: PISO, municipio: muniCrudo, lat: LAT, lon: LON, lugar: lugarTxt }; },
+  tiempo(){ return { biol: biolEstado(p), caldo: caldoEstado(p), horas: horasEsp(p) }; }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

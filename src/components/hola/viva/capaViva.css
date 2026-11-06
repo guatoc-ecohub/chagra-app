@@ -1,0 +1,178 @@
+/* ── CapaViva: la vida alrededor del compai ─────────────────────────────────
+   Sin z-index propio (no abre contexto de apilado): cada hijo se ubica por su
+   cuenta, el halo DEBAJO del compai y el ave por encima del paisaje.
+   Geometría del halo por compai: --cv-x/--cv-y (centro), --cv-d (diámetro). */
+.capa-viva {
+  --cv-nivel: 0;
+  --cv-x: 50%;
+  --cv-y: 50%;
+  --cv-d: 300px;
+  --cv-cielo: 12%;
+  --cv-z-halo: 0;
+  container-type: inline-size;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cv-halo,
+.cv-latido {
+  position: absolute;
+  left: var(--cv-x);
+  top: var(--cv-y);
+  width: var(--cv-d);
+  height: var(--cv-d);
+  margin: calc(var(--cv-d) / -2) 0 0 calc(var(--cv-d) / -2);
+  border-radius: 50%;
+  z-index: var(--cv-z-halo);
+}
+
+/* El halo: un anillo suave del color del estado. En reposo está quieto.
+   Con la voz de la persona sube la luz y se RECOGE hacia el compai. */
+.cv-halo {
+  background: radial-gradient(circle closest-side,
+    transparent 58%,
+    color-mix(in srgb, var(--cv-color) 42%, transparent) 76%,
+    color-mix(in srgb, var(--cv-color) 14%, transparent) 90%,
+    transparent 100%);
+  opacity: calc(0.35 + var(--cv-nivel) * 0.65);
+  transform: scale(calc(1.06 - var(--cv-nivel) * 0.2));
+  transition: transform 90ms linear, opacity 90ms linear, background 600ms ease;
+  animation: cv-aparece 900ms ease 1.2s both;
+}
+.capa-viva[data-voz='pensando'] .cv-halo {
+  animation: cv-aparece 900ms ease both, cv-pensando 3.2s ease-in-out infinite;
+}
+
+/* El latido: uno por frase que el TTS arranca (evento onFrase). */
+.cv-latido {
+  border: 3px solid var(--cv-color);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cv-color) 60%, transparent);
+  animation: cv-latido 900ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* El espejo del paisaje sonoro: el ave cruza en la misma duración y
+   dirección en que su canto viaja de un oído al otro. */
+.cv-ave,
+.cv-abeja {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  animation: cv-cruza var(--cv-dura, 3s) linear both;
+}
+.cv-ave { top: var(--cv-cielo); width: 40px; height: 20px; }
+.cv-ave[data-desde='1'],
+.cv-abeja[data-desde='1'] { animation-name: cv-cruza-izq; }
+.cv-ave-cuerpo { display: block; width: 100%; height: 100%; fill: var(--cv-ave, #20362b); overflow: visible; }
+.cv-ala { transform-box: fill-box; animation: cv-aletea 0.32s ease-in-out infinite alternate; }
+.cv-ala--izq { transform-origin: right bottom; }
+.cv-ala--der { transform-origin: left bottom; }
+
+.cv-abeja { top: var(--cv-abeja-y, 64%); width: 10px; height: 10px; }
+.cv-abeja-cuerpo {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f1b83c;
+  box-shadow: 0 0 0 1.5px #3b2a12, -2px -3px 0 1px #fff8e6aa, 2px -3px 0 1px #fff8e6aa;
+  animation: cv-zumba 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes cv-aparece { from { opacity: 0; } }
+@keyframes cv-pensando {
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+@keyframes cv-latido {
+  from { opacity: 0.9; transform: scale(0.82); }
+  to { opacity: 0; transform: scale(1.32); }
+}
+@keyframes cv-cruza {
+  from { transform: translate(-40px, 10px); }
+  50% { transform: translate(calc(50cqw - 15px), -8px); }
+  to { transform: translate(calc(100cqw + 40px), 4px); }
+}
+@keyframes cv-cruza-izq {
+  from { transform: translate(calc(100cqw + 40px), 10px) scaleX(-1); }
+  50% { transform: translate(calc(50cqw - 15px), -8px) scaleX(-1); }
+  to { transform: translate(-40px, 4px) scaleX(-1); }
+}
+@keyframes cv-aletea { to { transform: scaleY(-0.55); } }
+@keyframes cv-zumba { to { transform: translateY(-4px); } }
+
+/* La racha: se mecen las hierbas del primer plano (arte de la escena). */
+@keyframes cv-mece {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(5deg); }
+  55% { transform: rotate(-2deg); }
+  75% { transform: rotate(3deg); }
+}
+[data-racha] .cv-hierba {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cv-mece var(--cv-racha-dura, 4s) ease-in-out;
+}
+[data-racha] .cv-hierba:nth-child(2) { animation-delay: 0.25s; }
+
+/* ── Geometría por compai (la del contenedor del compai en cada escena) ── */
+.capa-viva[data-compai='angelita'] {
+  --cv-x: calc(var(--hola-compai-x) + var(--hola-compai-caja) * var(--hola-compai-escala) / 2);
+  --cv-y: calc(var(--hola-compai-y) + var(--hola-compai-caja) * var(--hola-compai-escala) * 0.58);
+  --cv-d: calc(var(--hola-compai-caja) * var(--hola-compai-escala) * 1.45);
+  --cv-z-halo: 2;
+  --cv-abeja-y: 70%;
+}
+.capa-viva[data-compai='guacamaya'] {
+  --cv-x: calc(100% - 100px);
+  --cv-y: 82px;
+  --cv-d: 330px;
+  --cv-cielo: 150px;
+  --cv-ave: #e9dcc0;
+}
+.capa-viva[data-compai='jaguar'] {
+  --cv-x: 50%;
+  --cv-y: calc(100% - 150px);
+  --cv-d: 340px;
+}
+.capa-viva[data-compai='oso-baston'] {
+  --cv-x: 50%;
+  --cv-y: calc(100% - 172px);
+  --cv-d: 330px;
+  --cv-cielo: 34%;
+}
+
+/* ── Controles: silencio (siempre visible) y «Háblele» ───────────────── */
+.cv-controles {
+  position: fixed;
+  z-index: 40;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 8px;
+}
+.cv-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--cv-color) 70%, transparent);
+  background: rgb(15 23 42 / 0.82);
+  color: #f5efe0;
+  font-size: 14px;
+  font-weight: 700;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: border-color 600ms ease;
+}
+.cv-boton[aria-pressed='true'] { background: rgb(15 23 42 / 0.95); }
+.cv-boton:focus-visible { outline: 2px solid var(--cv-color); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-halo { transition: none; animation: none !important; transform: none; }
+  .cv-latido { animation-duration: 1ms; }
+  .cv-ave, .cv-abeja { display: none; }
+  [data-racha] .cv-hierba { animation: none; }
+}

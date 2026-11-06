@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — del corral a la tierra negra</title>
+<meta name="description" content="Una sola toma, sin cortes, que baja en tamaño y en tiempo: del corral y la pila de compost al calor de adentro, a los microbios y a la tierra negra, semana a semana. Cada temperatura, tiempo y proporción tiene su fuente; glosario, lectura en voz alta y un repaso para jugar.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(14,12,10,.68); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a; --calor:#f0a04b; --duda:#f1d27f;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#140e0a;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#140e0a;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#1d2e1a}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#22361f;max-width:27rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#22361f;margin-top:1em;font-weight:600}
+#titulo h1,#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(240,244,232,.95),0 0 16px rgba(240,244,232,.8)}
+
+/* Medidor: tamaño y tiempo */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;width:21rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .tiempo{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#medidor .adentro{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+#vAdentro{font-family:var(--sans);font-size:1rem;font-weight:600;color:var(--calor);text-align:right}
+#vAdentro.frio{color:var(--tinta)}
+#vAdentro.tierra{color:var(--acento-tinta)}
+.semanas{margin-top:8px}
+.semanas .barra{position:relative;height:8px;border-radius:4px;background:rgba(255,255,255,.14)}
+.semanas .barra .lleno{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:linear-gradient(90deg,#8a6a3a,#f0a04b 18%,#c96d3a 40%,#4b3a2b 60%,#2b2118);width:0}
+.semanas .barra b{position:absolute;top:-3px;width:2px;height:14px;background:var(--tinta);opacity:.85;transform:translateX(-1px)}
+.semanas .barra i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--tinta);border:2px solid #140e0a;transform:translate(-50%,-50%);left:0}
+.semanas .ejes{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.8rem;color:var(--tinta-2);margin-top:5px}
+.semanas .marcas{font-family:var(--sans);font-size:.86rem;color:var(--tinta-2);margin-top:3px;line-height:1.35}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:.92rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans)}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .cab-pag.ojo{color:var(--calor)}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase .ojo-p{border-left:3px solid var(--calor);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+#frase .cuenta{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);margin-top:.5em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#frase .cuenta .dias{display:inline-flex;gap:5px}
+#frase .cuenta .dias i{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--calor);display:inline-block}
+#frase .cuenta .dias i.si{background:var(--calor)}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(14,12,10,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(40,34,28,.85);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#17130f;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(8,6,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#17130f;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+.dlg .aviso.calor{border-left-color:var(--calor)}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#211b15;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.solo-ancho{display:inline-block}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);width:auto;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.2rem}
+  #medidor .tiempo{grid-column:1 / -1;margin-top:4px;padding-top:5px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;margin-top:2px;font-size:.86rem;line-height:1.3}
+  .semanas{margin-top:5px}
+  .semanas .barra{height:6px}
+  .semanas .barra b{top:-3px;height:12px}
+  .semanas .barra i{width:12px;height:12px}
+  .semanas .ejes{font-size:.74rem;margin-top:2px;line-height:1.2}
+  .semanas .marcas{font-size:.74rem;margin-top:0;line-height:1.25}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.06rem;line-height:1.42}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 13px}
+  .solo-ancho{display:none}
+  #riel{left:auto;right:4px;top:52%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 9px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo, en tamaño y en tiempo, desde una finca con su corral hasta los microbios de una pila de compost, y de vuelta a la tierra negra" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p>Del corral a la tierra negra: dentro de una pila de compost, semana a semana.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño y de tiempo">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">9,00 m</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="tiempo">
+    <div class="adentro"><span class="rot">Adentro</span><span id="vAdentro" class="frio">día 0 · recién armada</span></div>
+    <div class="semanas" aria-hidden="true">
+      <div class="barra"><span class="lleno" id="vLleno"></span><b style="left:51.43%"></b><b style="left:80%"></b><b style="left:100%"></b><i id="vMarca"></i></div>
+      <div class="ejes"><span>0</span><span>5</span><span>10 semanas</span></div>
+      <div class="marcas">Rayas: día 36 boñiga · 56 gallinaza · 70 cerdo</div>
+    </div>
+  </div>
+  <div class="estacion"><span id="vEstacion">1/7 · El corral</span><span id="vNivel">al aire</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 7</div>
+  <h2 id="fTit">El corral</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón">Sonido: no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn solo-ancho" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Cada temperatura, tiempo o proporción que dice esta pieza tiene su fuente en esta lista; lo que no la tiene, no se dice. Todas las cifras se leyeron en el resumen del estudio.</p>
+    <p class="aviso calor"><b>El reloj.</b> El recorrido pone las fases de la pila en orden: se arma, se calienta, se voltea, se enfría, madura. Solo llevan número los días que tienen fuente: los 3 días por encima de 55 °C [<span data-num="wichuk2007"></span>], y los días 36, 56 y 70 de un ensayo con tres estiércoles [<span data-num="huang2017"></span>]. Entre una marca y otra, el reloj es de esquema: cada pila lleva su paso.</p>
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>. El calor de la pila está <b>dibujado</b>, en naranja: es un esquema, no una medición. Los colores del puñado son parecidos a los reales; los de los microbios son <b>de dibujo</b>: el ámbar y el rosado solo sirven para distinguirlos. Las capas de la pila <b>no dan una proporción</b> de boñiga y material seco: no hallamos una fuente que la sostenga para estos materiales. «Tijeras» es una comparación.</p>
+    <ol id="listaFuentes"></ol>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso del compost — baja en tamaño y en tiempo.
+   Cinco niveles anidados; cada uno vive dentro del anterior
+   (portal). La cámara y el reloj de la pila los mueve un solo
+   parámetro p, y p lo mueve solo quien mira: scroll, dedo,
+   teclado o «Bajar». Nada respira por su cuenta.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false, CX = 0, CY = 0;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function mixh(a, b, t){ const A = hex(a), B = hex(b); const h2 = v => Math.round(v).toString(16).padStart(2, '0'); return '#' + h2(lerp(A[0],B[0],t)) + h2(lerp(A[1],B[1],t)) + h2(lerp(A[2],B[2],t)); }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]); for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); } c.closePath(); }
+function suave(c, pts){ c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length - 1; i++){ const mx = (pts[i][0]+pts[i+1][0])/2, my = (pts[i][1]+pts[i+1][1])/2; c.quadraticCurveTo(pts[i][0], pts[i][1], mx, my); } const z = pts[pts.length-1]; c.lineTo(z[0], z[1]); }
+function blob(r, x, y, rr, k){ const pts = []; const a0 = r()*6.28; for (let j = 0; j < k; j++){ const a = a0 + j/k*6.283 + (r()-.5)*0.5; const d = rr*(0.62 + r()*0.5); pts.push([x + Math.cos(a)*d, y + Math.sin(a)*d*0.85]); } return pts; }
+/* cápsula (bacteria en bastón) centrada en el origen, largo L y ancho w, sobre el eje x */
+function capsula(c, L, w){ const r = w/2, h = L/2 - r; c.beginPath(); c.moveTo(-h, -r); c.lineTo(h, -r); c.arc(h, 0, r, -Math.PI/2, Math.PI/2); c.lineTo(-h, r); c.arc(-h, 0, r, Math.PI/2, Math.PI*1.5); c.closePath(); }
+
+/* ============================================================
+   EL RELOJ DE LA PILA (días de esquema; solo se muestran con
+   número los que tienen fuente: ver «El reloj» en Fuentes)
+   ============================================================ */
+let DIA = 0;
+const calor = D => sstep(0.6, 4.2, D) * (1 - sstep(14, 30, D));   // 0..1, dibujado
+const volteo = D => sstep(5.3, 7.7, D);                            // barrido de la horqueta
+const madura = D => sstep(12, 36, D);
+const vivos = D => 1 - sstep(9.05, 12, D);                         // microbios que enferman
+const sucesion = D => sstep(15, 31, D);                            // actinobacterias y hongos
+const comido = D => sstep(9, 32, D);                               // la paja, comida
+const aplicado = D => sstep(36.6, 40, D);
+
+/* ============================================================
+   NIVELES (F = ancho del cuadro de cada nivel, en metros; y crece hacia abajo)
+   ============================================================ */
+const LV = [
+  { F: 9,      par: -1, nom: 'finca' },
+  { F: 2.4,    par: 0,  nom: 'pila' },
+  { F: 0.06,   par: 1,  nom: 'puñado' },
+  { F: 1.5e-4, par: 2,  nom: 'paja mojada' },
+  { F: 8e-6,   par: 3,  nom: 'una bacteria' },
+];
+const KIDS = [[1], [2], [3], [4], []];
+LV[0].O = [0, 0];
+function fijaPortal(L, x, y){ const l = LV[L], P = LV[l.par]; l.x = x; l.y = y; l.s = l.F / P.F; l.O = [P.O[0] + P.F*x, P.O[1] + P.F*y]; }
+
+/* ============================================================
+   NIVEL 0 · LA FINCA  (1 unidad = 9 m)
+   ============================================================ */
+const yg0 = x => 0.12 + 0.011*Math.sin(x*2.2 + 0.4) + 0.004*Math.sin(x*9.1);
+const PILA0 = { x: 0.045 };
+fijaPortal(1, PILA0.x, yg0(PILA0.x) - 0.055);
+const s1 = LV[1].s;
+/* la pila, en unidades del nivel 1 (de ahí sale también la del nivel 0: una sola geometría) */
+const PI1 = { GY: 0.055 / s1, HB: 0.1275 / s1, H0: 0.112 / s1 };
+function altoPila(D){ return PI1.H0 * (1 - 0.28*madura(D)) * (1 - 0.35*aplicado(D)); }
+function topePila(x, h){ const u = Math.abs(x)/PI1.HB; if (u >= 1) return PI1.GY; return PI1.GY - h*Math.pow(1 - Math.pow(u, 2.2), 0.72); }
+
+const FIN = (() => {
+  const r = rng(7);
+  const postes = []; for (let x = -0.66; x <= -0.2; x += 0.05) postes.push({ x: x + (r()-.5)*0.006, h: 0.06 + r()*0.01, a: (r()-.5)*0.04 });
+  const bonigas = []; for (let i = 0; i < 22; i++){ const x = -0.64 + r()*0.42; bonigas.push({ x, dy: 0.004 + r()*0.05, r: 0.0065 + r()*0.006, t: r() }); }
+  const matas = []; for (let i = 0; i < 7; i++) matas.push({ x: 0.27 + i*0.058 + (r()-.5)*0.008, s: 0.9 + r()*0.25, seed: 100 + i });
+  const maiz = []; for (let i = 0; i < 14; i++) maiz.push({ x: 0.255 + i*0.031 + (r()-.5)*0.008, h: 0.19 + r()*0.05, seed: 200 + i, t: r() });
+  const pasto = []; for (let i = 0; i < 900; i++){ const x = -1.6 + r()*3.2; pasto.push({ x, dy: Math.pow(r(), 0.8)*1.1, l: 0.004 + r()*0.012, a: (r()-.5)*0.7, t: r() }); }
+  const flores = []; for (let i = 0; i < 70; i++) flores.push({ x: -1.4 + r()*2.8, dy: 0.02 + r()*0.9, t: r() });
+  const vacas = [{ x: -0.36, s: 0.017, d: 1 }, { x: -0.3, s: 0.015, d: -1 }, { x: 0.62, s: 0.013, d: 1 }];
+  const piedras = []; for (let i = 0; i < 14; i++) piedras.push({ x: -0.2 + i*0.03 + (r()-.5)*0.02, dy: 0.2 + r()*0.2, r: 0.008 + r()*0.01 });
+  return { postes, bonigas, matas, maiz, pasto, flores, vacas, piedras };
+})();
+const MATA_QUEMADA = 0; // la primera mata de la huerta recibe estiércol crudo
+
+function cordilleras(c, v, px){
+  const capas = [['#a9c2cd', -0.085, 0.055, 3.1, 1], ['#8fb0a4', -0.05, 0.05, 4.3, 2], ['#739c7a', -0.018, 0.04, 6.0, 3]];
+  const x0 = v[0] - 0.05, x1 = v[2] + 0.05, paso = Math.max(0.003, (x1 - x0)/500);
+  for (const [col, base, amp, fr, k] of capas){
+    c.fillStyle = col; c.beginPath(); c.moveTo(x0, 0.4);
+    for (let x = x0; x <= x1 + paso; x += paso){ const y = base - amp*(0.55 + 0.45*Math.sin(x*fr + k*1.7))*(0.7 + 0.3*Math.sin(x*fr*2.7 + k)) - 0.004*Math.sin(x*41 + k); c.lineTo(x, y); }
+    c.lineTo(x1, 0.4); c.closePath(); c.fill();
+    const gn = c.createLinearGradient(0, base - 0.02, 0, base + 0.04); gn.addColorStop(0, 'rgba(236,240,230,0)'); gn.addColorStop(1, 'rgba(236,240,230,.5)'); c.fillStyle = gn; c.fillRect(x0, base - 0.02, x1 - x0, 0.06);
+  }
+  // la loma del potrero, con sus vacas lejanas
+  const lom = x => 0.052 - 0.028*Math.sin(x*2.6 + 0.9) - 0.006*Math.sin(x*11);
+  const gl = c.createLinearGradient(0, 0.0, 0, 0.13); gl.addColorStop(0, '#6e9c58'); gl.addColorStop(1, '#4f7d42');
+  c.fillStyle = gl; c.beginPath(); c.moveTo(x0, 0.4); for (let x = x0; x <= x1 + paso; x += paso) c.lineTo(x, lom(x)); c.lineTo(x1, 0.4); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(70,52,30,.5)'; c.lineWidth = Math.max(px, 0.0012); c.beginPath(); for (let x = -0.9; x < 0.9; x += 0.045){ const y = lom(x); c.moveTo(x, y); c.lineTo(x, y + 0.009); } c.stroke();
+  for (const q of FIN.vacas){ if (q.x < v[0] - 0.05 || q.x > v[2] + 0.05) continue; vaca(c, q.x, lom(q.x) + 0.004, q.s, q.d); }
+}
+function vaca(c, x, y, s, d){ // silueta pequeña, de lejos
+  c.save(); c.translate(x, y); c.scale(s*d, s);
+  c.fillStyle = '#3c2e24'; c.beginPath(); c.ellipse(0, -0.55, 0.9, 0.42, 0, 0, 7); c.fill();
+  c.beginPath(); c.moveTo(0.75, -0.75); c.quadraticCurveTo(1.25, -0.95, 1.45, -0.62); c.quadraticCurveTo(1.35, -0.38, 1.05, -0.45); c.closePath(); c.fill();
+  c.fillRect(-0.7, -0.3, 0.14, 0.32); c.fillRect(-0.45, -0.3, 0.14, 0.3); c.fillRect(0.4, -0.3, 0.14, 0.32); c.fillRect(0.62, -0.3, 0.14, 0.3);
+  c.fillStyle = '#efe6d6'; c.beginPath(); c.ellipse(-0.15, -0.62, 0.3, 0.18, 0.3, 0, 7); c.fill();
+  c.restore();
+}
+function pintaCielo(c, v){
+  const g = c.createLinearGradient(0, -1.4, 0, 0.06); g.addColorStop(0, '#5e8fbd'); g.addColorStop(0.55, '#a3c3da'); g.addColorStop(0.9, '#e4ecde'); g.addColorStop(1, '#eef0e2');
+  c.fillStyle = g; c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, 0.2 - v[1] + 0.1);
+  const gs = c.createRadialGradient(0.36, -0.3, 0, 0.36, -0.3, 0.55); gs.addColorStop(0, 'rgba(255,249,226,.95)'); gs.addColorStop(0.05, 'rgba(255,245,214,.75)'); gs.addColorStop(0.3, 'rgba(255,238,200,.18)'); gs.addColorStop(1, 'rgba(255,238,200,0)');
+  c.fillStyle = gs; c.fillRect(-0.3, -1.0, 1.4, 1.2);
+  // nubes suaves
+  const r = rng(3); for (let i = 0; i < 9; i++){ const x = -1.1 + i*0.28 + r()*0.1, y = -0.25 - r()*0.35, w = 0.12 + r()*0.12; const gc = c.createRadialGradient(x, y, 0, x, y, w); gc.addColorStop(0, 'rgba(255,255,255,.55)'); gc.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = gc; c.save(); c.translate(x, y); c.scale(1, 0.32); c.translate(-x, -y); c.beginPath(); c.arc(x, y, w, 0, 7); c.fill(); c.restore(); }
+}
+function suelo0(c, v, px){
+  const x0 = v[0] - 0.05, x1 = v[2] + 0.05, paso = Math.max(0.002, (x1 - x0)/400);
+  const g = c.createLinearGradient(0, 0.08, 0, 1.3); g.addColorStop(0, '#6f9a4c'); g.addColorStop(0.15, '#5f8a41'); g.addColorStop(0.6, '#4d7437'); g.addColorStop(1, '#3d5d2d');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x0, 2); for (let x = x0; x <= x1 + paso; x += paso) c.lineTo(x, yg0(x)); c.lineTo(x1, 2); c.closePath(); c.fill();
+  // camino de tierra hacia la pila
+  c.fillStyle = 'rgba(128,96,58,.55)'; c.beginPath(); c.moveTo(-0.24, yg0(-0.24) + 0.004); c.quadraticCurveTo(-0.05, 0.2, -0.2, 1.4); c.lineTo(0.2, 1.4); c.quadraticCurveTo(0.08, 0.3, 0.1, yg0(0.1) + 0.004); c.closePath(); c.fill();
+  // pasto: trazos cortos, más largos y oscuros cerca
+  if (px < 0.004){
+    c.lineCap = 'round';
+    for (const q of FIN.pasto){ const y = yg0(q.x) + q.dy; if (q.x < v[0] - 0.02 || q.x > v[2] + 0.02 || y < v[1] - 0.02 || y > v[3] + 0.02) continue;
+      const k = 1 + q.dy*2.2; c.strokeStyle = q.t < 0.5 ? 'rgba(128,168,84,.7)' : 'rgba(58,92,40,.65)'; c.lineWidth = Math.max(px*0.8, 0.0011*k);
+      c.beginPath(); c.moveTo(q.x, y); c.lineTo(q.x + Math.sin(q.a)*q.l*k, y - Math.cos(q.a)*q.l*k); c.stroke(); }
+    if (false) for (const f of FIN.flores){ const y = yg0(f.x) + f.dy; if (f.x < v[0] || f.x > v[2] || y < v[1] || y > v[3]) continue; c.fillStyle = f.t < 0.5 ? '#f4e6a0' : '#f3f1e8'; c.beginPath(); c.arc(f.x, y - 0.003, 0.0022*(1 + f.dy*2), 0, 7); c.fill(); }
+  }
+}
+function corral(c, v, px, D){
+  if (v[0] > -0.18) return;
+  // barro del corral y las boñigas
+  c.fillStyle = 'rgba(96,72,44,.75)'; c.beginPath(); c.moveTo(-0.7, yg0(-0.7) + 0.002); for (let x = -0.7; x <= -0.2; x += 0.01) c.lineTo(x, yg0(x) + 0.002); c.lineTo(-0.22, yg0(-0.22) + 0.07); c.quadraticCurveTo(-0.45, 0.22, -0.7, 0.2); c.closePath(); c.fill();
+  for (const b of FIN.bonigas){ const y = yg0(b.x) + b.dy; const g = c.createRadialGradient(b.x - b.r*0.3, y - b.r*0.35, 0, b.x, y, b.r); g.addColorStop(0, '#6b5634'); g.addColorStop(0.7, '#43341f'); g.addColorStop(1, '#2f2416');
+    c.fillStyle = g; c.beginPath(); c.ellipse(b.x, y, b.r, b.r*0.42, 0, 0, 7); c.fill(); c.fillStyle = 'rgba(255,245,220,.25)'; c.beginPath(); c.ellipse(b.x - b.r*0.3, y - b.r*0.16, b.r*0.3, b.r*0.1, 0, 0, 7); c.fill(); }
+  // cerca de palos, con dos varas
+  c.lineCap = 'round';
+  for (const p of FIN.postes){ const y = yg0(p.x); c.strokeStyle = '#5a4430'; c.lineWidth = Math.max(px, 0.006); c.beginPath(); c.moveTo(p.x, y + 0.004); c.lineTo(p.x + p.a*p.h, y - p.h); c.stroke(); c.strokeStyle = 'rgba(210,180,130,.35)'; c.lineWidth = Math.max(px, 0.0018); c.beginPath(); c.moveTo(p.x - 0.0015, y); c.lineTo(p.x - 0.0015 + p.a*p.h, y - p.h + 0.003); c.stroke(); }
+  for (const k of [0.62, 0.3]){ c.strokeStyle = '#6b5238'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); FIN.postes.forEach((p, i) => { const y = yg0(p.x) - p.h*k; i ? c.lineTo(p.x + p.a*p.h*k, y) : c.moveTo(p.x + p.a*p.h*k, y); }); c.stroke(); }
+  // la canoa del agua
+  c.fillStyle = '#6a5036'; c.fillRect(-0.5, yg0(-0.5) - 0.018, 0.09, 0.02); c.fillStyle = '#8fb8c8'; c.fillRect(-0.495, yg0(-0.5) - 0.016, 0.08, 0.004);
+}
+function huerta(c, v, px, D){
+  if (v[2] < 0.22) return;
+  const ap = aplicado(D);
+  // era levantada
+  c.fillStyle = '#4a3624'; c.beginPath(); c.moveTo(0.235, yg0(0.235) + 0.004); for (let x = 0.235; x <= 0.68; x += 0.01) c.lineTo(x, yg0(x) - 0.006); c.lineTo(0.68, yg0(0.68) + 0.02); c.lineTo(0.235, yg0(0.235) + 0.02); c.closePath(); c.fill();
+  if (ap > 0){ const r = rng(55); c.fillStyle = rgba('#22170f', 0.9*ap); c.beginPath(); for (let x = 0.245; x <= 0.67; x += 0.008) c.lineTo(x, yg0(x) - 0.011 - r()*0.003); for (let x = 0.67; x >= 0.245; x -= 0.01) c.lineTo(x, yg0(x) - 0.004); c.closePath(); c.fill();
+    c.fillStyle = rgba('#3a2a1c', ap); for (let i = 0; i < 120; i++){ const x = 0.245 + r()*0.42; c.beginPath(); c.arc(x, yg0(x) - 0.008 - r()*0.004, 0.0012 + r()*0.0015, 0, 7); c.fill(); } }
+  // maíz de atrás
+  for (const m of FIN.maiz){ if (m.x < v[0] - 0.05 || m.x > v[2] + 0.05) continue; const y = yg0(m.x) - 0.006, r = rng(m.seed);
+    c.strokeStyle = '#7d9a4a'; c.lineWidth = Math.max(px, 0.0032); c.beginPath(); c.moveTo(m.x, y); c.quadraticCurveTo(m.x + 0.004, y - m.h*0.5, m.x + 0.002, y - m.h); c.stroke();
+    for (let k = 0; k < 7; k++){ const yy = y - m.h*(0.18 + k*0.11), lado = k % 2 ? 1 : -1, L = 0.05*(1 - k*0.08); c.fillStyle = k % 3 ? '#6f9b45' : '#5d8a3b'; c.beginPath(); c.moveTo(m.x, yy); c.quadraticCurveTo(m.x + lado*L*0.55, yy - L*0.45, m.x + lado*L, yy + L*0.12 + r()*0.01); c.quadraticCurveTo(m.x + lado*L*0.5, yy - L*0.25, m.x, yy + 0.004); c.fill(); }
+    c.strokeStyle = '#d8c070'; c.lineWidth = Math.max(px, 0.0015); c.beginPath(); for (let k = -2; k <= 2; k++){ c.moveTo(m.x + 0.002, y - m.h); c.lineTo(m.x + 0.002 + k*0.006, y - m.h - 0.02 + Math.abs(k)*0.004); } c.stroke(); }
+  // matas de hortaliza (repollo), en roseta
+  FIN.matas.forEach((m, i) => {
+    if (m.x < v[0] - 0.06 || m.x > v[2] + 0.06) return;
+    const y = yg0(m.x) - 0.008, r = rng(m.seed), R = 0.024*m.s;
+    const quema = i === MATA_QUEMADA ? (1 - 0.85*ap) : 0;
+    if (i === MATA_QUEMADA && ap < 1){ // el estiércol crudo, tirado al pie: un montón húmedo y oscuro
+      const a = 1 - ap, dx = m.x - 0.03, dy = y + 0.003;
+      c.fillStyle = rgba('#1c140c', 0.4*a); c.beginPath(); c.ellipse(dx + 0.002, dy + 0.002, 0.03, 0.006, 0, 0, 7); c.fill();
+      const g = c.createRadialGradient(dx - 0.008, dy - 0.012, 0, dx, dy - 0.004, 0.03); g.addColorStop(0, rgba('#6b5634', a)); g.addColorStop(0.6, rgba('#46361f', a)); g.addColorStop(1, rgba('#2d2215', a));
+      c.fillStyle = g; c.beginPath(); c.moveTo(dx - 0.03, dy); c.bezierCurveTo(dx - 0.024, dy - 0.02, dx - 0.004, dy - 0.028, dx + 0.008, dy - 0.02); c.bezierCurveTo(dx + 0.02, dy - 0.016, dx + 0.028, dy - 0.006, dx + 0.03, dy); c.closePath(); c.fill();
+      c.fillStyle = rgba('#fff4dc', 0.32*a); for (const [ox, oy, rx] of [[-0.012, -0.016, 0.006], [0.006, -0.018, 0.004], [-0.002, -0.008, 0.005]]){ c.beginPath(); c.ellipse(dx + ox, dy + oy, rx, rx*0.3, -0.2, 0, 7); c.fill(); } }
+    if (ap > 0){ c.fillStyle = rgba('#1f150e', 0.85*ap); c.beginPath(); c.ellipse(m.x, y + 0.004, R*1.35, R*0.3, 0, 0, 7); c.fill(); }
+    for (let k = 0; k < 11; k++){ const a = -Math.PI/2 + (k - 5)*0.29 + (r()-.5)*0.1, L = R*(1.05 - Math.abs(k - 5)*0.035);
+      const cx2 = m.x + Math.cos(a)*L*0.55, cy2 = y + Math.sin(a)*L*0.42;
+      const afuera = Math.abs(k - 5) >= 3; // las hojas de afuera son las que se dañan
+      const q = afuera ? quema : quema*0.35;
+      c.fillStyle = mixh(mixh('#7fa86a', '#5d8f5a', r()), '#b09a4c', 0.75*q); c.beginPath(); c.ellipse(cx2, cy2, L*0.52, L*0.34, a + Math.PI/2, 0, 7); c.fill();
+      if (q > 0.05){ const tx = cx2 + Math.cos(a)*L*0.36, ty = cy2 + Math.sin(a)*L*0.26; c.fillStyle = rgba('#7a4c22', 0.85*q); c.beginPath(); c.ellipse(tx, ty, L*0.24, L*0.16, a + Math.PI/2, 0, 7); c.fill(); }
+      c.strokeStyle = 'rgba(220,235,200,.5)'; c.lineWidth = Math.max(px, 0.0008); c.beginPath(); c.moveTo(m.x, y); c.lineTo(cx2 + Math.cos(a)*L*0.3, cy2 + Math.sin(a)*L*0.25); c.stroke(); }
+    const gcab = c.createRadialGradient(m.x - R*0.15, y - R*0.35, 0, m.x, y - R*0.2, R*0.55); gcab.addColorStop(0, mixh('#d6e6b8', '#d8d0a0', 0.5*quema)); gcab.addColorStop(1, mixh('#8fb87a', '#a4a060', 0.5*quema)); c.fillStyle = gcab; c.beginPath(); c.arc(m.x, y - R*0.22, R*0.45, 0, 7); c.fill();
+  });
+}
+function ramada(c, v, px, delante){
+  const xs = [PILA0.x - 0.165, PILA0.x + 0.165], techo = yg0(PILA0.x) - 0.245;
+  if (!delante){ // postes de atrás, más oscuros
+    c.strokeStyle = '#3f3122'; c.lineWidth = Math.max(px, 0.006); c.beginPath(); for (const x of xs){ c.moveTo(x + 0.03, yg0(x) - 0.01); c.lineTo(x + 0.03, techo + 0.01); } c.stroke(); return; }
+  c.strokeStyle = '#5b4631'; c.lineWidth = Math.max(px, 0.008); c.beginPath(); for (const x of xs){ c.moveTo(x, yg0(x) + 0.004); c.lineTo(x, techo + 0.012); } c.stroke();
+  // techo de paja
+  const g = c.createLinearGradient(0, techo - 0.04, 0, techo + 0.02); g.addColorStop(0, '#c8a860'); g.addColorStop(1, '#8a6c3a');
+  c.fillStyle = g; c.beginPath(); c.moveTo(xs[0] - 0.05, techo + 0.02); c.lineTo(PILA0.x, techo - 0.055); c.lineTo(xs[1] + 0.05, techo + 0.02); c.closePath(); c.fill();
+  if (px < 0.003){ const r = rng(9); c.strokeStyle = 'rgba(90,64,30,.55)'; c.lineWidth = Math.max(px, 0.0009); c.beginPath(); for (let i = 0; i < 90; i++){ const u = r(), x = lerp(xs[0] - 0.05, xs[1] + 0.05, u); const yT = techo - 0.055*(1 - Math.abs(u - 0.5)*2) + 0.02*Math.abs(u - 0.5)*2; const L = 0.01 + r()*0.03; c.moveTo(x, yT + 0.004); c.lineTo(x + (r()-.5)*0.004, Math.min(techo + 0.02, yT + L)); } c.stroke(); }
+  c.fillStyle = 'rgba(40,28,16,.35)'; c.beginPath(); c.moveTo(xs[0] - 0.05, techo + 0.02); c.lineTo(xs[1] + 0.05, techo + 0.02); c.lineTo(xs[1] + 0.03, techo + 0.028); c.lineTo(xs[0] - 0.03, techo + 0.028); c.fill();
+  // horqueta recostada y carretilla con boñiga
+  c.strokeStyle = '#7a6040'; c.lineWidth = Math.max(px, 0.0028); c.beginPath(); c.moveTo(xs[0] - 0.012, yg0(xs[0]) - 0.002); c.lineTo(xs[0] - 0.03, techo + 0.06); c.stroke();
+  c.strokeStyle = '#9aa0a4'; c.lineWidth = Math.max(px, 0.0013); c.beginPath(); for (const o of [-0.004, 0, 0.004]){ c.moveTo(xs[0] - 0.012 + o, yg0(xs[0]) - 0.002); c.lineTo(xs[0] - 0.012 + o*1.4, yg0(xs[0]) + 0.012); } c.stroke();
+  const cx = -0.19, cy = yg0(-0.19);
+  c.fillStyle = '#4b5a64'; c.beginPath(); c.moveTo(cx - 0.035, cy - 0.03); c.lineTo(cx + 0.03, cy - 0.03); c.lineTo(cx + 0.018, cy - 0.008); c.lineTo(cx - 0.028, cy - 0.008); c.closePath(); c.fill();
+  c.fillStyle = '#4a3a24'; c.beginPath(); c.ellipse(cx - 0.003, cy - 0.031, 0.031, 0.008, 0, Math.PI, 0); c.fill();
+  c.strokeStyle = '#2d2a26'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.arc(cx + 0.022, cy - 0.006, 0.006, 0, 7); c.stroke();
+  c.strokeStyle = '#6b5238'; c.beginPath(); c.moveTo(cx - 0.03, cy - 0.02); c.lineTo(cx - 0.06, cy - 0.012); c.stroke();
+}
+function dibujaFinca(c, env, sinPila){
+  const v = env.view, px = env.px, D = DIA;
+  pintaCielo(c, v);
+  cordilleras(c, v, px);
+  suelo0(c, v, px);
+  corral(c, v, px, D);
+  ramada(c, v, px, false);
+  if (!sinPila){
+    const P = LV[1];
+    c.save(); c.translate(P.x, P.y); c.scale(P.s, P.s);
+    pintaPila(c, px / P.s, D, false);
+    c.restore();
+  }
+  ramada(c, v, px, true);
+  huerta(c, v, px, D);
+  // sombra de la luz de la mañana, desde el sol
+  const gl = c.createLinearGradient(0.5, -0.4, -0.4, 0.4); gl.addColorStop(0, 'rgba(255,244,210,.10)'); gl.addColorStop(1, 'rgba(20,30,15,.08)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]);
+}
+
+/* ============================================================
+   NIVEL 1 · LA PILA, CORTADA  (1 unidad = 2,4 m)
+   ============================================================ */
+let texTamo = null, texBoniga = null, texMezcla = null, texMadura = null;
+function teja(fn){ const t = document.createElement('canvas'); t.width = t.height = 256; fn(t.getContext('2d')); return t; }
+/* todo lo que se pinta en una teja se repite en los 9 vecinos, para que la teja no tenga costura */
+function nueve(c, f){ for (const dx of [-256, 0, 256]) for (const dy of [-256, 0, 256]){ c.save(); c.translate(dx, dy); f(); c.restore(); } }
+function prepTexturas(){
+  texTamo = teja((c) => { const r = rng(101); c.fillStyle = '#b48c3e'; c.fillRect(0, 0, 256, 256); c.lineCap = 'round';
+    for (let i = 0; i < 460; i++){ const x = r()*256, y = r()*256, a = (r()-.5)*0.9, L = 14 + r()*42, col = ['#dbbb6a', '#c9a24e', '#9c7634', '#ead394', '#a98238'][Math.floor(r()*5)], lw = 1.3 + r()*2.6;
+      nueve(c, () => { c.strokeStyle = 'rgba(70,48,20,.35)'; c.lineWidth = lw + 1; c.beginPath(); c.moveTo(x + 1, y + 1); c.lineTo(x + 1 + Math.cos(a)*L, y + 1 + Math.sin(a)*L); c.stroke(); c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); }); } });
+  texBoniga = teja((c) => { const r = rng(202); c.fillStyle = '#43341e'; c.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 160; i++){ const x = r()*256, y = r()*256, rr = 8 + r()*22, col = ['#54432a', '#3a2c19', '#4d4326', '#5c4a2e'][Math.floor(r()*4)];
+      nueve(c, () => { const g = c.createRadialGradient(x - rr*0.3, y - rr*0.3, 0, x, y, rr); g.addColorStop(0, col); g.addColorStop(1, 'rgba(50,38,22,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, rr, 0, 7); c.fill(); }); }
+    for (let i = 0; i < 70; i++){ const x = r()*256, y = r()*256, a = r()*3, L = 3 + r()*6; nueve(c, () => { c.fillStyle = 'rgba(255,244,214,.12)'; c.beginPath(); c.ellipse(x, y, L, L*0.35, a, 0, 7); c.fill(); }); }
+    c.lineCap = 'round'; for (let i = 0; i < 70; i++){ const x = r()*256, y = r()*256, a = r()*3, L = 5 + r()*12; nueve(c, () => { c.strokeStyle = 'rgba(160,130,70,.5)'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); }); } });
+  texMezcla = teja((c) => { const r = rng(303); c.fillStyle = '#5a4428'; c.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 120; i++){ const x = r()*256, y = r()*256, rr = 6 + r()*16, col = ['#4a3a22', '#3a2c19', '#6a5232'][Math.floor(r()*3)];
+      nueve(c, () => { const g = c.createRadialGradient(x, y, 0, x, y, rr); g.addColorStop(0, col); g.addColorStop(1, 'rgba(60,45,26,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, rr, 0, 7); c.fill(); }); }
+    c.lineCap = 'round'; for (let i = 0; i < 240; i++){ const x = r()*256, y = r()*256, a = r()*6.28, L = 8 + r()*26, col = ['#c9a24e', '#a8843e', '#d9b867', '#8a6a34'][Math.floor(r()*4)], lw = 1.1 + r()*2;
+      nueve(c, () => { c.strokeStyle = 'rgba(40,28,14,.4)'; c.lineWidth = lw + 1; c.beginPath(); c.moveTo(x + 1, y + 1); c.lineTo(x + 1 + Math.cos(a)*L, y + 1 + Math.sin(a)*L); c.stroke(); c.strokeStyle = col; c.lineWidth = lw; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); }); } });
+  texMadura = teja((c) => { const r = rng(404); c.fillStyle = '#231810'; c.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 1400; i++){ const x = r()*256, y = r()*256, rr = 0.8 + Math.pow(r(), 2.2)*6, col = ['#3a2a1c', '#170f09', '#46331f', '#2c2016', '#52402a'][Math.floor(r()*5)];
+      nueve(c, () => { c.fillStyle = col; c.beginPath(); c.ellipse(x, y, rr, rr*0.8, 0, 0, 7); c.fill(); }); }
+    for (let i = 0; i < 40; i++){ const x = r()*256, y = r()*256, a = r()*3, L = 3 + r()*7; nueve(c, () => { c.strokeStyle = 'rgba(128,98,58,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); }); } });
+}
+function patron(c, tex, tam){ const p = c.createPattern(tex, 'repeat'); if (p.setTransform) p.setTransform(new DOMMatrix([tam/256, 0, 0, tam/256, 0, 0])); return p; }
+
+/* capas de la pila: gruesos distintos, bordes irregulares y pajas que cruzan de una a otra.
+   El dibujo NO da una proporción de boñiga y material seco (ver Fuentes). */
+const CAPAS = 7;
+const CAPA = (() => {
+  const r = rng(61); const w = []; let acc = 0;
+  for (let k = 0; k < CAPAS; k++){ const ww = k % 2 ? 0.55 + r()*0.6 : 0.8 + r()*0.7; w.push(ww); acc += ww; }
+  const f = []; let s = 0; for (let k = 0; k < CAPAS; k++){ s += w[k]; f.push(s/acc); }
+  const ph = []; for (let k = 0; k < CAPAS; k++) ph.push([r()*6, r()*6, r()*6]);
+  const fib = []; for (let k = 0; k < CAPAS - 1; k++) for (let i = 0; i < 38; i++) fib.push({ k, u: r()*2 - 1, a: (r()-.5)*1.6, L: 0.012 + r()*0.03, t: r() });
+  return { f, ph, fib };
+})();
+function bordeCapa(k, x, h){
+  if (k >= CAPAS - 1) return topePila(x, h);
+  const q = CAPA.ph[k]; const n = 0.035*(Math.sin(x*7 + q[0])*0.5 + Math.sin(x*19 + q[1])*0.3 + Math.sin(x*47 + q[2])*0.2);
+  return PI1.GY - (PI1.GY - topePila(x, h))*clamp(CAPA.f[k] + n, 0.02, 0.985);
+}
+/* La pila en corte. `detalle` = true solo en su propio nivel. */
+function pintaPila(c, px, D, detalle){
+  const h = altoPila(D), GY = PI1.GY, HB = PI1.HB;
+  const perfil = () => { c.beginPath(); c.moveTo(-HB - 0.01, GY); for (let x = -HB; x <= HB + 1e-9; x += HB/70) c.lineTo(x, topePila(x, h)); c.lineTo(HB + 0.01, GY); c.closePath(); };
+  // sombra en el suelo
+  const gs = c.createRadialGradient(0, GY, 0, 0, GY, HB*1.25); gs.addColorStop(0, 'rgba(20,14,8,.5)'); gs.addColorStop(1, 'rgba(20,14,8,0)'); c.save(); c.translate(0, GY); c.scale(1, 0.12); c.translate(0, -GY); c.fillStyle = gs; c.beginPath(); c.arc(0, GY, HB*1.25, 0, 7); c.fill(); c.restore();
+  c.save(); perfil(); c.clip();
+  const mz = volteo(D), md = madura(D);
+  const xs = lerp(-HB - 0.08, HB + 0.08, mz); // barrido de la horqueta: a su izquierda, ya mezclado
+  const tam = 0.16, paso = HB/70;
+  if (mz < 1){
+    for (let k = CAPAS - 1; k >= 0; k--){
+      c.fillStyle = k % 2 ? patron(c, texBoniga, tam*0.9) : patron(c, texTamo, tam);
+      c.beginPath(); c.moveTo(-HB - 0.02, GY + 0.02); for (let x = -HB; x <= HB + 1e-9; x += paso) c.lineTo(x, bordeCapa(k, x, h)); c.lineTo(HB + 0.02, GY + 0.02); c.closePath(); c.fill(); }
+    // pajas que cruzan el borde entre capas
+    if (px < 0.006){ c.lineCap = 'round';
+      for (const fb of CAPA.fib){ const x = fb.u*HB*0.96, y = bordeCapa(fb.k, x, h); c.strokeStyle = fb.t < 0.5 ? '#d9b867' : '#b08a40'; c.lineWidth = Math.max(px, 0.0032); c.beginPath(); c.moveTo(x - Math.cos(fb.a)*fb.L*0.5, y - Math.sin(fb.a)*fb.L*0.5); c.lineTo(x + Math.cos(fb.a)*fb.L*0.5, y + Math.sin(fb.a)*fb.L*0.5); c.stroke(); } }
+  }
+  if (mz > 0){ // lo ya volteado, con un frente irregular
+    c.fillStyle = patron(c, texMezcla, tam*0.85); c.beginPath(); c.moveTo(-HB - 0.1, GY + 0.05); c.lineTo(-HB - 0.1, GY - h - 0.1);
+    for (let y = GY - h - 0.1; y <= GY + 0.05; y += 0.02) c.lineTo(xs + 0.035*Math.sin(y*37) + 0.02*Math.sin(y*91), y);
+    c.closePath(); c.fill(); }
+  if (md > 0){ c.globalAlpha = md; c.fillStyle = patron(c, texMadura, tam*0.6); c.fillRect(-HB - 0.05, GY - h - 0.05, 2*HB + 0.1, h + 0.1); c.globalAlpha = 1; }
+  // el calor, dibujado: antes del volteo, solo el centro; después, casi toda la pila
+  const cal = calor(D);
+  if (cal > 0.01){
+    const cy = GY - h*0.42, R = HB*lerp(0.38, 0.95, mz);
+    c.save(); c.globalCompositeOperation = 'lighter';
+    const gc = c.createRadialGradient(0, cy, 0, 0, cy, R); gc.addColorStop(0, `rgba(255,118,36,${0.5*cal})`); gc.addColorStop(0.5, `rgba(235,100,36,${0.28*cal})`); gc.addColorStop(1, 'rgba(235,100,36,0)');
+    c.translate(0, cy); c.scale(1, 0.62); c.translate(0, -cy); c.fillStyle = gc; c.beginPath(); c.arc(0, cy, R, 0, 7); c.fill(); c.restore();
+  }
+  // costra de afuera: paja suelta y más seca
+  c.lineWidth = 0.05; c.strokeStyle = md < 0.5 ? patron(c, texTamo, tam*0.8) : rgba('#2e2016', 0.8); c.globalAlpha = 0.75*(1 - md*0.5); c.beginPath(); for (let x = -HB; x <= HB + 1e-9; x += paso){ const y = topePila(x, h); x === -HB ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke(); c.globalAlpha = 1;
+  c.restore();
+  c.strokeStyle = 'rgba(30,20,12,.5)'; c.lineWidth = Math.max(px*1.2, 0.004); perfil(); c.stroke();
+  // pajas sueltas que asoman por el copete
+  if (px < 0.006 && md < 0.7){ const r = rng(77); c.lineCap = 'round'; c.globalAlpha = 1 - md; for (let i = 0; i < 46; i++){ const x = (r()*2 - 1)*HB*0.97, y = topePila(x, h), a = -Math.PI/2 + (r()-.5)*2.4, L = 0.012 + r()*0.03; c.strokeStyle = r() < .5 ? '#dcbc6c' : '#a8843e'; c.lineWidth = Math.max(px, 0.0032); c.beginPath(); c.moveTo(x, y + 0.01); c.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); c.stroke(); } c.globalAlpha = 1; }
+  // la horqueta, mientras voltea
+  if (mz > 0.01 && mz < 0.99){ const x = xs, y = topePila(clamp(x, -HB, HB), h);
+    c.strokeStyle = '#6f5538'; c.lineWidth = Math.max(px, 0.014); c.beginPath(); c.moveTo(x + 0.02, y + 0.08); c.lineTo(x + 0.3, y - 0.46); c.stroke();
+    c.strokeStyle = '#b8bec2'; c.lineWidth = Math.max(px, 0.007); c.beginPath(); for (const o of [-0.022, 0, 0.022]){ c.moveTo(x + 0.02 + o, y + 0.08); c.quadraticCurveTo(x - 0.01 + o*1.2, y + 0.16, x - 0.035 + o*1.4, y + 0.22); } c.stroke(); }
+  // vapor: bocanadas suaves que suben del copete (se mueven solo con el scroll)
+  if (cal > 0.05){
+    for (let i = 0; i < 6; i++){ const x0 = (i - 2.5)*HB*0.24, y0 = topePila(x0, h);
+      for (let j = 0; j < 5; j++){ const u = ((p*0.9 + i*0.21 + j/5) % 1); const yy = y0 - 0.03 - u*0.55, xx = x0 + 0.06*Math.sin(u*5 + i), rr = 0.04 + u*0.13, al = cal*0.2*Math.sin(Math.PI*u);
+        const g = c.createRadialGradient(xx, yy, 0, xx, yy, rr); g.addColorStop(0, `rgba(245,243,236,${al})`); g.addColorStop(1, 'rgba(245,243,236,0)'); c.fillStyle = g; c.beginPath(); c.arc(xx, yy, rr, 0, 7); c.fill(); } }
+  }
+  // el termómetro: una varilla hasta el centro, con su reloj arriba (la aguja es un esquema)
+  if (detalle || px < 0.02){
+    const x1 = HB*0.3, y1 = topePila(x1, h) - 0.1, x2 = 0.05, y2 = GY - h*0.42;
+    c.strokeStyle = '#c3c8cc'; c.lineWidth = 0.009; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 0.003; c.beginPath(); c.moveTo(x1 - 0.003, y1); c.lineTo(x2 - 0.003, y2); c.stroke();
+    const R = 0.034; c.fillStyle = '#ece9df'; c.beginPath(); c.arc(x1, y1, R, 0, 7); c.fill(); c.strokeStyle = '#61666a'; c.lineWidth = 0.008; c.stroke();
+    c.strokeStyle = '#6b6f73'; c.lineWidth = 0.003; c.beginPath(); for (let k = 0; k <= 8; k++){ const a = lerp(-Math.PI*1.2, Math.PI*0.2, k/8); c.moveTo(x1 + Math.cos(a)*R*0.7, y1 + Math.sin(a)*R*0.7); c.lineTo(x1 + Math.cos(a)*R*0.88, y1 + Math.sin(a)*R*0.88); } c.stroke();
+    const a55 = lerp(-Math.PI*1.2, Math.PI*0.2, 0.62); c.strokeStyle = '#d0452a'; c.lineWidth = 0.006; c.beginPath(); c.moveTo(x1 + Math.cos(a55)*R*0.62, y1 + Math.sin(a55)*R*0.62); c.lineTo(x1 + Math.cos(a55)*R*0.92, y1 + Math.sin(a55)*R*0.92); c.stroke();
+    const ag = lerp(-Math.PI*1.2, Math.PI*0.2, 0.08 + 0.72*calor(D)); c.strokeStyle = '#1d1f22'; c.lineWidth = 0.005; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x1 + Math.cos(ag)*R*0.8, y1 + Math.sin(ag)*R*0.8); c.stroke();
+    c.fillStyle = '#1d1f22'; c.beginPath(); c.arc(x1, y1, 0.006, 0, 7); c.fill();
+    PI1.termo = [x1, y1]; PI1.punta = [x2, y2];
+  }
+}
+function dibujaPila(c, env){
+  const P = LV[1], v = env.view;
+  // la finca alrededor, sin la pila de baja resolución: la misma que se veía desde arriba
+  c.save(); c.translate(-P.x/P.s, -P.y/P.s); c.scale(1/P.s, 1/P.s);
+  const v0 = [P.x + v[0]*P.s, P.y + v[1]*P.s, P.x + v[2]*P.s, P.y + v[3]*P.s];
+  dibujaFinca(c, { view: v0, px: env.px*P.s }, true);
+  c.restore();
+  const gsh = c.createLinearGradient(0, -1.0, 0, PI1.GY); gsh.addColorStop(0, 'rgba(24,18,10,.28)'); gsh.addColorStop(1, 'rgba(24,18,10,0)'); c.fillStyle = gsh; c.fillRect(-0.66, -1.0, 1.32, 1.0 + PI1.GY);
+  pintaPila(c, env.px, DIA, true);
+}
+
+/* ============================================================
+   NIVEL 2 · UN PUÑADO DEL CENTRO  (1 unidad = 6 cm)
+   ============================================================ */
+fijaPortal(2, 0.02, PI1.GY - PI1.H0*0.42);
+const ANG = -0.42; // ángulo de la paja elegida; la película lo hereda
+const PU = (() => {
+  const r = rng(23);
+  const pajas = [{ x: 0, y: 0, a: ANG, L: 1.05, w: 0.052, t: 0.55, honor: true, seed: 1 }];
+  for (let i = 0; i < 64; i++){ const x = -0.85 + r()*1.7, y = -0.95 + r()*1.9; if (Math.abs((y - x*Math.tan(ANG))*Math.cos(ANG)) < 0.07 && Math.abs(x) < 0.6){ r(); r(); r(); r(); continue; } pajas.push({ x, y, a: r()*Math.PI, L: 0.1 + r()*0.32, w: 0.012 + r()*0.03, t: r(), seed: 10 + i }); }
+  const migas = [[], [], [], []];
+  for (let i = 0; i < 380; i++){ const x = -0.9 + r()*1.8, y = -1.0 + r()*2.0, rr = 0.01 + Math.pow(r(), 1.7)*0.05; const pts = blob(r, x, y, rr, 8 + Math.floor(r()*4)); migas[Math.floor(r()*4)].push({ pts, bb: [x - rr, y - rr, x + rr, y + rr], x, y, rr }); }
+  const humus = [[], [], []];
+  for (let i = 0; i < 520; i++){ const x = -0.9 + r()*1.8, y = -1.0 + r()*2.0, rr = 0.005 + Math.pow(r(), 1.8)*0.028; humus[Math.floor(r()*3)].push({ pts: blob(r, x, y, rr, 7), bb: [x - rr, y - rr, x + rr, y + rr], t: r() }); }
+  const gotas = []; for (let i = 0; i < 130; i++) gotas.push({ x: -0.9 + r()*1.8, y: -1 + r()*2, r: 0.004 + r()*0.011, a: r()*3 });
+  const parches = []; for (let i = 0; i < 30; i++){ const x = -0.85 + r()*1.7, y = -0.95 + r()*1.9, R = 0.025 + r()*0.05; const fil = []; for (let k = 0; k < 90; k++) fil.push([r()*6.283, Math.sqrt(r())*R*0.25, R*(0.35 + r()*0.75), (r()-.5)*0.7]); parches.push({ x, y, R, fil, t: r() }); }
+  return { pajas, migas, humus, gotas, parches };
+})();
+function paja(c, q, px, md, honor){
+  const L = q.L*(honor ? 1 - 0.5*md : 1 - 0.6*md), w = q.w*(1 - 0.2*md);
+  const r = rng(q.seed);
+  c.save(); c.translate(q.x, q.y); c.rotate(q.a);
+  const base = mixh(q.t < 0.5 ? '#d6b262' : '#bf9846', '#4b3623', md*0.9);
+  // contorno con puntas deshilachadas
+  c.beginPath(); c.moveTo(-L/2 + w*0.2, -w/2); c.lineTo(L/2 - w*0.2, -w/2);
+  for (let k = 0; k <= 6; k++){ const yy = -w/2 + w*k/6; c.lineTo(L/2 + (k % 2 ? w*0.55 : -w*0.05)*(0.4 + r()*0.9), yy); }
+  c.lineTo(-L/2 + w*0.2, w/2);
+  for (let k = 6; k >= 0; k--){ const yy = -w/2 + w*k/6; c.lineTo(-L/2 - (k % 2 ? w*0.45 : -w*0.05)*(0.4 + r()*0.9), yy); }
+  c.closePath();
+  c.save(); c.translate(w*0.08, w*0.14); c.fillStyle = 'rgba(12,8,4,.45)'; c.fill(); c.restore();
+  const g = c.createLinearGradient(0, -w/2, 0, w/2); g.addColorStop(0, mixh(base, '#f4e3ac', 0.4*(1 - md))); g.addColorStop(0.35, base); g.addColorStop(1, mixh(base, '#2a1d10', 0.4));
+  c.fillStyle = g; c.fill();
+  if (w/px > 5){ c.strokeStyle = rgba(mixh('#7a5a2c', '#20150c', md), 0.45); c.lineWidth = Math.max(px*0.7, w*0.035); c.beginPath(); for (let k = 1; k < 6; k++){ const yy = -w/2 + w*k/6 + (r()-.5)*w*0.05; c.moveTo(-L/2 + w*0.3, yy); c.lineTo(L/2 - w*0.3, yy); } c.stroke();
+    // una rajadura
+    const x0 = (r() - 0.5)*L*0.6; c.strokeStyle = rgba('#2a1d10', 0.6); c.lineWidth = Math.max(px, w*0.05); c.beginPath(); c.moveTo(x0, -w*0.1); c.lineTo(x0 + L*0.18, w*0.05); c.stroke(); }
+  // el agua que la moja: un brillo en el borde de arriba
+  c.strokeStyle = `rgba(232,245,250,${0.3 + 0.25*(1 - md)})`; c.lineWidth = Math.max(px, w*0.08); c.beginPath(); c.moveTo(-L*0.36, -w*0.4); c.lineTo(L*0.28, -w*0.4); c.stroke();
+  c.restore();
+}
+function dibujaPunado(c, env){
+  const v = env.view, px = env.px, D = DIA, md = madura(D), cal = calor(D), su = sucesion(D);
+  // el fondo: la mezcla de boñiga y paja, que se oscurece al madurar
+  c.fillStyle = patron(c, texMezcla, 0.14); c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]);
+  if (md > 0){ c.globalAlpha = md; c.fillStyle = patron(c, texMadura, 0.09); c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]); c.globalAlpha = 1; }
+  c.fillStyle = 'rgba(20,12,6,.35)'; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]);
+  // migas de boñiga, con sombra y un brillo de humedad
+  const tonos = [['#5c4a2c', '#33251a'], ['#4a3a22', '#281c13'], ['#695533', '#3d2c1d'], ['#524428', '#2f2217']];
+  c.save(); c.translate(0.004, 0.007); c.fillStyle = 'rgba(8,5,3,.55)'; c.beginPath(); for (const T of PU.migas) for (const g of T){ if (inView(g.bb, v, 0.05)) roundPoly(c, g.pts); } c.fill(); c.restore();
+  PU.migas.forEach((T, i) => { c.beginPath(); for (const g of T){ if (inView(g.bb, v, 0.05)) roundPoly(c, g.pts); }
+    c.fillStyle = patron(c, md < 0.5 ? texBoniga : texMadura, 0.07); c.fill(); c.globalAlpha = 0.55; c.fillStyle = mixh(tonos[i][0], tonos[i][1], md); c.fill(); c.globalAlpha = 1; });
+  c.fillStyle = `rgba(255,240,210,${0.13*(1 - md*0.6)})`; c.beginPath(); for (const T of PU.migas) for (const g of T){ if (!inView(g.bb, v, 0.02) || g.rr < 0.018) continue; c.moveTo(g.x - g.rr*0.2, g.y - g.rr*0.35); c.ellipse(g.x - g.rr*0.25, g.y - g.rr*0.35, g.rr*0.35, g.rr*0.12, -0.3, 0, 7); } c.fill();
+  // pajas: atrás las de lado, adelante la elegida
+  for (const q of PU.pajas){ if (q.honor) continue; const bb = [q.x - q.L/2, q.y - q.L/2, q.x + q.L/2, q.y + q.L/2]; if (!inView(bb, v, 0.05)) continue; paja(c, q, px, md, false); }
+  paja(c, PU.pajas[0], px, md, true);
+  { const P3 = LV[3], anchoL3 = (v[2] - v[0])/P3.s, al = 1 - sstep(4.2, 6.5, anchoL3);
+    if (al > 0.01){ const q = PU.pajas[0], Lh = q.L*(1 - 0.5*md), wh = q.w*(1 - 0.2*md);
+      c.save(); c.translate(q.x, q.y); c.rotate(q.a); c.beginPath(); c.rect(-Lh/2 + wh*0.3, -wh/2, Lh - wh*0.6, wh); c.clip(); c.rotate(-q.a); c.translate(-q.x, -q.y);
+      c.translate(P3.x, P3.y); c.scale(P3.s, P3.s); c.globalAlpha = al; c.rotate(ANG); paredPaja(c, px/P3.s, D); c.globalAlpha = 1; c.restore(); } }
+  // la paja elegida se va comiendo por encima (lo que la película muestra de cerca)
+  const cm = comido(D);
+  if (cm > 0){ const q = PU.pajas[0]; const r = rng(71); c.save(); c.translate(q.x, q.y); c.rotate(q.a); c.fillStyle = rgba('#3a2616', 0.5*cm); for (let i = 0; i < 46; i++){ const x = (r() - .5)*q.L*0.9, y = (r() - .5)*q.w*0.7; c.beginPath(); c.ellipse(x, y, 0.003 + r()*0.01*cm, 0.0015 + r()*0.004*cm, 0, 0, 7); c.fill(); } c.restore(); }
+  // tierra negra: migas finas y oscuras que aparecen al madurar
+  if (md > 0.02){ const th = ['#1a110b', '#2a1d13', '#3a2a1b']; PU.humus.forEach((T, i) => { c.fillStyle = th[i]; c.beginPath(); for (const g of T){ if (g.t > md*1.15) continue; if (inView(g.bb, v, 0.03)) roundPoly(c, g.pts); } c.fill(); }); }
+  // gotas de agua
+  for (const g of PU.gotas){ if (g.x < v[0] - 0.02 || g.x > v[2] + 0.02 || g.y < v[1] - 0.02 || g.y > v[3] + 0.02) continue; c.fillStyle = 'rgba(200,225,235,.2)'; c.beginPath(); c.ellipse(g.x, g.y, g.r, g.r*0.7, g.a, 0, 7); c.fill(); c.fillStyle = 'rgba(255,255,255,.6)'; c.beginPath(); c.arc(g.x - g.r*0.3, g.y - g.r*0.25, g.r*0.22, 0, 7); c.fill(); }
+  // actinobacterias, al enfriarse: una pelusa blanquecina de hilos muy finos, pegada a las migas
+  if (su > 0.01){ c.lineCap = 'round';
+    for (const q of PU.parches){ const g = clamp(su*1.5 - q.t*0.5, 0, 1); if (g <= 0) continue; if (q.x + q.R < v[0] || q.x - q.R > v[2] || q.y + q.R < v[1] || q.y - q.R > v[3]) continue;
+      const R = q.R*(0.4 + 0.6*g); const gr = c.createRadialGradient(q.x, q.y, 0, q.x, q.y, R); gr.addColorStop(0, `rgba(226,222,208,${0.3*g})`); gr.addColorStop(0.7, `rgba(226,222,208,${0.12*g})`); gr.addColorStop(1, 'rgba(226,222,208,0)'); c.fillStyle = gr; c.beginPath(); c.arc(q.x, q.y, R, 0, 7); c.fill();
+      c.strokeStyle = `rgba(240,236,224,${0.5*g})`; c.lineWidth = Math.max(px*0.6, 0.0009); c.beginPath();
+      for (const [a, d0, Lf, cu] of q.fil){ const d = (d0/(q.R*0.25))*R*0.85, x0 = q.x + Math.cos(a)*d, y0 = q.y + Math.sin(a)*d*0.8, L2 = Lf*0.18*g, b = a*3.7 + cu*5; c.moveTo(x0, y0); c.quadraticCurveTo(x0 + Math.cos(b + cu)*L2, y0 + Math.sin(b + cu)*L2, x0 + Math.cos(b)*L2*1.6, y0 + Math.sin(b)*L2*1.6); } c.stroke(); } }
+  if (cal > 0.01){ c.fillStyle = `rgba(255,130,50,${0.13*cal})`; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]); }
+}
+
+/* ============================================================
+   NIVEL 3 · LA PAJA MOJADA  (1 unidad = 150 µm)
+   La cara de la paja: células largas de pared ondulada.
+   Encima, la película de agua con sus bacterias.
+   ============================================================ */
+fijaPortal(3, 0.0, 0.0);
+const menisco = x => -0.235 + 0.03*Math.sin(x*2.3 + 0.5) + 0.01*Math.sin(x*7.1);
+const PE = (() => {
+  const r = rng(31);
+  // en el marco de la paja (x a lo largo, y a lo ancho)
+  const filas = []; let y = -3; while (y < 3){ const w = 0.085 + r()*0.035; const cortes = []; let x = -3.2 - r()*0.5; while (x < 3.2){ x += 0.45 + r()*0.6; cortes.push(x); } filas.push({ y0: y, y1: y + w, cortes, f: r()*6, amp: 0.0035 + r()*0.003, k: 95 + r()*40 }); y += w; }
+  const hoyos = []; for (let i = 0; i < 1100; i++) hoyos.push({ x: -3 + r()*6, y: -3 + r()*6, r: 0.006 + r()*0.024, t: r(), a: (r()-.5)*0.4 });
+  const bac = [], col = [];
+  for (let k = 0; k < 30; k++){ let cx, cy, n0 = 0; do { cx = -1.0 + r()*2.0; cy = -0.18 + r()*1.05; n0++; } while (cy < menisco(cx) + 0.05 && n0 < 20);
+    const pat = k % 6 === 2 || k % 6 === 5; const n = 14 + Math.floor(r()*26); const a0 = r()*3.14; const R = 0.022 + 0.0022*n; col.push({ cx, cy, R, pat });
+    for (let i = 0; i < n; i++){ const d = Math.sqrt(r())*R, t = r()*6.28; const x = cx + Math.cos(t)*d, yy = cy + Math.sin(t)*d*0.8; const a = a0 + (r()-.5)*1.3, L = 0.012 + r()*0.01, w = 0.0056 + r()*0.0012, pp = r(), tt = r(); if (yy < menisco(x) + 0.012) continue; bac.push({ x, y: yy, a, L, w, pat: pat && pp < 0.8, t: tt }); } }
+  for (let i = 0; i < 130; i++){ const x = -1.0 + r()*2.0, yy = -0.2 + r()*1.1, a = r()*3.14, L = 0.012 + r()*0.01, w = 0.0056 + r()*0.0012, tt = r(); if (yy < menisco(x) + 0.012) continue; bac.push({ x, y: yy, a, L, w, pat: false, t: tt }); }
+  // la bacteria elegida (portal al nivel 4)
+  const elegida = { x: 0.03, y: 0.035, a: -1.12, L: 0.02, w: 0.0067, pat: false, t: 0.5, honor: true };
+  bac.push(elegida);
+  // hongos y actinobacterias (llegan al enfriarse)
+  const hifas = []; for (let i = 0; i < 7; i++){ let x = -1.1 + r()*0.3, yy = -0.1 + r()*0.8, a = (r()-.5)*0.6; const pts = [[x, yy]]; for (let k = 0; k < 42; k++){ a += (r()-.5)*0.25; x += Math.cos(a)*0.05; yy += Math.sin(a)*0.05; pts.push([x, yy]); } hifas.push({ pts, w: 0.018 + r()*0.01, t: r() }); }
+  const actino = []; for (let i = 0; i < 26; i++){ let x = -0.95 + r()*1.9, yy = -0.12 + r()*0.95, a = r()*6.28; const pts = [[x, yy]]; for (let k = 0; k < 20; k++){ a += (r()-.5)*0.5; x += Math.cos(a)*0.012; yy += Math.sin(a)*0.012; pts.push([x, yy]); } const ram = []; for (let k = 3; k < pts.length; k += 4){ const b = a + (r() < .5 ? 1 : -1)*1.0; let bx = pts[k][0], by = pts[k][1]; const q = [[bx, by]]; for (let j = 0; j < 6; j++){ bx += Math.cos(b + (r()-.5)*0.4)*0.01; by += Math.sin(b + (r()-.5)*0.4)*0.01; q.push([bx, by]); } ram.push({ k, q }); } actino.push({ pts, ram, t: r() }); }
+  return { filas, hoyos, bac, col, elegida, hifas, actino };
+})();
+fijaPortal(4, PE.elegida.x, PE.elegida.y);
+function paredPaja(c, px, D){ // la cara de la paja, en el marco de la paja (girado); la usan la película y el puñado
+  const cm = comido(D), md = madura(D);
+  const base = mixh('#c9a65a', '#6b4c2e', md*0.85);
+  c.fillStyle = base; c.fillRect(-3.2, -3.2, 6.4, 6.4);
+  // estrías finas a lo largo
+  c.lineWidth = Math.max(px, 0.0025); for (let i = 0; i < 300; i++){ const yy = -3 + i*0.02; c.strokeStyle = i % 2 ? 'rgba(90,64,30,.10)' : 'rgba(255,240,200,.08)'; c.beginPath(); c.moveTo(-3.2, yy); c.lineTo(3.2, yy + 0.004); c.stroke(); }
+  // cada fila de células, abombada
+  for (const f of PE.filas){ const g = c.createLinearGradient(0, f.y0, 0, f.y1); g.addColorStop(0, 'rgba(70,48,22,.22)'); g.addColorStop(0.45, 'rgba(255,240,205,.16)'); g.addColorStop(1, 'rgba(70,48,22,.28)'); c.fillStyle = g; c.fillRect(-3.2, f.y0, 6.4, f.y1 - f.y0); }
+  // paredes onduladas entre filas, y los tabiques de cada célula
+  const pared = mixh('#6d4b24', '#2c1d10', md), paso = Math.max(0.008, px*3);
+  for (const f of PE.filas){
+    c.strokeStyle = pared; c.lineWidth = Math.max(px, 0.0045); c.beginPath(); for (let x = -3.2; x <= 3.2; x += paso){ const y = f.y0 + f.amp*Math.sin(x*f.k + f.f); x === -3.2 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke();
+    c.strokeStyle = 'rgba(255,238,196,.35)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); for (let x = -2; x <= 2; x += paso){ const y = f.y0 + 0.004 + f.amp*Math.sin(x*f.k + f.f); x === -3.2 ? c.moveTo(x, y) : c.lineTo(x, y); } c.stroke();
+    c.strokeStyle = pared; c.lineWidth = Math.max(px, 0.004); c.beginPath(); for (const xc of f.cortes){ c.moveTo(xc, f.y0); for (let k = 1; k <= 6; k++) c.lineTo(xc + (k % 2 ? 0.006 : -0.006), f.y0 + (f.y1 - f.y0)*k/6); } c.stroke();
+  }
+  // la paja comida: huecos que crecen, con borde claro
+  if (cm > 0){ for (const h of PE.hoyos){ if (h.t > cm*1.2) continue; const k = clamp((cm*1.2 - h.t)*2.5, 0, 1); c.fillStyle = rgba('#3b2717', 0.6*k); c.beginPath(); c.ellipse(h.x, h.y, h.r*k*1.5, h.r*k*0.6, h.a, 0, 7); c.fill(); c.strokeStyle = rgba('#ecd8a4', 0.25*k); c.lineWidth = Math.max(px, 0.002); c.stroke(); } }
+}
+function dibujaPelicula(c, env){
+  const v = env.view, px = env.px, D = DIA, cm = comido(D), md = madura(D), su = sucesion(D), vv = vivos(D), cal = calor(D);
+  c.save(); c.rotate(ANG); paredPaja(c, px, D);
+  c.restore();
+  // lo seco, arriba del menisco, más mate; lo mojado, abajo, con brillo
+  const x0 = v[0] - 0.05, x1 = v[2] + 0.05, pas = (x1 - x0)/120;
+  c.fillStyle = 'rgba(60,40,20,.14)'; c.beginPath(); c.moveTo(x0, -2); for (let x = x0; x <= x1 + pas; x += pas) c.lineTo(x, menisco(x)); c.lineTo(x1, -2); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(150,196,214,.18)'; c.beginPath(); c.moveTo(x0, 2); for (let x = x0; x <= x1 + pas; x += pas) c.lineTo(x, menisco(x)); c.lineTo(x1, 2); c.closePath(); c.fill();
+  const gb = c.createLinearGradient(0, -0.25, 0, 0.05); gb.addColorStop(0, 'rgba(255,255,255,.16)'); gb.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = gb; c.beginPath(); c.moveTo(x0, 0.05); for (let x = x0; x <= x1 + pas; x += pas) c.lineTo(x, menisco(x)); c.lineTo(x1, 0.05); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(232,246,252,.8)'; c.lineWidth = Math.max(px*1.5, 0.004); c.beginPath(); for (let x = x0; x <= x1 + pas; x += pas){ x === x0 ? c.moveTo(x, menisco(x)) : c.lineTo(x, menisco(x)); } c.stroke();
+  // hongos y actinobacterias, cuando se enfría
+  if (su > 0.01){
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    for (const h of PE.hifas){ const n = Math.floor(h.pts.length*clamp(su*1.3 - h.t*0.3, 0, 1)); if (n < 2) continue;
+      c.strokeStyle = 'rgba(214,222,190,.42)'; c.lineWidth = h.w; c.beginPath(); c.moveTo(h.pts[0][0], h.pts[0][1]); for (let k = 1; k < n; k++) c.lineTo(h.pts[k][0], h.pts[k][1]); c.stroke();
+      c.strokeStyle = 'rgba(250,252,240,.55)'; c.lineWidth = Math.max(px, h.w*0.12); c.stroke();
+      c.strokeStyle = 'rgba(120,130,100,.6)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); for (let k = 3; k < n; k += 4){ const a = Math.atan2(h.pts[k][1] - h.pts[k-1][1], h.pts[k][0] - h.pts[k-1][0]) + Math.PI/2; c.moveTo(h.pts[k][0] + Math.cos(a)*h.w*0.45, h.pts[k][1] + Math.sin(a)*h.w*0.45); c.lineTo(h.pts[k][0] - Math.cos(a)*h.w*0.45, h.pts[k][1] - Math.sin(a)*h.w*0.45); } c.stroke(); }
+    for (const h of PE.actino){ const n = Math.floor(h.pts.length*clamp(su*1.5 - h.t*0.5, 0, 1)); if (n < 2) continue;
+      c.strokeStyle = 'rgba(244,238,226,.85)'; c.lineWidth = Math.max(px, 0.0045); c.beginPath(); c.moveTo(h.pts[0][0], h.pts[0][1]); for (let k = 1; k < n; k++) c.lineTo(h.pts[k][0], h.pts[k][1]); for (const q of h.ram){ if (q.k >= n) continue; c.moveTo(q.q[0][0], q.q[0][1]); for (let j = 1; j < q.q.length; j++) c.lineTo(q.q[j][0], q.q[j][1]); } c.stroke(); }
+  }
+  // la baba de cada colonia
+  for (const q of PE.col){ if (q.cx + q.R < v[0] || q.cx - q.R > v[2] || q.cy + q.R < v[1] || q.cy - q.R > v[3]) continue; const g = c.createRadialGradient(q.cx, q.cy, 0, q.cx, q.cy, q.R*1.3); g.addColorStop(0, 'rgba(236,226,176,.22)'); g.addColorStop(1, 'rgba(236,226,176,0)'); c.fillStyle = g; c.beginPath(); c.arc(q.cx, q.cy, q.R*1.3, 0, 7); c.fill(); }
+  // las bacterias
+  const quedan = 1 - 0.55*sstep(16, 30, D); // al enfriarse, menos de las del calor
+  const dib = (b, relleno, borde) => { c.save(); c.translate(b.x, b.y); c.rotate(b.a); capsula(c, b.L, b.w); c.fillStyle = relleno; c.fill(); c.strokeStyle = borde; c.lineWidth = Math.max(px, 0.0011); c.stroke();
+    if (b.w/px > 4){ c.strokeStyle = 'rgba(255,244,220,.5)'; c.lineWidth = Math.max(px*0.8, b.w*0.18); c.beginPath(); c.moveTo(-b.L*0.3, -b.w*0.18); c.lineTo(b.L*0.2, -b.w*0.18); c.stroke(); } c.restore(); };
+  for (const b of PE.bac){ if (b.x < v[0] - 0.03 || b.x > v[2] + 0.03 || b.y < v[1] - 0.03 || b.y > v[3] + 0.03) continue;
+    if (b.pat){
+      if (vv > 0.02) dib(b, `rgba(226,118,146,${0.95*vv})`, `rgba(120,40,60,${0.85*vv})`);
+      if (vv < 0.98){ c.save(); c.translate(b.x, b.y); c.rotate(b.a); c.setLineDash([0.003, 0.003]); c.strokeStyle = `rgba(226,118,146,${0.5*(1 - vv)})`; c.lineWidth = Math.max(px, 0.001); capsula(c, b.L*0.8, b.w*0.65); c.stroke(); c.setLineDash([]); c.restore(); }
+    } else { if (!b.honor && b.t > quedan) continue; dib(b, '#e39a45', 'rgba(110,56,18,.9)'); } }
+  if (cal > 0.01){ c.fillStyle = `rgba(255,140,60,${0.09*cal})`; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]); }
+}
+
+/* ============================================================
+   NIVEL 4 · UNA BACTERIA Y SUS TIJERAS  (1 unidad = 8 µm)
+   Haces de celulosa (engrosados), la red blanda de hemicelulosa
+   y la lignina pegada encima. Enzimas en el frente de lo comido.
+   ============================================================ */
+const BA = (() => {
+  const r = rng(41);
+  const hilos = []; for (let y = -1.5; y < 1.5; ){ const w = 0.016 + r()*0.012; hilos.push({ y, w, f: r()*6, amp: 0.004 + r()*0.006, k: 5 + r()*6, cortes: [r(), r(), r(), r()].map(x => x*2.4 - 1.2), t: r() }); y += w + 0.01 + r()*0.012; }
+  const red = []; for (let i = 0; i < 1500; i++){ const x = -1.5 + r()*3, y = -1.5 + r()*3; red.push({ x, y, a: Math.PI/2 + (r()-.5)*1.1, L: 0.03 + r()*0.05, cu: (r()-.5)*0.03 }); }
+  const lig = []; for (let i = 0; i < 18; i++){ let x = -1.3 + r()*2.6, y = -1.3 + r()*2.6; const rr = 0.06 + r()*0.12; if (Math.hypot(x, y) < 0.42){ const k = 0.42/Math.max(0.05, Math.hypot(x, y)); x *= k; y *= k; } lig.push({ pts: blob(r, x, y, rr, 10), x, y, rr, pintas: Array.from({ length: 10 }, () => [x + (r()-.5)*rr, y + (r()-.5)*rr*0.8, 0.004 + r()*0.01]) }); }
+  const enz = []; for (let i = 0; i < 64; i++) enz.push({ a: r()*6.283, t: r(), v: 0.6 + r()*0.8, s: 0.8 + r()*0.5, g: r()*6.28 });
+  return { hilos, red, lig, enz };
+})();
+function tijeras(D){ return clamp((D - 12.5)/1.5, 0, 1); }
+function radioComido(D){ return 0.1 + 0.4*tijeras(D) + 0.25*comido(D); }
+function dibujaBacteria(c, env){
+  const v = env.view, px = env.px, D = DIA, md = madura(D), cal = calor(D);
+  const t = tijeras(D), radio = radioComido(D);
+  const B = PE.elegida;
+  c.fillStyle = mixh('#7a5c3a', '#3a2a1a', md); c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]);
+  c.save(); c.rotate(ANG);
+  const cutR = t > 0.5 ? (radio - 0.2)*(t - 0.5)*2 : 0;
+  const paso = Math.max(0.02, px*4);
+  // haces de celulosa
+  c.lineCap = 'butt';
+  for (const h of BA.hilos){
+    const tray = () => { c.beginPath(); for (let x = -2; x <= 2; x += paso){ const y = h.y + h.amp*Math.sin(x*h.k + h.f); x === -2 ? c.moveTo(x, y) : c.lineTo(x, y); } };
+    tray(); c.strokeStyle = 'rgba(58,40,22,.55)'; c.lineWidth = h.w + 0.004; c.stroke();
+    c.strokeStyle = mixh('#d8c190', '#8a6c44', md); c.lineWidth = h.w; c.stroke();
+    c.save(); c.translate(0, -h.w*0.22); tray(); c.strokeStyle = 'rgba(248,238,206,.55)'; c.lineWidth = h.w*0.28; c.stroke(); c.restore();
+  }
+  // cortes en la celulosa, más tarde y más cerca de la bacteria
+  if (cutR > 0.01){ for (const h of BA.hilos){ for (const xc of h.cortes){ const yc = h.y + h.amp*Math.sin(xc*h.k + h.f); if (Math.hypot(xc, yc) > cutR) continue;
+    c.fillStyle = mixh('#7a5c3a', '#3a2a1a', md); c.beginPath(); c.ellipse(xc, yc, 0.028, h.w*0.9, 0, 0, 7); c.fill();
+    c.strokeStyle = '#d8c190'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); for (const s of [-1, 1]) for (let j = -1; j <= 1; j++){ c.moveTo(xc + s*0.028, yc + j*h.w*0.3); c.lineTo(xc + s*0.04, yc + j*h.w*0.45); } c.stroke(); } } }
+  // la red blanda de hemicelulosa, que se come primero
+  c.lineCap = 'round';
+  c.strokeStyle = 'rgba(208,224,170,.85)'; c.lineWidth = Math.max(px, 0.0045); c.beginPath();
+  for (const q of BA.red){ const d = Math.hypot(q.x, q.y); if (d < radio || d > 2) continue; c.moveTo(q.x, q.y); c.quadraticCurveTo(q.x + Math.cos(q.a)*q.L*0.5 + q.cu, q.y + Math.sin(q.a)*q.L*0.5, q.x + Math.cos(q.a)*q.L, q.y + Math.sin(q.a)*q.L); }
+  c.stroke();
+  // pedacitos sueltos en el frente
+  c.strokeStyle = 'rgba(208,224,170,.4)'; c.lineWidth = Math.max(px, 0.0035); c.beginPath();
+  for (const q of BA.red){ const d = Math.hypot(q.x, q.y); if (d >= radio || d < radio - 0.07) continue; c.moveTo(q.x, q.y); c.lineTo(q.x + Math.cos(q.a)*q.L*0.35, q.y + Math.sin(q.a)*q.L*0.35); }
+  c.stroke();
+  // lignina: lo duro, pegado encima, que queda
+  for (const l of BA.lig){ const g = c.createRadialGradient(l.x - l.rr*0.3, l.y - l.rr*0.3, 0, l.x, l.y, l.rr*1.1); g.addColorStop(0, '#9a5e32'); g.addColorStop(1, '#5e3419'); c.fillStyle = g; c.beginPath(); roundPoly(c, l.pts); c.fill(); c.strokeStyle = 'rgba(40,20,8,.6)'; c.lineWidth = Math.max(px, 0.004); c.stroke();
+    c.fillStyle = 'rgba(214,160,110,.35)'; for (const [x, y, rr] of l.pintas){ c.beginPath(); c.arc(x, y, rr, 0, 7); c.fill(); } }
+  // enzimas: globitos en el frente de lo comido (su lugar lo da el scroll)
+  for (const e of BA.enz){ const u = (e.t + t*1.6*e.v) % 1; const d = radio + (u - 0.6)*0.1; if (d < 0.14) continue; const x = Math.cos(e.a)*d, y = Math.sin(e.a)*d; const s = 0.0075*e.s;
+    c.fillStyle = '#4fae9f'; c.beginPath(); c.arc(x, y, s*1.25, 0, 7); c.arc(x + Math.cos(e.g)*s*1.3, y + Math.sin(e.g)*s*1.3, s, 0, 7); c.arc(x + Math.cos(e.g + 2)*s*1.2, y + Math.sin(e.g + 2)*s*1.2, s*0.9, 0, 7); c.fill();
+    c.fillStyle = 'rgba(210,255,246,.55)'; c.beginPath(); c.arc(x - s*0.4, y - s*0.4, s*0.45, 0, 7); c.fill(); }
+  c.restore();
+  // la bacteria (con su propio ángulo)
+  c.save(); c.rotate(B.a);
+  const L = B.L/LV[4].s, w = B.w/LV[4].s;
+  c.fillStyle = 'rgba(20,12,6,.35)'; c.save(); c.translate(0.012, 0.02); capsula(c, L, w); c.fill(); c.restore();
+  const g = c.createLinearGradient(0, -w/2, 0, w/2); g.addColorStop(0, '#f3c781'); g.addColorStop(0.45, '#df9a4a'); g.addColorStop(1, '#8e4f1c'); c.fillStyle = g; capsula(c, L, w); c.fill();
+  c.strokeStyle = '#5e3310'; c.lineWidth = Math.max(px, 0.006); c.stroke();
+  c.save(); capsula(c, L, w); c.clip(); const gn = c.createRadialGradient(L*0.05, w*0.05, 0, L*0.05, w*0.05, L*0.35); gn.addColorStop(0, 'rgba(255,226,170,.28)'); gn.addColorStop(1, 'rgba(255,226,170,0)'); c.fillStyle = gn; c.fillRect(-L, -w, 2*L, 2*w); c.restore();
+  c.strokeStyle = 'rgba(255,236,196,.5)'; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(-L*0.25, -w*0.02); c.bezierCurveTo(-L*0.1, w*0.16, L*0.05, -w*0.18, L*0.22, w*0.04); c.stroke();
+  c.fillStyle = 'rgba(255,244,220,.4)'; c.beginPath(); c.ellipse(-L*0.1, -w*0.26, L*0.22, w*0.08, 0, 0, 7); c.fill();
+  c.restore();
+  if (cal > 0.01){ c.fillStyle = `rgba(255,140,60,${0.07*cal})`; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]); }
+}
+
+const DIB = [dibujaFinca, dibujaPila, dibujaPunado, dibujaPelicula, dibujaBacteria];
+
+/* ============================================================
+   GUION DE CÁMARA Y DE RELOJ (X, Y, Z en metros; D en días de esquema)
+   ============================================================ */
+function K(L, x, y, f){ const l = LV[L]; return { X: l.O[0] + l.F*x, Y: l.O[1] + l.F*y, Z: l.F*f }; }
+let SEGS = [], T = 0, EST = [], PARADAS = [];
+function guion(){
+  const P = PORT;
+  const e0 = K(0, P ? 0.05 : 0.0, P ? 0.02 : 0.055, P ? 1.25 : 1.0), e0b = { ...e0, Z: e0.Z*0.94 };
+  const e1 = K(1, 0, P ? -0.05 : -0.02, P ? 2.05 : 1.05), e1b = { ...e1, Z: e1.Z*0.94 };
+  const e2 = K(1, 0.01, P ? -0.02 : 0.0, P ? 1.75 : 0.92), e2b = { ...e2, Z: e2.Z*0.95 };
+  const c1 = K(2, 0, P ? -0.04 : 0, P ? 1.05 : 0.95), c1b = { ...c1, Z: c1.Z*0.94 };
+  const e3 = K(3, P ? 0.0 : 0.04, P ? -0.02 : 0.02, P ? 1.1 : 0.95), e3b = { ...e3, Z: e3.Z*0.94 };
+  const e4 = K(4, 0, P ? 0.02 : 0, P ? 1.3 : 1.05), e4b = { ...e4, Z: e4.Z*0.95 };
+  const c2 = K(3, 0.02, P ? -0.04 : 0.02, P ? 1.25 : 1.1), c2b = { ...c2, Z: c2.Z*0.95 };
+  const e5 = K(2, 0, P ? -0.04 : 0, P ? 1.1 : 1.0), e5b = { ...e5, Z: e5.Z*0.95 };
+  const e6 = K(0, P ? 0.2 : 0.12, P ? 0.0 : 0.02, P ? 1.05 : 0.85), e6b = { ...e6, Z: e6.Z*0.95 };
+  SEGS = [
+    { k:'hold', A:e0,  B:e0b, w:1.1, st:0, card:'e0', D0:0,    D1:0 },
+    { k:'move', A:e0b, B:e1,  w:1.5,                  D0:0,    D1:0 },
+    { k:'hold', A:e1,  B:e1b, w:1.2, st:1, card:'e1', D0:0,    D1:0.5 },
+    { k:'move', A:e1b, B:e2,  w:1.1, card:'c0',       D0:0.5,  D1:4.2 },
+    { k:'hold', A:e2,  B:e2b, w:2.1, st:2, card:'e2', D0:4.2,  D1:8.1 },
+    { k:'move', A:e2b, B:c1,  w:1.4,                  D0:8.1,  D1:8.4 },
+    { k:'hold', A:c1,  B:c1b, w:1.0, card:'c1',       D0:8.4,  D1:8.7 },
+    { k:'move', A:c1b, B:e3,  w:1.4,                  D0:8.7,  D1:9.0 },
+    { k:'hold', A:e3,  B:e3b, w:2.1, st:3, card:'e3', D0:9.0,  D1:12.3 },
+    { k:'move', A:e3b, B:e4,  w:1.3,                  D0:12.3, D1:12.5 },
+    { k:'hold', A:e4,  B:e4b, w:1.7, st:4, card:'e4', D0:12.5, D1:14.0 },
+    { k:'move', A:e4b, B:c2,  w:1.6, sube:true,       D0:14,   D1:20 },
+    { k:'hold', A:c2,  B:c2b, w:1.6, card:'c2', sube:true, D0:20, D1:29 },
+    { k:'move', A:c2b, B:e5,  w:1.5, sube:true,       D0:29,   D1:36 },
+    { k:'hold', A:e5,  B:e5b, w:1.5, st:5, card:'e5', D0:36,   D1:36 },
+    { k:'move', A:e5b, B:e6,  w:2.2, sube:true,       D0:36,   D1:40 },
+    { k:'hold', A:e6,  B:e6b, w:1.4, st:6, card:'e6', D0:40,   D1:42 },
+  ];
+  let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; } T = acc;
+  EST = SEGS.filter(s => s.st !== undefined);
+  PARADAS = []; for (const s of SEGS) if (s.card && s.k === 'hold') PARADAS.push(s === SEGS[0] ? 0 : s === SEGS[SEGS.length-1] ? T : (s.a + s.b)/2);
+}
+const estP = i => i === 0 ? 0 : i === EST.length - 1 ? T : (EST[i].a + EST[i].b)/2;
+
+function camAt(p){
+  p = clamp(p, 0, T);
+  let s = SEGS[SEGS.length-1], i = SEGS.length - 1;
+  for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ s = SEGS[j]; i = j; break; } }
+  const u = clamp((p - s.a)/s.w, 0, 1); const A = s.A, B = s.B;
+  const D = lerp(s.D0, s.D1, u);
+  if (s.k === 'hold') return { X: A.X, Y: A.Y, Z: A.Z*Math.pow(B.Z/A.Z, u), seg: s, i, u, D };
+  const e = u*u*(3 - 2*u);
+  const Z = A.Z*Math.pow(B.Z/A.Z, e);
+  let X, Y;
+  if (Math.abs(Math.log(B.Z/A.Z)) > 0.05){ const k = (A.Z - Z)/(A.Z - B.Z); X = A.X + (B.X - A.X)*k; Y = A.Y + (B.Y - A.Y)*k; }
+  else { X = lerp(A.X, B.X, e); Y = lerp(A.Y, B.Y, e); }
+  return { X, Y, Z, seg: s, i, u, D };
+}
+function anchoVista(cam){ return cam.Z * W / S; }
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+let pRender = 0, p = 0;
+function envPara(L, cx, cy, f, ppu){ return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - CX/ppu, cy - CY/ppu, cx + (W - CX)/ppu, cy + (H - CY)/ppu] }; }
+function baseDe(cam){
+  let L = 0;
+  for (;;){ let nx = -1;
+    for (const k of KIDS[L]){ const l = LV[k]; if (cam.Z/l.F > 1/0.92) continue; const lx = (cam.X - l.O[0])/l.F, ly = (cam.Y - l.O[1])/l.F; if (Math.abs(lx) < 0.75 && Math.abs(ly) < 0.75){ nx = k; break; } }
+    if (nx < 0) return L; L = nx; }
+}
+function pintaNivel(c, L, cx, cy, f){
+  const ppu = S/f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(CX - cx*ppu), DPR*(CY - cy*ppu));
+  DIB[L](c, envPara(L, cx, cy, f, ppu));
+  for (const k of KIDS[L]){
+    const P = LV[k]; const pp = P.s*ppu; const a = sstep(0.28*S, 0.92*S, pp); if (a <= 0) continue;
+    const ox = CX + (P.x - cx)*ppu, oy = CY + (P.y - cy)*ppu;
+    if (ox + pp*1.3 < 0 || ox - pp*1.3 > W || oy + pp*1.3 < 0 || oy - pp*1.3 > H) continue;
+    const ppu2 = ppu*P.s, cx2 = (cx - P.x)/P.s, cy2 = (cy - P.y)/P.s, f2 = f/P.s;
+    const cubre = a >= 0.999; const dst = cubre ? c : bctx;
+    if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+    dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*(CX - cx2*ppu2), DPR*(CY - cy2*ppu2));
+    DIB[k](dst, envPara(k, cx2, cy2, f2, ppu2));
+    if (cubre) continue;
+    bctx.setTransform(1,0,0,1,0,0);
+    bctx.globalCompositeOperation = 'destination-in';
+    const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+    const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+    gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+    bctx.globalCompositeOperation = 'source-over';
+    c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+  }
+}
+let camR = null;
+function aPantalla(L, x, y){ const l = LV[L]; const X = l.O[0] + l.F*x, Y = l.O[1] + l.F*y; return [CX + (X - camR.X)*S/camR.Z, CY + (Y - camR.Y)*S/camR.Z]; }
+function luzProf(Z){ return clamp((Math.log10(Z) + 5.2)/6.0, 0, 1); }
+let vel = 0;
+function render(){
+  const cam = camAt(pRender); camR = cam; DIA = cam.D;
+  const L = baseDe(cam), l = LV[L];
+  pintaNivel(ctx, L, (cam.X - l.O[0])/l.F, (cam.Y - l.O[1])/l.F, cam.Z/l.F);
+  ctx.setTransform(1,0,0,1,0,0);
+  const lz = luzProf(cam.Z);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, `rgba(12,8,4,${0.1 + 0.4*(1 - lz)})`);
+  ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.seg.k === 'move'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  leeVeto();
+  rotulos(cam);
+  return cam;
+}
+
+/* ============================================================
+   RÓTULOS en pantalla (cortos, con guía que no cruza nada)
+   ============================================================ */
+const $ = id => document.getElementById(id);
+let fSans = '';
+let VETO = [];
+function leeVeto(){ VETO = []; for (const id of ['medidor', 'frase', 'controles', 'riel']){ const e = $(id); if (!e) continue; if (id === 'frase' && !e.classList.contains('ver')) continue; const b = e.getBoundingClientRect(); VETO.push([b.left - 8, b.top - 8, b.right + 8, b.bottom + 8]); } }
+function choca(x0, y0, x1, y1){ for (const v of VETO) if (!(x1 < v[0] || x0 > v[2] || y1 < v[1] || y0 > v[3])) return true; return x0 < 6 || y0 < 6 || x1 > W - 6 || y1 > H - 6; }
+function mejor(L, cands, fx, fy){
+  let best = null, d0 = 1e18; const tx = fx*W, ty = fy*H;
+  for (const q of cands){ const s = aPantalla(L, q[0], q[1]); if (choca(s[0] - 14, s[1] - 14, s[0] + 14, s[1] + 14)) continue; const d = (s[0]-tx)*(s[0]-tx) + (s[1]-ty)*(s[1]-ty); if (d < d0){ d0 = d; best = s; } }
+  return best;
+}
+function rotulo(texto, pt, dx, dy, a, col){
+  if (!pt || a <= 0.01) return;
+  if (choca(pt[0] - 3, pt[1] - 3, pt[0] + 3, pt[1] + 3)) return;
+  ctx.font = '600 15px ' + fSans; ctx.textBaseline = 'middle'; const w = ctx.measureText(texto).width;
+  let ok = null;
+  for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]){ const tx = pt[0] + dx*sx, ty = pt[1] + dy*sy; const lx = tx + (dx*sx < 0 ? -w - 10 : 10); if (!choca(lx - 6, ty - 13, lx + w + 6, ty + 13)){ ok = [tx, ty, lx]; break; } }
+  if (!ok) return;
+  const [tx, ty, lx] = ok;
+  ctx.globalAlpha = a;
+  ctx.strokeStyle = 'rgba(10,8,6,.6)'; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(pt[0], pt[1]); ctx.lineTo(tx, ty); ctx.stroke();
+  ctx.strokeStyle = col || 'rgba(251,250,244,.92)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(pt[0], pt[1]); ctx.lineTo(tx, ty); ctx.stroke();
+  ctx.fillStyle = '#fbfaf4'; ctx.strokeStyle = 'rgba(10,8,6,.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(pt[0], pt[1], 4.5, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(14,10,8,.88)'; const x0 = lx - 8, y0 = ty - 13; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x0, y0, w + 16, 26, 9); else ctx.rect(x0, y0, w + 16, 26); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = col || '#fbfaf4'; ctx.fillText(texto, lx, ty + 0.5); ctx.globalAlpha = 1;
+  VETO.push([lx - 10, ty - 15, lx + w + 10, ty + 15]);
+}
+function alfaSeg(i){ const s = SEGS[i]; return (i === 0 ? 1 : sstep(s.a - 0.15, s.a + 0.2, pRender)) * (1 - sstep(s.b - 0.15, s.b + 0.25, pRender)); }
+function rotulos(cam){
+  const D = DIA; let a;
+  a = alfaSeg(0);
+  if (a > 0.01){ const b = FIN.bonigas.filter(q => q.x > -0.45).map(q => [q.x, yg0(q.x) + q.dy]); rotulo('boñiga fresca', mejor(0, b, 0.25, 0.6), 34, 36, a);
+    const m = FIN.matas[MATA_QUEMADA]; rotulo('estiércol crudo al pie', aPantalla(0, m.x - 0.024, yg0(m.x) - 0.006), 30, 40, a, '#f0c08a');
+    rotulo('la pila de compost', aPantalla(0, PILA0.x - 0.03, yg0(PILA0.x) - 0.08), -40, -44, a); }
+  a = alfaSeg(2);
+  if (a > 0.01){ const h = altoPila(D);
+    const banda = (k) => { const out = []; for (let x = -0.4; x <= 0.4; x += 0.04){ const y0 = k ? bordeCapa(k - 1, x, h) : PI1.GY, y1 = bordeCapa(k, x, h); out.push([x, (y0 + y1)/2]); } return out; };
+    rotulo('boñiga', mejor(1, banda(3).concat(banda(1)), 0.32, 0.42), -34, -30, a);
+    rotulo('tamo seco', mejor(1, banda(4).concat(banda(2)), 0.66, 0.55), 34, 30, a);
+    if (PI1.termo) rotulo('termómetro', aPantalla(1, PI1.termo[0], PI1.termo[1]), 34, -30, a); }
+  a = alfaSeg(4);
+  if (a > 0.01){ const h = altoPila(D), mz = volteo(D);
+    rotulo(mz < 0.5 ? 'centro: más caliente' : 'volteada: toda caliente', aPantalla(1, -0.04, PI1.GY - h*0.42), -40, -40, a, '#ffc78a');
+    if (mz < 0.3) rotulo('borde: se calienta menos', aPantalla(1, PI1.HB*0.8, PI1.GY - 0.03), 30, 34, a*(1 - mz/0.3));
+    if (calor(D) > 0.4) rotulo('vapor', aPantalla(1, -PI1.HB*0.3, topePila(-PI1.HB*0.3, h) - 0.1), -34, -24, a); }
+  a = alfaSeg(6);
+  if (a > 0.01){ const q = PU.pajas[0]; rotulo('paja', aPantalla(2, q.x + Math.cos(q.a)*0.25, q.y + Math.sin(q.a)*0.25), 30, -34, a);
+    const mg = []; for (const T of PU.migas) for (const g of T) if (Math.abs(g.x) < 0.4 && Math.abs(g.y) < 0.4 && g.rr > 0.03) mg.push([g.x, g.y]); rotulo('estiércol', mejor(2, mg, 0.3, 0.65), -30, 34, a);
+    const gt = PU.gotas.filter(g => Math.abs(g.x) < 0.4 && Math.abs(g.y) < 0.4 && g.r > 0.01).map(g => [g.x, g.y]); rotulo('agua', mejor(2, gt, 0.72, 0.35), 30, -30, a, '#cfe6ee'); }
+  a = alfaSeg(8);
+  if (a > 0.01){ const pat = PE.bac.filter(b => b.pat && Math.abs(b.x) < 0.35 && Math.abs(b.y) < 0.35).map(b => [b.x, b.y]); rotulo(vivos(D) > 0.6 ? 'microbio que enferma' : vivos(D) > 0.12 ? 'microbio que enferma: se muere' : 'microbio que enferma: muerto', mejor(3, pat, 0.3, 0.3), 36, -36, a, '#f4a8bc');
+    const bt = PE.bac.filter(b => !b.pat && !b.honor && Math.abs(b.x) < 0.35 && Math.abs(b.y) < 0.35).map(b => [b.x, b.y]); rotulo('bacteria del calor', mejor(3, bt, 0.72, 0.6), 36, 36, a, '#f6c77a');
+    rotulo('película de agua', mejor(3, [[-0.2, menisco(-0.2)], [0.25, menisco(0.25)], [0.05, menisco(0.05)]], 0.6, 0.25), 30, -30, a, '#cfe6ee'); }
+  a = alfaSeg(10);
+  if (a > 0.01){ rotulo('una bacteria', aPantalla(4, 0.05, -0.12), 44, -44, a, '#f6c77a');
+    const r = radioComido(D); const en = BA.enz.map(e => { const ca = Math.cos(ANG), sa = Math.sin(ANG); const d = r; const x = Math.cos(e.a)*d, y = Math.sin(e.a)*d*0.9; return [x*ca - y*sa, x*sa + y*ca]; });
+    rotulo('enzimas: las tijeras', mejor(4, en, 0.3, 0.3), -40, -40, a, '#8fe0d6');
+    const hc = []; for (const q of BA.red.slice(0, 300)){ const ca = Math.cos(ANG), sa = Math.sin(ANG); const x = q.x*ca - q.y*sa, y = q.x*sa + q.y*ca; if (Math.hypot(q.x, q.y) > r + 0.05 && Math.abs(x) < 0.45 && Math.abs(y) < 0.4) hc.push([x, y]); } rotulo('hemicelulosa: lo blando', mejor(4, hc, 0.72, 0.3), 30, -34, a, '#d6e2b2');
+    const lg = BA.lig.map(l => { const ca = Math.cos(ANG), sa = Math.sin(ANG); return [l.x*ca - l.y*sa, l.x*sa + l.y*ca]; }).filter(q => Math.abs(q[0]) < 0.45 && Math.abs(q[1]) < 0.4); rotulo('lignina: lo duro', mejor(4, lg, 0.7, 0.72), 30, 34, a, '#d8a878'); }
+  a = alfaSeg(12);
+  if (a > 0.01 && sucesion(D) > 0.3){ const ac = []; for (const h of PE.actino) for (const q of h.pts.slice(0, 8)) if (Math.abs(q[0]) < 0.4 && Math.abs(q[1]) < 0.4) ac.push(q); rotulo('actinobacteria', mejor(3, ac, 0.7, 0.3), 30, -30, a);
+    const hf = []; for (const h of PE.hifas) for (const q of h.pts.slice(0, 18)) if (Math.abs(q[0]) < 0.45 && Math.abs(q[1]) < 0.4) hf.push(q); rotulo('hongo', mejor(3, hf, 0.3, 0.62), -30, 30, a, '#dfe6c2'); }
+  a = alfaSeg(14);
+  if (a > 0.01){ const hs = PU.parches.filter(q => q.t < 0.8 && Math.abs(q.x) < 0.4 && Math.abs(q.y) < 0.4).map(q => [q.x, q.y]); rotulo('actinobacterias', mejor(2, hs, 0.7, 0.3), 30, -30, a);
+    const hm = []; for (const T of PU.humus) for (const g of T) if (g.t < 0.8 && Math.abs(g.bb[0]) < 0.35 && Math.abs(g.bb[1]) < 0.35) hm.push([(g.bb[0] + g.bb[2])/2, (g.bb[1] + g.bb[3])/2]); rotulo('tierra negra', mejor(2, hm, 0.3, 0.62), -30, 34, a, '#c9e28a'); }
+  a = alfaSeg(16);
+  if (a > 0.01){ const m = FIN.matas[3]; rotulo('compost maduro', aPantalla(0, m.x + 0.02, yg0(m.x) - 0.005), 30, 40, a, '#c9e28a');
+    rotulo('la pila, más baja', aPantalla(0, PILA0.x + 0.02, LV[1].y + (PI1.GY - altoPila(D)*0.8)*s1), -36, -40, a); }
+}
+
+/* ============================================================
+   FUENTES (leídas en el resumen; ver INFORME)
+   ============================================================ */
+const FUENTES = [
+  ['wu2000', '<b>Wu L, Ma LQ, Martinez GA (2000).</b> <em>Comparison of methods for evaluating stability and maturity of biosolids compost.</em> Journal of Environmental Quality 29: 424–429. doi:10.2134/jeq2000.00472425002900020008x — el compost inmaduro puede dañar el crecimiento de las plantas; al curarse, bajó la respiración (CO₂) y subió la germinación de semillas, que sirve para seguir la maduración. Compost de lodos, no de estiércol.'],
+  ['garcia1991', '<b>García C, Hernández T, Costa F (1991).</b> <em>Study on water extract of sewage sludge composts.</em> Soil Science and Plant Nutrition 37: 399–408. doi:10.1080/00380768.1991.10415052 — el compostaje y la maduración bajaron las sustancias que dañan a las plantas: amonio, fenoles y ácidos orgánicos pequeños. Lodos mezclados con restos orgánicos.'],
+  ['wichuk2007', '<b>Wichuk KM, McCartney D (2007).</b> <em>A review of the effectiveness of current time–temperature regulations on pathogen inactivation during composting.</em> Journal of Environmental Engineering and Science 6: 573–586. doi:10.1139/s07-011 — las normas de EE. UU. y Canadá esperan sanear el compost si todas sus partes pasan de 55 °C por al menos 3 días; aun así, en muchos estudios sobrevivieron patógenos, quizá porque no toda la pila se calentó.'],
+  ['islam2004', '<b>Islam M, Morgan J, Doyle MP, Phatak SC, Millner P, Jiang X (2004).</b> <em>Fate of Salmonella enterica serovar Typhimurium on carrots and radishes grown in fields treated with contaminated manure composts or irrigation water.</em> Applied and Environmental Microbiology 70: 2497–2502. doi:10.1128/AEM.70.4.2497-2502.2004 — en parcelas de campo con compost de estiércol contaminado a propósito, la bacteria sobrevivió en la tierra de 203 a 231 días, y en la zanahoria hasta 203 días.'],
+  ['eghball2000', '<b>Eghball B, Lesoing GW (2000).</b> <em>Viability of weed seeds following manure windrow composting.</em> Compost Science &amp; Utilization 8: 46–53. doi:10.1080/1065657X.2000.10701749 — con 60 °C o más, las semillas de maleza pierden la vida después de una sola volteada; el estiércol regado se calentó más y por más tiempo; el de lechería tardó de 4 a 5 meses.'],
+  ['larney2006', '<b>Larney FJ, Sullivan DM, Buckley KE, Eghball B (2006).</b> <em>The role of composting in recycling manure nutrients.</em> Canadian Journal of Soil Science 86: 597–611. doi:10.4141/S05-116 — compostar reduce la masa, el volumen y el agua del estiércol; elimina patógenos, parásitos, semillas de maleza y malos olores; se pierden carbono y nitrógeno; los nutrientes quedan quietos y se sueltan despacio en la tierra.'],
+  ['kebrom2019', '<b>Kebrom TH, Woldesenbet S, Bayabil HK y otros (2019).</b> <em>Evaluation of phytotoxicity of three organic amendments to collard greens using the seed germination bioassay.</em> Environmental Science and Pollution Research 26: 5454–5462. doi:10.1007/s11356-018-3928-4 — una gallinaza comercial dañó la germinación de la col; la boñiga de lechería, no. Tenía más cobre, zinc, níquel y sales.'],
+  ['bernal2009', '<b>Bernal MP, Alburquerque JA, Moral R (2009).</b> <em>Composting of animal manures and chemical criteria for compost maturity assessment. A review.</em> Bioresource Technology 100: 5444–5453. doi:10.1016/j.biortech.2008.11.027 — un buen material de relleno (seco, que da estructura) reduce las pérdidas de nitrógeno al compostar estiércol. Resumen leído en Europe PMC.'],
+  ['huang2017', '<b>Huang J, Yu Z, Gao H y otros (2017).</b> <em>Chemical structures and characteristics of animal manures and composts during composting and assessment of maturity indices.</em> PLOS ONE 12: e0178110. doi:10.1371/journal.pone.0178110 — sin material seco se perdió más amoníaco; compostados solos, el de vaca estuvo estable hacia el día 36, el de gallina hacia el 56, y el de cerdo no maduró en 70 días.'],
+  ['tiquia2005', '<b>Tiquia SM (2005).</b> <em>Microbiological parameters as indicators of compost maturity.</em> Journal of Applied Microbiology 99: 816–828. doi:10.1111/j.1365-2672.2005.02673.x — la temperatura subía con el oxígeno que gastaban los microbios; con la humedad en 60 % y volteando cada 4 días, el estiércol de cerdo maduró en 56 días.'],
+  ['antunes2016', '<b>Antunes LP, Martins LF, Pereira RV y otros (2016).</b> <em>Microbial community structure and dynamics in thermophilic composting viewed through metagenomics and metatranscriptomics.</em> Scientific Reports 6: 38915. doi:10.1038/srep38915 — una pila grande en São Paulo se mantuvo entre 50 y 75 °C, y eso parecía no dejar trabajar a los hongos; voltear devolvió en parte los microbios del comienzo; la hemicelulosa se degradó antes que la celulosa y la lignina.'],
+  ['partanen2010', '<b>Partanen P, Hultman J, Paulin L, Auvinen P, Romantschuk M (2010).</b> <em>Bacterial diversity at different stages of the composting process.</em> BMC Microbiology 10: 94. doi:10.1186/1471-2180-10-94 — compostar es un proceso de microbios que respiran aire, bacterias y hongos; se estimaron más de 2 000 clases de bacterias en los compost estudiados.'],
+  ['finore2023', '<b>Finore I, Feola A, Russo L y otros (2023).</b> <em>Thermophilic bacteria and their thermozymes in composting processes: a review.</em> Chemical and Biological Technologies in Agriculture 10: 7. doi:10.1186/s40538-023-00381-z — en la fase caliente, <i>Bacillus</i> y <i>Thermus</i> son de las bacterias principales; sueltan enzimas que cortan la celulosa, la hemicelulosa y la lignina.'],
+  ['neher2013', '<b>Neher DA, Weicht TR, Bates ST, Leff JW, Fierer N (2013).</b> <em>Changes in bacterial and fungal communities across compost recipes, preparation methods, and composting times.</em> PLoS ONE 8: e79512. doi:10.1371/journal.pone.0079512 — con el tiempo, los hongos del compost se suceden unos a otros, como se conocía en el estiércol de herbívoros; se sabe poco de lo que pasa después de la fase caliente.'],
+  ['meng2019', '<b>Meng Q, Yang W, Men M y otros (2019).</b> <em>Microbial community succession and response to environmental variables during cow manure and corn straw composting.</em> Frontiers in Microbiology 10: 529. doi:10.3389/fmicb.2019.00529 — en el compost de boñiga con tamo de maíz, las actinobacterias (Actinomycetales) marcaron la fase de maduración.'],
+  ['villar2016', '<b>Villar I, Alves D, Garrido J, Mato S (2016).</b> <em>Evolution of microbial dynamics during the maturation phase of the composting of different types of waste.</em> Waste Management 54: 83–92. doi:10.1016/j.wasman.2016.05.011 — al madurar, el compost de estiércol tuvo más bacterias que hongos; en el de pescado mandaron los hongos.'],
+  ['gerber1965', '<b>Gerber NN, Lechevalier HA (1965).</b> <em>Geosmin, an earthy-smelling substance isolated from actinomycetes.</em> Applied Microbiology 13: 935–938. doi:10.1128/am.13.6.935-938.1965 — la geosmina, que huele a tierra, sale de actinobacterias.'],
+  ['gross2021', '<b>Gross A, Glaser B (2021).</b> <em>Meta-analysis on how manure application changes soil organic carbon storage.</em> Scientific Reports 11: 5516. doi:10.1038/s41598-021-82739-7 — 101 estudios: el estiércol subió en promedio 35,4 % el carbono orgánico guardado en el suelo; en clima tropical, menos que fuera del trópico.'],
+  ['krause2024', '<b>Krause HM, Mäder P, Fliessbach A, Jarosch KA, Oberson A, Mayer J (2024).</b> <em>Organic cropping systems balance environmental impacts and agricultural production.</em> Scientific Reports 14: 25537. doi:10.1038/s41598-024-76776-1 — ensayo DOK (Suiza), más de 40 años: con estiércol, el carbono y el nitrógeno del suelo se mantuvieron o subieron, sobre todo con compost de estiércol; con abono solo mineral, bajaron.'],
+  ['sharpley2013', '<b>Sharpley A, Jarvie HP, Buda A, May L, Spears B, Kleinman P (2013).</b> <em>Phosphorus legacy: overcoming the effects of past management practices to mitigate future water quality impairment.</em> Journal of Environmental Quality 42: 1308–1326. doi:10.2134/jeq2013.03.0098 — el fósforo echado de más por años se acumula y sigue llegando a ríos y lagos.'],
+];
+const NUM = {}; FUENTES.forEach(([k], i) => NUM[k] = i + 1);
+$('listaFuentes').innerHTML = FUENTES.map(([k, h]) => `<li id="f-${k}">${h}</li>`).join('');
+for (const e of document.querySelectorAll('[data-num]')) e.textContent = NUM[e.dataset.num] || '?';
+
+/* ============================================================
+   INTERFAZ: estaciones por páginas, palabras
+   [[clave|texto]] = palabra del glosario · {a,b} = fuentes
+   ============================================================ */
+const ESTACIONES = [
+  { t:'El corral', c:'El corral', pags:[
+    { s:['Esta es una finca con su corral.', 'La boñiga que sale de ahí es abono, pero cruda puede hacer daño.', 'Vamos a entrar a una pila de [[compost|compost]] y a ver pasar las semanas.'], nota:'El recuadro de arriba dice cuánto mide lo que usted ve, y qué pasa adentro de la pila.' },
+    { k:'ojo', s:['El abono sin madurar puede dañar a las matas{wu2000}.', 'Lleva cosas que las queman: [[amonio|amonio]], fenoles y ácidos{garcia1991}.', 'Una gallinaza dañó la germinación de la col; la boñiga, no{kebrom2019}.'], nota:'Esos ensayos fueron con lodos y con abonos comprados, no con su estiércol.' },
+    { k:'ojo', s:['Si el abono lleva [[patogeno|microbios que enferman]], duran mucho.', 'En un ensayo echaron una bacteria a propósito en compost de estiércol.', 'Duró más de 200 días en la tierra y llegó a la zanahoria{islam2004}.'], nota:'No eche estiércol crudo sobre lo que se come sin cocinar.' },
+    { s:['Compostar mata microbios dañinos y semillas de [[maleza|maleza]], y quita el mal olor{larney2006}.', 'Vamos a ver cómo.'] },
+    { k:'hacer', s:['Mire el montón de estiércol fresco del corral después de una lluvia.', '¿Qué le nace encima?'] } ] },
+  { t:'La pila', c:'La pila', pags:[
+    { s:['Aquí la pila está cortada por la mitad, para verla por dentro.', 'Lleva capas de boñiga y de [[seco|material seco]]: tamo, hojarasca, paja.'], nota:'El corte es de dibujo: la pila de verdad no se corta.' },
+    { s:['El material seco ayuda a que no se pierda el [[nitrogeno|nitrógeno]]{bernal2009}.', 'Sin él, se escapa más como [[amoniaco|amoníaco]]{huang2017}.'] },
+    { s:['La pila necesita agua.', 'En un ensayo, el estiércol regado se calentó más y por más tiempo{eghball2000}.', 'En otro, con la [[humedad|humedad]] en 60 de cada 100 partes y volteando cada 4 días, el estiércol de cerdo maduró en 56 días{tiquia2005}.'] },
+    { k:'hacer', s:['Apriete un puñado de la pila con la mano.', '¿Le moja la mano, o se le deshace seco?'] } ] },
+  { t:'El calor de adentro', c:'El calor', pags:[
+    { s:['Armada la pila, se calienta por dentro.', 'El calor anda con los [[microbio|microbios]]: donde más oxígeno gastan, más caliente está{tiquia2005}.'], nota:'El naranja del dibujo es el calor: un esquema, no una medición.' },
+    { s:['Para sanear el compost, toda la pila debe pasar de 55 grados por al menos 3 días{wichuk2007}.', 'Pero los bordes se calientan menos, y ahí pueden quedar microbios que enferman{wichuk2007}.'] },
+    { s:['Por eso se [[voltear|voltea]]: lo de afuera pasa al centro{wichuk2007}.', 'Voltear también le devuelve, en parte, los microbios del comienzo{antunes2016}.'], nota:'Siga bajando: la horqueta voltea la pila.' },
+    { k:'tam', s:['Con 60 grados o más, las semillas de maleza mueren después de una sola volteada{eghball2000}.', 'En una pila grande de Brasil, el centro se mantuvo entre 50 y 75 grados{antunes2016}.'] },
+    { k:'hacer', s:['Meta un palo hasta el centro de la pila y déjelo un rato.', 'Sáquelo y tóquelo: ¿cómo está?'] } ] },
+  { t:'Los microbios', c:'Los microbios', pags:[
+    { s:['Estamos sobre un pedazo de paja mojada.', 'Cada palito es una [[bacteria|bacteria]].'], nota:'El ámbar y el rosado son colores de dibujo, para distinguirlas.' },
+    { s:['En una pila puede haber más de 2 000 clases de bacterias{partanen2010}.', 'En el calor mandan las que lo aguantan, como Bacillus y Thermus{finore2023}.', 'En una pila muy caliente, los [[hongo|hongos]] parecían no trabajar{antunes2016}.'] },
+    { s:['Ahora toda la pila pasa de 55 grados.', 'Mire la cuenta de días{wichuk2007}.', 'Los palitos rosados son microbios que enferman: con el calor, muchos mueren{wichuk2007}.'], extra:`<div class="cuenta" aria-hidden="true"><span>Días a más de 55 °C:</span><span class="dias"><i id="d1"></i><i id="d2"></i><i id="d3"></i></span><span id="txtDias">0 de 3</span></div>`, nota:'Aun así, en varios estudios sobrevivieron algunos{wichuk2007}.' },
+    { k:'pensar', s:['Si la pila se seca, ¿qué les pasa a los microbios que viven en el agua de la paja?'] } ] },
+  { t:'Las tijeras', c:'Las tijeras', pags:[
+    { s:['Esta es una sola bacteria sobre los hilos de la paja.', 'Suelta [[enzima|enzimas]]: tijeras que cortan la paja{finore2023}.'], nota:'«Tijeras» es una comparación. Los hilos están dibujados más gruesos de lo que son.' },
+    { s:['Se come primero lo blando, la [[hemicelulosa|hemicelulosa]], antes que la [[celulosa|celulosa]] y la [[lignina|lignina]]{antunes2016}.', 'Siga bajando: el claro alrededor de la bacteria crece.'] },
+    { k:'pensar', s:['¿Qué parte de la paja cree que queda de última?'] } ] },
+  { t:'La tierra negra', c:'La tierra negra', pags:[
+    { s:['Pasaron las semanas. El puñado ya es oscuro y se desmorona.', 'Ya casi no se reconoce la paja.'] },
+    { s:['¿Cuándo está listo? Depende del estiércol{huang2017}.', 'En un ensayo, la boñiga estuvo estable hacia el día 36; la gallinaza, hacia el 56; la de cerdo no maduró en 70 días{huang2017}.', 'Una pila larga de estiércol de lechería tardó de 4 a 5 meses{eghball2000}.'], nota:'Mire las rayas del reloj, en el recuadro de arriba.' },
+    { s:['Los hilos blancos son [[actinobacteria|actinobacterias]]: marcan la maduración{meng2019}.', 'El olor a tierra lo hacen actinobacterias como estas{gerber1965}.', 'Y la pila quedó más chiquita, más liviana y con menos agua{larney2006}.'] },
+    { k:'hacer', s:['Siembre unas semillas en un poquito del compost, y otras al lado en tierra.', 'Si nacen igual de bien, ya no quema.'], nota:'La prueba de la semilla sirve para saber si el compost maduró{wu2000}.' } ] },
+  { t:'A la mata', c:'A la mata', pags:[
+    { s:['El compost maduro va a la tierra, al pie de las matas.', 'Suelta su alimento despacio{larney2006}.'] },
+    { s:['El estiércol hace [[tierranegra|tierra negra]]: en promedio, un tercio más de carbono en el suelo{gross2021}.', 'En Suiza, en más de 40 años, la tierra con estiércol guardó o ganó carbono; la de abono solo mineral, lo perdió{krause2024}.'], nota:'En el trópico, el aumento fue menor{gross2021}.' },
+    { k:'ojo', s:['Pero más no siempre es mejor.', 'El [[fosforo|fósforo]] que sobra se acumula por años y termina en las quebradas{sharpley2013}.'] },
+    { k:'hacer', s:['Arme su pila con la boñiga del corral y el tamo de la cosecha.', 'Voltéela para que los bordes también se calienten, y haga la prueba de la semilla antes de usarla.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>` } ] },
+];
+const PASOS = {
+  c0: { n:'De paso', t:'Se calienta', pags:[ { s:['Pasan los días y la pila se calienta.', 'Mire el termómetro: su aguja es un esquema.'] } ] },
+  c1: { n:'De paso', t:'Un puñado del centro', pags:[ { s:['Adentro hay paja, estiércol, agua y aire.', 'Compostar es un trabajo de microbios que respiran aire{partanen2010}.'] } ] },
+  c2: { n:'La subida', t:'Se enfría', pags:[
+    { s:['Pasan las semanas y la pila se enfría.', 'Cambian los que trabajan: los hongos se suceden, unos tras otros{neher2013}.', 'En la boñiga que madura aparecen las actinobacterias{meng2019}.'], nota:'En el estiércol que madura siguen mandando las bacterias{villar2016}.' } ] },
+};
+const GLOS = [
+  ['compost', 'Compost', 'Estiércol y restos de cosecha amontonados hasta que se calientan y se deshacen. Compostar es un trabajo de microbios que respiran aire{partanen2010}. Si toda la pila pasa de 55 °C por al menos 3 días, mueren muchos microbios que enferman{wichuk2007}.'],
+  ['amonio', 'Amonio y amoníaco', 'Formas del nitrógeno. En el abono sin madurar, el amonio es de las cosas que dañan a las plantas{garcia1991}. El amoníaco es un gas: por ahí se escapa nitrógeno de la pila{huang2017}.'],
+  ['amoniaco', 'Amoníaco', 'Un gas que sale del estiércol. Sin material seco en la pila, se pierde más nitrógeno así{huang2017}.'],
+  ['patogeno', 'Microbios que enferman', 'También se llaman patógenos. Pueden venir en el estiércol y durar mucho en la tierra{islam2004}. El calor de la pila mata muchos, si llega a todas partes{wichuk2007}.'],
+  ['maleza', 'Semillas de maleza', 'El estiércol las trae. Con 60 °C o más, mueren después de una volteada{eghball2000}.'],
+  ['seco', 'Material seco', 'Tamo, hojarasca, paja, cascarilla: lo que da estructura a la pila. Ayuda a no perder nitrógeno{bernal2009}.'],
+  ['nitrogeno', 'Nitrógeno', 'Uno de los alimentos principales de las matas. En la pila se pierde una parte{larney2006}; el material seco ayuda a perder menos{bernal2009}.'],
+  ['humedad', 'Humedad', 'El agua que tiene la pila. En un ensayo se mantuvo en 60 de cada 100 partes{tiquia2005}.'],
+  ['microbio', 'Microbio', 'Ser vivo tan pequeño que no se ve a simple vista, como las bacterias y muchos hongos. Son los que hacen el compost{partanen2010}.'],
+  ['voltear', 'Voltear', 'Mover la pila para que lo de afuera pase al centro y se caliente también{wichuk2007}. Con 60 °C o más, una volteada basta para acabar con las semillas de maleza{eghball2000}.'],
+  ['bacteria', 'Bacteria', 'Un microbio de una sola célula. En el compost hay miles de clases{partanen2010}. En el calor mandan las que lo aguantan, como Bacillus y Thermus{finore2023}.'],
+  ['hongo', 'Hongo', 'Microbios que crecen en hilos. En una pila muy caliente parecían no trabajar{antunes2016}; con el tiempo se suceden unos a otros{neher2013}.'],
+  ['enzima', 'Enzima', 'Una pieza que sueltan los microbios para cortar la paja: una «tijera» química{finore2023}. «Tijera» es una comparación.'],
+  ['hemicelulosa', 'Hemicelulosa', 'La parte blanda de la paja. Se degrada antes que la celulosa y la lignina{antunes2016}.'],
+  ['celulosa', 'Celulosa', 'Los hilos que dan fuerza a la paja. Se degrada después de la hemicelulosa{antunes2016}.'],
+  ['lignina', 'Lignina', 'Lo más duro de la paja. La hemicelulosa se va antes que ella{antunes2016}.'],
+  ['actinobacteria', 'Actinobacteria', 'Bacterias que crecen en hilos finos. En la boñiga con tamo marcaron la maduración{meng2019}. Hacen la geosmina, que huele a tierra{gerber1965}.'],
+  ['tierranegra', 'Tierra negra', 'Tierra con más materia orgánica. El estiércol sube el carbono del suelo, en promedio un tercio{gross2021}; con abono solo mineral, baja{krause2024}.'],
+  ['fosforo', 'Fósforo', 'Otro alimento de las matas. El que sobra se acumula en la tierra y llega a las quebradas{sharpley2013}.'],
+];
+function refs(l){ return '<sup>' + l.split(',').map(k => { const n = NUM[k.trim()]; return n ? `<a href="#f-${k.trim()}" data-f>${n}</a>` : '?'; }).join('<span aria-hidden="true">,</span>') + '</sup>'; }
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([a-z0-9,]+)\}/g, (m, l) => refs(l));
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[a-z0-9,]+\}/g, ''); }
+
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿Cuánto calor?', ojo:'Cuidado' };
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag${P.k === 'ojo' ? ' ojo' : ''}">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : P.k === 'ojo' ? ' class="ojo-p"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue);
+  else if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } } }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+function fmtEscala(m){ const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6],['nm',1e-9]]; for (const [u, k] of U){ if (m >= k*0.9999 || u === 'nm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } } }
+function fmtAumento(x){ if (x < 10) return '×' + fmt3(x); const e = Math.floor(Math.log10(x)); const r = Math.round(x/Math.pow(10, e-2))*Math.pow(10, e-2); return '×' + Math.round(r).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+/* lo que se dice de adentro: solo lleva número lo que tiene fuente */
+function adentro(D){
+  if (D < 0.6) return ['día 0 · recién armada', 'frio'];
+  if (D < 4.2) return ['se calienta', ''];
+  if (D < 5.3) return ['el centro, caliente; los bordes, menos', ''];
+  if (D < 7.7) return ['volteando', ''];
+  if (D < 9.0) return ['toda la pila, caliente', ''];
+  if (D < 12.0) return [`más de 55 °C · día ${Math.min(3, 1 + Math.floor(D - 9))} de 3`, ''];
+  if (D < 14) return ['más de 55 °C · 3 días cumplidos', ''];
+  if (D < 35.9) return ['se enfría; cambian los microbios', 'frio'];
+  if (D < 36.6) return ['madura: la boñiga, hacia el día 36', 'tierra'];
+  return ['en la tierra, al pie de las matas', 'tierra'];
+}
+function diasCumplidos(D){ return D < 9 ? 0 : D >= 12 ? 3 : Math.min(3, 1 + Math.floor(D - 9)); }
+const NOTAS = [
+  'Tamaños aproximados. Colores reales.',
+  'Corte de dibujo. El calor, en naranja, es un esquema.',
+  'Tamaños aproximados. Colores parecidos a los reales.',
+  'Colores de dibujo, no reales.',
+  'Colores de dibujo. Hilos engrosados.',
+];
+const NIVEL = ['al aire', 'la pila', 'un puñado', 'la paja mojada', 'una bacteria'];
+let anchoInicial = 0, ultCard = '', ultEst = -1;
+function cardDe(p){
+  for (const s of SEGS) if (s.card && s.k === 'hold' && p >= s.a - 0.25 && p <= s.b + 0.2) return s.card;
+  for (const s of SEGS) if (s.card && s.k === 'move' && p >= s.a + 0.2 && p <= s.b - 0.15) return s.card;
+  return '';
+}
+function actualizaUI(cam){
+  const ancho = anchoVista(cam), D = cam.D;
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial/ancho));
+  const [txt, cls] = adentro(D); const va = $('vAdentro'); if (va._s !== txt){ va._s = txt; va.textContent = txt; va.className = cls; }
+  const pct = clamp(D/70*100, 0, 100).toFixed(2) + '%'; $('vMarca').style.left = pct; $('vLleno').style.width = pct;
+  let st = 0; for (let i = 0; i < EST.length; i++){ if (pRender >= EST[i].a - 0.4) st = i; }
+  const L = baseDe(cam);
+  $('vEstacion').textContent = `${st+1}/7 · ${ESTACIONES[st].c}`;
+  $('vNivel').textContent = cam.seg.sube ? '↑ subiendo' : NIVEL[L];
+  const nota = pRender < 0.4 ? 'Tamaños aproximados. Aumento respecto al primer cuadro.' : NOTAS[L];
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  const card = cardDe(pRender);
+  if (card !== ultCard){ ultCard = card;
+    detenVoz();
+    if (!card) fr.classList.remove('ver');
+    else {
+      const esEst = card[0] === 'e'; const i = esEst ? +card.slice(1) : -1;
+      estAct = esEst ? ESTACIONES[i] : PASOS[card]; pagAct = 0;
+      $('fNum').textContent = esEst ? `Estación ${i+1} de 7` : PASOS[card].n;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = esEst ? `Estación ${i+1}: ${estAct.t}` : `${PASOS[card].n}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  const nd = diasCumplidos(D); for (let k = 1; k <= 3; k++){ const e = $('d' + k); if (e) e.classList.toggle('si', k <= nd); } const td = $('txtDias'); if (td) td.textContent = `${nd} de 3`;
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, pRender);
+  $('titulo').style.visibility = pRender > 0.65 ? 'hidden' : 'visible';
+  if (!auto) rotuloBajar();
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿Por qué no echar estiércol crudo al pie de la mata?', ops:[{ t:'Puede dañarla y traer microbios que enferman' }, { t:'Porque pesa mucho' }, { t:'Porque se lo lleva el viento' }], ok:0, si:'Eso es: sin madurar puede dañar la mata, y puede traer microbios que enferman.', no:'Esa no. Piense en la mata y en quien se come la cosecha.' },
+  { q:'¿Qué pide la pila para sanearse?', ops:[{ t:'Tibia una semana' }, { t:'Más de 55 grados por 3 días, toda' }, { t:'Una hora al sol' }], ok:1, si:'Eso es: toda la pila, más de 55 grados, al menos 3 días.', no:'Esa no. Busque el número de grados y de días.' },
+  { q:'¿Para qué se voltea la pila?', ops:[{ t:'Para que se vea bonita' }, { t:'Para enfriarla del todo' }, { t:'Para que los bordes también se calienten' }], ok:2, si:'Eso es: lo de afuera pasa al centro y también se calienta.', no:'Esa no. Piense en los bordes de la pila.' },
+  { q:'¿Dónde están los que hacen el trabajo?', ops:[{ m:0, n:'El corral' }, { m:3, n:'Los microbios' }, { m:6, n:'La mata' }], ok:1, si:'Eso es: los microbios, en el agua que moja la paja.', no:'Esa no. Busque los palitos.' },
+  { q:'¿Qué se come primero la bacteria?', ops:[{ t:'Lo blando: la hemicelulosa' }, { t:'Lo duro: la lignina' }, { t:'La piedra' }], ok:0, si:'Eso es: primero lo blando, antes que la celulosa y la lignina.', no:'Esa no. Empieza por lo más fácil.' },
+  { q:'¿Cómo sabe si el compost ya no quema?', ops:[{ t:'Cuando cumple una semana' }, { t:'Siembro semillas en él y nacen bien' }, { t:'Cuando está bien caliente' }], ok:1, si:'Eso es: la prueba de la semilla.', no:'Esa no. Pregúntele a una semilla.' },
+];
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, CX, CY, bw: buf.width, bh: buf.height, D: DIA };
+  W = H = S = lado; DPR = 1; PORT = false; CX = CY = lado/2; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  const cam = camAt(estP(i)); DIA = cam.D; const L = baseDe(cam), l = LV[L];
+  try { pintaNivel(x, L, (cam.X - l.O[0])/l.F, (cam.Y - l.O[1])/l.F, cam.Z/l.F); }
+  finally { ({ W, H, S, DPR, PORT, CX, CY } = g); DIA = g.D; buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó del corral a los microbios, y volvió a la tierra negra.</p><p>Mañana, métale un palo a su pila y tóquelo.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver al corral</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80)/3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara y el reloj
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight*(1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY/maxScroll(), 0, 1)*T; }
+function irA(pp){ const y = pp/T*maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+let pObj = 0, sucio = true;
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+/* «Bajar» va de parada en parada y se detiene: quien lee despacio decide cuándo seguir */
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = PARADAS.find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto/T*maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && e.target === bBajar)) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar y se calienta con la pila
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){ const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[49, 'sawtooth', 0.3], [73.4, 'sawtooth', 0.2], [98.1, 'triangle', 0.35], [146.8, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false }; }
+    audio.on = !audio.on; if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? 'Sonido: sí' : 'Sonido: no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar bordón');
+  } catch (err){ bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){ if (!audio || !audio.on) return; const lz = luzProf(cam.Z), ca = calor(cam.D); const t = audio.ac.currentTime; audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz + 500*ca, t, 0.2); const base = 49*(0.84 + 0.16*lz)*(1 + 0.06*ca); [1, 1.4983, 2.002, 2.996].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4)); }
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  CX = W/2; CY = H*(PORT ? 0.4 : 0.47);
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  fSans = getComputedStyle(document.body).getPropertyValue('--sans');
+  guion();
+  anchoInicial = SEGS[0].A.Z*W/S;
+  altoPista();
+  colocaTitulo();
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+/* En móvil el título va debajo del medidor; el medidor cambia de alto cuando cambia su nota, así que se recoloca cada vez. */
+function colocaTitulo(){ const mb = Math.round($('medidor').getBoundingClientRect().bottom); $('titulo').style.top = innerWidth <= 640 ? (mb + 9) + 'px' : ''; }
+if ('ResizeObserver' in window) new ResizeObserver(colocaTitulo).observe($('medidor'));
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt)/1000); tAnt = now;
+  if (auto && !RM){ const y = scrollY + auto*(maxScroll()/T)*(T/95)*dt; const yM = metaAuto/T*maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ let best = 1e9, mi = 0; for (let k = 0; k < PARADAS.length; k++){ const d = Math.abs(PARADAS[k] - pObj); if (d < best){ best = d; mi = k; } } meta = PARADAS[mi];
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; } }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt/0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt*7); p += (meta - p)*k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes)/dt : 0;
+  if (p !== antes) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){ // fundido entre dos paradas, nunca a negro
+      pRender = rmDesde; render(); ctx.setTransform(1,0,0,1,0,0);
+      bctx.setTransform(1,0,0,1,0,0); bctx.globalCompositeOperation = 'copy'; bctx.drawImage(cv, 0, 0); bctx.globalCompositeOperation = 'source-over';
+      const copia = document.createElement('canvas'); copia.width = buf.width; copia.height = buf.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      pRender = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else { pRender = p; cam = render(); }
+    actualizaUI(cam); sonido(cam);
+    sucio = (RM && rmT < 1);
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e){} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+prepTexturas();
+redim();
+if (qs.has('p')){ const raw = qs.get('p'); const pp = raw.startsWith('e') ? estP(+raw.slice(1)) : parseFloat(raw); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el video; no altera nada) */
+window.__descenso = {
+  get T(){ return T; }, get SEGS(){ return SEGS; }, get PARADAS(){ return PARADAS; }, get p(){ return pRender; }, get rm(){ return RM; }, estP, camAt,
+  anchoVista: pp => anchoVista(camAt(pp)), nivel: pp => baseDe(camAt(pp)), dia: pp => camAt(pp).D, adentro: pp => adentro(camAt(pp).D)[0],
+  fijar(pp){ window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, PASOS, GLOS, FUENTES }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0)/ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp/T*maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1)/((marcas[marcas.length-1] - marcas[0])/1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H, canvas: document.querySelectorAll('canvas').length }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

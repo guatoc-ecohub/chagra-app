@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — de la flor de fresa a la semilla, con las abejas</title>
+<meta name="description" content="Una sola toma, sin cortes: de una mata de fresa en flor a la abeja que la visita, al grano de polen, al óvulo, y de vuelta hasta la fresa que cuaja completa. Por qué salen fresas torcidas y por qué no fumigar en flor. Cifras con fuente; tamaños aproximados; glosario, lectura en voz alta y un repaso para jugar.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(20,15,10,.7); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#f2c14e; --acento-tinta:#ffd97a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#140f0b;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#140f0b;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#1f2d17}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#26381c;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#26381c;margin-top:1em;font-weight:600}
+#titulo h1,#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(246,244,232,.95),0 0 16px rgba(246,244,232,.85)}
+
+#titulo{background:rgba(246,244,232,.96);border-radius:16px;padding:12px 16px 14px}
+
+/* La finca: altitud desde la URL, la ubicación o a mano */
+#ubicacion{position:fixed;z-index:5;right:var(--gut);top:var(--ubic-top,220px);width:min(24rem,calc(100vw - 2*var(--gut)));background:rgba(246,242,226,.96);color:#2a2213;border:1px solid #8a7348;border-radius:14px;padding:8px 14px;font-size:1rem;box-shadow:0 6px 22px rgba(20,14,6,.25);transition:opacity .3s ease}
+#ubicacion summary{cursor:pointer;font-weight:650;line-height:1.4;min-height:32px;display:flex;align-items:center}
+#ubicacion p{margin:.5em 0;line-height:1.4}
+#ubicacion input{font:inherit;width:8em;min-height:44px;border:1px solid #8a7348;border-radius:8px;padding:6px;background:#fff;color:#2a2213}
+#ubicacion button{font:inherit;background:#4a3a1c;color:#fff;border-radius:9px;padding:8px 12px;min-height:44px;border:0;cursor:pointer;margin:2px 4px 2px 0}
+#ubicacion label{display:block;margin:6px 0}
+#ubicacion.oculto{opacity:0;pointer-events:none}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(242,193,78,.3)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:var(--acento);color:#2a1d05;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(18,13,8,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(20,15,10,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(44,34,24,.85);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:var(--acento);color:#2a1d05;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#f7cf6a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:2px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:5px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#1a1510;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(10,7,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#1a1510;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#241d15;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(242,193,78,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{grid-column:1 / -1;margin-top:4px;padding-top:4px}
+  #medidor .nota{display:none}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px;max-height:52vh;overflow:auto}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .btn{padding:10px 9px;font-size:.95rem}
+  #bSonido .lbl{display:none}
+  #riel{left:auto;right:4px;top:52%}
+  #riel button span{display:none}
+  #ubicacion{left:var(--gut);right:var(--gut);width:auto;padding:4px 12px}
+  #ubicacion[open]{max-height:56vh;overflow:auto}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 7px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo desde una mata de fresa en flor, con su abeja, hasta el óvulo de un pistilo, y de vuelta hasta la fresa" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p id="subtitulo">De la flor de la fresa a la abeja, al grano de polen y al óvulo, y de vuelta hasta la fresa que cuaja completa.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<details id="ubicacion">
+  <summary id="origenPiso" aria-live="polite">Altitud de ejemplo</summary>
+  <p id="detallePiso">La altitud de su finca cambia qué abeja se ve en la flor. Nada de esto se guarda ni se envía.</p>
+  <form id="alturaManual"><label>Altitud de su finca, en metros <input id="alturaFinca" type="number" min="0" max="6000" step="any" required></label><button type="submit">Usar esta altitud</button></form>
+  <p><button id="usarUbicacion" type="button">Usar mi ubicación</button></p>
+  <p id="estadoUbicacion" role="status"></p>
+</details>
+
+<aside id="medidor" aria-label="Medidor de tamaño">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">60,0 cm</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 600 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/8 · La mata</span><span id="vMomento">flor abierta</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 8</div>
+  <h2 id="fTit">La mata de fresa</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el zumbido"><span aria-hidden="true">♪</span><span class="lbl"> Sonido: <span class="est">no</span></span></button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>: dan el orden de tamaño de lo que se ve, no una medición. El pistilo, el óvulo y el aquenio están <b>simplificados</b>, y sus colores son <b>de dibujo</b>. El tamaño de las abejas en el dibujo no es una medida. La fresa es un <b>ejemplo</b>: en ella se ve claro lo que hace la abeja. Palabras como «canastita», «puertica» o «botoncito» son <b>comparaciones</b>; el texto lo dice cada vez. Angelita es el dibujo aprobado de la casa; no es un retrato científico de la especie.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>Nates-Parra G (2001).</b> <em>Las abejas sin aguijón (Hymenoptera: Apidae: Meliponini) de Colombia.</em> Biota Colombiana 2(3): 233–248. Instituto Humboldt, redalyc.org/articulo.oa?id=49120302 — abejas corbiculadas; aguijón reducido; junto con la abeja de miel, las únicas abejas altamente sociales; en Colombia se les dice angelitas, entre otros nombres; <i>Tetragonisca angustula</i> registrada entre 10 y 1 800 m; nueve especies de abejas sin aguijón por encima de 2 000 m, hasta 3 400 m; la entrada del nido de <i>Tetragonisca</i> es un tubo de cera recto.</li>
+      <li id="f2"><b>Malagodi-Braga KS, Kleinert AMP (2004).</b> <em>Could Tetragonisca angustula Latreille (Apinae, Meliponini) be effective as strawberry pollinator in greenhouses?</em> Australian Journal of Agricultural Research 55: 771–773. doi:10.1071/AR03240 — solo se leyó el resumen: una colonia en un invernadero de unas 1 350 matas de la variedad «Oso Grande» alcanzó para polinizar las flores primarias; aportó al peso y la forma de las fresas.</li>
+      <li id="f3"><b>Klatt BK, Holzschuh A, Westphal C y otros (2014).</b> <em>Bee pollination improves crop quality, shelf life and commercial value.</em> Proceedings of the Royal Society B 281: 20132440. doi:10.1098/rspb.2013.2440 — nueve variedades de fresa; las polinizadas por abejas pesaron 11,0 % más que las de viento y 30,3 % más que las de autopolinización, con menos deformaciones; los aquenios son los frutos verdaderos; los fecundados producen auxina y los no fecundados no; las abejas reparten el polen parejo sobre el receptáculo; el estigma está receptivo antes de que las anteras de la misma flor suelten polen; los aquenios fecundados se hunden en agua y los abortados flotan.</li>
+      <li id="f4"><b>Tian Y, Xin W, Lin J y otros (2022).</b> <em>Auxin coordinates achene and receptacle development during fruit initiation in Fragaria vesca.</em> Frontiers in Plant Science 13: 929831. doi:10.3389/fpls.2022.929831 — la auxina que produce el óvulo fecundado en el aquenio hace crecer el receptáculo; sin aquenios, el receptáculo no crece.</li>
+      <li id="f5"><b>Nitsch JP (1950).</b> <em>Growth and morphogenesis of the strawberry as related to auxin.</em> American Journal of Botany 37: 211–215. doi:10.1002/j.1537-2197.1950.tb12183.x — el experimento de quitar los aquenios. <b>No se leyó</b>: se cita tal como lo resume [4].</li>
+      <li id="f6"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §32.2 «Pollination and Fertilization». OpenStax (CC BY 4.0), openstax.org/books/biology-2e/pages/32-2-pollination-and-fertilization — polinización: polen de la antera al estigma; el tubo necesita agua y oxígeno, crece por el estilo y entra al óvulo por el micrópilo; una célula del polen fecunda la ovocélula y la otra forma el endospermo; el óvulo se vuelve semilla; la fresa es un fruto accesorio que sale del receptáculo; las abejas buscan polen y néctar.</li>
+      <li id="f7"><b>Halbritter H, Auer W (2016).</b> <em>Fragaria viridis.</em> PalDat, base de datos palinológica, paldat.org/pub/Fragaria_viridis/304038 — grano de polen hidratado de 16 a 20 µm. Es una fresa silvestre del mismo género, no la fresa de cultivo.</li>
+      <li id="f8"><b>ICA (2018).</b> <em>Para proteger a los polinizadores, el ICA capacitó a 1256 personas en 13 departamentos del país.</em> ica.gov.co/noticias/ica-polinizadores-abejas-capacitacion.aspx — identificar los visitantes florales del cultivo; buscar la asesoría de un agrónomo; evitar o disminuir los insecticidas cuando las flores estén abiertas; consultar si hay apiarios cerca; dejar vegetación natural que florezca junto al cultivo.</li>
+      <li id="f9"><b>ICA (2021).</b> <em>Resolución 092101 del 2 de marzo de 2021.</em> Suspende el registro de los productos con fipronil para aguacate, café, cítricos y pasifloras; el fipronil es sistémico y llega al néctar y al polen.</li>
+      <li id="f10"><b>ICA (2021).</b> <em>La protección a las abejas, tarea del país productor</em> (28 de diciembre). ica.gov.co/noticias/ica-proteccion-abejas-tarea-pais-productor — 45 denuncias de mortalidad de abejas atendidas en 2021; fipronil en el 51,35 % de 37 resultados de laboratorio.</li>
+      <li id="f11"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §4.1 «Studying Cells». OpenStax (CC BY 4.0) — una micra (µm) es la millonésima parte de un metro.</li>
+    </ol>
+    <p class="aviso"><b>Cuentas hechas con esas cifras.</b> Granos de polen en fila en un milímetro: 1 000 µm ÷ 20 µm = 50 y 1 000 µm ÷ 16 µm ≈ 62 [7]. «Más de 70 años»: de 1950 [5] a 2026. «La mitad de los casos»: 51,35 % [10]. La línea «En su regla» del medidor divide un milímetro entre el ancho de la vista, que es aproximado.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script id="lamina" type="application/json">{"decir": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(-1.9 .6) scale(0.84 .84) rotate(0)\"><path d=\"M0 0 C-1.71 .96 -5.47 3.56 -7.13 5.46 C-8.01 6.47 -8.47 7.59 -7.95 7.84 C-7.13 8.21 -4.6 7.13 -2.86 5.44 C-1.02 3.7 .27 1.64 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"></path><path d=\"M-.18 .51 C-1.86 3.16 -5.38 6.62 -7.68 7.61 Q-4.6 6.83 -2.8 4.85 Q-.74 2.63 -.18 .51Z\" fill=\"#cdb989\" opacity=\".18\"></path><path d=\"M-.22 .43 C-1.66 2.3 -5.98 5.69 -7.81 7.61 M-.69 1.09 C-1.75 3.2 -3.7 5.8 -6.75 7.48 M-1.04 2.31 Q-2.2 4.9 -4.86 6.9 M-2.77 3.36 Q-3.02 4.49 -4.31 5.01 M-4.47 4.71 Q-5.36 5.08 -6.08 5.35 M-2.77 4.98 Q-3.6 5.13 -3.95 5.86 M-5.47 6.33 Q-5.65 6.84 -6.02 7.18\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"></path><path d=\"M-1.8 1.5 Q-5.86 4.45 -7.4 6.54 M-7.23 7.66 Q-5.78 7.28 -4.72 6.5\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"></path></g><g data-anatomia=\"ala\" transform=\"translate(1.7 .6) scale(-0.84 .84) rotate(0)\"><path d=\"M0 0 C-1.01 .98 -2.55 3.25 -3.88 5.16 C-4.49 6.1 -5.03 7.25 -4.72 7.78 C-4.34 8.26 -2.69 7.65 -1.81 6.46 C-.49 4.75 .35 2.1 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"></path><path d=\"M-.14 .49 C-1.29 3.55 -3.42 6.71 -4.5 7.59 Q-2.72 7.31 -1.35 4.86 Q-.22 2.42 -.14 .49Z\" fill=\"#cdb989\" opacity=\".18\"></path><path d=\"M-.18 .45 C-.86 2.63 -3.78 6.45 -4.59 7.55 M-.46 1.04 Q-1.07 4.18 -3.11 7.19 M-.4 2.2 Q-.82 5.25 -2.24 6.92 M-1.62 3.21 Q-1.71 4.42 -2.82 4.98 M-2.18 5.4 Q-2.75 5.69 -3.39 5.81 M-1.03 4.52 Q-1.63 4.66 -2.02 4.2\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"></path><path d=\"M-.97 1.55 Q-2.73 4.04 -4.06 6.23 M-4.14 7.66 Q-3.07 7.3 -2.39 6.6\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"></path></g></g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-1.5 5.2) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"></path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"></path></g></g><g data-anatomia=\"pata-posterior\" transform=\"translate(1.85 5.2) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"></path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"></path></g></g></g><g data-anatomia=\"abdomen\"><path d=\"M-2.2 2.25 C-4.07 3.39 -4.35 6.9 -2.34 9.3 Q-1.79 9.99 -1.49 10.12 C.1 9.63 2.79 7.93 3.08 5.28 Q3.4 3.48 1.81 2.33Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"></path><path d=\"M-2.8 3.07 Q-3.42 3.52 -3.59 4.38 Q-2.62 5.7 -.68 5.63 Q1.93 5.48 3.06 4.32 L2.94 3.51 Q1.92 4.47 .05 4.55 L-.55 4.25 L-1.09 4.56 L-1.48 4.09 L-1.83 4.31 Q-2.38 3.94 -2.8 3.07Z M-3.65 5.26 Q-3.86 6.11 -3.36 7.05 Q-1.95 8.07 -.49 7.74 Q1.68 7.29 2.48 6.38 L2.86 5.49 Q1.67 6.25 .18 6.49 L-.28 6.2 L-.75 6.55 L-1.35 6.26 L-1.79 6.42 Q-2.98 6.36 -3.65 5.26Z M-2.98 7.9 Q-2.55 8.68 -1.86 9.35 Q-.47 9.57 1.25 8.05 L1.78 7.45 Q.32 8.39 -.9 8.5 L-1.3 8.27 L-1.67 8.51Z\" fill=\"#c58f42\"></path><path d=\"M-2.91 3.53 Q-3.27 4 -3.09 4.39 M-3.33 5.85 L-3.01 6.47 M-2.59 8.17 L-2.12 8.69\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"></path><path d=\"M-3.68 4.78 Q-1.38 6.79 2.92 4.96 M-3.31 7.39 Q-.45 8.85 2.13 6.97 M-2.3 9.19 Q-.65 9.66 .52 8.98\" stroke=\"#88603a\" stroke-width=\".1\" fill=\"none\"></path><path d=\"M1.59 3.39 Q2.74 7.19 -1.49 10.12 Q2.75 8.34 3.08 5.28 Q3.38 3.58 1.81 2.33Z\" fill=\"#30251b\" opacity=\".26\"></path></g><g data-anatomia=\"torax\"><path d=\"M-2.56 -2.16 Q-2.98 -2.18 -3.26 -1.82 L-3.08 -1.79 L-3.49 -1.43 L-3.26 -1.44 L-3.6 -.98 L-3.43 -1.04 L-3.73 -.45 L-3.51 -.6 L-3.75 .03 L-3.57 -.08 Q-3.82 .74 -3.48 1.57 L-3.59 1.48 L-3.31 2.12 L-3.42 2.07 L-3.02 2.66 L-3.12 2.71 L-2.57 3.13 L-2.69 3.18 L-2.05 3.51 L-2.12 3.66 L-1.56 3.8 L-1.63 3.94 L-1.04 3.94 L-.91 4.12 L-.63 3.99 L-.32 4.05 L-.06 3.85 L.22 3.9 L.5 3.64 L.77 3.7 L1.02 3.36 L1.28 3.41 L1.48 3.07 L1.75 3.01 L1.86 2.71 L2.12 2.57 L2.18 2.25 L2.49 2.04 L2.49 1.77 L2.81 1.52 L2.72 1.34 L3.01 .95 L2.91 .8 L3.17 .37 L3.03 .25 L3.29 -.24 L3.12 -.24 L3.31 -.8 L3.07 -.67 L3.17 -1.14 L2.94 -1.03 Q2.79 -1.65 2.39 -1.83 Q.03 -3.08 -2.56 -2.16Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"></path><path d=\"M-3.24 -1.3 Q-3.49 -.65 -3.2 .2 C-2.78 1.16 -2.07 1.47 -1.29 1.94 Q.19 2.62 1.19 1.4 Q2.36 .4 2.85 -1.09 L2.99 -.46 Q2.9 .53 2.34 1.24 L2.32 1.5 Q1.68 2.75 .44 3.27 L.19 3.21 L-.32 3.63 L-.76 3.48 L-1.19 3.61 Q-2.9 2.86 -3.33 1.42 Q-3.86 -.12 -3.24 -1.3Z\" fill=\"#c58f42\"></path><path d=\"M-3.03 -1.55 Q-3.36 -.61 -2.77 .36 Q-2.39 1.16 -1.3 1.63 L-.99 1.56 Q.11 2.2 1.13 1.11 Q2.09 .47 2.76 -.93 L2.69 -.15 Q2.21 1.25 1.32 1.66 L1.27 1.85 L.63 2.2 L.32 2.12 L-.14 2.38 L-.34 2.17 L-.77 2.27 L-1.11 2.05 L-1.42 2.05 Q-2.69 1.47 -3.05 .54 Q-3.68 -.67 -3.03 -1.55Z\" fill=\"#edc67d\"></path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-2.79 -1.72 q-.4 .18 -.59 .68 M-2.62 -1.3 q-.55 .57 -.44 1.12 M-3.04 -.83 q-.36 .35 -.4 .69 M-2.79 -.51 q-.18 .38 -.08 .78 M-2.38 -.6 q-.3 .54 -.06 1.11 M-2.1 -.38 q-.09 .27 .12 .61 M-1.8 -.29 q-.19 .53 .16 1.06 M-1.23 -.06 q-.2 .42 .05 .81 M-.92 .05 q-.04 .25 .18 .47 M-.6 .03 q-.16 .52 .03 .84 M-.04 -.04 q.08 .55 -.13 1.05 M.39 .02 q.22 .18 .03 .57 M.96 -.21 q.22 .4 -.18 .98 M1.44 -.35 q.24 .17 -.01 .69 M1.83 -.63 q.09 .5 -.27 .99 M2.36 -.94 q.02 .34 -.14 .5 M2.59 -1.12 q.24 .32 -.04 .73\"></path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-3.24 -1.35 l-.21 .36 M-3.17 -.51 q-.06 .43 .18 .68 M-2.77 -.23 l.06 .53 M-2.63 .23 q.11 .48 .45 .72 M-2.23 .71 l.22 .58 M-1.89 .88 q.12 .46 .52 .69 M-1.43 1.24 l.15 .38 M-1.07 1.44 q.07 .41 .29 .5 M-.48 1.58 l.02 .46 M-.13 1.53 q.15 .3 -.01 .65 M.28 1.55 q.01 .38 -.24 .58 M.63 1.31 l-.09 .43 M1.05 1.04 q-.1 .57 -.34 .76 M1.49 .85 l-.11 .31 M1.71 .54 q.09 .3 -.3 .68 M2.03 .23 l-.12 .39 M2.42 -.22 q.02 .35 -.28 .75 M2.8 -.62 l-.18 .31\"></path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-3.41 .08 q.03 .37 .19 .53 M-3.21 .78 q.02 .62 .45 .97 M-2.91 1.17 l.14 .37 M-2.58 1.54 q.24 .55 .6 .75 M-2.2 1.82 l.14 .4 M-1.84 2.11 q.25 .4 .55 .5 M-1.28 2.26 l.06 .42 M-.96 2.48 q.05 .31 .24 .55 M-.49 2.51 l-.03 .65 M-.14 2.67 q-.02 .25 -.19 .46 M.31 2.51 l-.13 .39 M.67 2.21 q-.12 .51 -.52 .87 M1.12 1.9 q-.12 .37 -.35 .57 M1.65 1.64 l-.22 .52 M2.06 1.1 q-.05 .58 -.38 .88 M2.31 .74 l-.03 .3 M2.74 .23 q-.02 .54 -.3 .8\"></path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-3.37 1.28 q-.06 .5 .18 .87 M-2.97 1.92 l.36 .61 M-2.73 2.34 q.1 .42 .55 .7 M-2.27 2.63 l.31 .48 M-1.95 2.9 q.08 .46 .47 .81 M-1.48 3.11 l.23 .38 M-1.13 3.16 q.04 .51 .35 .8 M-.73 3.26 l-.06 .58 M-.28 3.21 q-.03 .4 -.33 .8 M.17 3.12 l-.2 .42 M.51 2.81 q-.05 .45 -.39 .78 M.92 2.62 l-.08 .33 M1.38 2.15 q-.12 .67 -.45 1.01 M1.81 1.92 l-.2 .46 M2.2 1.33 q.12 .35 -.19 .79\"></path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-3.56 -.6 l-.23 .35 M-3.58 -.13 l-.16 .4 M-3.58 .54 l.09 .52 M-3.28 1.79 l.18 .31 M-2.94 2.41 l.13 .29 M-2.45 2.81 l.12 .42 M-2.06 3.19 l.17 .29 M-1.7 3.3 l.19 .41 M-1.21 3.54 l.09 .4 M-.87 3.6 l-.06 .47 M-.38 3.59 l-.14 .32 M.17 3.42 l-.06 .33 M.61 3.12 l-.12 .47 M1.12 2.86 l-.18 .4 M1.57 2.42 l-.07 .35 M2.01 2.14 l-.17 .37 M2.48 1.56 l-.21 .38 M2.85 .88 l-.08 .28 M3.05 -.04 l-.14 .42\"></path><path stroke=\"#bd914b\" stroke-width=\".04\" d=\"M-2.92 -1.19 q-.35 .39 -.3 .83 M-2.82 -.93 l-.31 .4 M-2.57 -.85 q-.26 .42 -.11 .81 M-2.19 -.63 l-.12 .61 M-1.98 -.36 q-.18 .41 .08 .91 M-1.6 -.23 l.04 .52 M-1.32 .14 q-.13 .3 .13 .68 M-.97 .36 l.13 .41 M-.71 -.04 q-.07 .32 .08 .64 M-.35 .19 l.03 .74 M.18 .24 q.1 .45 -.08 .91 M.56 -.09 l.03 .51 M.83 .22 q.04 .31 -.21 .76 M1.17 -.27 l.05 .63 M1.51 -.19 q.05 .44 -.18 .78 M1.91 -.48 l-.04 .56 M2.22 -.74 q.14 .26 -.13 .82 M2.69 -.91 l-.01 .43 M-3.36 .41 l.12 .46 M-3.08 .85 l.2 .36 M-2.84 1.41 q.15 .46 .32 .59 M-2.62 1.93 l.21 .44 M-2.29 2.08 q.04 .35 .29 .6 M-1.91 2.47 l.19 .46 M-1.62 2.67 q.08 .41 .37 .67 M-1.24 2.91 l.21 .49 M-.92 3.1 l.15 .54 M-.61 3.25 l.01 .38 M-.27 3.34 l-.1 .31 M.1 3.21 l-.07 .29 M.42 2.88 l-.15 .37 M.8 2.65 q-.04 .5 -.28 .66 M1.23 2.27 l-.17 .51 M1.64 1.95 q-.06 .34 -.28 .68 M2.07 1.56 l-.18 .41 M2.42 1.14 l-.17 .49\"></path><path stroke=\"#f0cc80\" stroke-width=\".035\" d=\"M-3.39 -.91 l-.12 .31 M-3.08 -.12 l.06 .24 M-2.92 .25 l.16 .39 M-2.46 .62 l.15 .28 M-2.04 1.11 l.21 .31 M-1.64 1.22 l.06 .36 M-1.17 1.65 l.13 .43 M-.79 1.72 l.04 .26 M-.36 1.82 l.11 .48 M.15 1.62 l-.03 .29 M.57 1.71 l-.13 .29 M.87 1.45 l-.04 .38 M1.25 1.12 l-.16 .33 M1.56 .93 l-.03 .29 M1.93 .54 l-.18 .46 M2.22 .06 l-.03 .29 M2.62 -.3 l-.12 .48 M-2.61 2.59 l.29 .33 M-2.24 2.9 l.13 .34 M-1.88 3.25 l.29 .31 M-1.38 3.47 l.12 .31 M-.99 3.48 l.09 .35 M-.47 3.49 l-.07 .37 M.03 3.32 l-.12 .43 M.49 3.02 l-.11 .41 M1.01 2.81 l-.18 .27 M1.47 2.33 l-.13 .5 M1.89 1.83 l-.09 .27 M2.38 1.44 l-.18 .29\"></path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-2.83 .6 q.07 .26 .21 .38 M-2.12 .14 l.11 .56 M-1.47 .27 q-.04 .31 .19 .62 M-.75 .61 l.15 .32 M-.03 .29 q.17 .33 -.06 .67 M.62 .31 l-.12 .59 M1.22 .17 q.09 .3 -.18 .66 M2.08 -.12 l-.2 .57 M-2.79 1.85 l.2 .36 M-1.96 2.36 l.27 .31 M-1.47 2.68 q-.04 .25 .18 .56 M-.62 2.9 l.05 .43 M.13 2.88 l-.12 .44 M.9 2.47 l-.2 .4 M1.7 2.09 l-.27 .37\"></path></g></g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-media\" transform=\"translate(-3.25 1.65) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path></g><g data-anatomia=\"pata-media\" transform=\"translate(3 1.65) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path></g></g><g data-anatomia=\"cabeza\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"></path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"></circle></g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"></path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"></circle></g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"></path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"></path></g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"></path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"></path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"></path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"></path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"></circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"></path></g><g><circle cx=\"-0.7752\" cy=\"-4.1028\" r=\"0.6324\" fill=\"#20130a\"></circle><circle cx=\"-1.02816\" cy=\"-4.4190000000000005\" r=\"0.26560799999999996\" fill=\"#fffdf7\"></circle></g></g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"></circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"></path></g><g><circle cx=\"2.2028\" cy=\"-4.2308\" r=\"0.44639999999999996\" fill=\"#20130a\"></circle><circle cx=\"2.02424\" cy=\"-4.454000000000001\" r=\"0.187488\" fill=\"#fffdf7\"></circle></g></g></g></g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-1.96 -5.64 Q-1.3 -6.68 -.42 -5.88 Q-1.25 -6.25 -1.96 -5.64Z\"></path></g><g><path d=\"M1.05 -6.03 Q1.85 -6.92 2.55 -5.87 Q1.84 -6.38 1.05 -6.03Z\"></path></g></g></g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"></ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"></ellipse></g></g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"></path><g><g data-anatomia=\"boca\"><path d=\"M.05 -1.61 C.4 -2.34 1.53 -2.35 1.69 -1.78 Q1.69 -1.16 .63 -1.18 Q.08 -1.19 .05 -1.61Z\" fill=\"#30251b\"></path><path d=\"M.64 -1.48 Q1.16 -1.87 1.47 -1.56 Q1.12 -1.27 .64 -1.48Z\" fill=\"#ae7753\"></path></g></g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"></path></g></g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g data-anatomia=\"mano\" transform=\"translate(-7.2 0.38) rotate(0) scale(1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"></path></g></g></g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g data-anatomia=\"mano\" transform=\"translate(7.5 -0.05) rotate(0) scale(-1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"></path></g></g></g></g></svg>", "volar": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(-1.3 -1.2) scale(.92 .92)\"><path d=\"M0 0 C-1.6 -1.16 -3.42 -3.55 -6.3 -5.72 C-7.77 -6.83 -8.9 -7.13 -9.03 -6.43 C-9.2 -5.64 -7.34 -3.56 -5.43 -2.05 C-3.39 -.44 -1.02 .63 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"></path><path d=\"M-.24 -.31 Q-4.16 -4.68 -8.47 -6.49 Q-5.05 -3.55 -1.1 -.04Z\" fill=\"#cdb989\" opacity=\".18\"></path><path d=\"M-.25 -.24 Q-3.51 -3.72 -8.53 -6.47 M-.83 -.12 Q-3.99 -2.78 -7.03 -5.55 M-1.52 -.05 Q-3.77 -1.7 -5.96 -4.48 M-2.31 -.32 Q-3.47 -1.03 -4.77 -2.65\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"></path><path d=\"M-1.53 -.55 Q-4.74 -3.75 -7.98 -5.99\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"></path></g><g data-anatomia=\"ala\" transform=\"translate(2.3 -.1) scale(-.78 .78) rotate(-90)\"><path d=\"M0 0 C-1.05 -.9 -2.1 -3.22 -4.2 -5.48 C-5.33 -6.7 -6.12 -7.27 -6.39 -6.78 C-6.73 -6.12 -5.58 -4.1 -4.1 -2.27 C-2.53 -.34 -.72 .55 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"></path><path d=\"M-.2 -.31 Q-2.72 -4.36 -5.94 -6.5 Q-3.62 -3.58 -1.06 -.01Z\" fill=\"#cdb989\" opacity=\".18\"></path><path d=\"M-.2 -.25 Q-2.43 -3.25 -5.94 -6.5 M-.71 -.16 Q-3.21 -2.53 -5.34 -5.3 M-1.33 -.08 Q-3.55 -1.69 -4.62 -4.13 M-2.02 -.4 Q-3.28 -1.03 -3.93 -2.49\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"></path><path d=\"M-1.03 -.55 Q-3.14 -3.62 -5.54 -5.97\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"></path></g></g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-1.1 2.1) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.1 1.03 .92 1.72 Q1.8 2.36 2.64 2.05 L3.65 2.58\" stroke=\"#30251b\" stroke-width=\"0.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M.66 1.45 Q1.78 1.47 2.26 2.18 L2.93 2.8 Q2.56 3.31 1.94 2.83 L.89 2.25 Q.35 1.91 .66 1.45Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M1.02 1.86 L1.66 2.12 M1.28 2.24 L1.96 2.49 M1.72 2.58 L2.3 2.78\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path><path d=\"M2.82 2.45 Q3.38 2.32 3.58 2.64 Q3.82 2.45 4.13 2.72 Q4.36 2.58 4.52 2.95 Q4.2 3.3 3.8 3.13 Q3.35 3.31 2.9 3.03Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"></path></g><g data-anatomia=\"pata-posterior\" transform=\"translate(1.5 2.1) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.1 1.03 .92 1.72 Q1.8 2.36 2.64 2.05 L3.65 2.58\" stroke=\"#30251b\" stroke-width=\"0.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M.66 1.45 Q1.78 1.47 2.26 2.18 L2.93 2.8 Q2.56 3.31 1.94 2.83 L.89 2.25 Q.35 1.91 .66 1.45Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M1.02 1.86 L1.66 2.12 M1.28 2.24 L1.96 2.49 M1.72 2.58 L2.3 2.78\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path><path d=\"M2.82 2.45 Q3.38 2.32 3.58 2.64 Q3.82 2.45 4.13 2.72 Q4.36 2.58 4.52 2.95 Q4.2 3.3 3.8 3.13 Q3.35 3.31 2.9 3.03Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"></path></g></g><g data-anatomia=\"abdomen\" transform=\"translate(-.35 1.7) rotate(90) scale(.92 .92)\"><path d=\"M-2.2 2.25 C-4.07 3.39 -4.35 6.9 -2.34 9.3 Q-1.79 9.99 -1.49 10.12 C.1 9.63 2.79 7.93 3.08 5.28 Q3.4 3.48 1.81 2.33Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"></path><path d=\"M-2.8 3.07 Q-3.42 3.52 -3.59 4.38 Q-2.62 5.7 -.68 5.63 Q1.93 5.48 3.06 4.32 L2.94 3.51 Q1.92 4.47 .05 4.55 L-.55 4.25 L-1.09 4.56 L-1.48 4.09 L-1.83 4.31 Q-2.38 3.94 -2.8 3.07Z M-3.65 5.26 Q-3.86 6.11 -3.36 7.05 Q-1.95 8.07 -.49 7.74 Q1.68 7.29 2.48 6.38 L2.86 5.49 Q1.67 6.25 .18 6.49 L-.28 6.2 L-.75 6.55 L-1.35 6.26 L-1.79 6.42 Q-2.98 6.36 -3.65 5.26Z M-2.98 7.9 Q-2.55 8.68 -1.86 9.35 Q-.47 9.57 1.25 8.05 L1.78 7.45 Q.32 8.39 -.9 8.5 L-1.3 8.27 L-1.67 8.51Z\" fill=\"#c58f42\"></path><path d=\"M-2.91 3.53 Q-3.27 4 -3.09 4.39 M-3.33 5.85 L-3.01 6.47 M-2.59 8.17 L-2.12 8.69\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"></path><path d=\"M-3.68 4.78 Q-1.38 6.79 2.92 4.96 M-3.31 7.39 Q-.45 8.85 2.13 6.97 M-2.3 9.19 Q-.65 9.66 .52 8.98\" stroke=\"#88603a\" stroke-width=\".1\" fill=\"none\"></path><path d=\"M1.59 3.39 Q2.74 7.19 -1.49 10.12 Q2.75 8.34 3.08 5.28 Q3.38 3.58 1.81 2.33Z\" fill=\"#30251b\" opacity=\".26\"></path></g><g data-anatomia=\"torax\" transform=\"translate(0 1.15) scale(1.12 .72)\"><path d=\"M-2.56 -2.16 Q-2.98 -2.18 -3.26 -1.82 L-3.08 -1.79 L-3.49 -1.43 L-3.26 -1.44 L-3.6 -.98 L-3.43 -1.04 L-3.73 -.45 L-3.51 -.6 L-3.75 .03 L-3.57 -.08 Q-3.82 .74 -3.48 1.57 L-3.59 1.48 L-3.31 2.12 L-3.42 2.07 L-3.02 2.66 L-3.12 2.71 L-2.57 3.13 L-2.69 3.18 L-2.05 3.51 L-2.12 3.66 L-1.56 3.8 L-1.63 3.94 L-1.04 3.94 L-.91 4.12 L-.63 3.99 L-.32 4.05 L-.06 3.85 L.22 3.9 L.5 3.64 L.77 3.7 L1.02 3.36 L1.28 3.41 L1.48 3.07 L1.75 3.01 L1.86 2.71 L2.12 2.57 L2.18 2.25 L2.49 2.04 L2.49 1.77 L2.81 1.52 L2.72 1.34 L3.01 .95 L2.91 .8 L3.17 .37 L3.03 .25 L3.29 -.24 L3.12 -.24 L3.31 -.8 L3.07 -.67 L3.17 -1.14 L2.94 -1.03 Q2.79 -1.65 2.39 -1.83 Q.03 -3.08 -2.56 -2.16Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"></path><path d=\"M-3.24 -1.3 Q-3.49 -.65 -3.2 .2 C-2.78 1.16 -2.07 1.47 -1.29 1.94 Q.19 2.62 1.19 1.4 Q2.36 .4 2.85 -1.09 L2.99 -.46 Q2.9 .53 2.34 1.24 L2.32 1.5 Q1.68 2.75 .44 3.27 L.19 3.21 L-.32 3.63 L-.76 3.48 L-1.19 3.61 Q-2.9 2.86 -3.33 1.42 Q-3.86 -.12 -3.24 -1.3Z\" fill=\"#c58f42\"></path><path d=\"M-3.03 -1.55 Q-3.36 -.61 -2.77 .36 Q-2.39 1.16 -1.3 1.63 L-.99 1.56 Q.11 2.2 1.13 1.11 Q2.09 .47 2.76 -.93 L2.69 -.15 Q2.21 1.25 1.32 1.66 L1.27 1.85 L.63 2.2 L.32 2.12 L-.14 2.38 L-.34 2.17 L-.77 2.27 L-1.11 2.05 L-1.42 2.05 Q-2.69 1.47 -3.05 .54 Q-3.68 -.67 -3.03 -1.55Z\" fill=\"#edc67d\"></path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-2.79 -1.72 q-.4 .18 -.59 .68 M-2.62 -1.3 q-.55 .57 -.44 1.12 M-3.04 -.83 q-.36 .35 -.4 .69 M-2.79 -.51 q-.18 .38 -.08 .78 M-2.38 -.6 q-.3 .54 -.06 1.11 M-2.1 -.38 q-.09 .27 .12 .61 M-1.8 -.29 q-.19 .53 .16 1.06 M-1.23 -.06 q-.2 .42 .05 .81 M-.92 .05 q-.04 .25 .18 .47 M-.6 .03 q-.16 .52 .03 .84 M-.04 -.04 q.08 .55 -.13 1.05 M.39 .02 q.22 .18 .03 .57 M.96 -.21 q.22 .4 -.18 .98 M1.44 -.35 q.24 .17 -.01 .69 M1.83 -.63 q.09 .5 -.27 .99 M2.36 -.94 q.02 .34 -.14 .5 M2.59 -1.12 q.24 .32 -.04 .73\"></path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-3.24 -1.35 l-.21 .36 M-3.17 -.51 q-.06 .43 .18 .68 M-2.77 -.23 l.06 .53 M-2.63 .23 q.11 .48 .45 .72 M-2.23 .71 l.22 .58 M-1.89 .88 q.12 .46 .52 .69 M-1.43 1.24 l.15 .38 M-1.07 1.44 q.07 .41 .29 .5 M-.48 1.58 l.02 .46 M-.13 1.53 q.15 .3 -.01 .65 M.28 1.55 q.01 .38 -.24 .58 M.63 1.31 l-.09 .43 M1.05 1.04 q-.1 .57 -.34 .76 M1.49 .85 l-.11 .31 M1.71 .54 q.09 .3 -.3 .68 M2.03 .23 l-.12 .39 M2.42 -.22 q.02 .35 -.28 .75 M2.8 -.62 l-.18 .31\"></path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-3.41 .08 q.03 .37 .19 .53 M-3.21 .78 q.02 .62 .45 .97 M-2.91 1.17 l.14 .37 M-2.58 1.54 q.24 .55 .6 .75 M-2.2 1.82 l.14 .4 M-1.84 2.11 q.25 .4 .55 .5 M-1.28 2.26 l.06 .42 M-.96 2.48 q.05 .31 .24 .55 M-.49 2.51 l-.03 .65 M-.14 2.67 q-.02 .25 -.19 .46 M.31 2.51 l-.13 .39 M.67 2.21 q-.12 .51 -.52 .87 M1.12 1.9 q-.12 .37 -.35 .57 M1.65 1.64 l-.22 .52 M2.06 1.1 q-.05 .58 -.38 .88 M2.31 .74 l-.03 .3 M2.74 .23 q-.02 .54 -.3 .8\"></path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-3.37 1.28 q-.06 .5 .18 .87 M-2.97 1.92 l.36 .61 M-2.73 2.34 q.1 .42 .55 .7 M-2.27 2.63 l.31 .48 M-1.95 2.9 q.08 .46 .47 .81 M-1.48 3.11 l.23 .38 M-1.13 3.16 q.04 .51 .35 .8 M-.73 3.26 l-.06 .58 M-.28 3.21 q-.03 .4 -.33 .8 M.17 3.12 l-.2 .42 M.51 2.81 q-.05 .45 -.39 .78 M.92 2.62 l-.08 .33 M1.38 2.15 q-.12 .67 -.45 1.01 M1.81 1.92 l-.2 .46 M2.2 1.33 q.12 .35 -.19 .79\"></path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-3.56 -.6 l-.23 .35 M-3.58 -.13 l-.16 .4 M-3.58 .54 l.09 .52 M-3.28 1.79 l.18 .31 M-2.94 2.41 l.13 .29 M-2.45 2.81 l.12 .42 M-2.06 3.19 l.17 .29 M-1.7 3.3 l.19 .41 M-1.21 3.54 l.09 .4 M-.87 3.6 l-.06 .47 M-.38 3.59 l-.14 .32 M.17 3.42 l-.06 .33 M.61 3.12 l-.12 .47 M1.12 2.86 l-.18 .4 M1.57 2.42 l-.07 .35 M2.01 2.14 l-.17 .37 M2.48 1.56 l-.21 .38 M2.85 .88 l-.08 .28 M3.05 -.04 l-.14 .42\"></path><path stroke=\"#bd914b\" stroke-width=\".04\" d=\"M-2.92 -1.19 q-.35 .39 -.3 .83 M-2.82 -.93 l-.31 .4 M-2.57 -.85 q-.26 .42 -.11 .81 M-2.19 -.63 l-.12 .61 M-1.98 -.36 q-.18 .41 .08 .91 M-1.6 -.23 l.04 .52 M-1.32 .14 q-.13 .3 .13 .68 M-.97 .36 l.13 .41 M-.71 -.04 q-.07 .32 .08 .64 M-.35 .19 l.03 .74 M.18 .24 q.1 .45 -.08 .91 M.56 -.09 l.03 .51 M.83 .22 q.04 .31 -.21 .76 M1.17 -.27 l.05 .63 M1.51 -.19 q.05 .44 -.18 .78 M1.91 -.48 l-.04 .56 M2.22 -.74 q.14 .26 -.13 .82 M2.69 -.91 l-.01 .43 M-3.36 .41 l.12 .46 M-3.08 .85 l.2 .36 M-2.84 1.41 q.15 .46 .32 .59 M-2.62 1.93 l.21 .44 M-2.29 2.08 q.04 .35 .29 .6 M-1.91 2.47 l.19 .46 M-1.62 2.67 q.08 .41 .37 .67 M-1.24 2.91 l.21 .49 M-.92 3.1 l.15 .54 M-.61 3.25 l.01 .38 M-.27 3.34 l-.1 .31 M.1 3.21 l-.07 .29 M.42 2.88 l-.15 .37 M.8 2.65 q-.04 .5 -.28 .66 M1.23 2.27 l-.17 .51 M1.64 1.95 q-.06 .34 -.28 .68 M2.07 1.56 l-.18 .41 M2.42 1.14 l-.17 .49\"></path><path stroke=\"#f0cc80\" stroke-width=\".035\" d=\"M-3.39 -.91 l-.12 .31 M-3.08 -.12 l.06 .24 M-2.92 .25 l.16 .39 M-2.46 .62 l.15 .28 M-2.04 1.11 l.21 .31 M-1.64 1.22 l.06 .36 M-1.17 1.65 l.13 .43 M-.79 1.72 l.04 .26 M-.36 1.82 l.11 .48 M.15 1.62 l-.03 .29 M.57 1.71 l-.13 .29 M.87 1.45 l-.04 .38 M1.25 1.12 l-.16 .33 M1.56 .93 l-.03 .29 M1.93 .54 l-.18 .46 M2.22 .06 l-.03 .29 M2.62 -.3 l-.12 .48 M-2.61 2.59 l.29 .33 M-2.24 2.9 l.13 .34 M-1.88 3.25 l.29 .31 M-1.38 3.47 l.12 .31 M-.99 3.48 l.09 .35 M-.47 3.49 l-.07 .37 M.03 3.32 l-.12 .43 M.49 3.02 l-.11 .41 M1.01 2.81 l-.18 .27 M1.47 2.33 l-.13 .5 M1.89 1.83 l-.09 .27 M2.38 1.44 l-.18 .29\"></path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-2.83 .6 q.07 .26 .21 .38 M-2.12 .14 l.11 .56 M-1.47 .27 q-.04 .31 .19 .62 M-.75 .61 l.15 .32 M-.03 .29 q.17 .33 -.06 .67 M.62 .31 l-.12 .59 M1.22 .17 q.09 .3 -.18 .66 M2.08 -.12 l-.2 .57 M-2.79 1.85 l.2 .36 M-1.96 2.36 l.27 .31 M-1.47 2.68 q-.04 .25 .18 .56 M-.62 2.9 l.05 .43 M.13 2.88 l-.12 .44 M.9 2.47 l-.2 .4 M1.7 2.09 l-.27 .37\"></path></g></g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-media\" transform=\"translate(-2.35 1.15) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.15 .7 -.84 1.3 Q-1.48 1.86 -.78 2.55 L-.12 3.05\" stroke=\"#30251b\" stroke-width=\"0.45\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M-.76 1.08 Q-.1 1.37 -.18 2.13 L-.12 2.93 Q-.7 3.12 -1.02 2.46 L-1.19 1.7 Q-1.2 1.22 -.76 1.08Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.76 1.58 L-.37 1.88 M-.83 2.04 L-.4 2.3 M-.76 2.49 L-.35 2.71\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path></g><g data-anatomia=\"pata-media\" transform=\"translate(2.15 1.15) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.15 .7 -.84 1.3 Q-1.48 1.86 -.78 2.55 L-.12 3.05\" stroke=\"#30251b\" stroke-width=\"0.45\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><path d=\"M-.76 1.08 Q-.1 1.37 -.18 2.13 L-.12 2.93 Q-.7 3.12 -1.02 2.46 L-1.19 1.7 Q-1.2 1.22 -.76 1.08Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.76 1.58 L-.37 1.88 M-.83 2.04 L-.4 2.3 M-.76 2.49 L-.35 2.71\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"></path></g></g><path data-anatomia=\"cuello-volar\" d=\"M2.05 -.28 Q3.3 -.78 4.2 -.18 Q4.45 .18 3.76 .68 Q2.77 .75 2.06 .36Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"></path><g data-anatomia=\"cabeza\" transform=\"translate(5.2 .25) scale(.84 .72)\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"></path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"></circle></g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"></path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"></circle></g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"></path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"></path></g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"></path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"></path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"></path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"></path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"></circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"></path></g><g><circle cx=\"-0.7752\" cy=\"-4.1028\" r=\"0.6324\" fill=\"#20130a\"></circle><circle cx=\"-1.02816\" cy=\"-4.4190000000000005\" r=\"0.26560799999999996\" fill=\"#fffdf7\"></circle></g></g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"></circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"></path></g><g><circle cx=\"2.2028\" cy=\"-4.2308\" r=\"0.44639999999999996\" fill=\"#20130a\"></circle><circle cx=\"2.02424\" cy=\"-4.454000000000001\" r=\"0.187488\" fill=\"#fffdf7\"></circle></g></g></g></g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-1.96 -5.64 Q-1.3 -6.68 -.42 -5.88 Q-1.25 -6.25 -1.96 -5.64Z\"></path></g><g><path d=\"M1.05 -6.03 Q1.85 -6.92 2.55 -5.87 Q1.84 -6.38 1.05 -6.03Z\"></path></g></g></g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"></ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"></ellipse></g></g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"></path><g><g data-anatomia=\"boca\"><path d=\"M-.27 -1.75 Q.57 -1.08 1.4 -1.88 Q.81 -.76 -.27 -1.75Z\" fill=\"#30251b\"></path></g></g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"></path></g></g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g data-anatomia=\"mano\" transform=\"translate(-6.65 2.55) scale(1 1)\"><path d=\"M-.28 .48 Q-.82 .24 -1.08 -.23 Q-1.3 -.62 -.99 -.79 Q-.72 -.91 -.47 -.56 L-.1 -.24 Q.12 -.43 .03 -.78 Q-.04 -1.08 .27 -1.12 Q.58 -1.12 .67 -.7 Q.78 -.08 .47 .37 Q.19 .67 -.28 .48Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.74 -.2 Q-.43 .08 -.08 .1 M.03 -.27 Q.25 -.08 .43 -.06 M-.78 -.55 Q-.55 -.38 -.34 -.37\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"></path></g></g></g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></g><g data-anatomia=\"mano\" transform=\"translate(6.2 2.75) scale(-1 1)\"><path d=\"M-.28 .48 Q-.82 .24 -1.08 -.23 Q-1.3 -.62 -.99 -.79 Q-.72 -.91 -.47 -.56 L-.1 -.24 Q.12 -.43 .03 -.78 Q-.04 -1.08 .27 -1.12 Q.58 -1.12 .67 -.7 Q.78 -.08 .47 .37 Q.19 .67 -.28 .48Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"></path><path d=\"M-.74 -.2 Q-.43 .08 -.08 .1 M.03 -.27 Q.25 -.08 .43 -.06 M-.78 -.55 Q-.55 -.38 -.34 -.37\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"></path></g></g></g></g></svg>"}</script>
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso de las abejas — una sola toma: la mata de fresa, la
+   flor con su abeja, el grano de polen, el óvulo, y de vuelta
+   arriba hasta la fresa. Cada escala vive dentro de otra (portal).
+   La cámara se mueve por un parámetro p que solo mueve el usuario.
+   El motor (cámara, medidor, tarjetas, voz, palabras, fuentes,
+   repaso) es el del Descenso del café.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'); const texB = document.createElement('canvas');
+let texOK = false;
+let RELOJ = 0; // segundos, solo para el aleteo; con movimiento reducido no corre
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const TAU = Math.PI * 2;
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function h1(n){ const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+
+/* Voronoi por recorte de semiplanos, con cubetas para vecinos (del café) */
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function roundPoly(c, pts){ const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath(); }
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function blob(c, x, y, rx, ry, col, a){ const g = c.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry)); g.addColorStop(0, rgba(col, a)); g.addColorStop(0.65, rgba(col, a*0.5)); g.addColorStop(1, rgba(col, 0)); c.save(); c.translate(x, y); c.scale(1, ry/rx); c.translate(-x, -y); c.fillStyle = g; c.beginPath(); c.arc(x, y, rx, 0, TAU); c.fill(); c.restore(); }
+const TINTA = '#30251b';
+
+/* ============================================================
+   LA FINCA: altitud por la URL (?alt=&municipio=&lat=&lon=),
+   por la ubicación del aparato o a mano. Cambia qué abeja se ve
+   en la flor: los registros de la angelita en Colombia llegan
+   hasta 1 800 m [1].
+   ============================================================ */
+const numero = (v, min, max) => v !== null && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const ALT_ANGELITA = 1800;
+let altura = numero(qs.get('alt'), 0, 6000);
+let origenAlt = altura === null ? '' : 'Altitud de la app';
+const municipio = (qs.get('municipio') || '').trim().slice(0, 60);
+const ALTA = () => altura !== null && altura > ALT_ANGELITA;
+
+/* ============================================================
+   ANGELITA: la lámina aprobada (AbejaLamina de chagra), ya
+   renderizada a SVG e interpretada sobre Canvas sin tocar su
+   geometría — el mismo intérprete del corto «compai vivo».
+   ============================================================ */
+const LAMINA = JSON.parse(document.getElementById('lamina').textContent);
+function parseTf(s){
+  if (!s) return null;
+  let m = new DOMMatrix(); const re = /(\w+)\(([^)]*)\)/g; let r;
+  while ((r = re.exec(s))){ const a = r[2].trim().split(/[\s,]+/).map(Number);
+    if (r[1] === 'translate') m = m.translate(a[0], a[1] || 0);
+    else if (r[1] === 'scale') m = m.scale(a[0], a.length > 1 ? a[1] : a[0]);
+    else if (r[1] === 'rotate') m = m.rotate(a[0]); }
+  return m;
+}
+const ESTILOS = ['fill', 'stroke', 'stroke-width', 'fill-opacity', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'fill-rule'];
+function build(el, cuenta){
+  const n = { tag: el.tagName, anat: el.getAttribute('data-anatomia'), tf: parseTf(el.getAttribute('transform')), st: {}, op: 1, kids: [] };
+  for (const a of ESTILOS){ const v = el.getAttribute(a); if (v != null) n.st[a] = v; }
+  const o = el.getAttribute('opacity'); if (o != null) n.op = +o;
+  if (n.anat){ cuenta[n.anat] = (cuenta[n.anat] || 0); n.i = cuenta[n.anat]++; }
+  if (n.tag === 'path') n.p = new Path2D(el.getAttribute('d'));
+  else if (n.tag === 'circle'){ n.p = new Path2D(); n.p.arc(+el.getAttribute('cx') || 0, +el.getAttribute('cy') || 0, +el.getAttribute('r'), 0, TAU); n.circ = el.getAttribute('fill'); }
+  else if (n.tag === 'ellipse'){ n.p = new Path2D(); n.p.ellipse(+el.getAttribute('cx') || 0, +el.getAttribute('cy') || 0, +el.getAttribute('rx'), +el.getAttribute('ry'), 0, 0, TAU); }
+  for (const c of el.children) n.kids.push(build(c, cuenta));
+  return n;
+}
+function marcar(n, dentroOjos){
+  if (n.anat === 'ojos') dentroOjos = true;
+  if (dentroOjos && n.tag === 'g' && n.kids[0] && n.kids[0].circ === '#20130a') n.rol = 'pupila';
+  if ((n.anat === 'torax' || n.anat === 'abdomen') && n.kids[0] && n.kids[0].p) n.silueta = n.kids[0].p;
+  for (const k of n.kids) marcar(k, dentroOjos);
+}
+function hornear(n, padre){
+  const e = Object.assign({}, padre, n.st);
+  n.relleno = e.fill === undefined ? '#000' : (e.fill === 'none' ? null : e.fill);
+  n.ra = e['fill-opacity'] !== undefined ? +e['fill-opacity'] : 1;
+  n.regla = e['fill-rule'] === 'evenodd' ? 'evenodd' : 'nonzero';
+  n.trazo = e.stroke && e.stroke !== 'none' ? e.stroke : null;
+  n.ta = e['stroke-opacity'] !== undefined ? +e['stroke-opacity'] : 1;
+  n.grosor = e['stroke-width'] !== undefined ? +e['stroke-width'] : 1;
+  n.punta = e['stroke-linecap'] || 'butt'; n.union = e['stroke-linejoin'] || 'miter';
+  n.guardar = !!(n.tf || n.anat || n.rol);
+  for (const k of n.kids) hornear(k, e);
+}
+const POSES = {};
+for (const [pose, src] of Object.entries(LAMINA)){ const doc = new DOMParser().parseFromString(src, 'image/svg+xml'); const raiz = build(doc.documentElement, {}); marcar(raiz, false); hornear(raiz, {}); POSES[pose] = raiz; }
+const POLEN_T = [...Array(46)].map((_, i) => [lerp(-3.6, 3.6, h1(i * 3.1)), lerp(-2.3, 2.7, h1(i * 5.7 + 1)), lerp(.11, .22, h1(i * 9.3 + 2)), h1(i * 1.9 + 7)]);
+const POLEN_A = [...Array(34)].map((_, i) => [lerp(-4.2, 3.3, h1(i * 4.3 + 11)), lerp(2.4, 10, h1(i * 6.1 + 13)), lerp(.12, .2, h1(i * 2.7 + 5)), h1(i * 8.9 + 3)]);
+function pintarNodo(c, n, alpha, B){
+  if (n.relleno){ c.globalAlpha = alpha * n.ra; c.fillStyle = n.relleno; c.fill(n.p, n.regla); }
+  if (n.trazo){ c.globalAlpha = alpha * n.ta; c.strokeStyle = n.trazo; c.lineWidth = n.grosor; c.lineCap = n.punta; c.lineJoin = n.union; c.stroke(n.p); }
+}
+function nodo(c, n, alpha, B){
+  alpha *= n.op;
+  if (!n.guardar){ if (n.p) pintarNodo(c, n, alpha, B); for (const k of n.kids) nodo(c, k, alpha, B); return; }
+  c.save();
+  if (n.tf) c.transform(n.tf.a, n.tf.b, n.tf.c, n.tf.d, n.tf.e, n.tf.f);
+  const g = n.anat && GANCHO[n.anat];
+  if (g && g.pre && g.pre(c, n, B, alpha) === 'hecho'){ c.restore(); return; }
+  if (n.rol === 'pupila') c.translate(B.mirada[0] * .3, B.mirada[1] * .24);
+  if (n.p) pintarNodo(c, n, alpha, B);
+  for (const k of n.kids) nodo(c, k, alpha, B);
+  if (g && g.post) g.post(c, n, B, alpha);
+  c.restore();
+}
+function giroEn(c, px, py, a){ if (!a) return; c.translate(px, py); c.rotate(a); c.translate(-px, -py); }
+function polenEn(c, sil, pts, cant){
+  c.save(); c.clip(sil);
+  for (const [x, y, r, u] of pts){ if (u > cant) continue; c.globalAlpha = clamp((cant - u) * 6, 0, 1); c.fillStyle = u > .5 ? '#ffe28a' : '#f3bf2f'; c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); }
+  c.restore();
+}
+const GANCHO = {
+  cabeza: { pre(c, n, B){ giroEn(c, .3, -1.7, B.cabeza); } },
+  antenas: { pre(c, n, B){ giroEn(c, .35, -17, Math.sin(B.t * 2.1 + B.sem) * .04); } },
+  'brazo-izquierdo': { pre(c, n, B){ giroEn(c, -2.7, .4, B.brazoI); } },
+  'brazo-derecho': { pre(c, n, B){ giroEn(c, 2.6, .4, -B.brazoD); } },
+  abdomen: { post(c, n, B){ if (B.polen > 0) polenEn(c, n.silueta, POLEN_A, B.polen); } },
+  torax: { post(c, n, B){ if (B.polen > 0) polenEn(c, n.silueta, POLEN_T, B.polen); } },
+  'pata-posterior': { post(c, n, B){
+    if (B.carga <= 0) return;
+    const vol = B.pose === 'volar';
+    const [x, y, rx, ry, r] = vol ? [1.85, 2.35, .95, .62, .5] : [1.02, 3.9, .66, 1.05, -.22];
+    const k = Math.sqrt(B.carga);
+    c.save(); c.translate(x, y); c.rotate(r); c.scale(k, k); c.globalAlpha = 1;
+    c.beginPath(); c.ellipse(0, 0, rx, ry, 0, 0, TAU); c.fillStyle = '#e9a524'; c.fill(); c.lineWidth = .14; c.strokeStyle = TINTA; c.stroke();
+    c.beginPath(); c.ellipse(-rx * .28, -ry * .3, rx * .38, ry * .28, 0, 0, TAU); c.fillStyle = '#ffd97a'; c.fill();
+    c.restore(); } },
+  ala: { pre(c, n, B, alpha){
+    const tomas = B.estela ? [[-.34, .16], [-.17, .28], [0, .85]] : [[0, 1]];
+    for (const [dp, al] of tomas){ c.save(); const fase = (B.alaFase + dp) * TAU; const r = B.alaAmp * Math.sin(fase);
+      c.rotate(r); c.scale(1, 1 - .45 * B.alaAmp * Math.abs(Math.cos(fase)) * (B.pose === 'volar' ? 1 : .3));
+      for (const k of n.kids) nodo(c, k, alpha * al, B); c.restore(); }
+    return 'hecho'; } },
+};
+function angelita(o){ return Object.assign({ pose: 'decir', x: 0, y: 0, s: 1, rot: 0, voltear: false, cabeza: 0, mirada: [0, 0], brazoI: 0, brazoD: 0, alaFase: 0, alaAmp: 0, estela: false, polen: 0, carga: 0, t: 0, sem: 0 }, o); }
+function pintarAngelita(c, B){
+  const P = POSES[B.pose]; if (!P) return;
+  c.save(); c.translate(B.x, B.y); c.rotate(B.rot); c.scale(B.s, B.s); if (B.voltear) c.scale(-1, 1);
+  nodo(c, P, 1, B); c.restore(); c.globalAlpha = 1;
+}
+/* aleteo: con movimiento reducido las alas quedan quietas */
+function aleteo(B, frec, amp){ B.t = RELOJ; if (RM){ B.alaFase = 0.2; B.alaAmp = amp*0.4; B.estela = false; } else { B.alaFase = RELOJ*frec; B.alaAmp = amp; B.estela = amp > 0.3; } return B; }
+
+/* ============================================================
+   LA ABEJA DE MIEL: dibujada aquí en tinta, aparte de Angelita
+   (no se recolorea el dibujo de un compai para otra especie).
+   Cuerpo a lo largo de +x, largo 1, cabeza en +x.
+   ============================================================ */
+function abejaMiel(c, x, y, s, rot, vuela, carga, espejo){
+  c.save(); c.translate(x, y); c.rotate(rot); c.scale(espejo ? -s : s, s);
+  const tn = (w) => { c.lineWidth = w; c.strokeStyle = TINTA; c.lineJoin = 'round'; c.lineCap = 'round'; };
+  // patas
+  tn(0.022);
+  const patas = [[0.2, 0.06, 0.28, 0.24, 0.34, 0.3], [0.1, 0.08, 0.1, 0.26, 0.14, 0.34], [0.0, 0.08, -0.12, 0.24, -0.2, 0.32]];
+  for (const [a, b, c2, d, e, f] of patas){ c.beginPath(); c.moveTo(a, b); c.quadraticCurveTo(c2, d, e, f); c.stroke(); }
+  if (carga){ c.fillStyle = '#e9a524'; c.beginPath(); c.ellipse(-0.1, 0.22, 0.06, 0.045, 0.4, 0, TAU); c.fill(); tn(0.012); c.stroke(); }
+  // alas de atrás (detrás del cuerpo)
+  const bat = vuela && !RM ? Math.sin(RELOJ*48) : 0.35;
+  const ala = (ox, oy, rx, ry, a, al) => { c.save(); c.translate(ox, oy); c.rotate(a); c.beginPath(); c.ellipse(rx*0.9, 0, rx, ry, 0, 0, TAU); c.fillStyle = `rgba(226,238,246,${al})`; c.fill(); tn(0.012); c.globalAlpha = 0.7; c.stroke(); c.globalAlpha = 1;
+    c.strokeStyle = 'rgba(48,37,27,.35)'; c.lineWidth = 0.006; c.beginPath(); c.moveTo(0, 0); c.lineTo(rx*1.6, -ry*0.2); c.moveTo(rx*0.4, 0.01); c.lineTo(rx*1.3, ry*0.5); c.stroke(); c.restore(); };
+  ala(0.08, -0.1, 0.16, 0.06, -2.5 + bat*0.5, 0.45);
+  // abdomen con bandas
+  c.save(); c.beginPath(); c.ellipse(-0.24, 0.02, 0.3, 0.16, -0.05, 0, TAU);
+  const ga = c.createLinearGradient(0, -0.16, 0, 0.18); ga.addColorStop(0, '#e6a640'); ga.addColorStop(1, '#9a5a17'); c.fillStyle = ga; c.fill(); c.clip();
+  c.fillStyle = '#3a2412'; for (const bx of [-0.12, -0.26, -0.4]){ c.beginPath(); c.ellipse(bx, 0.02, 0.04, 0.2, 0.1, 0, TAU); c.fill(); }
+  c.fillStyle = 'rgba(255,240,200,.35)'; c.beginPath(); c.ellipse(-0.22, -0.08, 0.2, 0.04, -0.05, 0, TAU); c.fill();
+  c.restore(); tn(0.02); c.beginPath(); c.ellipse(-0.24, 0.02, 0.3, 0.16, -0.05, 0, TAU); c.stroke();
+  // tórax peludo
+  const gt = c.createRadialGradient(0.08, -0.05, 0.02, 0.1, 0, 0.16); gt.addColorStop(0, '#c98a3d'); gt.addColorStop(1, '#6e4520');
+  c.fillStyle = gt; c.beginPath(); c.ellipse(0.1, 0, 0.14, 0.13, 0, 0, TAU); c.fill(); tn(0.02); c.stroke();
+  c.strokeStyle = 'rgba(245,215,160,.6)'; c.lineWidth = 0.008; for (let i = 0; i < 26; i++){ const a = h1(i*3.3)*TAU; const r0 = 0.12; c.beginPath(); c.moveTo(0.1 + Math.cos(a)*r0*0.8, Math.sin(a)*r0*0.8); c.lineTo(0.1 + Math.cos(a)*(r0 + 0.035), Math.sin(a)*(r0 + 0.035)); c.stroke(); }
+  // cabeza, ojo compuesto y antena
+  c.fillStyle = '#3b2817'; c.beginPath(); c.ellipse(0.3, 0.02, 0.085, 0.1, 0.2, 0, TAU); c.fill(); tn(0.02); c.stroke();
+  c.fillStyle = '#17110b'; c.beginPath(); c.ellipse(0.31, -0.01, 0.05, 0.07, 0.25, 0, TAU); c.fill(); c.fillStyle = 'rgba(255,255,255,.45)'; c.beginPath(); c.arc(0.3, -0.04, 0.014, 0, TAU); c.fill();
+  tn(0.016); c.beginPath(); c.moveTo(0.34, -0.06); c.quadraticCurveTo(0.42, -0.2, 0.5, -0.2); c.stroke();
+  // ala de adelante
+  ala(0.1, -0.11, 0.2, 0.07, -2.75 + bat*0.6, 0.55);
+  c.restore();
+}
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   0 mata · 1 flor · 2 centro · 3 estigma · 4 pistilo en corte
+   5 óvulo · 6 aquenio · 7 las fresas
+   ============================================================ */
+const HF3 = 0.85;
+const F = [0.6, 0.04, 3e-3, 1.2e-4, 1.2e-4*HF3*0.97, 0, 3e-3, 0.07];
+const S45 = 2.22;                   // el óvulo, dentro del pistilo cortado
+F[5] = F[4] * S45;
+const OV = 0.62;                    // el óvulo ocupa esta fracción de su cuadro (nivel 5)
+const S56 = 0.30 / OV;              // la semilla madura, dentro del aquenio
+const G0 = F[5] / (F[6] * S56);     // tamaño del óvulo en flor / tamaño de la semilla madura
+/* PORTAL[L] = dónde vive el nivel hijo dentro de L: {c, x, y, s} */
+const PORTAL = [];
+PORTAL[0] = { c:1, x: 0.058, y:-0.052, s: F[1]/F[0] };
+PORTAL[1] = { c:2, x: 0.018, y: 0.012, s: F[2]/F[1] };
+PORTAL[2] = { c:3, x: 0, y: 0, s: F[3]/F[2] };        // se fija al estigma elegido (abajo)
+PORTAL[4] = { c:5, x: 0.1, y: 4.6, s: S45 };
+PORTAL[6] = { c:5, x: 0.0, y: -0.02, s: S56 };
+PORTAL[7] = { c:6, x: 0, y: 0, s: F[6]/F[7] };          // se fija al aquenio elegido de la fresa torcida
+
+/* ============================================================
+   GUION DE CÁMARA
+   hold: se queda en un nivel (f y centro pueden moverse)
+   in:   del nivel padre al hijo por su portal
+   out:  del hijo al padre (se aleja), mientras pasan los días
+   ============================================================ */
+const FIN7 = () => PORT ? { f: 2.15, cx: 0.0, cy: 0.42 } : { f: 1.6, cx: -0.05, cy: 0.1 };
+const SEGS = [
+  { k:'hold', L:0, f0:1, f1:0.86, cy0:'port', cy1:'port', st:0, w:1.0 },
+  { k:'in',   L:0, w:1.25, e:'in' },
+  { k:'hold', L:1, f0:1, f1:0.9, st:1, w:1.3 },
+  { k:'in',   L:1, w:1.2, e:'both' },
+  { k:'hold', L:2, f0:1, f1:0.9, st:2, w:1.15 },
+  { k:'in',   L:2, w:1.25, e:'both' },
+  { k:'hold', L:3, f0:1, f1:HF3, st:3, w:1.4 },
+  { k:'tilt', w:1.6 },
+  { k:'hold', L:4, f0:1, f1:8, cx1:0.07, cy1:3.7, st:4, w:2.3 },
+  { k:'in',   L:4, w:1.3, e:'both' },
+  { k:'hold', L:5, f0:1, f1:1.1, st:5, w:2.0 },
+  { k:'out',  L:6, w:1.6, e:'both' },
+  { k:'hold', L:6, f0:1, f1:1.8, cx1:-0.12, cy1:0.06, st:6, w:2.0 },
+  { k:'out',  L:7, w:1.5, e:'both' },
+  { k:'hold', L:7, f0:1, f1:'fin', st:7, w:2.2 },
+];
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc;
+const EST = SEGS.filter(s => s.k === 'hold').map(s => ({ a: s.a, b: s.b, st: s.st, L: s.L, seg: s }));
+const NEST = EST.length;
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const easeF = { '':u=>u, 'in':u=>2*u*u-u*u*u, 'out':u=>{const v=1-u; return 1-(2*v*v-v*v*v);}, 'both':u=>u*u*(3-2*u) };
+const cyP = v => v === 'port' ? (PORT ? 0.12 : 0) : (v || 0);
+function holdFin(s){ // cámara al final de un hold
+  if (s.f1 === 'fin'){ const q = FIN7(); return { f: q.f, cx: q.cx, cy: q.cy }; }
+  return { f: s.f1, cx: s.cx1 || 0, cy: cyP(s.cy1) };
+}
+function camHold(s, u){
+  const fin = holdFin(s), e = sstep(0, 1, u);
+  return { k:'lvl', L:s.L, cx: lerp(s.cx0 || 0, fin.cx, e), cy: lerp(cyP(s.cy0), fin.cy, e), f: s.f0 * Math.pow(fin.f/s.f0, u), seg:s, u };
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let i = SEGS.length - 1; for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ i = j; break; } }
+  const s = SEGS[i];
+  const u = clamp((p - s.a) / s.w, 0, 1);
+  if (s.k === 'hold') return camHold(s, u);
+  if (s.k === 'tilt') return { k:'tilt', t:u, seg:s, u };
+  const uu = easeF[s.e](u);
+  if (s.k === 'in'){ // del final del hold anterior a su portal
+    const P = PORTAL[s.L], ini = holdFin(SEGS[i-1]);
+    const f = ini.f * Math.pow(P.s / ini.f, uu);
+    const k = (ini.f - f) / (ini.f - P.s);
+    return { k:'lvl', L:s.L, cx: lerp(ini.cx, P.x, k), cy: lerp(ini.cy, P.y, k), f, seg:s, u };
+  }
+  // 'out': el hijo (hold anterior) queda dentro del portal del padre y la cámara se aleja
+  const P = PORTAL[s.L], hijo = holdFin(SEGS[i-1]), sig = SEGS[i+1];
+  const cre = s.L === 6 ? lerp(G0, 1, uu) : 1; // el óvulo crece hasta ser semilla mientras nos alejamos
+  const sE = P.s * cre;
+  const f0 = sE * hijo.f; // mismo tamaño en pantalla que al final del hijo (con su crecimiento)
+  const f0r = P.s * (s.L === 6 ? G0 : 1) * hijo.f;
+  const f = f0r * Math.pow(sig.f0 / f0r, uu);
+  const x0 = P.x + hijo.cx * P.s * (s.L === 6 ? G0 : 1), y0 = P.y + hijo.cy * P.s * (s.L === 6 ? G0 : 1);
+  const k = (f - f0r) / (sig.f0 - f0r);
+  return { k:'lvl', L:s.L, cx: lerp(x0, sig.cx0 || 0, k), cy: lerp(y0, sig.cy0 || 0, k), f, seg:s, u, cre };
+}
+function anchoVista(cam){
+  const r = W / S;
+  if (cam.k === 'lvl') return F[cam.L] * cam.f * r;
+  const a = F[3]*HF3, b = F[4]; return Math.exp(lerp(Math.log(a), Math.log(b), cam.t)) * r;
+}
+
+/* ---------- el estado del cuento, derivado solo de p ---------- */
+const segDe = st => EST[st].seg;
+function estado(p){
+  const e = {};
+  const h3 = segDe(3), h4 = segDe(4), h5 = segDe(5), h6 = segDe(6), o6 = SEGS[SEGS.indexOf(h6) - 1];
+  e.tubo3 = sstep(h3.a + 0.1, h3.b - 0.15, p);                    // el grano echa el tubo
+  e.tubo4 = sstep(h4.a + 0.05, h4.b - 0.25, p);                   // el tubo baja por el estilo
+  e.fec = sstep(h5.a + 0.05, h5.b - 0.15, p);                     // fecundación
+  e.madura = sstep(o6.a, o6.b, p);                                 // el óvulo se vuelve semilla
+  e.crece = sstep(h6.a + 0.1, h6.b - 0.2, p);                     // la auxina hace crecer la carne
+  return e;
+}
+let E = estado(0);
+function momento(p){
+  const o6 = SEGS[SEGS.indexOf(segDe(6)) - 1];
+  if (p < o6.a) return 'flor abierta';
+  if (p < segDe(7).a - 0.3) return 'pasan los días';
+  return 'fresa madura';
+}
+
+/* ============================================================
+   NIVEL 1 · LA FLOR  (1 unidad = 4 cm) — su dibujo se usa también,
+   reducido, en la mata. Centro (receptáculo) en el origen.
+   ============================================================ */
+const FLOR = (() => {
+  const r = rng(101);
+  const petalos = []; for (let i = 0; i < 5; i++) petalos.push({ a: -Math.PI/2 + i*TAU/5 + (r()-.5)*0.12, L: 0.3 + r()*0.02, w: 0.2 + r()*0.02, t: r() });
+  const sepalos = []; for (let i = 0; i < 10; i++) sepalos.push({ a: -Math.PI/2 + TAU/10*(i + 0.5) + (r()-.5)*0.1, L: i % 2 ? 0.27 : 0.33, w: i % 2 ? 0.045 : 0.07 });
+  const estambres = []; for (let i = 0; i < 26; i++){ const a = i/26*TAU + (r()-.5)*0.1; estambres.push({ a, r0: 0.085, r1: 0.125 + r()*0.03, k: r() }); }
+  const RD = 0.085; // radio del receptáculo
+  const pist = []; const GA = Math.PI*(3 - Math.sqrt(5));
+  for (let i = 0; i < 300; i++){ const rr = RD*Math.sqrt((i + 0.5)/300)*0.97, a = i*GA; pist.push({ x: Math.cos(a)*rr, y: Math.sin(a)*rr, k: r(), i }); }
+  const vetas = []; for (let i = 0; i < 9; i++) vetas.push((i - 4)/4.6);
+  return { petalos, sepalos, estambres, RD, pist, vetas };
+})();
+/* ¿recibió polen este pistilo? — de un lado de la flor la abeja casi no pasó */
+const conPolen = q => (q.x*0.8 - q.y*0.6) > -0.004 + (q.k - 0.5)*0.008;
+function petalo(c, P, px, det){
+  c.save(); c.rotate(P.a);
+  const L = P.L, w = P.w;
+  c.beginPath(); c.moveTo(0.05, 0);
+  c.bezierCurveTo(0.08, -w*0.55, L*0.72, -w*0.72, L*0.94, -w*0.28);
+  c.quadraticCurveTo(L*1.02, 0, L*0.94, w*0.28);
+  c.bezierCurveTo(L*0.72, w*0.72, 0.08, w*0.55, 0.05, 0); c.closePath();
+  const g = c.createRadialGradient(0.02, 0, 0.02, 0.05, 0, L);
+  g.addColorStop(0, '#f3efd9'); g.addColorStop(0.35, '#fbfaf2'); g.addColorStop(0.85, '#ffffff'); g.addColorStop(1, '#f1ede0');
+  c.fillStyle = g; c.fill();
+  if (det > 0.3){
+    c.save(); c.clip();
+    c.strokeStyle = 'rgba(190,178,150,.28)'; c.lineWidth = Math.max(px, 0.0025);
+    for (const v of FLOR.vetas){ c.beginPath(); c.moveTo(0.06, v*w*0.12); c.quadraticCurveTo(L*0.5, v*w*0.55, L*0.95, v*w*0.6); c.stroke(); }
+    const gs = c.createLinearGradient(0, -w, 0, w); gs.addColorStop(0, 'rgba(120,110,80,0)'); gs.addColorStop(0.5, 'rgba(120,110,80,0)'); gs.addColorStop(1, 'rgba(120,110,80,.12)'); c.fillStyle = gs; c.fillRect(0, -w, L*1.1, w*2);
+    c.restore();
+  }
+  c.strokeStyle = 'rgba(150,138,110,.55)'; c.lineWidth = Math.max(px*1.1, 0.003); c.stroke();
+  c.restore();
+}
+function flor(c, det, px, conAbeja){
+  // sépalos verdes por detrás
+  for (const s of FLOR.sepalos){ c.save(); c.rotate(s.a); c.beginPath(); c.moveTo(0.04, -s.w*0.5); c.quadraticCurveTo(s.L*0.6, -s.w*0.7, s.L, 0); c.quadraticCurveTo(s.L*0.6, s.w*0.7, 0.04, s.w*0.5); c.closePath();
+    const g = c.createLinearGradient(0, 0, s.L, 0); g.addColorStop(0, '#3f6a2c'); g.addColorStop(1, '#6f9a45'); c.fillStyle = g; c.fill(); c.strokeStyle = 'rgba(30,50,20,.5)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); c.restore(); }
+  // sombra suave de los pétalos
+  if (det > 0.3){ c.fillStyle = 'rgba(40,30,15,.12)'; c.beginPath(); c.arc(0.012, 0.018, 0.31, 0, TAU); c.fill(); }
+  for (const P of FLOR.petalos) petalo(c, P, px, det);
+  // halo cálido del centro
+  const gh = c.createRadialGradient(0, 0, FLOR.RD*0.8, 0, 0, FLOR.RD*2.1); gh.addColorStop(0, 'rgba(236,196,90,.45)'); gh.addColorStop(1, 'rgba(236,196,90,0)'); c.fillStyle = gh; c.beginPath(); c.arc(0, 0, FLOR.RD*2.1, 0, TAU); c.fill();
+  // estambres: filamento y antera con polen
+  for (const s of FLOR.estambres){ const ca = Math.cos(s.a), sa = Math.sin(s.a);
+    c.strokeStyle = '#e8dcb0'; c.lineWidth = Math.max(px, 0.004); c.lineCap = 'round'; c.beginPath(); c.moveTo(ca*s.r0, sa*s.r0); c.lineTo(ca*s.r1, sa*s.r1); c.stroke();
+    c.save(); c.translate(ca*s.r1, sa*s.r1); c.rotate(s.a); const gA = c.createRadialGradient(-0.003, -0.004, 0.001, 0, 0, 0.014); gA.addColorStop(0, '#ffe07a'); gA.addColorStop(1, s.k < 0.5 ? '#e0a51e' : '#cf9418'); c.fillStyle = gA;
+    for (const d of [-1, 1]){ c.beginPath(); c.ellipse(0, d*0.005, 0.0085, 0.0062, 0, 0, TAU); c.fill(); }
+    c.strokeStyle = 'rgba(140,95,15,.45)'; c.lineWidth = Math.max(px, 0.0012); c.beginPath(); c.ellipse(0, 0, 0.0095, 0.012, 0, 0, TAU); c.stroke(); c.restore();
+    if (det > 0.5){ c.fillStyle = 'rgba(250,210,80,.8)'; for (let k = 0; k < 4; k++){ const d = s.r1 + 0.01 + h1(s.a*50 + k)*0.02, aa = s.a + (h1(s.a*9 + k) - 0.5)*0.12; c.beginPath(); c.arc(Math.cos(aa)*d, Math.sin(aa)*d, 0.0025, 0, TAU); c.fill(); } } }
+  // receptáculo: el domo del centro, cubierto de pistilos
+  const R = FLOR.RD;
+  const gr = c.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.05); gr.addColorStop(0, '#f2e27a'); gr.addColorStop(0.55, '#d6c74e'); gr.addColorStop(1, '#9fa23a');
+  c.fillStyle = gr; c.beginPath(); c.arc(0, 0, R, 0, TAU); c.fill();
+  if (det > 0.3){
+    for (const q of FLOR.pist){ const d = Math.hypot(q.x, q.y)/R; const lit = clamp(0.6 - (q.x + q.y)/R*0.35, 0, 1);
+      c.fillStyle = mix('#b8b247', '#f6eb95', lit*(1 - d*0.4)); c.beginPath(); c.arc(q.x, q.y, 0.0048*(1 - d*0.3), 0, TAU); c.fill();
+      if (det > 0.6 && conPolen(q) && q.k < 0.7){ c.fillStyle = 'rgba(245,190,40,.95)'; c.beginPath(); c.arc(q.x + 0.001, q.y - 0.001, 0.0022, 0, TAU); c.fill(); } }
+  }
+  c.strokeStyle = 'rgba(110,100,30,.45)'; c.lineWidth = Math.max(px, 0.002); c.beginPath(); c.arc(0, 0, R, 0, TAU); c.stroke();
+}
+
+/* ============================================================
+   LA FRESA (se usa en la mata y en la última estación)
+   Coordenadas: cáliz arriba en y=-0.2, punta abajo; ancho ~0.36.
+   def = 1: fresa torcida (el lado izquierdo no recibió polen).
+   ============================================================ */
+const FRESA = { top: -0.19, L: 0.44 };
+function anchoFresa(v){ return 0.185*Math.pow(Math.sin(Math.PI*clamp(0.12 + 0.88*v, 0, 1)), 0.72)*(1 - 0.25*v*v); }
+function hundido(v, lado, def){ // cuánto se encoge el lado sin polen
+  if (!def || lado > 0) return 1;
+  return 1 - def*0.55*Math.pow(Math.sin(Math.PI*clamp((v - 0.12)/0.8, 0, 1)), 1.4);
+}
+function contornoFresa(c, def){
+  c.beginPath();
+  const n = 40;
+  for (let i = 0; i <= n; i++){ const v = i/n; c.lineTo(anchoFresa(v)*hundido(v, 1, def), FRESA.top + v*FRESA.L); }
+  for (let i = n; i >= 0; i--){ const v = i/n; const x = -anchoFresa(v)*hundido(v, -1, def) + (def ? 0.015*Math.sin(v*Math.PI) : 0); c.lineTo(x, FRESA.top + v*FRESA.L); }
+  c.closePath();
+}
+/* aquenios en espiral sobre el cono: [x, y, tamaño, fecundado, lado] */
+function aqueniosFresa(def){
+  const out = []; const filas = 16;
+  for (let j = 0; j < filas; j++){ const v = 0.06 + j/filas*0.9; const n = Math.max(3, Math.round(12*anchoFresa(v)/0.185));
+    for (let i = 0; i < n; i++){ const th = -Math.PI/2 + (i + 0.5 + (j%2)*0.5)/n*Math.PI; if (th > Math.PI/2) continue;
+      const lado = Math.sin(th) < 0 ? -1 : 1; const hu = hundido(v, lado, def);
+      const x = anchoFresa(v)*Math.sin(th)*hu + (def && lado < 0 ? 0.015*Math.sin(v*Math.PI) : 0);
+      const fec = !(def && lado < 0 && hu < 0.8);
+      out.push([x, FRESA.top + v*FRESA.L, Math.cos(th)*(fec ? 1 : 0.75), fec, lado, th, v]); } }
+  return out;
+}
+const AQ = { buena: aqueniosFresa(0), torcida: aqueniosFresa(1) };
+function fresa(c, def, px, det){
+  const aq = def ? AQ.torcida : AQ.buena;
+  // sombra
+  c.fillStyle = 'rgba(30,15,8,.18)'; c.beginPath(); c.ellipse(0.02, FRESA.top + FRESA.L + 0.02, 0.15, 0.03, 0, 0, TAU); c.fill();
+  contornoFresa(c, def);
+  const g = c.createRadialGradient(-0.06, -0.08, 0.01, 0, 0.02, 0.32);
+  g.addColorStop(0, '#ff6b5a'); g.addColorStop(0.45, '#d8202a'); g.addColorStop(1, '#8a0e18'); c.fillStyle = g; c.fill();
+  c.save(); contornoFresa(c, def); c.clip();
+  if (def){ // la parte que no creció: pálida, dura
+    const my = FRESA.top + FRESA.L*0.55; const gd = c.createRadialGradient(-0.13, my, 0.01, -0.1, my, 0.2); gd.addColorStop(0, 'rgba(236,238,200,.95)'); gd.addColorStop(0.5, 'rgba(228,214,160,.6)'); gd.addColorStop(1, 'rgba(228,214,160,0)');
+    c.save(); c.translate(-0.1, my); c.scale(0.7, 1.35); c.translate(0.1, -my); c.fillStyle = gd; c.beginPath(); c.arc(-0.1, my, 0.2, 0, TAU); c.fill(); c.restore(); }
+  // brillo húmedo
+  const gb = c.createRadialGradient(-0.07, -0.07, 0, -0.07, -0.07, 0.12); gb.addColorStop(0, 'rgba(255,240,235,.5)'); gb.addColorStop(1, 'rgba(255,240,235,0)'); c.fillStyle = gb; c.fillRect(-0.3, -0.3, 0.6, 0.6);
+  c.restore();
+  // aquenios en su hoyito
+  for (const [x, y, k, fec] of aq){ if (k < 0.12) continue;
+    const rx = 0.0068*k, ry = 0.0095;
+    if (det > 0.3){ c.fillStyle = fec ? 'rgba(90,5,10,.45)' : 'rgba(150,140,90,.3)'; c.beginPath(); c.ellipse(x, y + 0.002, rx*1.5, ry*1.25, 0, 0, TAU); c.fill(); }
+    c.fillStyle = fec ? '#f0c64a' : '#c9cf8d'; c.beginPath(); c.ellipse(x, y, rx*(fec ? 1 : 0.8), ry*(fec ? 0.8 : 0.62), 0, 0, TAU); c.fill();
+    if (det > 0.5){ c.strokeStyle = fec ? 'rgba(120,70,5,.6)' : 'rgba(100,110,50,.5)'; c.lineWidth = Math.max(px, 0.0015); c.stroke(); } }
+  c.strokeStyle = 'rgba(70,5,10,.5)'; c.lineWidth = Math.max(px, 0.003); contornoFresa(c, def); c.stroke();
+  // cáliz
+  for (let i = 0; i < 9; i++){ const a = -Math.PI*0.95 + i/8*Math.PI*0.9 + (h1(i + (def ? 20 : 0)) - 0.5)*0.15; c.save(); c.translate(0, FRESA.top + 0.01); c.rotate(a);
+    c.beginPath(); c.moveTo(0, -0.018); c.quadraticCurveTo(0.07, -0.03, 0.11 + h1(i*3)*0.03, 0); c.quadraticCurveTo(0.07, 0.03, 0, 0.018); c.closePath();
+    c.fillStyle = i % 2 ? '#4f7d31' : '#3c6a26'; c.fill(); c.strokeStyle = 'rgba(25,45,15,.6)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); c.restore(); }
+  c.strokeStyle = '#4d7a2c'; c.lineWidth = 0.02; c.lineCap = 'round'; c.beginPath(); c.moveTo(0, FRESA.top); c.quadraticCurveTo(0.02, FRESA.top - 0.07, 0.06, FRESA.top - 0.13); c.stroke();
+}
+
+/* ============================================================
+   NIVEL 0 · LA MATA  (1 unidad = 60 cm)
+   ============================================================ */
+const MATA = (() => {
+  const r = rng(11);
+  const suelo = 0.2;
+  const hojas = []; for (let i = 0; i < 17; i++){ const a = -Math.PI*0.93 + i/16*Math.PI*0.86 + (r()-.5)*0.1; const L = 0.17 + r()*0.08; hojas.push({ a, L, z: r(), fol: [0.052 + r()*0.012, 0.048 + r()*0.01], rot: (r()-.5)*0.5, luz: r() }); }
+  hojas.sort((a, b) => a.z - b.z);
+  const flores = [
+    { x: PORTAL[0].x, y: PORTAL[0].y, s: PORTAL[0].s, sx: 1, rot: 0.2, elegida: true },
+    { x: -0.13, y: -0.06, s: PORTAL[0].s*0.92, sx: 0.55, rot: -0.9 },
+    { x: -0.05, y: 0.0, s: PORTAL[0].s*0.85, sx: 0.8, rot: 0.6 },
+    { x: 0.16, y: -0.01, s: PORTAL[0].s*0.8, sx: 0.5, rot: 1.1 },
+    { x: 0.2, y: 0.08, s: PORTAL[0].s*0.7, sx: 0.7, rot: 0.3, boton: true },
+    { x: -0.2, y: 0.05, s: PORTAL[0].s*0.7, sx: 0.8, rot: -0.3, boton: true },
+  ];
+  const fondo = []; for (let i = 0; i < 28; i++) fondo.push({ x: -0.95 + i*0.07 + (r()-.5)*0.03, y: 0.07 + r()*0.03, r: 0.03 + r()*0.03 });
+  const paja = []; for (let i = 0; i < 260; i++) paja.push([-1.1 + r()*2.2, suelo + r()*0.4, (r()-.5)*1.2, 0.015 + r()*0.03, r()]);
+  return { suelo, hojas, flores, fondo, paja };
+})();
+const FRUTOS0 = [{ x: 0.0, y: 0.145, s: 0.13, def: 0, rot: 0.2 }, { x: 0.135, y: 0.155, s: 0.13, def: 1, rot: -0.2 }];
+function foliolo(c, L, w, luz, det, px){
+  c.beginPath(); c.moveTo(0, 0);
+  const n = 14; const pts = [];
+  for (let i = 1; i <= n; i++){ const u = i/n; const ww = w*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.8)), 0.8)*0.5; const dent = (i%2 ? 1 : 0.86); pts.push([u*L, -ww*dent]); }
+  for (const q of pts) c.lineTo(q[0], q[1]);
+  for (let i = n - 1; i >= 1; i--){ const u = i/n; const ww = w*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.8)), 0.8)*0.5; const dent = (i%2 ? 1 : 0.86); c.lineTo(u*L, ww*dent); }
+  c.closePath();
+  const g = c.createLinearGradient(0, -w*0.5, 0, w*0.5); g.addColorStop(0, mix('#3d6b2a', '#8dbb52', luz)); g.addColorStop(1, mix('#23461d', '#4d7f2e', luz)); c.fillStyle = g; c.fill();
+  if (det){ c.strokeStyle = 'rgba(210,235,160,.35)'; c.lineWidth = Math.max(px, L*0.02); c.beginPath(); c.moveTo(0, 0); c.lineTo(L*0.95, 0); c.stroke();
+    c.lineWidth = Math.max(px*0.7, L*0.008); for (let i = 1; i < 7; i++){ const u = i/7.5; c.beginPath(); c.moveTo(u*L, 0); c.lineTo(u*L + L*0.08, -w*0.3); c.moveTo(u*L, 0); c.lineTo(u*L + L*0.08, w*0.3); c.stroke(); } }
+}
+let bgBlur = null;
+function pintaFondoMata(c){
+  const g = c.createLinearGradient(0, -1, 0, 0.12); g.addColorStop(0, '#8cc6e6'); g.addColorStop(0.55, '#cfe7ef'); g.addColorStop(1, '#f1efdc'); c.fillStyle = g; c.fillRect(-1.2, -1.2, 2.4, 1.4);
+  const sx = -0.2, sy = -0.3; const gs = c.createRadialGradient(sx, sy, 0, sx, sy, 0.45); gs.addColorStop(0, 'rgba(255,248,220,.95)'); gs.addColorStop(0.1, 'rgba(255,244,205,.6)'); gs.addColorStop(1, 'rgba(255,240,200,0)'); c.fillStyle = gs; c.fillRect(-1.2, -1.2, 2.4, 2.4);
+  const capas = [['#a9c3cf', -0.02, 0.1, 5], ['#8eae9b', 0.01, 0.07, 9], ['#6d955e', 0.045, 0.05, 17]];
+  capas.forEach(([col, base, amp, sd], k) => { const r = rng(sd); c.fillStyle = col; c.beginPath(); c.moveTo(-1.2, 0.4); let y;
+    for (let x = -1.2; x <= 1.21; x += 0.02){ y = base - amp*(0.5 + 0.5*Math.sin(x*(3 + k*1.7) + sd))*(0.6 + 0.4*Math.sin(x*11 + k)) - (r()-.5)*0.006*(3-k); c.lineTo(x, y); }
+    c.lineTo(1.2, 0.4); c.closePath(); c.fill(); });
+  const gb = c.createLinearGradient(0, -0.06, 0, 0.1); gb.addColorStop(0, 'rgba(240,244,232,0)'); gb.addColorStop(1, 'rgba(240,244,232,.5)'); c.fillStyle = gb; c.fillRect(-1.2, -0.06, 2.4, 0.2);
+  // surcos de fresa al fondo, en camas cubiertas
+  const gt = c.createLinearGradient(0, 0.05, 0, 0.5); gt.addColorStop(0, '#7a8a4c'); gt.addColorStop(0.4, '#5f6b38'); gt.addColorStop(1, '#4a3a24'); c.fillStyle = gt; c.fillRect(-1.2, 0.07, 2.4, 1.2);
+  for (const b of MATA.fondo){ const r = rng(Math.floor(b.x*1000) + 4000);
+    for (let i = 0; i < 16; i++){ const a = r()*TAU, d = Math.sqrt(r()); const x = b.x + Math.cos(a)*b.r*0.9*d, y = b.y + Math.sin(a)*b.r*0.4*d - b.r*0.2; c.fillStyle = mix('#2c4a22', '#83ad53', clamp(0.5 - (y - b.y)/b.r, 0, 1)*0.7); c.beginPath(); c.ellipse(x, y, b.r*0.3, b.r*0.15, (r()-.5)*1.2, 0, TAU); c.fill(); }
+    if (r() < 0.6){ c.fillStyle = '#f7f4e8'; c.beginPath(); c.arc(b.x + (r()-.5)*b.r, b.y - b.r*0.35, 0.006, 0, TAU); c.fill(); } }
+  // la cama de la mata, con hojarasca seca
+  const gs2 = c.createLinearGradient(0, 0.18, 0, 0.6); gs2.addColorStop(0, '#8a6e44'); gs2.addColorStop(1, '#4a3622'); c.fillStyle = gs2;
+  c.beginPath(); c.moveTo(-1.2, MATA.suelo + 0.02); c.quadraticCurveTo(0, MATA.suelo - 0.025, 1.2, MATA.suelo + 0.02); c.lineTo(1.2, 1.2); c.lineTo(-1.2, 1.2); c.closePath(); c.fill();
+  for (const [x, y, a, l, k] of MATA.paja){ c.strokeStyle = k < 0.5 ? 'rgba(214,184,120,.55)' : 'rgba(160,125,70,.5)'; c.lineWidth = 0.003; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*l, y + Math.sin(a)*l*0.4); c.stroke(); }
+}
+function prepFondoMata(){
+  const res = Math.max(200, Math.round(S / 3));
+  const c1 = document.createElement('canvas'); c1.width = c1.height = res; const x1 = c1.getContext('2d');
+  x1.setTransform(res/1.6, 0, 0, res/1.6, res/2, res/2); pintaFondoMata(x1);
+  const c2 = document.createElement('canvas'); c2.width = c2.height = res; const x2 = c2.getContext('2d');
+  if ('filter' in x2){ x2.filter = `blur(${Math.max(2, res/140)}px)`; x2.drawImage(c1, 0, 0); x2.filter = 'none'; }
+  else x2.drawImage(c1, 0, 0);
+  bgBlur = c2;
+}
+function florEnMata(c, fl, px){
+  c.save(); c.translate(fl.x, fl.y); c.rotate(fl.rot); c.scale(fl.s, fl.s*fl.sx);
+  if (fl.boton){ // botón cerrado: pétalos apretados asomando entre los sépalos
+    c.fillStyle = '#f4f2e2'; c.beginPath(); c.ellipse(0, -0.05, 0.13, 0.16, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(140,130,100,.6)'; c.lineWidth = px/fl.s; c.stroke();
+    c.fillStyle = '#4f7d31'; for (const a of [-0.9, -0.3, 0.3, 0.9]){ c.save(); c.rotate(a); c.beginPath(); c.moveTo(-0.05, 0.12); c.quadraticCurveTo(-0.07, -0.02, 0, -0.1); c.quadraticCurveTo(0.07, -0.02, 0.05, 0.12); c.closePath(); c.fill(); c.restore(); } }
+  else flor(c, fl.elegida ? 0.5 : 0.2, px/fl.s, false);
+  c.restore();
+}
+function dibujaMata(c, env){
+  const z = 1 / env.f; const tb = sstep(1.05, 2.6, z);
+  c.save(); const k = 1 - Math.pow(z, -0.72); c.translate(env.cx*k, env.cy*k); const sb = Math.pow(z, 0.28) / z; c.scale(sb, sb);
+  if (tb < 1) pintaFondoMata(c);
+  if (tb > 0 && bgBlur){ c.globalAlpha = tb; c.drawImage(bgBlur, -0.8, -0.8, 1.6, 1.6); c.globalAlpha = 1; }
+  c.restore();
+  const px = env.px, v = env.view; const base = [0, MATA.suelo - 0.01];
+  // sombra de la mata
+  c.fillStyle = 'rgba(40,25,10,.28)'; c.beginPath(); c.ellipse(0.01, MATA.suelo + 0.01, 0.26, 0.035, 0, 0, TAU); c.fill();
+  // hojas trifoliadas en su pecíolo
+  for (const h of MATA.hojas){
+    const ex = base[0] + Math.cos(h.a)*h.L*1.15, ey = base[1] + Math.sin(h.a)*h.L*0.95;
+    if (ex + 0.12 < v[0] || ex - 0.12 > v[2] || ey + 0.12 < v[1] || ey - 0.12 > v[3]) continue;
+    c.strokeStyle = '#6b8a3a'; c.lineWidth = 0.0055; c.lineCap = 'round'; c.beginPath(); c.moveTo(base[0], base[1]); c.quadraticCurveTo(base[0] + Math.cos(h.a)*h.L*0.3, ey + 0.05, ex, ey); c.stroke();
+    c.save(); c.translate(ex, ey); c.rotate(h.a + h.rot);
+    const prof = 0.35 + h.z*0.65;
+    for (const [da, L] of [[-0.75, h.fol[1]], [0.75, h.fol[1]], [0, h.fol[0]]]){ c.save(); c.rotate(da); foliolo(c, L*1.15, L*0.78, clamp(h.luz*0.5 + prof*0.5, 0, 1), true, px); c.restore(); }
+    c.restore();
+  }
+  // tallos de las flores
+  for (const fl of MATA.flores){ c.strokeStyle = '#6f8f3c'; c.lineWidth = 0.004; c.beginPath(); c.moveTo(base[0] + fl.x*0.1, base[1]); c.quadraticCurveTo(fl.x*0.7, fl.y + 0.1, fl.x, fl.y); c.stroke(); }
+  // los dos frutos del final, colgando
+  for (const q of FRUTOS0){ c.strokeStyle = '#6f8f3c'; c.lineWidth = 0.004; c.beginPath(); c.moveTo(base[0], base[1] - 0.02); c.quadraticCurveTo(q.x*0.6, q.y - 0.1, q.x + Math.sin(q.rot)*0.03, q.y - 0.035); c.stroke();
+    c.save(); c.translate(q.x, q.y); c.rotate(q.rot); c.scale(q.s, q.s); fresa(c, q.def, px/q.s, 0.4); c.restore(); }
+  for (const fl of MATA.flores) florEnMata(c, fl, px);
+  // Angelita (o la abeja de miel, en finca alta) llegando a la flor
+  const P = PORTAL[0];
+  if (ALTA()) abejaMiel(c, P.x + 0.045, P.y - 0.03, 0.018, -0.35, true, true);
+  else { const B = aleteo(angelita({ pose: 'volar', x: P.x + 0.04, y: P.y - 0.028, s: 0.00045, voltear: true, carga: 0.7, polen: 0.4 }), 9, 0.55); pintarAngelita(c, B); }
+  const gl = c.createRadialGradient(-0.2, -0.3, 0, -0.2, -0.3, 1.1); gl.addColorStop(0, 'rgba(255,245,210,.14)'); gl.addColorStop(1, 'rgba(255,245,210,0)'); c.fillStyle = gl; c.fillRect(v[0], v[1], v[2]-v[0], v[3]-v[1]);
+}
+
+/* ============================================================
+   NIVEL 1 · LA FLOR Y SU ABEJA  (1 unidad = 4 cm)
+   ============================================================ */
+const BOKEH = (() => { const r = rng(21), a = []; for (let i = 0; i < 34; i++){ const q = r(); a.push({ x: -1 + r()*2, y: -1 + r()*2, r: 0.08 + r()*0.2, col: q < 0.3 ? '#cfe7ef' : q < 0.7 ? '#3f6a2c' : q < 0.85 ? '#8dbb52' : '#23461d', a: 0.25 + r()*0.45 }); } return a; })();
+const POS1 = () => ALTA()
+  ? { miel: { x: PORT ? -0.12 : -0.33, y: PORT ? 0.2 : -0.06, s: PORT ? 0.26 : 0.3, rot: PORT ? -0.75 : -0.15, vuela: false }, ang: { x: PORT ? 0.12 : 0.34, y: PORT ? -0.28 : 0.0, s: 0.0052, pose: 'volar', voltear: true } }
+  : { ang: { x: -0.125, y: 0.012, s: 0.0056, pose: 'decir', voltear: false }, miel: { x: PORT ? 0.1 : 0.37, y: PORT ? -0.3 : 0.03, s: PORT ? 0.26 : 0.32, rot: PORT ? 0.5 : 0.25, vuela: true, espejo: true } };
+function dibujaFlor(c, env){
+  const g = c.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, '#bcdcea'); g.addColorStop(0.45, '#86ad73'); g.addColorStop(1, '#2d4a24'); c.fillStyle = g; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  for (const b of BOKEH){ const gg = c.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); gg.addColorStop(0, rgba(b.col, b.a)); gg.addColorStop(0.7, rgba(b.col, b.a*0.6)); gg.addColorStop(1, rgba(b.col, 0)); c.fillStyle = gg; c.fillRect(b.x-b.r, b.y-b.r, b.r*2, b.r*2); }
+  // una hoja trifoliada desenfocada detrás
+  c.save(); c.globalAlpha = 0.55; c.translate(-0.45, 0.4); c.rotate(-0.6); for (const da of [-0.8, 0, 0.8]){ c.save(); c.rotate(da); foliolo(c, 0.5, 0.36, 0.4, false, env.px); c.restore(); } c.restore(); c.globalAlpha = 1;
+  c.strokeStyle = 'rgba(80,110,50,.6)'; c.lineWidth = 0.03; c.beginPath(); c.moveTo(0.05, 1.3); c.quadraticCurveTo(0.08, 0.6, 0.02, 0.25); c.stroke();
+  flor(c, 1, env.px, true);
+  const Q = POS1();
+  if (Q.miel) abejaMiel(c, Q.miel.x, Q.miel.y, Q.miel.s, Q.miel.rot, Q.miel.vuela, true, Q.miel.espejo);
+  if (Q.ang){ const B = angelita({ pose: Q.ang.pose, x: Q.ang.x, y: Q.ang.y, s: Q.ang.s, voltear: Q.ang.voltear, carga: 0.85, polen: 0.75, brazoD: 0.3 });
+    if (Q.ang.pose === 'volar') aleteo(B, 9, 0.55); else aleteo(B, 0.8, 0.12);
+    pintarAngelita(c, B); }
+  // granos sueltos de polen en el aire, alrededor de la abeja
+  if (env.px < 0.004){ c.fillStyle = 'rgba(250,205,70,.9)'; for (let i = 0; i < 22; i++){ const x = -0.2 + h1(i*7.1)*0.16, y = -0.06 + h1(i*3.9)*0.16; c.beginPath(); c.arc(x, y, 0.0025, 0, TAU); c.fill(); } }
+  const gl = c.createRadialGradient(-0.4, -0.6, 0, -0.4, -0.6, 1.6); gl.addColorStop(0, 'rgba(255,248,220,.2)'); gl.addColorStop(1, 'rgba(60,80,40,.1)'); c.fillStyle = gl; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+}
+
+/* ============================================================
+   NIVEL 2 · EL CENTRO DE LA FLOR: LOS PISTILOS  (1 unidad = 3 mm)
+   ============================================================ */
+const s12 = PORTAL[1].s;
+const PIST2 = (() => { // los pistilos de la flor, llevados a este nivel
+  const out = []; const cx0 = -PORTAL[1].x/s12, cy0 = -PORTAL[1].y/s12;
+  for (const q of FLOR.pist){ const x = (q.x - PORTAL[1].x)/s12, y = (q.y - PORTAL[1].y)/s12;
+    const dx = x - cx0, dy = y - cy0, d = Math.hypot(dx, dy) || 1, a = Math.atan2(dy, dx) + (q.k - 0.5)*0.9;
+    const L = 0.07 + 0.05*q.k; // largo aparente del estilo, visto desde arriba
+    out.push({ x, y, k: q.k, pol: conPolen(q), r: 0.05*(0.85 + q.k*0.3), sx: x + Math.cos(a)*L, sy: y + Math.sin(a)*L, sr: 0.017 + q.k*0.004, q }); }
+  return out;
+})();
+const ELEG2 = (() => { let b = null, d = 1e9; for (const q of PIST2){ const dd = (q.sx - 0.08)**2 + (q.sy - 0.05)**2; if (q.pol && dd < d){ d = dd; b = q; } } return b; })();
+PORTAL[2].x = ELEG2.sx; PORTAL[2].y = ELEG2.sy;
+const GR3 = [{ x: 0.02, y: -0.03, a: 0.5, R: 0.072, main: true }, { x: -0.2, y: 0.16, a: 2.1, R: 0.068 }, { x: 0.23, y: 0.12, a: 1.2, R: 0.07 }];
+const GRANOS2 = (() => { const r = rng(55), out = []; for (const G of GR3) out.push({ x: PORTAL[2].x + G.x*PORTAL[2].s, y: PORTAL[2].y + G.y*PORTAL[2].s, a: G.a, q: ELEG2 }); for (const q of PIST2){ if (!q.pol || q === ELEG2) continue; const n = 1 + Math.floor(r()*4); for (let i = 0; i < n; i++){ const a = r()*TAU, d = r()*q.sr*0.8; out.push({ x: q.sx + Math.cos(a)*d, y: q.sy + Math.sin(a)*d, a: r()*3, q }); } } return out; })();
+function granoPolen(c, x, y, R, a, px, det){ // grano de polen: tres surcos (colpos) con su poro, y estrías finas
+  c.save(); c.translate(x, y); c.rotate(a);
+  const ry = R*1.12;
+  const g = c.createRadialGradient(-R*0.35, -ry*0.35, R*0.1, 0, 0, R*1.15); g.addColorStop(0, '#fff6c2'); g.addColorStop(0.45, '#f6d45a'); g.addColorStop(1, '#c9921f');
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, R, ry, 0, 0, TAU); c.fill();
+  if (det){ c.save(); c.beginPath(); c.ellipse(0, 0, R, ry, 0, 0, TAU); c.clip();
+    c.strokeStyle = 'rgba(170,120,30,.28)'; c.lineWidth = Math.max(px, R*0.03);
+    for (let i = -9; i <= 9; i++){ const xx = i/9*R; c.beginPath(); c.moveTo(xx*0.7, -ry); c.bezierCurveTo(xx*1.15, -ry*0.4, xx*1.15, ry*0.4, xx*0.7, ry); c.stroke(); }
+    for (const xx of [-R*0.6, 0, R*0.6]){ // el surco, hundido, y su poro en el ecuador
+      c.strokeStyle = 'rgba(150,100,20,.55)'; c.lineWidth = Math.max(px, R*0.1); c.beginPath(); c.moveTo(xx*0.75, -ry*0.82); c.quadraticCurveTo(xx*1.05, 0, xx*0.75, ry*0.82); c.stroke();
+      c.strokeStyle = 'rgba(255,245,200,.55)'; c.lineWidth = Math.max(px, R*0.035); c.beginPath(); c.moveTo(xx*0.75 + R*0.06, -ry*0.8); c.quadraticCurveTo(xx*1.05 + R*0.06, 0, xx*0.75 + R*0.06, ry*0.8); c.stroke();
+      c.fillStyle = 'rgba(140,90,15,.7)'; c.beginPath(); c.ellipse(xx*1.02, 0, R*0.1, R*0.08, 0, 0, TAU); c.fill(); }
+    const gb = c.createRadialGradient(0, 0, R*0.6, 0, 0, R*1.1); gb.addColorStop(0, 'rgba(120,70,10,0)'); gb.addColorStop(1, 'rgba(120,70,10,.35)'); c.fillStyle = gb; c.fillRect(-R, -ry, 2*R, 2*ry);
+    c.fillStyle = 'rgba(255,252,225,.6)'; c.beginPath(); c.ellipse(-R*0.38, -ry*0.45, R*0.22, R*0.14, -0.6, 0, TAU); c.fill();
+    c.restore(); }
+  c.strokeStyle = 'rgba(130,85,15,.6)'; c.lineWidth = Math.max(px, R*0.04); c.beginPath(); c.ellipse(0, 0, R, ry, 0, 0, TAU); c.stroke();
+  c.restore();
+}
+function dibujaCentro(c, env){
+  const v = env.view, px = env.px;
+  const cx0 = -PORTAL[1].x/s12, cy0 = -PORTAL[1].y/s12, R0 = FLOR.RD/s12;
+  const g = c.createRadialGradient(cx0 - R0*0.35, cy0 - R0*0.4, R0*0.05, cx0, cy0, R0*1.05); g.addColorStop(0, '#e9dc78'); g.addColorStop(0.6, '#c5b64a'); g.addColorStop(1, '#8c8a33');
+  c.fillStyle = g; c.fillRect(v[0] - 0.2, v[1] - 0.2, v[2] - v[0] + 0.4, v[3] - v[1] + 0.4);
+  const vis = q => !(q.x < v[0] - 0.2 || q.x > v[2] + 0.2 || q.y < v[1] - 0.2 || q.y > v[3] + 0.2);
+  // los ovarios, apretados en el domo: bultos que apenas asoman
+  for (const q of PIST2){ if (!vis(q)) continue; const lit = clamp(0.62 - ((q.x - cx0) + (q.y - cy0))/R0*0.35, 0, 1);
+    const go = c.createRadialGradient(q.x - q.r*0.4, q.y - q.r*0.45, q.r*0.1, q.x, q.y, q.r*1.05); go.addColorStop(0, mix('#dfe38e', '#f3f3b8', lit)); go.addColorStop(1, mix('#8f963a', '#a9ad4c', lit));
+    c.fillStyle = go; c.beginPath(); c.ellipse(q.x, q.y, q.r, q.r*0.9, 0, 0, TAU); c.fill(); }
+  // sombras de los estilos
+  c.lineCap = 'round'; c.strokeStyle = 'rgba(60,55,10,.22)'; c.lineWidth = 0.022;
+  c.beginPath(); for (const q of PIST2){ if (!vis(q)) continue; c.moveTo(q.x + 0.012, q.y + 0.016); c.quadraticCurveTo((q.x + q.sx)/2 + 0.02, (q.y + q.sy)/2 + 0.02, q.sx + 0.014, q.sy + 0.018); } c.stroke();
+  // estilos: hilos delgados, más claros arriba
+  for (const q of PIST2){ if (!vis(q)) continue; const lit = clamp(0.62 - ((q.sx - cx0) + (q.sy - cy0))/R0*0.35, 0, 1);
+    const gs = c.createLinearGradient(q.x, q.y, q.sx, q.sy); gs.addColorStop(0, mix('#b9b24c', '#cfc964', lit)); gs.addColorStop(1, mix('#e9e6a0', '#fbf8d0', lit));
+    c.strokeStyle = gs; c.lineWidth = 0.013; c.beginPath(); c.moveTo(q.x, q.y); c.quadraticCurveTo((q.x + q.sx)/2 + 0.01*(q.k - 0.5), (q.y + q.sy)/2 - 0.01, q.sx, q.sy); c.stroke(); }
+  // estigmas: cabecitas húmedas
+  for (const q of PIST2){ if (!vis(q)) continue;
+    const gq = c.createRadialGradient(q.sx - q.sr*0.35, q.sy - q.sr*0.4, q.sr*0.1, q.sx, q.sy, q.sr); gq.addColorStop(0, '#fffbe4'); gq.addColorStop(0.7, q.pol ? '#f1ecb8' : '#e3e8b4'); gq.addColorStop(1, '#b9b777');
+    c.fillStyle = gq; c.beginPath(); c.arc(q.sx, q.sy, q.sr, 0, TAU); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.6)'; c.beginPath(); c.arc(q.sx - q.sr*0.35, q.sy - q.sr*0.4, q.sr*0.22, 0, TAU); c.fill(); }
+  for (const G of GRANOS2){ if (G.x < v[0] - 0.02 || G.x > v[2] + 0.02 || G.y < v[1] - 0.02 || G.y > v[3] + 0.02) continue; granoPolen(c, G.x, G.y, 0.0034, G.a, px, px < 0.0006); }
+  const gl = c.createRadialGradient(-0.5, -0.6, 0, -0.5, -0.6, 1.8); gl.addColorStop(0, 'rgba(255,250,220,.2)'); gl.addColorStop(1, 'rgba(60,60,10,.16)'); c.fillStyle = gl; c.fillRect(v[0] - 0.2, v[1] - 0.2, v[2] - v[0] + 0.4, v[3] - v[1] + 0.4);
+}
+
+/* ============================================================
+   NIVEL 3 · EL ESTIGMA Y EL GRANO DE POLEN  (1 unidad = 120 µm)
+   ============================================================ */
+const ESTIG = (() => {
+  const r = rng(61); const R = ELEG2.sr/PORTAL[2].s;
+  const sites = jitterSites(r, [-0.62, -0.62, 0.62, 0.62], 0.05, 0.9).filter(s => Math.hypot(s[0], s[1]) < R*1.02);
+  const cel = voronoi(sites, [-0.62, -0.62, 0.62, 0.62], 0.05).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.97), t: r() }));
+  const granos = GR3;
+  // el tubo: sale del grano, se arrima al estigma y se mete entre las papilas
+  const tubo = []; for (let i = 0; i <= 40; i++){ const u = i/40; tubo.push([0.02 + 0.05*Math.sin(u*2.4) + u*0.03, -0.03 + 0.09 + u*0.13 + 0.02*Math.sin(u*6)]); }
+  return { R, cel, granos, tubo };
+})();
+function trazoParcial(c, pts, g){ const n = Math.max(1, Math.floor(g*(pts.length - 1))); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i <= n; i++) c.lineTo(pts[i][0], pts[i][1]); return pts[n]; }
+function dibujaEstigma(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createRadialGradient(0, 0, 0.2, 0, 0, 1.3); g.addColorStop(0, '#6d7a2e'); g.addColorStop(1, '#2f3712'); c.fillStyle = g; c.fillRect(-1.3, -1.3, 2.6, 2.6);
+  // pistilos vecinos, fuera de foco
+  const r = rng(63); for (let i = 0; i < 8; i++){ const a = i/8*TAU + r()*0.4, d = 0.85 + r()*0.3; blob(c, Math.cos(a)*d, Math.sin(a)*d, 0.3, 0.3, '#e9eab0', 0.22); }
+  // el disco del estigma y sus papilas húmedas
+  c.fillStyle = '#d8dc97'; c.beginPath(); c.arc(0, 0, ESTIG.R*1.02, 0, TAU); c.fill();
+  for (const q of ESTIG.cel){ if (!inView(q.bb, v, 0.03)) continue; const d = Math.hypot(q.c[0], q.c[1])/ESTIG.R; if (d > 1.02) continue;
+    const lit = clamp(0.6 - (q.c[0] + q.c[1])*0.7, 0, 1);
+    c.beginPath(); roundPoly(c, q.sh); const gq = c.createRadialGradient(q.c[0] - 0.012, q.c[1] - 0.016, 0.003, q.c[0], q.c[1], 0.04);
+    gq.addColorStop(0, mix('#f6f7d8', '#ffffff', lit)); gq.addColorStop(0.55, mix('#dde2a4', '#eaedbe', lit*q.t)); gq.addColorStop(1, mix('#a7ad64', '#b8bd73', lit)); c.fillStyle = gq; c.fill();
+    if (lit > 0.3){ c.fillStyle = `rgba(255,255,255,${(lit - 0.3)*0.8})`; c.beginPath(); c.ellipse(q.c[0] - 0.012, q.c[1] - 0.015, 0.009, 0.005, -0.6, 0, TAU); c.fill(); } }
+  // una película de agua sobre todo el estigma
+  const gw = c.createRadialGradient(-0.12, -0.16, 0, -0.12, -0.16, ESTIG.R*1.1); gw.addColorStop(0, 'rgba(235,250,255,.22)'); gw.addColorStop(1, 'rgba(235,250,255,0)'); c.fillStyle = gw; c.beginPath(); c.arc(0, 0, ESTIG.R, 0, TAU); c.fill();
+  const gb = c.createRadialGradient(0, 0, ESTIG.R*0.75, 0, 0, ESTIG.R*1.05); gb.addColorStop(0, 'rgba(40,45,10,0)'); gb.addColorStop(1, 'rgba(40,45,10,.45)'); c.fillStyle = gb; c.beginPath(); c.arc(0, 0, ESTIG.R*1.05, 0, TAU); c.fill();
+  // el tubo polínico, que se mete entre las papilas (se oscurece al hundirse)
+  const g3 = E.tubo3;
+  if (g3 > 0.01){ c.lineCap = 'round'; c.lineJoin = 'round';
+    c.strokeStyle = 'rgba(80,60,10,.35)'; c.lineWidth = 0.034; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    const tip = ESTIG.tubo[Math.max(1, Math.floor(g3*(ESTIG.tubo.length - 1)))];
+    const gt = c.createLinearGradient(ESTIG.tubo[0][0], ESTIG.tubo[0][1], tip[0], tip[1]); gt.addColorStop(0, '#f6e7a8'); gt.addColorStop(1, g3 > 0.7 ? 'rgba(200,190,120,.35)' : '#efe1a0');
+    c.strokeStyle = gt; c.lineWidth = 0.024; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    c.strokeStyle = 'rgba(255,255,240,.6)'; c.lineWidth = 0.006; trazoParcial(c, ESTIG.tubo, g3); c.stroke();
+    if (g3 > 0.7){ c.fillStyle = `rgba(60,55,20,${(g3 - 0.7)*1.6})`; c.beginPath(); c.arc(tip[0], tip[1], 0.02, 0, TAU); c.fill(); } }
+  for (const G of ESTIG.granos) granoPolen(c, G.x, G.y, G.R, G.a, px, true);
+}
+
+/* ============================================================
+   NIVEL 4 · EL PISTILO CORTADO  (1 unidad ≈ 99 µm)
+   Arriba el estigma (y≈-0.3); abajo, el ovario con su óvulo.
+   ============================================================ */
+const PIS = (() => {
+  const r = rng(71);
+  const Po = PORTAL[4];
+  const ov = { x: Po.x, y: Po.y + 0.1*S45*OV, rx: 0.42*S45*OV*1.5, ry: 0.5*S45*OV*1.4 };
+  const micro = [Po.x, Po.y - 0.4*S45*OV];
+  const semi = x => 0.21 + 0.015*Math.sin(x*2); // medio ancho del estilo
+  const perfil = y => { // medio ancho del pistilo a la altura y
+    if (y < 0.3) return lerp(0.52, 0.24, sstep(-0.3, 0.3, y));
+    const t = (y - ov.y)/ov.ry, el = ov.rx*Math.sqrt(Math.max(0, 1 - t*t));
+    if (y < ov.y) return Math.max(0.22 + 0.02*Math.sin(y*1.7), el);
+    return el;
+  };
+  const y0 = -0.3, y1 = ov.y + ov.ry;
+  const sites = []; for (let y = y0 - 0.14; y < y1 + 0.14; y += 0.07){ const w = Math.max(perfil(clamp(y, y0, y1)), 0.2) + 0.16; for (let x = -w; x < w; x += 0.075) sites.push([x + (r()-.5)*0.05 + Po.x*sstep(0, 3, y), y + (r()-.5)*0.05]); }
+  const cel = voronoi(sites, [-2, -0.5, 2.2, y1 + 0.2], 0.08).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.88), t: r() }));
+  const papilas = []; for (let x = -0.5; x <= 0.5; x += 0.062) papilas.push([x + (r()-.5)*0.01, 0.028 + r()*0.012]);
+  // camino del tubo: del grano, por el centro del estilo, hasta el micrópilo
+  const camino = []; for (let i = 0; i <= 120; i++){ const u = i/120; const y = lerp(-0.34, micro[1], u); const x = lerp(0.02, micro[0], sstep(0, 1, u)) + 0.035*Math.sin(u*17)*(1 - u); camino.push([x, y]); }
+  return { ov, micro, perfil, cel, papilas, camino, xDe: y => Po.x*sstep(0, 3, y) };
+})();
+function contornoPistilo(c){
+  const n = 80, y0 = -0.3, y1 = PIS.ov.y + PIS.ov.ry;
+  c.beginPath();
+  for (let i = 0; i <= n; i++){ const y = lerp(y0, y1, i/n); c.lineTo(PIS.xDe(y) + PIS.perfil(y), y); }
+  for (let i = n; i >= 0; i--){ const y = lerp(y0, y1, i/n); c.lineTo(PIS.xDe(y) - PIS.perfil(y), y); }
+  c.closePath();
+}
+function dibujaCorte(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createLinearGradient(0, -1.5, 0, 8); g.addColorStop(0, '#39401a'); g.addColorStop(0.5, '#262c12'); g.addColorStop(1, '#1b200d'); c.fillStyle = g; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  // pistilos vecinos en sombra
+  for (const dx of [-1.9, 1.95]){ c.save(); c.translate(dx, 0.4); c.globalAlpha = 0.25; contornoPistilo(c); c.fillStyle = '#8e9a50'; c.fill(); c.restore(); } c.globalAlpha = 1;
+  // el receptáculo abajo
+  const yb = PIS.ov.y + PIS.ov.ry; c.fillStyle = '#b8b060'; c.fillRect(v[0] - 1, yb - 0.1, v[2] - v[0] + 2, 3);
+  // tejido del pistilo
+  c.save(); contornoPistilo(c); const gp = c.createLinearGradient(-0.5, 0, 0.6, 0); gp.addColorStop(0, '#b9c26a'); gp.addColorStop(0.5, '#e0e39c'); gp.addColorStop(1, '#aab35c'); c.fillStyle = gp; c.fill(); c.clip();
+  for (const q of PIS.cel){ if (!inView(q.bb, v, 0.05)) continue; c.beginPath(); roundPoly(c, q.sh); c.fillStyle = mix('#d4d98c', '#eff0bd', q.t*0.7); c.fill(); c.strokeStyle = 'rgba(120,125,55,.5)'; c.lineWidth = Math.max(px, 0.006); c.stroke(); }
+  // el tejido que guía al tubo, por el centro del estilo
+  c.strokeStyle = 'rgba(250,246,200,.35)'; c.lineWidth = 0.16; c.lineCap = 'round'; c.beginPath(); PIS.camino.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.stroke();
+  // la cavidad del ovario
+  const O = PIS.ov; c.fillStyle = '#4c5424'; c.beginPath(); c.ellipse(O.x, O.y, O.rx*0.8, O.ry*0.84, 0, 0, TAU); c.fill();
+  c.restore();
+  c.strokeStyle = '#6f7a33'; c.lineWidth = Math.max(px*1.5, 0.012); contornoPistilo(c); c.stroke();
+  // papilas del estigma (el mismo borde que se vio desde arriba)
+  for (const [x, h] of PIS.papilas){ c.fillStyle = '#f3f3cf'; c.beginPath(); c.ellipse(x, -0.3 - h*0.5, 0.03, h + 0.01, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(120,125,60,.6)'; c.lineWidth = Math.max(px, 0.004); c.stroke(); }
+  // el óvulo, en su portal (misma geometría del nivel 5)
+  const P = PORTAL[4]; c.save(); c.translate(P.x, P.y); c.scale(P.s, P.s); ovulo(c, px/P.s, 0.3, 0, 0); c.restore();
+  // el tubo que baja
+  const g4 = lerp(0.03, 1, E.tubo4);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(70,50,10,.4)'; c.lineWidth = Math.max(px*3, 0.05); trazoParcial(c, PIS.camino, g4); c.stroke();
+  c.strokeStyle = '#f7e6a2'; c.lineWidth = Math.max(px*2, 0.032); const tip = trazoParcial(c, PIS.camino, g4); c.stroke();
+  c.fillStyle = '#fff6cc'; c.beginPath(); c.arc(tip[0], tip[1], Math.max(px*2.2, 0.03), 0, TAU); c.fill();
+  // dos células del polen viajando junto a la punta
+  if (g4 > 0.15){ const k = Math.max(1, Math.floor(g4*(PIS.camino.length - 1)) - 3); const q = PIS.camino[k]; c.fillStyle = '#e0891d'; for (const d of [-0.012, 0.012]){ c.beginPath(); c.arc(q[0] + d, q[1], Math.max(px*1.3, 0.011), 0, TAU); c.fill(); } }
+  granoPolen(c, 0.02, -0.4, 0.074, 0.5, px, true);
+}
+
+/* ============================================================
+   NIVEL 5 · EL ÓVULO  (1 unidad ≈ 220 µm) — y, al subir, la semilla
+   ============================================================ */
+function ovulo(c, px, det, fec, madura){ c.save(); c.scale(OV, OV); ovuloDentro(c, px/OV, det, fec, madura); c.restore(); }
+function ovuloDentro(c, px, det, fec, madura){
+  const cy = 0.1, lw = Math.max(px, 0.004);
+  // el cordón que lo sostiene, abajo
+  c.strokeStyle = mix('#b8b56c', '#b08a4e', madura); c.lineWidth = 0.09; c.lineCap = 'round'; c.beginPath(); c.moveTo(0.02, cy + 0.46); c.quadraticCurveTo(0.08, cy + 0.62, 0.02, cy + 0.8); c.stroke();
+  // tegumento de afuera y de adentro, con su sombreado
+  const g1 = c.createRadialGradient(-0.12, cy - 0.14, 0.05, 0, cy, 0.52); g1.addColorStop(0, mix('#e3e0a6', '#dcc186', madura)); g1.addColorStop(1, mix('#a7a45c', '#9c7a3e', madura));
+  c.fillStyle = g1; c.beginPath(); c.ellipse(0, cy, 0.42, 0.5, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(90,85,35,.45)'; c.lineWidth = lw; c.stroke();
+  const g2 = c.createRadialGradient(-0.1, cy - 0.1, 0.04, 0, cy + 0.01, 0.44); g2.addColorStop(0, mix('#eeebbe', '#e8d39c', madura)); g2.addColorStop(1, mix('#c3c07c', '#bb9a5a', madura));
+  c.fillStyle = g2; c.beginPath(); c.ellipse(0, cy + 0.01, 0.35, 0.43, 0, 0, TAU); c.fill(); c.stroke();
+  // células de los tegumentos, apenas marcadas
+  if (det > 0.5){ c.strokeStyle = 'rgba(120,115,55,.18)'; c.lineWidth = lw; for (let i = 0; i < 36; i++){ const a = i/36*TAU; c.beginPath(); c.moveTo(Math.cos(a)*0.35, cy + 0.01 + Math.sin(a)*0.43); c.lineTo(Math.cos(a)*0.42, cy + Math.sin(a)*0.5); c.stroke(); } }
+  // nucela
+  const g3 = c.createRadialGradient(0, cy - 0.05, 0.02, 0, cy + 0.03, 0.36); g3.addColorStop(0, mix('#fbf8de', '#f6ebc6', madura)); g3.addColorStop(1, mix('#dedba6', '#e0c890', madura));
+  c.fillStyle = g3; c.beginPath(); c.ellipse(0, cy + 0.03, 0.27, 0.36, 0, 0, TAU); c.fill();
+  // micrópilo: la puertica de arriba, un canal entre los tegumentos
+  c.fillStyle = 'rgba(70,75,30,.85)'; c.beginPath(); c.moveTo(-0.03, -0.42); c.quadraticCurveTo(0, -0.37, 0.03, -0.42); c.lineTo(0.012, -0.3); c.lineTo(-0.012, -0.3); c.closePath(); c.fill();
+  // saco embrionario, que brilla
+  const sac = { x: 0, y: 0.02, rx: 0.1 + madura*0.14, ry: 0.3 + madura*0.02 };
+  const gs = c.createRadialGradient(0, -0.05, 0.02, 0, 0.02, 0.32); gs.addColorStop(0, '#fffdf0'); gs.addColorStop(1, mix('#f5ecc6', '#f7e3a8', madura));
+  c.fillStyle = gs; c.beginPath(); c.ellipse(sac.x, sac.y, sac.rx, sac.ry, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(160,150,90,.5)'; c.lineWidth = lw; c.stroke();
+  if (madura > 0.02){ // endospermo: celditas de reserva, y el embrión que crece
+    c.save(); c.beginPath(); c.ellipse(sac.x, sac.y, sac.rx, sac.ry, 0, 0, TAU); c.clip(); c.globalAlpha = madura;
+    for (let i = 0; i < 90; i++){ const x = (h1(i*1.7) - 0.5)*0.5, y = (h1(i*2.9) - 0.5)*0.66; c.fillStyle = i % 3 ? '#f5e2a4' : '#efd48c'; c.beginPath(); c.arc(x, y, 0.026, 0, TAU); c.fill(); c.strokeStyle = 'rgba(180,140,60,.3)'; c.lineWidth = lw; c.stroke(); }
+    const ge = c.createRadialGradient(-0.02, -0.14, 0.01, 0, -0.1, 0.16); ge.addColorStop(0, '#f4f8d0'); ge.addColorStop(1, '#bfd07a');
+    c.fillStyle = ge; c.beginPath(); c.ellipse(0, -0.1, 0.05 + madura*0.07, 0.07 + madura*0.1, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(110,130,50,.6)'; c.stroke();
+    c.restore(); c.globalAlpha = 1; }
+  if (madura >= 0.999) return;
+  c.globalAlpha = 1 - madura;
+  // sinérgidas: dos gotas delgadas junto al micrópilo, con su borde en hilos
+  for (const s of [-1, 1]){ c.save(); c.translate(s*0.036, -0.23); c.rotate(-s*0.18);
+    const gy = c.createLinearGradient(0, -0.06, 0, 0.05); gy.addColorStop(0, '#efe0b0'); gy.addColorStop(1, '#f7efd6'); c.fillStyle = gy;
+    c.beginPath(); c.moveTo(0, -0.065); c.quadraticCurveTo(0.036, -0.01, 0.022, 0.04); c.quadraticCurveTo(0, 0.058, -0.022, 0.04); c.quadraticCurveTo(-0.036, -0.01, 0, -0.065); c.fill();
+    c.strokeStyle = 'rgba(150,120,70,.45)'; c.lineWidth = lw; c.stroke();
+    c.strokeStyle = 'rgba(150,120,70,.3)'; for (const d of [-0.006, 0, 0.006]){ c.beginPath(); c.moveTo(d, -0.06); c.lineTo(d*1.4, -0.035); c.stroke(); }
+    c.fillStyle = 'rgba(160,120,60,.55)'; c.beginPath(); c.arc(0, 0.012, 0.009, 0, TAU); c.fill(); c.restore(); }
+  // ovocélula (pera, con su núcleo); al fecundarse brilla: es el cigoto
+  const zig = sstep(0.62, 0.8, fec);
+  c.save(); c.translate(0, -0.16);
+  const go = c.createRadialGradient(-0.01, 0.0, 0.005, 0, 0.01, 0.07); go.addColorStop(0, mix('#fbe8cf', '#ffe1a0', zig)); go.addColorStop(1, mix('#eccfae', '#f5c46a', zig));
+  c.fillStyle = go; c.beginPath(); c.moveTo(0, -0.05); c.bezierCurveTo(0.045, -0.04, 0.06, 0.03, 0.03, 0.06); c.quadraticCurveTo(0, 0.075, -0.03, 0.06); c.bezierCurveTo(-0.06, 0.03, -0.045, -0.04, 0, -0.05); c.fill();
+  c.strokeStyle = 'rgba(160,110,60,.55)'; c.lineWidth = lw; c.stroke();
+  c.fillStyle = mix('#c08a52', '#e0891d', zig); c.beginPath(); c.arc(0, 0.028, 0.015 + zig*0.005, 0, TAU); c.fill();
+  if (zig > 0){ const gz = c.createRadialGradient(0, 0.02, 0, 0, 0.02, 0.11); gz.addColorStop(0, `rgba(255,205,90,${0.45*zig})`); gz.addColorStop(1, 'rgba(255,205,90,0)'); c.fillStyle = gz; c.beginPath(); c.arc(0, 0.02, 0.11, 0, TAU); c.fill(); }
+  c.restore();
+  // célula central con dos núcleos polares, que se juntan con la otra célula del polen
+  const endo = sstep(0.62, 0.85, fec);
+  c.fillStyle = mix('#c29a62', '#e0a232', endo); for (const s of [-1, 1]){ c.beginPath(); c.arc(s*0.02*(1 - endo), 0.03, 0.017, 0, TAU); c.fill(); }
+  if (endo > 0){ const gz = c.createRadialGradient(0, 0.03, 0, 0, 0.03, 0.1); gz.addColorStop(0, `rgba(255,205,90,${0.4*endo})`); gz.addColorStop(1, 'rgba(255,205,90,0)'); c.fillStyle = gz; c.beginPath(); c.arc(0, 0.03, 0.1, 0, TAU); c.fill(); }
+  // antípodas, al fondo
+  for (const [x, y] of [[-0.03, 0.27], [0.03, 0.27], [0, 0.295]]){ c.fillStyle = '#ece3c2'; c.beginPath(); c.arc(x, y, 0.022, 0, TAU); c.fill(); c.strokeStyle = 'rgba(150,130,80,.4)'; c.lineWidth = lw; c.stroke(); c.fillStyle = 'rgba(160,130,80,.5)'; c.beginPath(); c.arc(x, y, 0.007, 0, TAU); c.fill(); }
+  c.globalAlpha = 1;
+}
+function dibujaOvulo(c, env){
+  const px = env.px;
+  const g = c.createRadialGradient(0, 0.06, 0.1, 0, 0.06, 0.9); g.addColorStop(0, '#59632a'); g.addColorStop(1, '#262c12'); c.fillStyle = g; c.fillRect(env.view[0] - 0.2, env.view[1] - 0.2, env.view[2] - env.view[0] + 0.4, env.view[3] - env.view[1] + 0.4);
+  // la pared del ovario, alrededor, con sus células
+  c.save(); c.scale(OV, OV);
+  c.strokeStyle = 'rgba(200,205,130,.3)'; c.lineWidth = 0.08; c.beginPath(); c.ellipse(0, 0.1, 0.66, 0.72, 0, 0, TAU); c.stroke();
+  c.strokeStyle = 'rgba(200,205,130,.14)'; c.lineWidth = 0.004; for (let i = 0; i < 48; i++){ const a = i/48*TAU; c.beginPath(); c.moveTo(Math.cos(a)*0.62, 0.1 + Math.sin(a)*0.68); c.lineTo(Math.cos(a)*0.7, 0.1 + Math.sin(a)*0.76); c.stroke(); }
+  c.restore();
+  const fec = E.fec;
+  ovulo(c, px, 1, fec, E.madura);
+  c.save(); c.scale(OV, OV); const pxo = px/OV;
+  // el tubo entra por el micrópilo y suelta dos células del polen
+  const llega = sstep(0, 0.3, fec);
+  c.globalAlpha = 1 - E.madura;
+  const tubo = [[0.01, -1.4], [0.006, -0.7], [0, -0.42], [0.008, -0.33], [0.026, -0.27]];
+  const n = 3 + llega*1.999;
+  const trazo = () => { c.beginPath(); c.moveTo(tubo[0][0], tubo[0][1]); for (let i = 1; i <= Math.floor(n); i++) c.lineTo(tubo[i][0], tubo[i][1]); const f = n - Math.floor(n); if (f > 0 && Math.floor(n) < 4){ const a = tubo[Math.floor(n)], b = tubo[Math.floor(n) + 1]; c.lineTo(lerp(a[0], b[0], f), lerp(a[1], b[1], f)); } };
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = 'rgba(70,50,10,.3)'; c.lineWidth = 0.034; trazo(); c.stroke();
+  c.strokeStyle = '#f5e4a0'; c.lineWidth = 0.022; trazo(); c.stroke();
+  c.strokeStyle = 'rgba(255,255,240,.6)'; c.lineWidth = 0.006; trazo(); c.stroke();
+  // las dos células del polen: una va a la ovocélula, la otra a los núcleos del centro
+  const suelta = sstep(0.3, 0.42, fec), viaja = sstep(0.42, 0.66, fec), une = sstep(0.62, 0.72, fec);
+  if (une < 1){ const base = llega < 1 ? [0.004, -0.6 + 0.3*llega] : [0.02, -0.28];
+    const s1 = [lerp(base[0] - 0.004, 0, viaja), lerp(base[1], -0.13, viaja)], s2 = [lerp(base[0] + 0.006, 0.0, viaja), lerp(base[1] + 0.012, 0.03, viaja)];
+    c.globalAlpha = (1 - une)*(1 - E.madura);
+    for (const q of (suelta > 0 ? [s1, s2] : [[base[0] - 0.004, base[1]], [base[0] + 0.006, base[1] + 0.012]])){
+      const gz = c.createRadialGradient(q[0], q[1], 0, q[0], q[1], 0.03); gz.addColorStop(0, 'rgba(255,170,60,.55)'); gz.addColorStop(1, 'rgba(255,170,60,0)'); c.fillStyle = gz; c.beginPath(); c.arc(q[0], q[1], 0.03, 0, TAU); c.fill();
+      c.fillStyle = '#d8801c'; c.beginPath(); c.ellipse(q[0], q[1], 0.009, 0.013, 0.2, 0, TAU); c.fill(); } }
+  c.globalAlpha = 1; c.restore();
+}
+
+/* ============================================================
+   NIVEL 6 · EL AQUENIO SOBRE LA CARNE  (1 unidad = 3 mm)
+   El aquenio fecundado (cortado para ver su semilla) y, a la
+   izquierda, uno sin fecundar. La auxina hace crecer la carne.
+   ============================================================ */
+const AQN = (() => {
+  const r = rng(81);
+  const sites = jitterSites(r, [-1.5, -0.2, 1.5, 1.6], 0.09, 0.85);
+  const cel = voronoi(sites, [-1.6, -0.3, 1.6, 1.8], 0.09).map(q => ({ ...q, t: r() }));
+  const auxina = []; for (let i = 0; i < 46; i++) auxina.push({ a: -0.2 + r()*1.9, d: r(), k: r() });
+  return { cel, auxina, vecino: { x: -0.34 } };
+})();
+function superficie6(x, cre){ // la piel de la fresa: sube (se hincha) del lado fecundado
+  const hincha = cre*0.14*sstep(-0.35, 0.35, x);
+  return 0.2 - hincha + 0.012*Math.sin(x*9);
+}
+function dibujaAquenio(c, env){
+  const v = env.view, px = env.px, cre = E.crece;
+  const g = c.createLinearGradient(0, -1.4, 0, 0.3); g.addColorStop(0, '#6b8a57'); g.addColorStop(0.55, mix('#b9a784', '#b3564a', cre*0.6)); g.addColorStop(1, mix('#d9cfa4', '#c23a33', cre*0.8)); c.fillStyle = g; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  // más allá, fuera de foco: la misma piel con otras pepitas
+  for (let i = 0; i < 9; i++){ const x = -1.4 + i*0.36 + h1(i)*0.1, y = -0.35 - h1(i*3)*0.5; blob(c, x, y, 0.1, 0.13, '#f2cf62', 0.35); }
+  // la carne: células que se hinchan del lado fecundado
+  c.save(); c.beginPath(); c.moveTo(-3, 3); for (let x = -3; x <= 3; x += 0.03) c.lineTo(x, superficie6(x, cre)); c.lineTo(3, 3); c.closePath();
+  const gc = c.createLinearGradient(-0.8, 0, 0.8, 0); gc.addColorStop(0, '#e6e2b6'); gc.addColorStop(0.45, mix('#e6e2b6', '#e2403a', cre*0.8)); gc.addColorStop(1, mix('#e8d9a8', '#c8141f', cre)); c.fillStyle = gc; c.fill(); c.clip();
+  for (const q of AQN.cel){ if (!inView(q.bb, v, 0.1)) continue; const lado = sstep(-0.35, 0.35, q.c[0]);
+    const k = 0.72 + 0.22*lado*cre; const sh = shrink(q.p, q.c, k);
+    c.beginPath(); roundPoly(c, sh); c.fillStyle = mix(mix('#f1edca', '#ea8a78', lado*cre*0.8), '#ffffff', q.t*0.12); c.fill(); c.strokeStyle = mix('#b8b27a', '#9a1c22', lado*cre); c.lineWidth = Math.max(px, 0.006); c.stroke(); }
+  // la auxina: bajando del aquenio hacia la carne de su lado
+  if (cre > 0.01){ for (const q of AQN.auxina){ const t = (q.d + (RM ? 0 : RELOJ*0.12*(0.6 + q.k))) % 1; const x = 0.02 + Math.cos(q.a)*t*0.9, y = superficie6(0, cre) + 0.02 + Math.sin(q.a)*t*0.7*0.7 + t*0.35;
+      c.fillStyle = `rgba(255,190,60,${0.75*cre*(1 - t)})`; c.beginPath(); c.arc(x, y, 0.02*(1 - t*0.5), 0, TAU); c.fill(); }
+    const ga = c.createRadialGradient(0.1, superficie6(0, cre) + 0.25, 0, 0.1, superficie6(0, cre) + 0.25, 0.8); ga.addColorStop(0, `rgba(255,170,60,${0.28*cre})`); ga.addColorStop(1, 'rgba(255,170,60,0)'); c.fillStyle = ga; c.fillRect(-1, -0.5, 2.2, 2); }
+  c.restore();
+  // brillo de la piel
+  c.strokeStyle = 'rgba(255,240,230,.5)'; c.lineWidth = Math.max(px, 0.01); c.beginPath(); for (let x = -3; x <= 3; x += 0.03) c.lineTo(x, superficie6(x, cre) + 0.006); c.stroke();
+  // el aquenio vecino, sin fecundar: flaco y vacío
+  const xv = AQN.vecino.x, yv = superficie6(xv, cre) - 0.07;
+  c.save(); c.translate(xv, yv); c.rotate(-0.15);
+  c.fillStyle = '#d3d49a'; c.beginPath(); c.moveTo(0, -0.12); c.quadraticCurveTo(0.075, -0.02, 0.05, 0.08); c.quadraticCurveTo(0, 0.11, -0.05, 0.08); c.quadraticCurveTo(-0.075, -0.02, 0, -0.12); c.fill();
+  c.strokeStyle = 'rgba(110,110,50,.7)'; c.lineWidth = Math.max(px, 0.006); c.stroke();
+  c.strokeStyle = 'rgba(120,120,60,.4)'; c.beginPath(); c.moveTo(-0.02, -0.06); c.quadraticCurveTo(-0.03, 0.02, -0.01, 0.07); c.moveTo(0.02, -0.05); c.quadraticCurveTo(0.028, 0.02, 0.012, 0.07); c.stroke();
+  c.restore();
+  // el aquenio fecundado, en su hoyito, cortado para ver la semilla
+  const P = PORTAL[6], sE = P.s*(env.cre !== undefined ? env.cre : 1);
+  const ax = P.x, ay = P.y + 0.1*sE*OV, arx = 0.42*OV*sE*1.22, ary = 0.5*OV*sE*1.2;
+  const casco = () => { c.beginPath(); c.moveTo(ax, ay - ary*1.12); c.bezierCurveTo(ax + arx*1.1, ay - ary*0.7, ax + arx*1.05, ay + ary*0.8, ax, ay + ary); c.bezierCurveTo(ax - arx*1.05, ay + ary*0.8, ax - arx*1.1, ay - ary*0.7, ax, ay - ary*1.12); };
+  // el hoyito en la piel
+  c.save(); c.beginPath(); c.moveTo(-3, 3); for (let x = -3; x <= 3; x += 0.03) c.lineTo(x, superficie6(x, cre)); c.lineTo(3, 3); c.closePath(); c.clip();
+  c.fillStyle = 'rgba(90,15,15,.45)'; c.beginPath(); c.ellipse(ax, ay + ary*0.7, arx*1.35, ary*0.45, 0, 0, TAU); c.fill(); c.restore();
+  const gh = c.createLinearGradient(ax - arx, ay - ary, ax + arx, ay + ary); gh.addColorStop(0, '#f8dc7c'); gh.addColorStop(0.55, '#e0ae42'); gh.addColorStop(1, '#a8741e');
+  c.fillStyle = gh; casco(); c.fill(); c.strokeStyle = 'rgba(110,72,16,.8)'; c.lineWidth = Math.max(px, 0.006); c.stroke();
+  // el aquenio cortado: su pared, delgada, deja ver la semilla
+  c.save(); casco(); c.clip(); c.fillStyle = '#6a4816'; c.beginPath(); c.ellipse(ax, ay, arx*0.86, ary*0.9, 0, 0, TAU); c.fill(); c.restore();
+  c.save(); casco(); c.clip(); c.translate(P.x, P.y); c.scale(sE, sE); ovulo(c, px/sE, 1, 1, E.madura); c.restore();
+  
+}
+
+/* ============================================================
+   NIVEL 7 · LAS DOS FRESAS  (1 unidad = 7 cm)
+   ============================================================ */
+const FR7 = [{ x: -0.24, y: 0.0, s: 1, def: 0 }, { x: 0.24, y: 0.02, s: 1, def: 1 }];
+const ELEG7 = (() => { // un aquenio fecundado de la fresa torcida, en el borde de la parte que no creció
+  let b = null, d = 1e9; for (const q of AQ.torcida){ if (!q[3]) continue; const dd = (q[5] + 0.05)**2*3 + (q[6] - 0.5)**2; if (dd < d){ d = dd; b = q; } } return b; })();
+PORTAL[7].x = FR7[1].x + ELEG7[0]; PORTAL[7].y = FR7[1].y + ELEG7[1];
+function dibujaFresas(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, '#9fc3a3'); g.addColorStop(0.5, '#6d8a4c'); g.addColorStop(1, '#6b5132'); c.fillStyle = g; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  for (const b of BOKEH){ const gg = c.createRadialGradient(b.x*1.3, b.y*1.3, 0, b.x*1.3, b.y*1.3, b.r*1.3); gg.addColorStop(0, rgba(b.col, b.a*0.7)); gg.addColorStop(1, rgba(b.col, 0)); c.fillStyle = gg; c.fillRect(b.x*1.3 - b.r*1.3, b.y*1.3 - b.r*1.3, b.r*2.6, b.r*2.6); }
+  // cama de hojarasca
+  const gs = c.createLinearGradient(0, 0.2, 0, 1.2); gs.addColorStop(0, 'rgba(150,115,70,.9)'); gs.addColorStop(1, 'rgba(80,58,35,1)'); c.fillStyle = gs; c.fillRect(v[0] - 1, 0.27, v[2] - v[0] + 2, 3);
+  const r = rng(93); for (let i = 0; i < 160; i++){ const x = -1.6 + r()*3.2, y = 0.28 + r()*1.2, a = (r()-.5)*1.2, l = 0.06 + r()*0.1; c.strokeStyle = r() < 0.5 ? 'rgba(220,190,130,.6)' : 'rgba(150,115,65,.55)'; c.lineWidth = 0.008; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a)*l, y + Math.sin(a)*l*0.4); c.stroke(); }
+  for (const q of FR7){ c.save(); c.translate(q.x, q.y); c.scale(q.s, q.s); fresa(c, q.def, px/q.s, 1); c.restore(); }
+  // el aquenio elegido, con la misma geometría del nivel 6
+  const P = PORTAL[7]; c.fillStyle = '#f0c64a'; c.beginPath(); c.ellipse(P.x, P.y, 0.0068, 0.0078, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(120,70,5,.7)'; c.lineWidth = Math.max(px, 0.0015); c.stroke();
+  // Angelita celebra junto a la fresa completa (en finca alta, la abeja de miel)
+  if (env.f < 2.6){
+    const ax = PORT ? 0.0 : -0.47, ay = PORT ? 0.3 : -0.12;
+    if (ALTA()) abejaMiel(c, ax, ay, 0.2, 0.15, true, true);
+    else { const B = aleteo(angelita({ pose: 'volar', x: ax, y: ay, s: 0.0068, carga: 0.9, polen: 0.5 }), 9, 0.55); pintarAngelita(c, B); } }
+}
+
+/* ============================================================
+   REGISTRO DE NIVELES Y RENDER
+   ============================================================ */
+const LV = [dibujaMata, dibujaFlor, dibujaCentro, dibujaEstigma, dibujaCorte, dibujaOvulo, dibujaAquenio, dibujaFresas];
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu, extra){
+  const hw = W/2/ppu, hh = H/2/ppu;
+  return Object.assign({ L, cx, cy, f, ppu, px: 1/ppu, view: [cx - hw, cy - hh, cx + hw, cy + hh] }, extra || {});
+}
+function pintaNivel(c, L, cx, cy, f, cre){
+  const ppu = S / f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(W/2 - cx*ppu), DPR*(H/2 - cy*ppu));
+  LV[L](c, envPara(L, cx, cy, f, ppu, { cre }));
+  const P = PORTAL[L];
+  if (!P) return;
+  const sE = P.s * (L === 6 && cre !== undefined ? cre : 1);
+  const pp = sE * ppu;
+  const a = sstep(0.28*S, 0.92*S, pp);
+  if (a <= 0) return;
+  const ppu2 = ppu * sE;
+  const ox = W/2 + (P.x - cx)*ppu, oy = H/2 + (P.y - cy)*ppu;
+  const cx2 = (cx - P.x) / sE, cy2 = (cy - P.y) / sE, f2 = f / sE;
+  // el disco del hijo: tapa todo solo si cubre las cuatro esquinas; si no toca la pantalla, no se pinta
+  const rDisco = pp*lerp(0.22, 0.85, a) + pp*0.16;
+  const lejos = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy));
+  const cerca = Math.hypot(clamp(ox, 0, W) - ox, clamp(oy, 0, H) - oy);
+  if (cerca > rDisco) return;
+  const cubre = a >= 0.999 && pp*0.85 >= lejos;
+  const dst = cubre ? c : bctx;
+  if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+  dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*ox, DPR*oy);
+  LV[P.c](dst, envPara(P.c, cx2, cy2, f2, ppu2));
+  if (cubre) return;
+  bctx.setTransform(1,0,0,1,0,0);
+  bctx.globalCompositeOperation = 'destination-in';
+  const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+  const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+  gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+  bctx.globalCompositeOperation = 'source-over';
+  c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+}
+function prepTexturasGiro(){
+  for (const t of [texA, texB]){ t.width = cv.width; t.height = cv.height; }
+  const guarda = E; E = estado(segDe(3).b); pintaNivel(texA.getContext('2d'), 3, 0, 0, HF3);
+  E = estado(segDe(4).a); pintaNivel(texB.getContext('2d'), 4, 0, 0, 1); E = guarda;
+  // el borde común (la superficie del estigma) está ARRIBA del corte: se voltean las dos caras
+  // y el giro de abajo; así la bisagra queda arriba y el corte baja desde ella
+  for (const tx of [texA, texB]){ const k = document.createElement('canvas'); k.width = tx.width; k.height = tx.height; k.getContext('2d').drawImage(tx, 0, 0);
+    const x = tx.getContext('2d'); x.setTransform(1, 0, 0, -1, 0, tx.height); x.drawImage(k, 0, 0); x.setTransform(1, 0, 0, 1, 0, 0); }
+  texOK = true;
+}
+/* el giro de 90°: el estigma visto desde arriba se tumba y se levanta el corte (del café) */
+function pintaGiro(cFinal, t){
+  if (!texOK) prepTexturasGiro();
+  const c = bctx;
+  const th = (t*t*(3 - 2*t)) * Math.PI/2;
+  const Wd = cv.width, Hd = cv.height, h = H, Dp = 1.8*Math.max(W, H);
+  c.setTransform(1,0,0,1,0,0); c.fillStyle = '#262c12'; c.fillRect(0, 0, Wd, Hd);
+  const ct = Math.cos(th), st = Math.sin(th);
+  const proy = (y, zp) => { const yr = y*ct - zp*st, zr = y*st + zp*ct + h/2; const k = Dp/(Dp + zr); return [H/2 + yr*k, k]; };
+  const paso = Math.max(2, Math.round(DPR*1.5));
+  if (th < Math.PI/2 - 0.001){
+    for (let j = 0; j < Hd; j += paso){ const y0 = j/DPR - h/2, y1 = (j + paso)/DPR - h/2;
+      const [s0, k0] = proy(y0, -h/2), [s1] = proy(y1, -h/2); if (s1 - s0 <= 0) continue;
+      const ww = W*Math.max(1, k0); c.drawImage(texA, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+    const [ya] = proy(-h/2, -h/2), [yb] = proy(h/2, -h/2); c.fillStyle = `rgba(20,24,8,${0.55*st})`; c.fillRect(0, ya*DPR, Wd, (yb - ya)*DPR);
+  }
+  for (let j = 0; j < Hd; j += paso){ const z0 = (Hd - j)/DPR, z1 = (Hd - j - paso)/DPR;
+    const [s0, k0] = proy(-h/2, z0 - h/2), [s1] = proy(-h/2, z1 - h/2); if (s1 - s0 <= 0) continue;
+    const ww = W*Math.max(1, k0); c.drawImage(texB, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+  const [yc] = proy(-h/2, h/2), [yd] = proy(-h/2, -h/2); c.fillStyle = `rgba(16,20,6,${0.6*ct})`; c.fillRect(0, yc*DPR, Wd, (yd - yc)*DPR);
+  c.strokeStyle = `rgba(243,243,207,${0.25 + 0.5*Math.sin(th*2)})`; c.lineWidth = 2*DPR; c.beginPath(); c.moveTo(0, yd*DPR); c.lineTo(Wd, yd*DPR); c.stroke();
+  cFinal.setTransform(1, 0, 0, -1, 0, Hd); cFinal.drawImage(buf, 0, 0); cFinal.setTransform(1, 0, 0, 1, 0, 0);
+}
+function render(pp){
+  E = estado(pp);
+  const cam = camAt(pp);
+  if (cam.k === 'tilt') pintaGiro(ctx, cam.t);
+  else pintaNivel(ctx, cam.L, cam.cx, cam.cy, cam.f, cam.cre);
+  ctx.setTransform(1,0,0,1,0,0);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(12,8,4,.3)'); ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.k === 'lvl'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+const animado = cam => cam.k === 'lvl' && (cam.L <= 1 || cam.L === 6 || cam.L === 7);
+
+/* ============================================================
+   TEXTOS  [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   ============================================================ */
+const fmtM = n => Math.round(n).toLocaleString('es-CO').replace(/\./g, ' ');
+function paginaFinca(){
+  const reg = 'En Colombia se ha registrado la [[angelita|angelita]] entre los 10 y los 1 800 metros de altura{1}.';
+  if (altura === null) return { k:'finca', s:['Si abre este recorrido desde Chagra, o escribe la altitud de su finca en el recuadro de arriba, bajo el medidor, esta página le dice qué abeja verá en la flor.', reg], nota:'Son registros de 2001, no un límite exacto.' };
+  if (ALTA()) return { k:'finca', s:[`Su finca está a unos ${fmtM(altura)} metros.`, 'Los registros de la angelita en Colombia llegan hasta los 1 800 metros{1}.', 'Por encima de 2 000 metros viven pocas abejas sin aguijón: nueve especies en esos registros{1}.', 'Por eso, en este viaje, la que visita la flor es la abeja de miel.'], nota:'Son registros de 2001, no un límite exacto. La lección de la flor es la misma con cualquier abeja.' };
+  return { k:'finca', s:[`Su finca está a unos ${fmtM(altura)} metros.`, reg, 'Por eso, en este viaje, la que visita la flor es la angelita.'], nota:'Son registros de 2001, no un límite exacto.' };
+}
+function construyeEstaciones(){
+  const alta = ALTA();
+  const visita = alta
+    ? { s:['Esta es la [[miel|abeja de miel]].', 'Junto con las abejas sin aguijón, como la angelita, son las únicas abejas que viven en colonias muy organizadas{1}.', 'Vino a la flor por polen y néctar, su comida{6}.'] }
+    : { s:['Esta es la [[angelita|angelita]], una [[sinaguijon|abeja sin aguijón]]: su aguijón es reducido{1}.', 'Vino a la flor por polen y néctar, su comida{6}.'] };
+  return [
+    { t:'La mata de fresa', c:'La mata', L:0, pags:[
+      { s:['Esta es una mata de fresa en flor.', 'Vamos a entrar en una de sus flores, detrás de una abeja.', 'Bajaremos hasta donde se hace la semilla y volveremos a subir hasta la fresa.'], nota:'La fresa es un ejemplo: en ella se ve claro lo que hace la abeja.' },
+      { s:['Mire las dos fresas de abajo.', 'Una salió completa; la otra salió torcida, con un lado flaco.', '¿Por qué? Al final del viaje lo sabrá.'] },
+      { s:['El recuadro de arriba dice cuánto mide de ancho lo que usted ve.', 'La última línea lo compara con un milímetro de su regla.'] },
+      paginaFinca(),
+      { k:'hacer', s:['Mañana temprano, párese cinco minutos junto a un cultivo en flor.', 'Mire qué animalitos visitan las flores{8}.', '¿Cuántas abejas distintas cuenta?'] } ] },
+    { t:'La flor y la abeja', c:'La flor', L:1, pags:[
+      { s:['Esta es una flor de fresa, de cerca.', 'Alrededor, el anillo de [[estambre|estambres]], que dan el [[polen|polen]].', 'En el centro, muchos [[pistilo|pistilos]], que reciben el polen{6}.'] },
+      visita,
+      { s:['En cada visita, la abeja reparte el polen parejo por el centro de la flor{3}.', 'Lo que carga lo lleva en sus [[corbicula|corbículas]]: las canastitas de polen{1}.'], nota:'«Canastita» es una comparación.' },
+      { k:'tam', s:['Un estudio probó la angelita en fresa, bajo invernadero{2}.', 'Una sola colonia alcanzó para unas 1 350 matas{2}.', 'Las fresas salieron más pesadas y mejor formadas{2}.'], nota:'Del estudio solo se leyó el resumen.' },
+      { k:'pensar', s:['Si en su finca no hubiera abejas, ¿quién le llevaría el polen a la flor?'] } ] },
+    { t:'El centro de la flor', c:'Los pistilos', L:2, pags:[
+      { s:['Estamos en el centro de la flor.', 'Cada botoncito es un pistilo{6}.', 'Cada pistilo fecundado se volverá una pepita de la fresa: un [[aquenio|aquenio]]{3,4}.'], nota:'«Botoncito» es una comparación.' },
+      { s:['Los granos amarillos son polen que dejó la abeja{3}.', 'Mire bien: unos pistilos recibieron polen y otros no.'] },
+      { s:['La flor de fresa tiene un truco: su punta, el [[estigma|estigma]], está lista antes de que suelte su propio polen{3}.', 'Así recibe mejor el polen que llega de otras flores{3}.'] },
+      { k:'pensar', s:['¿Qué pasará con los pistilos que no recibieron polen?'] } ] },
+    { t:'Un grano de polen', c:'El polen', L:3, pags:[
+      { s:['Este es un grano de polen sobre el estigma: la punta del pistilo, donde cae el polen{6}.', 'Las bolitas claras de abajo son las celditas del estigma.'], nota:'«Bolitas» es una comparación.' },
+      { k:'tam', s:['En una fresa silvestre pariente, el grano mojado mide de 16 a 20 [[micra|micras]]{7}.', 'Una micra es la milésima parte de un milímetro{11}.', 'En un milímetro caben de 50 a 60 granos en fila.'] },
+      { s:['Con agua y aire, el grano echa un tubo: el [[tubo|tubo polínico]]{6}.', 'El tubo se mete en el pistilo y baja{6}.'] } ] },
+    { t:'El tubo baja', c:'El tubo', L:4, pags:[
+      { s:['Ahora vemos el pistilo cortado de lado, como una tajada.', 'El tubo baja por el cuello del pistilo, el [[estilo|estilo]], y el estilo lo sostiene en el camino{6}.'], nota:'«Tajada» y «cuello» son comparaciones.' },
+      { s:['Por dentro del tubo viajan dos células del polen{6}.', 'Van hacia el [[ovulo|óvulo]], que espera abajo, en el [[ovario|ovario]]{6}.'] },
+      { s:['Al llegar, el tubo entra al óvulo por una puertica: el [[micropilo|micrópilo]]{6}.'], nota:'«Puertica» es una comparación.' } ] },
+    { t:'El óvulo', c:'El óvulo', L:5, pags:[
+      { s:['Dentro del óvulo espera la [[ovocelula|ovocélula]]{6}.', 'Una de las células del polen se une con ella: eso es la [[fecundacion|fecundación]]{6}.'] },
+      { s:['La otra célula del polen se une con dos núcleos del centro{6}.', 'De ahí sale el [[endospermo|endospermo]], la reserva de la semilla{6}.'] },
+      { s:['El óvulo fecundado se vuelve semilla{6}.', 'Si el tubo no llega, ese óvulo no hace semilla{6}.'] },
+      { k:'pensar', s:['Cada pistilo tiene su óvulo y necesita su propio grano de polen.', '¿Cuántas visitas de abeja necesitará una flor?'] } ] },
+    { t:'El aquenio', c:'El aquenio', L:6, pags:[
+      { s:['Volvimos a subir, y pasaron los días.', 'Esta pepita es un aquenio: el fruto verdadero de la fresa{3}.', 'Adentro lleva su semilla.'] },
+      { s:['Lo rojo que uno se come es el [[receptaculo|receptáculo]]: la base de la flor, que se hincha{6}.'] },
+      { s:['El aquenio fecundado fabrica [[auxina|auxina]], una hormona de la planta{3,4}.', 'La auxina hace crecer la carne que tiene cerca{4}.', 'El aquenio de la izquierda no se fecundó: no fabrica auxina{3}.'] },
+      { s:['Esto se sabe hace más de 70 años: si a la fresa le quitan los aquenios, no crece{4,5}.'] } ] },
+    { t:'La fresa', c:'La fresa', L:7, pags:[
+      { s:['Aquí están las dos fresas del comienzo.', 'Donde la abeja dejó polen, los aquenios se fecundaron y la carne creció{3}.', 'Donde no llegó polen, la carne no creció: la fresa sale torcida{3}.'] },
+      { k:'tam', s:['En un estudio con nueve variedades de fresa{3}:', 'las polinizadas por abejas pesaron 11 % más que las polinizadas solo por el viento{3},', 'y 30 % más que las que se polinizaron solas{3}.', 'Además salieron con menos deformaciones{3}.'] },
+      { k:'finca', cab:'¿Por qué no fumigar en flor?', s:['Con la flor abierta llegan las abejas{6}.', 'El ICA recomienda evitar o disminuir los insecticidas cuando las flores estén abiertas{8}.', 'Algunos insecticidas se meten a la planta y llegan al néctar y al polen, que es lo que come la abeja{9}.'] },
+      { s:['Por eso, en 2021, el ICA suspendió el fipronil en aguacate, café, cítricos y pasifloras{9}.', 'Ese año atendió 45 denuncias de abejas muertas{10}.', 'En los análisis, el fipronil apareció en la mitad de los casos{10}.'] },
+      { k:'hacer', s:['Antes de aplicar, pida consejo a un agrónomo{8}.', 'Pregunte si hay colmenas cerca{8}.', 'Deje junto al cultivo un pedazo de monte que florezca{8}.'] },
+      { k:'hacer', s:['Pruébelo en la casa: en el estudio licuaron fresas en agua{3}.', 'Los aquenios fecundados se van al fondo y los vanos flotan{3}.', 'Compare una fresa torcida con una completa.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>` } ] },
+  ];
+}
+let ESTACIONES = construyeEstaciones();
+const PASO = { t:'Pasan los días', c:'Subida', pags:[{ s:['Subimos otra vez, despacio.', 'Mientras tanto pasan los días: el óvulo crece y se vuelve semilla{6}, y el ovario se vuelve el aquenio{3,6}.'] }] };
+
+const GLOS = [
+  ['angelita', 'Angelita', 'Abeja sin aguijón de Colombia, <i>Tetragonisca angustula</i>{1}. En el país se ha registrado entre los 10 y los 1 800 metros de altura{1}. La entrada de su nido es un tubito de cera{1}.'],
+  ['sinaguijon', 'Abeja sin aguijón', 'Abejas de la tribu de los meliponinos: tienen el aguijón reducido{1}. En Colombia les dicen angelitas, perreras, candela o guare, según la región{1}.'],
+  ['miel', 'Abeja de miel', '<i>Apis mellifera</i>. Junto con las abejas sin aguijón, son las únicas abejas que viven en colonias muy organizadas{1}.'],
+  ['corbicula', 'Corbícula', 'La canastita donde las abejas corbiculadas, como la angelita y la abeja de miel, cargan el polen{1}.'],
+  ['estambre', 'Estambre', 'La parte de la flor que da el polen. El polen sale de su punta, la antera{6}.'],
+  ['polen', 'Polen', 'Los granitos que lleva la abeja de flor en flor. Pasar el polen de la antera al estigma es la polinización{6}.'],
+  ['pistilo', 'Pistilo', 'La parte de la flor que recibe el polen. Arriba tiene el estigma, luego el estilo y abajo el ovario con el óvulo{6}.'],
+  ['estigma', 'Estigma', 'La punta del pistilo, donde cae el polen{6}. En la fresa está lista antes de que la misma flor suelte su polen{3}.'],
+  ['estilo', 'Estilo', 'El cuello del pistilo. Por dentro de él baja el tubo polínico, hasta el óvulo{6}.'],
+  ['tubo', 'Tubo polínico', 'El tubo que echa el grano de polen. Necesita agua y aire, baja por el estilo y lleva dos células del polen hasta el óvulo{6}.'],
+  ['ovario', 'Ovario', 'La parte de abajo del pistilo, donde está el óvulo{6}.'],
+  ['ovulo', 'Óvulo', 'Lo que espera dentro del ovario. Fecundado, se vuelve semilla{6}.'],
+  ['micropilo', 'Micrópilo', 'La puertica del óvulo por donde entra el tubo polínico{6}.'],
+  ['ovocelula', 'Ovocélula', 'La célula del óvulo que se une con una célula del polen{6}.'],
+  ['fecundacion', 'Fecundación', 'Cuando una célula del polen se une con la ovocélula. La otra célula del polen forma el endospermo{6}.'],
+  ['endospermo', 'Endospermo', 'La reserva de comida de la semilla{6}.'],
+  ['aquenio', 'Aquenio', 'Cada pepita de la fresa. Es el fruto verdadero de la fresa y lleva la semilla adentro{3}. El fecundado se hunde en agua; el vano flota{3}.'],
+  ['receptaculo', 'Receptáculo', 'La base de la flor. En la fresa se hincha y se vuelve lo rojo que uno se come{6}.'],
+  ['auxina', 'Auxina', 'Una hormona de las plantas. La fabrica el aquenio fecundado y hace crecer la carne de la fresa{3,4}.'],
+  ['micra', 'Micra (µm)', 'La milésima parte de un milímetro{11}.'],
+  ['sistemico', 'Insecticida sistémico', 'El que se mete a la planta y viaja por ella. El fipronil es uno: llega al néctar y al polen{9}.'],
+];
+
+/* ============================================================
+   INTERFAZ (del café): medidor, estaciones por páginas, palabras
+   ============================================================ */
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '').replace(/<[^>]+>/g, ''); }
+
+const riel = $('riel');
+function pintaRiel(){ riel.innerHTML = ''; ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); }); ultEst = -1; }
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿Cuánto?', finca:'Su finca' };
+const cabDe = P => P.cab || (P.k ? CAB[P.k] : '');
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (cabDe(P)) h += `<p class="cab-pag">${cabDe(P)}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' || P.k === 'finca' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length){ voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => { i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz(); };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (cabDe(P) ? ' ' + cabDe(P) + '.' : ''), turno, sigue);
+  else if (cabDe(P)) di(cabDe(P) + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #f2c14e'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click', () => abreRepaso());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } } }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'µm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){
+  if (x < 10) return '×' + fmt3(x);
+  const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2);
+  return '×' + miles(Math.round(r));
+}
+function fmtRegla(m){
+  const mm = m * 1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1 / mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / q) * q; }
+  return `caben ${miles(r)} en 1 mm`;
+}
+let anchoInicial = 0;
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial / ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+  let st = 0; for (let i = 0; i < NEST; i++){ if (p >= EST[i].a - 0.4) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const enSubida = cam.k === 'lvl' && cam.seg.k === 'out' && cam.seg.L === 6;
+  const cap = vis ? 'e' + st : enSubida ? 's' : '';
+  $('vEstacion').textContent = `${st+1}/${NEST} · ${e.c}`;
+  const mo = momento(p); if ($('vMomento').textContent !== mo) $('vMomento').textContent = mo;
+  const nota = p > EST[2].a - 0.3 ? 'Tamaños aproximados. Colores de dibujo.' : 'Tamaños aproximados.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else {
+      estAct = cap === 's' ? PASO : e; pagAct = 0;
+      $('fNum').textContent = cap === 's' ? 'De paso, entre el óvulo y el aquenio' : `Estación ${st+1} de ${NEST}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = cap === 's' ? 'De paso: pasan los días' : `Estación ${st+1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  const op = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.opacity = op; $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  $('ubicacion').classList.toggle('oculto', p > 0.3);
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+function etqEstacion(st){
+  if (st === 0){ const P = PORTAL[0]; return [['Esta flor', P.x - 0.012, P.y + 0.01], [ALTA() ? 'Abeja de miel' : 'Angelita', P.x + 0.045, P.y - 0.03], ['Completa', FRUTOS0[0].x, FRUTOS0[0].y], ['Torcida', FRUTOS0[1].x, FRUTOS0[1].y]]; }
+  if (st === 1){ const Q = POS1(); const s = FLOR.estambres[5]; const out = [['Estambres', Math.cos(s.a)*s.r1, Math.sin(s.a)*s.r1], ['Pistilos', 0.03, 0.04], ['Pétalo', 0.2, 0.12]];
+    if (ALTA()) out.push(['Abeja de miel', Q.miel.x + 0.05, Q.miel.y], ['Angelita', Q.ang.x, Q.ang.y]); else out.push(['Angelita', Q.ang.x, Q.ang.y - 0.04], ['Abeja de miel', Q.miel.x, Q.miel.y]);
+    return out; }
+  if (st === 2){ let sin = null, d = 1e9; for (const q of PIST2){ if (q.pol) continue; const dd = (q.sx + 0.2)**2 + (q.sy - 0.22)**2; if (dd < d){ d = dd; sin = q; } }
+    const gr = GRANOS2.find(G => G.q === ELEG2);
+    return [['Estigma', ELEG2.sx, ELEG2.sy], gr ? ['Polen', gr.x, gr.y] : null, sin ? ['Sin polen', sin.sx, sin.sy] : null, ['Estilo', lerp(ELEG2.x, ELEG2.sx, 0.45), lerp(ELEG2.y, ELEG2.sy, 0.45)]]; }
+  if (st === 3){ const tip = ESTIG.tubo[Math.max(1, Math.floor(E.tubo3*(ESTIG.tubo.length - 1)))]; return [['Grano de polen', 0.02, -0.03], E.tubo3 > 0.3 ? ['Tubo', tip[0], tip[1]] : null, ['Estigma', -0.28, -0.22]]; }
+  if (st === 4){ const g4 = lerp(0.03, 1, E.tubo4); const tip = PIS.camino[Math.max(1, Math.floor(g4*(PIS.camino.length - 1)))]; return [['Tubo', tip[0], tip[1]], ['Estilo', PIS.xDe(1.8) - 0.2, 1.8], ['Óvulo', PORTAL[4].x + 0.3, PORTAL[4].y + 0.5], ['Ovario', PIS.ov.x - PIS.ov.rx*0.8, PIS.ov.y + 0.9], ['Micrópilo', PIS.micro[0], PIS.micro[1]]]; }
+  if (st === 5){ return [['Ovocélula', 0.03*OV, -0.15*OV], ['Micrópilo', 0, -0.4*OV], ['Núcleos del centro', 0.02*OV, 0.03*OV], ['Tubo', 0.006*OV, -0.62*OV], ['Óvulo', 0.4*OV, 0.2*OV]]; }
+  if (st === 6){ const P = PORTAL[6]; return [['Aquenio', P.x + 0.13, P.y + 0.02], ['Semilla', P.x, P.y - 0.02], ['Sin fecundar', AQN.vecino.x, superficie6(AQN.vecino.x, E.crece) - 0.1], E.crece > 0.3 ? ['Auxina', 0.3, 0.45] : null]; }
+  if (st === 7){ return [['Completa', FR7[0].x, FR7[0].y + 0.05], ['Torcida', FR7[1].x - 0.035, FR7[1].y + 0.06], ['Aquenio fecundado', PORTAL[7].x, PORTAL[7].y]]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(18,13,8,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(18,13,8,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  if (cam.k === 'lvl' && cap && cap[0] === 'e' && cam.L === EST[st].L && !(PORT && p < 0.5)) lista = etqEstacion(st);
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const Ee = nodoEtq(i);
+    if (!it){ Ee.el.style.opacity = 0; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (Ee.txt !== txt){ Ee.txt = txt; Ee.el.textContent = txt; Ee.w = Ee.el.offsetWidth; Ee.h = Ee.el.offsetHeight; }
+    const w = Ee.w || 80, h = Ee.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break; } }
+    const op = ok ? 1 : 0;
+    Ee.el.style.opacity = op; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = op;
+    if (!ok) continue;
+    Ee.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const Ln of [Ee.ln, Ee.halo]){ Ln.setAttribute('x1', ax.toFixed(1)); Ln.setAttribute('y1', ay.toFixed(1)); Ln.setAttribute('x2', lx.toFixed(1)); Ln.setAttribute('y2', ly.toFixed(1)); }
+    Ee.pt.setAttribute('cx', ax.toFixed(1)); Ee.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿Dónde recibe la flor el polen?', ops:[{ m:0, n:'La mata' }, { m:2, n:'Los pistilos' }, { m:7, n:'La fresa' }], ok:1, si:'Eso es: en los pistilos, en su punta, el estigma.', no:'Esa no. Busque el centro de la flor, lleno de botoncitos.' },
+  { q:'¿Qué echa el grano de polen para llegar al óvulo?', ops:[{ t:'Una raíz' }, { t:'Un tubo' }, { t:'Un ala' }], ok:1, si:'Eso es: el tubo polínico, que baja por el estilo.', no:'Mire otra vez: es algo que crece hacia abajo, por dentro del pistilo.' },
+  { q:'¿Dónde se une la célula del polen con la ovocélula?', ops:[{ m:1, n:'La flor' }, { m:3, n:'El polen' }, { m:5, n:'El óvulo' }], ok:2, si:'Eso es: dentro del óvulo. Esa es la fecundación.', no:'Esa no. Busque adentro del pistilo, abajo del todo.' },
+  { q:'¿Qué es cada pepita de la fresa?', ops:[{ t:'Un grano de polen' }, { t:'Un aquenio' }, { t:'Un huevo de abeja' }], ok:1, si:'Eso es: un aquenio, el fruto verdadero, con su semilla adentro.', no:'Esa no. Cada pepita salió de un pistilo fecundado.' },
+  { q:'¿Por qué sale torcida una fresa?', ops:[{ t:'Le faltó polen a un lado' }, { t:'Le sobró agua' }, { t:'La tocó el sol' }], ok:0, si:'Eso es: donde no llegó polen, los aquenios no fabricaron auxina y la carne no creció.', no:'Mire otra vez las dos fresas y sus pepitas.' },
+  { q:'¿Cuándo pide el ICA evitar los insecticidas?', ops:[{ t:'En la siembra' }, { t:'Con las flores abiertas' }, { t:'Con la fresa madura' }], ok:1, si:'Eso es: con la flor abierta llegan las abejas.', no:'Esa no. Piense en cuándo visitan las abejas.' },
+];
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, bw: buf.width, bh: buf.height, E };
+  W = H = S = lado; DPR = 1; PORT = false; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  const pp = i === 5 ? segDe(5).b - 0.1 : i === 7 ? estP(7) - 0.4 : estP(i); E = estado(pp); const cam = camAt(pp);
+  try { pintaNivel(x, cam.L, cam.cx, cam.cy, cam.f, cam.cre); } finally { ({ W, H, S, DPR, PORT, E } = g); buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó de la flor hasta el óvulo, y subió hasta la fresa.</p><p>La próxima vez que vea una fresa torcida, mírele las pepitas.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver a la mata</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80) / 3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function paradas(){ const o6 = SEGS[SEGS.indexOf(segDe(6)) - 1]; const out = []; for (let i = 0; i < NEST; i++){ out.push(estP(i)); if (i === 5) out.push(o6.a + 0.5*o6.w); } return out; }
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un zumbido sintetizado, que se apaga al bajar al óvulo
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+function rotuloSon(){ bSon.querySelector('.est').textContent = audio && audio.on ? 'sí' : 'no'; bSon.setAttribute('aria-pressed', String(!!(audio && audio.on))); bSon.setAttribute('aria-label', audio && audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el zumbido'); }
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'bandpass'; filtro.Q.value = 1.2; filtro.frequency.value = 900; filtro.connect(master);
+      const lfo = ac.createOscillator(); lfo.frequency.value = 5.5; const lg = ac.createGain(); lg.gain.value = 9; lfo.connect(lg); lfo.start();
+      const oscs = [[220, 'sawtooth', 0.3], [221.5, 'sawtooth', 0.25], [110, 'triangle', 0.3]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; lg.connect(o.frequency); const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.07 : 0, t, 0.25);
+    rotuloSon();
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){
+  if (!audio || !audio.on) return; const t = audio.ac.currentTime;
+  const cerca = cam.k === 'lvl' && (cam.L <= 1 || cam.L === 7) ? 1 : 0.25;
+  audio.master.gain.setTargetAtTime(0.07*cerca, t, 0.4);
+  audio.filtro.frequency.setTargetAtTime(cerca > 0.5 ? 900 : 380, t, 0.4);
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false;
+  anchoInicial = F[0] * (W / S);
+  prepFondoMata();
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom);
+  document.documentElement.style.setProperty('--ubic-top', (mb + 10) + 'px');
+  const ub = $('ubicacion'), abierto = ub.open; ub.open = false; const ubb = Math.round(ub.getBoundingClientRect().bottom); ub.open = abierto;
+  tt.style.top = W <= 640 ? (ubb + 10) + 'px' : '';
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   LA FINCA: interfaz de altitud
+   ============================================================ */
+function mostrarOrigen(){
+  const sum = altura === null ? 'Altitud de ejemplo · toque para poner la suya' : `${origenAlt} · ${fmtM(altura)} m${municipio ? ' · ' + municipio : ''}`;
+  $('origenPiso').textContent = sum;
+  $('alturaFinca').value = altura === null ? '' : altura;
+  $('detallePiso').textContent = altura === null ? 'La altitud de su finca cambia qué abeja se ve en la flor. Nada de esto se guarda ni se envía.' : ALTA() ? 'Por encima de 1 800 m no hay registros de la angelita en Colombia: la flor la visita la abeja de miel.' : 'A esta altura se ha registrado la angelita en Colombia: ella visita la flor.';
+  $('subtitulo').textContent = ALTA() ? 'De la flor de la fresa a la abeja de miel, al grano de polen y al óvulo, y de vuelta hasta la fresa que cuaja completa.' : 'De la flor de la fresa a la angelita, al grano de polen y al óvulo, y de vuelta hasta la fresa que cuaja completa.';
+}
+function cambiarAltura(alt, fuente){
+  altura = alt; origenAlt = fuente;
+  ESTACIONES = construyeEstaciones(); pintaRiel(); mini = {}; texOK = false;
+  ultCap = ''; sucio = true; mostrarOrigen();
+}
+$('alturaManual').addEventListener('submit', e => { e.preventDefault(); const alt = numero($('alturaFinca').value, 0, 6000); if (alt !== null){ cambiarAltura(alt, 'Altitud que usted dio'); $('ubicacion').open = false; } });
+$('usarUbicacion').addEventListener('click', () => {
+  const estado = $('estadoUbicacion');
+  if (!navigator.geolocation){ estado.textContent = 'Este navegador no ofrece ubicación. Escriba la altitud de su finca.'; return; }
+  estado.textContent = 'Esperando su permiso de ubicación…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const alt = numero(pos.coords.altitude, 0, 6000);
+    if (alt === null){ estado.textContent = 'El aparato dio coordenadas sin altitud. Escriba los metros de su finca.'; return; }
+    cambiarAltura(alt, 'Altitud del aparato (aproximada)'); estado.textContent = 'La altitud del aparato puede ser distinta de la de la finca.'; $('ubicacion').open = false;
+  }, err => { estado.textContent = err.code === 1 ? 'Permiso de ubicación no concedido. Escriba la altitud de su finca.' : 'No se pudo obtener la ubicación. Escriba la altitud de su finca.'; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+});
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (!RM && !congelado) RELOJ += dt;
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 90) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i); if (rmHacia === null){ rmHacia = meta; p = meta; } if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; } }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (!RM && !congelado && animado(camAt(p))) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      cam = render(rmDesde); bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); bctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = buf.width; copia.height = buf.height; copia.getContext('2d').drawImage(buf, 0, 0);
+      cam = render(rmHacia);
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render(p);
+    actualizaUI(cam); sonido(cam);
+    sucio = RM && rmT < 1;
+  }
+  requestAnimationFrame(cuadro);
+}
+let congelado = qs.has('quieto');
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+pintaRiel();
+redim();
+mostrarOrigen();
+if (altura === null){
+  const lat = numero(qs.get('lat'), -90, 90), lon = numero(qs.get('lon'), -180, 180);
+  if (lat !== null && lon !== null) $('estadoUbicacion').textContent = 'La app entregó coordenadas sin altitud. Escriba los metros de su finca.';
+  else if (qs.has('alt')) $('estadoUbicacion').textContent = 'La altitud de la dirección no es válida. Escriba los metros de su finca.';
+  if (qs.has('lat') || qs.has('alt')) $('ubicacion').open = true;
+}
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el FPS; no altera nada) */
+window.__descenso = {
+  T, SEGS, EST, estP, camAt, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  congelar(v){ congelado = !!v; sucio = true; },
+  get altura(){ return altura; }, get alta(){ return ALTA(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, PASO, GLOS, PREG }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

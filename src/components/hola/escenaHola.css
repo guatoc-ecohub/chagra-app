@@ -1,0 +1,359 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   escenaHola.css — EL AMANECER EN LA VEREDA (EscenaHola.jsx).
+
+   La bienvenida de Chagra deja de ser un formulario con un avatar al lado:
+   es una ventana al paisaje colombiano a primera luz — cielo índigo que
+   baja a miel en el horizonte, tres planos de cordillera con perspectiva
+   atmosférica (lejos = bruma azulada, medio = verde de montaña, cerca =
+   verde cafetal oscuro), bruma que deriva entre cuchillas, un sol que
+   respira y motas de polen que suben. El compai (Angelita por defecto)
+   VUELA en ese aire, a la izquierda, mirando hacia su burbuja de papel.
+
+   Reglas de la casa:
+   - Solo transform/opacity animados; los blur son ESTÁTICOS.
+   - Cero JS por frame: todo el ritmo vive aquí.
+   - prefers-reduced-motion = fotograma digno (la escena entera se queda
+     quieta, con todo visible). El cuerpo de Angelita ya respeta la misma
+     regla por su cuenta (angelita-agente.css).
+   - El color del paisaje NO depende del tema de la app (es un paisaje, no
+     chrome): solo el borde de tierra se funde con la superficie del tema
+     (--c-slate-950) para que el panel de abajo brote de la loma.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.hola-escena {
+  /* paleta del amanecer andino */
+  --hola-cielo-alto: #10262f;
+  --hola-cielo-medio: #1f4a4b;
+  --hola-cielo-verde: #3f736a;
+  --hola-cielo-miel: #b98a49;
+  --hola-horizonte: #f2c877;
+  --hola-horizonte-claro: #fbe4ac;
+  --hola-monte-lejos: #6b8b93;
+  --hola-monte-medio: #3d6a4e;
+  --hola-monte-cerca: #23452f;
+  --hola-mata: #1a3624;
+  --hola-bruma: 250 240 218;
+  --hola-papel: #fffaf0;
+  --hola-tinta: #33281a;
+  --hola-miel: #f2c064;
+
+  /* medidas por variante */
+  --hola-alto: clamp(300px, 46dvh, 440px);
+  --hola-compai-escala: 1;
+  --hola-compai-x: 5%;
+  --hola-compai-y: 24%;
+  --hola-compai-caja: 168px;
+  /* La burbuja se ANCLA al compai (no a la pantalla): en un teléfono de 430 px
+     cae en el mismo píxel que un 46%, pero en escritorio no se le va lejos. */
+  --hola-burbuja-x: calc(var(--hola-compai-x) + var(--hola-compai-caja) * var(--hola-compai-escala) + 8px);
+  --hola-burbuja-y: 27%;
+
+  position: relative;
+  width: 100%;
+  height: var(--hola-alto);
+  overflow: hidden;
+  isolation: isolate;
+  color: #fff;
+  transition: height 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.hola-escena[data-variante='compacta'] {
+  --hola-alto: clamp(184px, 27dvh, 240px);
+  --hola-compai-escala: 0.64;
+  --hola-compai-x: 6%;
+  --hola-compai-y: 17%;
+  --hola-burbuja-y: 40%;
+}
+
+.hola-escena[data-variante='celebra'] {
+  --hola-compai-x: 8%;
+  --hola-compai-y: 22%;
+  --hola-burbuja-y: 30%;
+}
+
+/* ── Cielo ─────────────────────────────────────────────────────────────── */
+.hola-cielo {
+  position: absolute;
+  inset: 0;
+  /* La banda de miel del amanecer queda JUSTO sobre la cordillera lejana
+     (que arranca a ~52% de la escena): lo que está más abajo lo tapan los
+     montes, así que el horizonte vive entre el 44% y el 66%. */
+  background: linear-gradient(
+    180deg,
+    var(--hola-cielo-alto) 0%,
+    var(--hola-cielo-medio) 22%,
+    var(--hola-cielo-verde) 38%,
+    var(--hola-cielo-miel) 49%,
+    var(--hola-horizonte) 57%,
+    var(--hola-horizonte-claro) 66%,
+    var(--hola-horizonte-claro) 100%
+  );
+  animation: hola-aparece 0.7s ease-out both;
+}
+
+/* El sol, detrás de la cordillera lejana: respira muy lento. */
+.hola-sol {
+  position: absolute;
+  left: 64%;
+  top: 47%;
+  width: 320px;
+  height: 320px;
+  margin: -160px 0 0 -160px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 238, 196, 1) 0%,
+    rgba(255, 216, 140, 0.62) 22%,
+    rgba(255, 190, 110, 0.26) 42%,
+    rgba(255, 180, 100, 0) 68%
+  );
+  transform-origin: 50% 50%;
+  animation:
+    hola-aparece 1.2s ease-out both,
+    hola-respira 7s ease-in-out 1.2s infinite;
+}
+
+/* Motas de polen / luciérnagas de madrugada: suben y se apagan. */
+.hola-motas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hola-mota {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--hola-miel);
+  box-shadow: 0 0 8px 2px rgba(242, 192, 100, 0.55);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(var(--s, 1));
+  animation: hola-mota-sube var(--d, 14s) linear var(--r, 0s) infinite;
+}
+
+/* ── Cordillera ────────────────────────────────────────────────────────── */
+.hola-cordillera {
+  position: absolute;
+  inset: auto 0 0 0;
+  width: 100%;
+  height: 78%;
+  display: block;
+}
+.hola-monte {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hola-monte-sube 0.9s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.hola-monte--lejos { fill: var(--hola-monte-lejos); opacity: 0.92; animation-delay: 0.1s; }
+.hola-monte--medio { fill: var(--hola-monte-medio); animation-delay: 0.22s; }
+.hola-monte--cerca { fill: var(--hola-monte-cerca); animation-delay: 0.34s; }
+.hola-matas { fill: var(--hola-monte-cerca); animation: hola-monte-sube 0.9s cubic-bezier(0.22, 0.9, 0.3, 1) 0.4s both; }
+
+/* La bruma deriva entre la cordillera lejana y la del medio. Dos bandas a
+   ritmos distintos para que nunca se lea el bucle. */
+.hola-bruma {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 22%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--hola-bruma), 0) 0%,
+    rgba(var(--hola-bruma), 0.26) 22%,
+    rgba(var(--hola-bruma), 0.08) 46%,
+    rgba(var(--hola-bruma), 0.3) 68%,
+    rgba(var(--hola-bruma), 0) 100%
+  );
+  filter: blur(7px);
+  will-change: transform;
+  animation: hola-bruma-deriva 52s ease-in-out infinite alternate;
+}
+.hola-bruma--1 { top: 54%; height: 14%; }
+.hola-bruma--2 { top: 66%; height: 12%; opacity: 0.6; animation-duration: 71s; animation-direction: alternate-reverse; }
+
+/* ── El compai en el aire ──────────────────────────────────────────────── */
+.hola-compai {
+  position: absolute;
+  left: var(--hola-compai-x);
+  top: var(--hola-compai-y);
+  transform: scale(var(--hola-compai-escala));
+  transform-origin: 0 0;
+  transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+              left 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+              top 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  z-index: 3;
+}
+/* Llega volando desde la derecha y arriba, con un pelo de rebase. */
+.hola-compai-llega {
+  animation: hola-compai-llega 1.05s cubic-bezier(0.22, 0.9, 0.3, 1) 0.3s both;
+}
+/* Halo cálido que la ancla al aire: está AHÍ, no pegada. Respira con ella. */
+.hola-compai-halo {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 150px;
+  height: 56px;
+  margin: 0 0 0 -75px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(242, 192, 100, 0.55) 0%, rgba(242, 192, 100, 0.18) 45%, rgba(242, 192, 100, 0) 72%);
+  filter: blur(4px);
+  z-index: -1;
+  animation: hola-halo-respira 4.6s ease-in-out infinite;
+}
+
+/* ── La burbuja de papel (la voz del compai) ───────────────────────────── */
+.hola-burbuja {
+  position: absolute;
+  left: var(--hola-burbuja-x);
+  top: var(--hola-burbuja-y);
+  max-width: min(400px, calc(100% - var(--hola-burbuja-x) - 14px));
+  padding: 0.62rem 0.9rem 0.66rem;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--hola-papel);
+  color: var(--hola-tinta);
+  border: 1.5px solid rgba(51, 40, 26, 0.55);
+  box-shadow:
+    0 10px 24px -12px rgba(16, 38, 47, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 0.005em;
+  transform-origin: 0% 100%;
+  transition: left 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+              top 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  z-index: 4;
+  animation: hola-burbuja-nace 0.42s cubic-bezier(0.34, 1.4, 0.64, 1) 0.95s both;
+}
+.hola-burbuja--nueva {
+  animation: hola-burbuja-nace 0.42s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+/* La colita apunta hacia el compai (abajo-izquierda). */
+.hola-burbuja::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  bottom: 9px;
+  width: 12px;
+  height: 12px;
+  background: var(--hola-papel);
+  border-left: 1.5px solid rgba(51, 40, 26, 0.55);
+  border-bottom: 1.5px solid rgba(51, 40, 26, 0.55);
+  transform: rotate(45deg) skew(-8deg, -8deg);
+  border-radius: 0 0 0 3px;
+}
+.hola-burbuja .tw__cursor { background: var(--hola-tinta); }
+.hola-escena[data-variante='compacta'] .hola-burbuja {
+  font-size: 0.98rem;
+  padding: 0.5rem 0.78rem 0.54rem;
+}
+
+/* ── Cabecera sobre el cielo (paso + costura + saltar) ─────────────────── */
+.hola-cabecera {
+  position: absolute;
+  inset: 0 0 auto 0;
+  padding: max(14px, env(safe-area-inset-top)) 16px 0;
+  z-index: 5;
+  /* El cielo de arriba SIEMPRE es oscuro (no depende del tema): colores fijos
+     para que el texto se lea en los temas claros también. */
+  color: rgba(255, 255, 255, 0.92);
+}
+.hola-cabecera .hola-paso {
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.hola-cabecera .bienvenida-costura-guia { color: rgba(255, 255, 255, 0.22); }
+.hola-cabecera .bienvenida-costura-hilo { color: var(--hola-miel); }
+.hola-saltar {
+  color: #ffd76a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.hola-saltar:hover { color: #fff1c2; }
+
+/* ── El borde de tierra: la loma se funde con la superficie del tema ───── */
+.hola-tierra {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(var(--c-slate-950) / 0) 0%, rgb(var(--c-slate-950) / 0.5) 48%, rgb(var(--c-slate-950) / 0.9) 78%, rgb(var(--c-slate-950)) 100%);
+}
+
+/* ── El panel de abajo brota de la loma ────────────────────────────────── */
+.hola-panel {
+  position: relative;
+  z-index: 1;
+  /* El panel sube a la loma: el título arranca sobre el verde que se funde. */
+  margin-top: -34px;
+}
+.hola-titulo {
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  line-height: 1.08;
+}
+.hola-ceja {
+  color: var(--hola-miel);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes hola-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes hola-respira {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.07); opacity: 1; }
+}
+@keyframes hola-halo-respira {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+@keyframes hola-monte-sube {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hola-monte--lejos { animation-name: hola-monte-sube-lejos; }
+@keyframes hola-monte-sube-lejos {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 0.92; transform: translateY(0); }
+}
+@keyframes hola-bruma-deriva {
+  from { transform: translate3d(-6%, 0, 0); }
+  to { transform: translate3d(6%, 0, 0); }
+}
+@keyframes hola-mota-sube {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(var(--s, 1)); }
+  12% { opacity: 0.85; }
+  60% { opacity: 0.5; }
+  100% { opacity: 0; transform: translate3d(var(--dx, 8px), -140px, 0) scale(var(--s, 1)); }
+}
+@keyframes hola-compai-llega {
+  0% { opacity: 0; transform: translate(44px, -26px) scale(calc(var(--hola-compai-escala) * 0.9)) rotate(-6deg); }
+  70% { opacity: 1; transform: translate(-4px, 3px) scale(calc(var(--hola-compai-escala) * 1.02)) rotate(1deg); }
+  100% { opacity: 1; transform: translate(0, 0) scale(var(--hola-compai-escala)) rotate(0deg); }
+}
+@keyframes hola-burbuja-nace {
+  0% { opacity: 0; transform: scale(0.86) translateY(6px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Quietud digna: quien pide menos movimiento, no ve movimiento ──────── */
+@media (prefers-reduced-motion: reduce) {
+  .hola-escena,
+  .hola-escena *,
+  .hola-escena *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  .hola-cielo, .hola-sol, .hola-monte, .hola-matas, .hola-compai, .hola-burbuja { opacity: 1; }
+  .hola-monte--lejos { opacity: 0.92; }
+  .hola-mota { opacity: 0.45; transform: translate3d(0, -40px, 0) scale(var(--s, 1)); }
+  .hola-bruma { transform: none; }
+  .hola-compai { transform: scale(var(--hola-compai-escala)); }
+}
+

@@ -1,0 +1,344 @@
+/* ============================================================================
+   hola-chagra.css — «Hola Chagra»: la pantalla de bienvenida con la guacamaya
+   de protagonista (Onboarding de perfil, paso 1 · 2026-09-08).
+
+   Idea: la guacamaya NO está pegada al lado de un formulario; está EN su
+   paisaje (madrugada de tierra caliente: cielo azul profundo, alba ámbar en el
+   horizonte, cordillera lejana, dosel cercano, bruma) y el formulario flota
+   delante, en vidrio, con la cola del ave cruzándole el borde. El color sale
+   de la propia ave (escarlata / azul de ala) y del paisaje colombiano, no de
+   una paleta de plantilla: el rojo y el azul mandan, el resto cede.
+
+   Reglas de la casa:
+   · Solo transform/opacity en lo que se mueve (GPU, gama campesina).
+   · Todo lo que respira se apaga con prefers-reduced-motion (bloque final),
+     además de la red de seguridad global de index.css y motion.css.
+   · Alcance: SOLO bajo `.hola-chagra` (el paso 1). Los demás pasos conservan
+     su piel de tema (tokens --c-*), así los temas claros no se rompen.
+   Español de Colombia (usted), sin voseo.
+   ========================================================================== */
+
+.hola-chagra {
+  /* Paleta del ave + paisaje */
+  --hc-noche: #061726;          /* cielo alto, casi negro azul */
+  --hc-cielo: #123b63;          /* azul profundo (familia del ala #26489e) */
+  --hc-cielo-claro: #2f6fb0;    /* azul del ala (#4a7ee8) apagado por la distancia */
+  --hc-alba: #f4a944;           /* ámbar del amanecer (pluma amarilla #ffd23a) */
+  --hc-rosa: #f26a4b;           /* rosa del horizonte (cola #f24a30) */
+  --hc-rojo: #d81f1b;           /* escarlata Ara macao (#e02420) para la acción */
+  --hc-rojo-hondo: #a8151a;
+  --hc-coral: #ff9a8a;          /* rojo legible sobre azul (kicker) */
+  --hc-selva: #0c3527;          /* dosel */
+  --hc-selva-honda: #061f16;
+  --hc-suelo: #04120e;          /* tierra bajo el formulario */
+  --hc-crema: #fdfbf2;          /* cara del ave: el blanco cálido */
+  --hc-crema-72: rgba(253, 251, 242, 0.72);
+  --hc-crema-55: rgba(253, 251, 242, 0.55);
+  --hc-crema-14: rgba(253, 251, 242, 0.14);
+  --hc-crema-08: rgba(253, 251, 242, 0.08);
+  --hc-azul-foco: #5b9cff;      /* foco/selección: el azul del ala, vivo */
+  --hc-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;              /* el ave se sale del borde a propósito */
+  background: var(--hc-suelo);
+  color: var(--hc-crema);
+}
+
+/* ── El mundo detrás (capas absolutas, ancladas en px al borde superior) ── */
+.hc-mundo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.hc-cielo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--hc-noche) 0px,
+    var(--hc-cielo) 250px,
+    #5b3a4a 380px,               /* el cielo se calienta hacia el horizonte */
+    var(--hc-selva-honda) 500px,
+    var(--hc-suelo) 700px
+  );
+}
+/* El alba: un sol que todavía no sale, detrás del ave. Respira muy lento. */
+.hc-alba {
+  position: absolute;
+  left: 50%;
+  top: 130px;
+  width: 620px;
+  height: 620px;
+  margin-left: -170px;           /* centrado bajo el ave (que va a la derecha) */
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 210, 120, 0.42) 0%,
+    rgba(244, 169, 68, 0.30) 22%,
+    rgba(242, 106, 75, 0.18) 42%,
+    rgba(242, 106, 75, 0) 66%
+  );
+  transform-origin: center;
+  animation: hc-alba-respira 12s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes hc-alba-respira {
+  0%, 100% { transform: scale(0.96); opacity: 0.85; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+/* Cordillera lejana: azul violeta, casi disuelta en el aire. */
+.hc-cordillera {
+  position: absolute;
+  left: -4%;
+  top: 268px;
+  width: 108%;
+  height: 150px;
+  color: #2b3f6e;
+  opacity: 0.72;
+}
+/* Bruma sobre la cordillera: deriva lenta de lado a lado. */
+.hc-bruma {
+  position: absolute;
+  left: -20%;
+  top: 322px;
+  width: 140%;
+  height: 96px;
+  background: linear-gradient(
+    90deg,
+    rgba(253, 251, 242, 0) 0%,
+    rgba(253, 251, 242, 0.16) 35%,
+    rgba(253, 251, 242, 0.22) 55%,
+    rgba(253, 251, 242, 0) 100%
+  );
+  filter: blur(6px);
+  animation: hc-bruma-deriva 26s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+@keyframes hc-bruma-deriva {
+  from { transform: translateX(-3%); opacity: 0.55; }
+  to   { transform: translateX(3%);  opacity: 0.9; }
+}
+/* Dosel cercano: silueta verde oscuro que se mece con la brisa. */
+.hc-dosel {
+  position: absolute;
+  left: -6%;
+  top: 356px;
+  width: 112%;
+  height: 170px;
+  color: var(--hc-selva);
+  animation: hc-dosel-brisa 16s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.hc-dosel .hc-dosel-hondo { color: var(--hc-selva-honda); }
+@keyframes hc-dosel-brisa {
+  from { transform: translateX(-5px) rotate(-0.15deg); }
+  to   { transform: translateX(5px)  rotate(0.15deg); }
+}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────── */
+.hola-chagra .hc-paso { color: var(--hc-crema-55); }
+.hola-chagra .bienvenida-costura-guia { color: var(--hc-crema-14); }
+.hola-chagra .bienvenida-costura-hilo { color: var(--hc-alba); }
+
+/* ── El hero: saludo a la izquierda, el ave a la derecha, cruzándose ───── */
+.hc-hero {
+  position: relative;
+  min-height: 232px;
+  margin-top: 6px;
+}
+.hc-saludo {
+  position: relative;
+  z-index: 1;
+  width: 50%;
+  padding-top: 10px;
+}
+.hc-kicker {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hc-coral);
+}
+.hc-titulo {
+  margin-top: 8px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--hc-crema);
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.45);
+}
+.hc-lema {
+  margin-top: 12px;
+  font-size: 0.98rem;
+  line-height: 1.42;
+  color: var(--hc-crema-72);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+/* El ave: SVG grande (viewBox generoso: el cuerpo ocupa ~45% del ancho y
+   ~77% del alto del cuadro, cabeza al 34%, cola al 94%). Se saca del borde
+   derecho y se sube para que la cabeza asome junto al título y la cola cruce
+   el borde superior de la tarjeta. Sin eventos: lo que hay debajo sigue
+   siendo tocable (la mirada y la presencia escuchan a window, no al svg). */
+.hc-ave {
+  position: absolute;
+  z-index: 2;
+  top: -140px;
+  right: -122px;
+  width: 443px;
+  height: 443px;
+  pointer-events: none;
+  /* Sin filter/drop-shadow aquí: el rig se redibuja cada cuadro y un filtro
+     sobre él se recalcula cada cuadro (caro en Mali-G78). La separación del
+     fondo la da el aura propia del ave (guacamaya-luces.css). */
+}
+.hc-ave svg { display: block; width: 100%; height: 100%; }
+/* Llegada: entra volando desde arriba a la derecha, una sola vez. */
+.hc-llega {
+  animation: hc-ave-llega 0.9s var(--hc-ease) both;
+  animation-delay: 80ms;
+}
+@keyframes hc-ave-llega {
+  from { opacity: 0; transform: translate(26px, -22px) scale(0.94); }
+  to   { opacity: 1; transform: translate(0, 0) scale(1); }
+}
+
+/* ── La tarjeta de vidrio con el formulario ────────────────────────────── */
+.hc-tarjeta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 46px 16px 18px;   /* arriba: espacio para la cola del ave, que cruza el borde */
+  border-radius: 24px;
+  background: rgba(4, 18, 14, 0.58);
+  border: 1px solid var(--hc-crema-14);
+  box-shadow:
+    0 30px 60px -30px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(253, 251, 242, 0.08);
+}
+/* El vidrio (backdrop-filter) SOLO en la franja alta de la tarjeta, que es la
+   que tiene paisaje vivo detrás (alba, cordillera, dosel). Más abajo el suelo
+   es uniforme y el fondo translúcido basta: así el desenfoque cubre ~300px y
+   no los ~2000px de la tarjeta completa (costo por cuadro en gama baja). */
+.hc-tarjeta::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto 0;
+  height: 300px;
+  border-radius: 24px 24px 0 0;
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.15);
+  pointer-events: none;
+}
+.hc-etiqueta {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hc-alba);
+}
+.hc-input {
+  margin-top: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  border-radius: 14px;
+  background: var(--hc-crema-08);
+  border: 1px solid var(--hc-crema-14);
+  color: var(--hc-crema);
+  transition: border-color 0.18s var(--hc-ease), background-color 0.18s var(--hc-ease);
+}
+.hc-input::placeholder { color: var(--hc-crema-55); }
+.hc-input:focus { border-color: var(--hc-azul-foco); background: rgba(91, 156, 255, 0.08); }
+
+/* Opciones grandes (identidad): vidrio suave; la elegida se enciende en el
+   azul del ala, no en el verde del tema. */
+.hc-opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 14px 16px;
+  min-height: 64px;
+  border-radius: 18px;
+  background: rgba(253, 251, 242, 0.05);
+  border: 1px solid var(--hc-crema-14);
+  color: var(--hc-crema);
+  transition: border-color 0.18s var(--hc-ease), background-color 0.18s var(--hc-ease), transform 0.16s var(--hc-ease);
+}
+.hc-opcion:hover { border-color: rgba(253, 251, 242, 0.3); }
+.hc-opcion:active { transform: scale(0.99); }
+.hc-opcion.is-sel {
+  border-color: var(--hc-azul-foco);
+  background: rgba(74, 126, 232, 0.18);
+  box-shadow: 0 0 0 1px rgba(91, 156, 255, 0.45), 0 10px 26px -14px rgba(91, 156, 255, 0.7);
+}
+.hc-opcion-titulo { display: block; font-size: 1rem; font-weight: 900; line-height: 1.15; }
+.hc-opcion-copy { display: block; font-size: 0.86rem; color: var(--hc-crema-72); }
+.hc-opcion-check { margin-left: auto; flex-shrink: 0; color: #9cc2ff; }
+
+/* Los selectores compartidos (compai / animal) llegan con su piel de tema;
+   aquí se les quita el fondo pizarra para que sean parte de la tarjeta. */
+.hc-tarjeta .hc-selector > div {
+  background: transparent;
+  border-color: var(--hc-crema-14);
+}
+
+/* ── Acciones: el rojo manda ───────────────────────────────────────────── */
+.hola-chagra .onboarding-piso-primary {
+  background: linear-gradient(180deg, #ea3a30 0%, var(--hc-rojo) 55%, #bf1a16 100%);
+  color: #fff;
+  box-shadow:
+    0 14px 30px -12px rgba(224, 36, 32, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.hola-chagra .onboarding-piso-primary:hover { filter: brightness(1.06); }
+.hola-chagra .onboarding-piso-secondary { color: var(--hc-alba); }
+.hola-chagra .onboarding-piso-secondary:hover { color: var(--hc-crema); }
+.hola-chagra .hc-saltar { color: var(--hc-crema-72); }
+.hola-chagra .hc-saltar:hover { color: var(--hc-crema); }
+.hola-chagra .hc-escuchar {
+  border-color: var(--hc-crema-14);
+  color: var(--hc-crema-72);
+}
+.hola-chagra .hc-escuchar:hover { color: var(--hc-crema); border-color: rgba(253, 251, 242, 0.32); }
+/* El anillo de foco global es verde; aquí el foco es azul del ala. */
+.hola-chagra :is(button, [role='button'], a, input, select, textarea):focus-visible {
+  --tw-ring-color: var(--hc-azul-foco);
+  --tw-ring-offset-color: var(--hc-suelo);
+}
+
+/* ── Pantallas angostas: el saludo cede un poco más de sitio al ave ───── */
+@media (max-width: 380px) {
+  .hc-saludo { width: 47%; }
+  .hc-titulo { font-size: 1.9rem; }
+  .hc-ave { right: -140px; }
+}
+
+/* ── Quietud: quien la pide, no ve nada moverse ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hc-alba,
+  .hc-bruma,
+  .hc-dosel,
+  .hc-llega {
+    animation: none;
+  }
+  .hc-alba { transform: none; opacity: 1; }
+  .hc-bruma { transform: none; opacity: 0.8; }
+  .hc-dosel { transform: none; }
+  .hc-llega { opacity: 1; transform: none; }
+  .hc-input,
+  .hc-opcion {
+    transition: none;
+  }
+}

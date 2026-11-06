@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es-CO" data-hora="manana">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chagra · Un día en la finca</title>
+<meta name="description" content="Chagra: el día y el año de la finca, y todas las funciones ordenadas como se piensa una finca agroecológica.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#a9d4ea">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22%3E%3Cpath d=%22M24 44V20%22 stroke=%22%232f5d1e%22 stroke-width=%224%22/%3E%3Cpath d=%22M24 26c-2-9-11-13-18-10 1 8 9 12 18 10zM24 20c1-9 10-14 18-11-1 8-9 13-18 11z%22 fill=%22%236fae3e%22/%3E%3C/svg%3E">
+<style>
+:root{
+  --tinta:#221a12; --tinta-2:#4a3b2c; --papel:#fffaf0; --papel-2:#f6eedb; --filete:#e2d5b8;
+  --verde:#2f5d1e; --verde-2:#3f7428; --oro:#f2b632; --teja:#b8553a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --dock:76px;
+}
+/* la luz del cielo sigue la hora real */
+[data-hora="madrugada"]{--s1:#7d86b5;--s2:#f3c7a4;--m1:#9d9fbf;--m2:#6e8580;--m2b:#5d7670;--m3:#58803f;--m3b:#476d33;--m4:#2c4524;--nube:#f6d9c8;--astro:#ffe2a8;--cab:#1b1510;--cab-2:#2b2118;--agua:#d9e6f0;--ventana:#ffd27a;--noche:0}
+[data-hora="manana"]{--s1:#8cc6e6;--s2:#e8f3ec;--m1:#a4b9c9;--m2:#789f78;--m2b:#628c62;--m3:#669a42;--m3b:#528534;--m4:#32552a;--nube:#ffffff;--astro:#fff3c4;--cab:#1b1510;--cab-2:#2b2118;--agua:#e4f2fa;--ventana:#3b4a52;--noche:0}
+[data-hora="mediodia"]{--s1:#7dbde6;--s2:#e2f1f6;--m1:#a9bfcf;--m2:#7ca676;--m2b:#669262;--m3:#6ca046;--m3b:#588a36;--m4:#34582b;--nube:#ffffff;--astro:#fffbe0;--cab:#1b1510;--cab-2:#2b2118;--agua:#e4f2fa;--ventana:#3b4a52;--noche:0}
+[data-hora="tarde"]{--s1:#95bfdb;--s2:#f6dcaa;--m1:#b3a9b8;--m2:#859a6a;--m2b:#71875a;--m3:#77994a;--m3b:#62843b;--m4:#3a5626;--nube:#fff4e0;--astro:#ffd27a;--cab:#1b1510;--cab-2:#2b2118;--agua:#f3e6c8;--ventana:#3b4a52;--noche:0}
+[data-hora="anochecer"]{--s1:#3d4a7c;--s2:#e8906c;--m1:#6c6390;--m2:#4a5d5a;--m2b:#3e504d;--m3:#3d5d33;--m3b:#324f2a;--m4:#1d321e;--nube:#f0a88a;--astro:#ffb070;--cab:#fff7e8;--cab-2:#f4e6cf;--agua:#c9b6c8;--ventana:#ffc862;--noche:.35}
+[data-hora="noche"]{--s1:#0c1331;--s2:#2b3a6b;--m1:#29315a;--m2:#1f3347;--m2b:#1a2c3d;--m3:#1c3829;--m3b:#173022;--m4:#0e2016;--nube:#3a4670;--astro:#f3eed8;--cab:#f6f1e3;--cab-2:#e8e0cc;--agua:#6f86a8;--ventana:#ffc862;--noche:1}
+
+*{box-sizing:border-box}
+html{background:#f4ecd8;scroll-padding-top:72px;scroll-padding-bottom:calc(var(--dock) + 24px)}
+body{margin:0;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent;background:#f4ecd8}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #1d3f8f;outline-offset:3px;border-radius:10px}
+.oculto{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.salto{position:absolute;left:12px;top:-60px;z-index:50;background:var(--papel);padding:10px 14px;border-radius:10px;color:var(--tinta)}
+.salto:focus{top:12px}
+svg.ic{width:1em;height:1em;display:block;flex:none}
+
+/* ---------- el cielo: la finca a esta hora ---------- */
+.cielo{position:relative;height:max(540px,64svh);overflow:hidden;background:var(--s1)}
+@media (min-width:1000px){.cielo{height:max(620px,76vh)}}
+.cielo svg.paisaje{position:absolute;inset:0;width:100%;height:100%;display:block}
+.capa{will-change:transform}
+.cab{position:relative;z-index:2;padding:max(16px,env(safe-area-inset-top)) 20px 0;max-width:1180px;margin:0 auto;color:var(--cab)}
+.marca{display:flex;align-items:center;gap:.5em;font-family:var(--serif);font-size:1.12rem;letter-spacing:.02em}
+.marca svg{width:26px;height:26px}
+.marca .fecha{margin-left:auto;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--cab-2)}
+.cab h1{position:relative;z-index:1;font-family:var(--serif);font-weight:400;font-size:clamp(2.05rem,6.2vw,4.3rem);line-height:1.02;margin:.5em 0 0;letter-spacing:-.015em;max-width:13ch}
+.cab p.bajada{margin:.55em 0 0 -.45em;padding:.25em .45em .3em;border-radius:40px;background:color-mix(in srgb,var(--s1) 80%,transparent);box-shadow:0 0 26px 18px color-mix(in srgb,var(--s1) 80%,transparent);max-width:31rem;font-family:var(--serif);font-size:clamp(1.02rem,1.5vw,1.22rem);line-height:1.4;color:var(--cab-2)}
+.entrando .sube{animation:sube 1.4s cubic-bezier(.2,.75,.2,1) both;animation-delay:var(--d,0s)}
+.entrando .cab>*{animation:aparece .9s ease-out both;animation-delay:calc(.35s + var(--d,0s))}
+.nube{animation:nube var(--v,110s) linear infinite alternate}
+.humo circle{animation:humo 5.5s linear infinite;animation-delay:var(--d,0s);transform-box:fill-box;transform-origin:center}
+.estrellas{opacity:var(--noche)}
+.estrellas circle{animation:titila 3.2s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+@keyframes sube{from{transform:translateY(80px);opacity:0}to{transform:none;opacity:1}}
+@keyframes aparece{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes nube{from{transform:translateX(-120px)}to{transform:translateX(160px)}}
+@keyframes humo{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:.55}100%{transform:translate(26px,-90px) scale(2.2);opacity:0}}
+@keyframes titila{from{opacity:.35}to{opacity:1}}
+
+/* ---------- hoy: la tarjeta que no espera ---------- */
+.hoy{position:relative;z-index:3;max-width:1180px;margin:-96px auto 0;padding:0 12px}
+.tarjeta{background:var(--papel);border:1px solid var(--filete);border-radius:22px;box-shadow:0 1px 0 #fff inset,0 18px 40px -22px rgba(40,30,10,.55)}
+.hoy-grid{display:grid;gap:12px}
+@media (min-width:900px){.hoy-grid{grid-template-columns:1.25fr 1fr}}
+.no-espera{padding:18px 18px 16px;position:relative}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:#5c4a36}
+.no-espera h2{font-family:var(--serif);font-weight:400;font-size:1.55rem;line-height:1.15;margin:.25em 0 .5em;padding-right:84px}
+.pendientes{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pendiente{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 12px;border-radius:14px;border:1px solid var(--filete);background:#fff;cursor:pointer}
+.pendiente:hover{border-color:#b9a37a}
+.pendiente .marca-p{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:22px}
+.pendiente b{display:block;font-size:1rem;line-height:1.25}
+.pendiente span.d{display:block;font-size:.88rem;color:#4f4032;margin-top:2px;line-height:1.3}
+.nota-ejemplo{margin:10px 2px 0;font-size:.8rem;color:#5c4a36;line-height:1.35}
+.a-un-toque{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px}
+.toque{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:92px;padding:10px 6px;border-radius:16px;border:1px solid var(--filete);background:#fff;cursor:pointer;text-align:center;font-size:.9rem;line-height:1.2;font-weight:600}
+.toque svg{width:30px;height:30px}
+.toque.fuerte{background:var(--verde);border-color:var(--verde);color:#fff}
+.toque.fuerte svg{color:#fff}
+.anio{padding:14px 16px 12px}
+.anio-cab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.anio-cab h3{margin:0;font-family:var(--serif);font-weight:400;font-size:1.25rem}
+.meses{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:10px;align-items:end;height:74px}
+.mes{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.mes i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#5aa0cf,#2f6f9f);min-height:6px}
+.mes.seco i{background:linear-gradient(180deg,#e9c46a,#c9962e)}
+.mes span{font-family:var(--mono);font-size:.72rem;color:#4a3b2c}
+.mes.ahora span{color:#fff;background:var(--tinta);border-radius:5px;padding:2px 5px}
+.anio-pie{display:flex;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:.84rem;color:#4f4032}
+.enlaces-anio{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid #cdbb95;background:#fff;border-radius:999px;padding:7px 12px;font-size:.88rem;cursor:pointer}
+.chip:hover{background:#fff6de}
+
+/* ---------- la trocha: los diez lugares ---------- */
+.trocha{position:sticky;top:0;z-index:20;margin-top:18px;background:rgba(244,236,216,.94);border-bottom:1px solid #e0d2b2;backdrop-filter:saturate(1.2)}
+.trocha-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:8px 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+.trocha-in::-webkit-scrollbar{display:none}
+.paso{flex:none;display:flex;align-items:center;gap:5px;padding:7px 9px 7px 7px;border-radius:999px;border:1px solid transparent;background:transparent;cursor:pointer;font-size:.9rem;white-space:nowrap;scroll-snap-align:start;color:var(--tinta)}
+.paso svg{width:24px;height:24px}
+.paso .n{font-family:var(--mono);font-size:.72rem;color:#5c4a36}
+.paso[aria-current="true"]{background:var(--papel);border-color:#cdbb95;box-shadow:0 2px 8px -4px rgba(40,30,10,.5)}
+.buscar-btn{margin-left:auto;flex:none;position:sticky;right:0;box-shadow:-14px 0 12px -4px rgba(244,236,216,.95);display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid #cdbb95;background:#fff;cursor:pointer;font-size:.92rem}
+.buscar-btn svg{width:18px;height:18px}
+@media (max-width:899px){.buscar-btn{display:none}}
+@media (min-width:900px){.paso .n{display:none}}
+@media (min-width:900px) and (max-width:1299px){.paso{font-size:.86rem}}
+
+/* ---------- los grupos: la finca de arriba abajo, del día a la noche ---------- */
+.grupo{position:relative;padding:0 0 34px;background:var(--fondo)}
+.banda{position:relative;height:168px;overflow:hidden}
+@media (min-width:900px){.banda{height:200px}}
+.banda svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.grupo-in{max-width:1180px;margin:0 auto;padding:0 12px}
+.grupo-cab{display:flex;align-items:flex-start;gap:12px;padding:16px 96px 12px 16px;margin-top:-26px;position:relative;background:var(--papel);border:1px solid var(--filete);border-radius:20px 20px 0 0;border-bottom:0}
+.grupo-cab .ic-g{width:52px;height:52px;flex:none;border-radius:16px;background:var(--papel-2);display:grid;place-items:center}
+.grupo-cab .ic-g svg{width:40px;height:40px}
+.grupo-cab h2{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(1.45rem,3.6vw,2.1rem);line-height:1.08}
+.grupo-cab .num{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:#5c4a36}
+.grupo-cab p.lema{margin:.35em 0 0;font-family:var(--serif);font-size:1.02rem;line-height:1.4;color:#3d3024;max-width:44rem}
+.grupo-cuerpo{background:var(--papel);border:1px solid var(--filete);border-top:0;border-radius:0 0 20px 20px;padding:4px 12px 14px}
+.pantallas{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+@media (min-width:640px){.pantallas{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.pantallas{grid-template-columns:1fr 1fr 1fr}.pantallas.destacadas{grid-template-columns:repeat(4,1fr)}}
+.pant{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;text-align:left;padding:11px 12px;border-radius:14px;border:1px solid var(--filete);background:#fff;cursor:pointer}
+.pant:hover{border-color:#b9a37a;background:#fffdf6}
+.pant .pt{display:block;font-weight:650;font-size:1rem;line-height:1.22}
+.pant .pd{display:block;font-size:.87rem;color:#4f4032;margin-top:3px;line-height:1.32}
+.pant .fl{margin-left:auto;width:18px;height:18px;flex:none;color:#7a6446}
+.destacadas .pant{border-width:1.5px;border-color:#d4c29a;background:#fffdf7}
+details.mas{margin-top:10px}
+details.mas>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px dashed #b9a37a;font-weight:600;font-size:.94rem;color:#3d3024}
+details.mas>summary::-webkit-details-marker{display:none}
+details.mas>summary svg{width:16px;height:16px;transition:transform .2s}
+details.mas[open]>summary svg{transform:rotate(90deg)}
+details.mas .pantallas{margin-top:10px}
+.gated{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:#6b4a1c;background:#f7e4b5;border-radius:6px;padding:1px 5px;margin-left:4px;vertical-align:1px}
+
+/* los de la noche: memoria y cuenta */
+.grupo.noche .grupo-cab,.grupo.noche .grupo-cuerpo{background:#fdf6e6}
+.pie{background:#0c1127;color:#e8e0cc;padding:28px 18px calc(var(--dock) + 40px);text-align:center;font-size:.9rem;line-height:1.5}
+.pie p{margin:.3em auto;max-width:40rem}
+.pie a{color:#ffd27a}
+
+/* ---------- el muelle: hablar, anotar, buscar ---------- */
+.muelle{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;display:flex;gap:8px;padding:7px;border-radius:999px;background:rgba(34,26,18,.94);box-shadow:0 14px 30px -12px rgba(0,0,0,.6)}
+.muelle button{display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:12px 16px;background:transparent;color:#f6efdf;cursor:pointer;font-weight:600;font-size:.95rem}
+.muelle button svg{width:22px;height:22px}
+.muelle button.hablar{background:#e9b949;color:#221a12;padding:12px 20px}
+.muelle button:focus-visible{outline-color:#ffd27a}
+
+/* ---------- la hoja (qué abre cada pantalla) y el buscador ---------- */
+dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none;color:var(--tinta)}
+dialog::backdrop{background:rgba(18,14,8,.45)}
+.hoja{position:fixed;left:0;right:0;bottom:0;top:auto;margin:0 auto;width:min(640px,100%);}
+.hoja-in{background:var(--papel);border-radius:24px 24px 0 0;padding:14px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px -10px rgba(0,0,0,.4)}
+@media (min-width:900px){.hoja{bottom:auto;top:50%;transform:translateY(-50%)}.hoja-in{border-radius:24px}}
+.hoja .asa{width:44px;height:5px;border-radius:3px;background:#d8c9a8;margin:0 auto 12px}
+.hoja h3{font-family:var(--serif);font-weight:400;font-size:1.7rem;line-height:1.1;margin:.2em 0 .35em}
+.hoja p{margin:.4em 0;line-height:1.45}
+.hoja .ruta{font-family:var(--mono);font-size:.84rem;background:#f1e7cf;border-radius:8px;padding:6px 9px;display:inline-block;margin-top:6px;color:#3d3024}
+.hoja .acciones{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.btn{border:1px solid #cdbb95;background:#fff;border-radius:999px;padding:11px 18px;cursor:pointer;font-weight:600}
+.btn.prim{background:var(--verde);border-color:var(--verde);color:#fff}
+.hoja .grupo-de{display:flex;align-items:center;gap:8px}
+.hoja .grupo-de svg{width:28px;height:28px}
+.buscador{padding:12px 16px;background:var(--papel)}
+.buscador-in{width:min(100%,1080px);margin:0 auto}.buscador-cab label{font-weight:700}.buscador-lista[hidden]{display:none}
+
+.buscador-cab{display:flex;gap:8px;align-items:center;padding:max(12px,env(safe-area-inset-top)) 12px 12px;border-bottom:1px solid var(--filete)}
+.buscador-cab input{flex:1;min-width:0;font:inherit;font-size:1.08rem;padding:12px 14px;border-radius:14px;border:1.5px solid #b9a37a;background:#fff;color:var(--tinta)}
+.buscador-lista{overflow:auto;padding:12px;display:grid;gap:8px;align-content:start}
+.buscador-lista .vacio{color:#4f4032;padding:18px 6px}
+.buscador-lista .de{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:#5c4a36;display:block;margin-bottom:2px}
+
+.chiva{animation:chiva 26s linear infinite}
+@keyframes chiva{from{transform:translateX(-360px)}to{transform:translateX(1560px)}}
+.cometa{animation:cometa 6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes cometa{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(7deg) translateY(-8px)}}
+.luciernaga{animation:luz 2.6s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes luz{0%,100%{opacity:.1}50%{opacity:1}}
+.brillo-agua{animation:brillo 3s linear infinite;stroke-dasharray:10 26}
+@keyframes brillo{to{stroke-dashoffset:-72}}
+
+.sin-anim *,.sin-anim *::before,.sin-anim *::after{animation:none!important}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .chiva{transform:translateX(560px)}
+}
+
+.trocha{display:flex;align-items:center}.trocha-in{min-width:0;flex:1}h2[tabindex="-1"]:focus{outline:0}
+body[data-percha-pestanas="si"] #trocha{margin-top:106px}
+.home-back{flex-shrink:0;margin-left:8px;background:var(--papel,#fffdf4);color:#2b2118;border:2px solid #3a2c1f;border-radius:999px;padding:10px 12px;font-weight:700;box-shadow:0 3px 0 #3a2c1f}
+.home-data{margin:16px 0;padding:16px;border:1px solid currentColor;border-radius:12px;overflow-wrap:anywhere}
+.home-data p{margin:6px 0}.home-data button{border:0;background:transparent;text-decoration:underline;cursor:pointer}
+.home-data:has(.home-data-counts),.home-data:has(.home-data-heading){padding:14px;border-color:var(--filete);background:linear-gradient(145deg,#fffdf7,var(--papel-2));color:var(--tinta)}
+.home-data-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.home-data-count{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 10px!important;border:1px solid var(--filete)!important;border-radius:12px;background:#fff!important;text-align:left;text-decoration:none!important;color:var(--verde);line-height:1.15}
+.home-data-count b{font-family:var(--serif);font-size:1.35rem;font-weight:500;font-variant-numeric:tabular-nums}
+.home-data-count span{font-size:.75rem;color:var(--tinta-2)}
+.home-data-lists{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.home-data-list{min-width:0}.home-data-list h3,.home-data-heading{margin:0 0 7px;font-family:var(--serif);font-size:1.08rem;font-weight:500;color:var(--tinta)}
+.home-data-rows{display:grid;gap:4px}
+.home-data-row{display:flex;width:100%;min-width:0;justify-content:space-between;align-items:center;gap:8px;padding:5px 1px!important;border-bottom:1px solid var(--filete)!important;text-align:left;text-decoration:none!important;color:var(--tinta-2);font-size:.85rem;line-height:1.25}
+.home-data-row span{overflow-wrap:anywhere}.home-data-row b{flex:none;color:var(--verde);font-variant-numeric:tabular-nums}
+.home-data-more{margin-top:7px;padding:5px 0!important;color:var(--verde)!important;font-size:.84rem;font-weight:650;text-decoration:none!important}
+.home-data-empty{color:var(--tinta-2);font-family:var(--serif);font-size:.9rem}
+@media(max-width:480px){.home-data{padding:12px}.home-data-lists{gap:10px}.home-data-count{padding:8px 7px!important}.home-data-count span{font-size:.68rem}}
+.grupo-resumen{cursor:pointer;min-height:64px;padding:12px 18px;margin:8px 12px;border:1px solid var(--filete);border-radius:16px;background:var(--papel)}
+.grupo-resumen h2{font-size:1.2rem!important;flex:1}
+.grupo-resumen::after{content:'+';font-size:1.5rem}
+.grupo[open]>.grupo-resumen::after{content:'−'}
+.grupo:not([open]){padding:0;background:transparent}
+.anio>summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+</style>
+</head>
+<body>
+<a class="salto" href="#grupos">Saltar a las funciones</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-hoy" viewBox="0 0 48 48"><circle cx="24" cy="27" r="9" fill="#f2b632"/><g stroke="#c9861a" stroke-width="2.4" stroke-linecap="round"><path d="M24 8v5M9.5 14.5l3.5 3.5M38.5 14.5L35 18M4 27h5M39 27h5"/></g><path d="M2 38c8-7 15-9 22-9s14 2 22 9v6H2z" fill="#5f9a3c"/><path d="M2 41c9-4 16-5 22-5s13 1 22 5" fill="none" stroke="#3f7428" stroke-width="2"/></symbol>
+    <symbol id="i-casa" viewBox="0 0 48 48"><path d="M10 22h28v20H10z" fill="#f4ecd6" stroke="#5a3d25" stroke-width="2"/><path d="M10 36h28v6H10z" fill="#2f7fa5"/><path d="M21 29h7v13h-7z" fill="#c8452f" stroke="#5a3d25" stroke-width="1.6"/><path d="M13 27h5v4h-5z" fill="#2f7fa5" stroke="#5a3d25" stroke-width="1.2"/><path d="M4 25L24 8l20 17z" fill="#b8553a" stroke="#6b2f1d" stroke-width="2.4" stroke-linejoin="round"/><path d="M10 21l14-11 14 11" fill="none" stroke="#d9805c" stroke-width="1.4"/></symbol>
+    <symbol id="i-suelo" viewBox="0 0 48 48"><path d="M4 14h40v6H4z" fill="#5f9a3c"/><path d="M8 14l2-5 2 5M18 14l1.5-6 1.5 6M33 14l2-5 2 5" fill="#5f9a3c" stroke="#3f7428" stroke-width="1.2"/><path d="M4 20h40v9H4z" fill="#5b3a22"/><path d="M4 29h40v8H4z" fill="#8a5a33"/><path d="M4 37h40v7H4z" fill="#b98a57"/><path d="M11 26c4-3 7 3 11 0s7 3 11 0" fill="none" stroke="#e59a9a" stroke-width="3.2" stroke-linecap="round"/><path d="M36 20v15M36 28l-5 6M36 26l5 5" stroke="#e8d7b4" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-sembrar" viewBox="0 0 48 48"><path d="M4 40c10-3 30-3 40 0v4H4z" fill="#6b4428"/><path d="M24 40V22" stroke="#3f7428" stroke-width="3" stroke-linecap="round"/><path d="M24 27c-2-8-10-11-16-9 1 7 8 11 16 9z" fill="#6fae3e"/><path d="M24 22c1-8 9-12 16-10-1 7-8 12-16 10z" fill="#8cc152"/><ellipse cx="24" cy="41" rx="4" ry="2.6" fill="#e0b25a"/></symbol>
+    <symbol id="i-sanidad" viewBox="0 0 48 48"><path d="M6 42C8 19 22 7 43 5c1 21-11 36-37 37z" fill="#6fae3e"/><path d="M8 40C18 29 29 18 41 7" stroke="#3f7428" stroke-width="2" fill="none"/><circle cx="27" cy="27" r="8" fill="#d63a2b" stroke="#2a1a14" stroke-width="1.6"/><path d="M27 19v16" stroke="#2a1a14" stroke-width="1.6"/><circle cx="23.5" cy="25" r="1.7" fill="#2a1a14"/><circle cx="30.5" cy="25" r="1.7" fill="#2a1a14"/><circle cx="24" cy="30.5" r="1.5" fill="#2a1a14"/><circle cx="30" cy="30.5" r="1.5" fill="#2a1a14"/><path d="M22.5 20.5a4.5 3.5 0 0 1 9 0z" fill="#2a1a14"/></symbol>
+    <symbol id="i-cosecha" viewBox="0 0 48 48"><circle cx="17" cy="20" r="6" fill="#e6532e"/><circle cx="30" cy="18" r="6.5" fill="#f2b632"/><circle cx="23" cy="13" r="5" fill="#7cb342"/><path d="M6 22h36l-5 20H11z" fill="#c68a45" stroke="#6b4428" stroke-width="2" stroke-linejoin="round"/><path d="M8 28h32M9.5 34h29M11 40h26" stroke="#8a5a2b" stroke-width="1.8"/><path d="M16 22l-2 20M24 22v20M32 22l2 20" stroke="#8a5a2b" stroke-width="1.4"/></symbol>
+    <symbol id="i-monte" viewBox="0 0 48 48"><path d="M22 44V30" stroke="#5a3d25" stroke-width="3.4" stroke-linecap="round"/><path d="M8 26c-3-7 3-14 9-13 2-6 12-8 16-2 7-1 11 7 7 13 3 5-2 11-8 10-3 4-12 4-15 0-6 1-11-3-9-8z" fill="#3f7c35"/><path d="M14 22c2-3 6-4 9-2M27 17c3-1 6 0 8 3" stroke="#6fae3e" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M38 29c-3 5-5 7-5 10a5 5 0 0 0 10 0c0-3-2-5-5-10z" fill="#3b9bd1" stroke="#1f5f86" stroke-width="1.5"/></symbol>
+    <symbol id="i-aprender" viewBox="0 0 48 48"><path d="M10 16h28c0 10-7 20-14 26C17 36 10 26 10 16z" fill="#e6532e"/><path d="M12.5 24h23M16 31h16" stroke="#f2b632" stroke-width="3"/><ellipse cx="24" cy="16" rx="14" ry="4" fill="#f7c85a" stroke="#8a4a1f" stroke-width="1.6"/><path d="M24 12V5" stroke="#8a4a1f" stroke-width="3" stroke-linecap="round"/><path d="M24 42v4" stroke="#444" stroke-width="2" stroke-linecap="round"/><path d="M26 6c6 0 10 2 14 6" stroke="#8a6a3a" stroke-width="1.6" fill="none" stroke-dasharray="2 2"/></symbol>
+    <symbol id="i-memoria" viewBox="0 0 48 48"><path d="M24 12C18 8 10 8 4 10v28c6-2 14-2 20 2z" fill="#f4ecd6" stroke="#5a3d25" stroke-width="2" stroke-linejoin="round"/><path d="M24 12c6-4 14-4 20-2v28c-6-2-14-2-20 2z" fill="#fff8e6" stroke="#5a3d25" stroke-width="2" stroke-linejoin="round"/><path d="M8 17c4-1 9-1 12 1M8 23c4-1 9-1 12 1M8 29c4-1 9-1 12 1M28 18c3-2 8-2 12-1M28 24c3-2 8-2 12-1" stroke="#8a6a4a" stroke-width="1.5" fill="none"/><path d="M30 35l10-10 3 3-10 10-4 1z" fill="#f2b632" stroke="#5a3d25" stroke-width="1.4"/></symbol>
+    <symbol id="i-cuenta" viewBox="0 0 48 48"><ellipse cx="24" cy="32" rx="21" ry="7" fill="#efe2bf" stroke="#6b5230" stroke-width="2"/><path d="M13 31c0-10 4-17 11-17s11 7 11 17c-4 2-18 2-22 0z" fill="#f4e9c8" stroke="#6b5230" stroke-width="2"/><path d="M13.4 25.5c5 2 16 2 21.2 0l.4 4c-5 2-17 2-22 0z" fill="#2a2a2a"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M8.5 21.5h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lapiz" viewBox="0 0 24 24"><path d="M4 20l1-4.5L15.5 5 19 8.5 8.5 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.5 7l3.5 3.5" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-fl" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-nube" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.3 9.2 4.4 4.4 0 0 0 7 18z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 21l1-2M13 21l1-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lista" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M3.5 6l1.2 1.2L7 4.8M3.5 12l1.2 1.2L7 10.8M3.5 18l1.2 1.2L7 16.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-hoja" viewBox="0 0 24 24"><path d="M4 20C5 9 11 4 20 3c1 10-5 17-16 17z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 19c4-5 8-9 12-12" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="i-lupa-hoja" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l5.5 5.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M7 12.5c.5-3.5 2.5-5 6-5.3.2 3.4-2 5.4-6 5.3z" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<header class="cielo" id="cielo" aria-labelledby="saludo">
+  <svg class="paisaje" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--s1)"/><stop offset=".42" style="stop-color:var(--s1)"/><stop offset=".86" style="stop-color:var(--s2)"/></linearGradient>
+      <radialGradient id="gHalo"><stop offset="0" style="stop-color:var(--astro)" stop-opacity=".9"/><stop offset=".4" style="stop-color:var(--astro)" stop-opacity=".35"/><stop offset="1" style="stop-color:var(--astro)" stop-opacity="0"/></radialGradient>
+      <linearGradient id="gBruma" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>
+    </defs>
+    <rect width="1440" height="800" fill="url(#gCielo)"/>
+    <g class="estrellas" id="estrellas"></g>
+    <g id="astro" class="capa" data-k=".08"><circle id="halo" cx="720" cy="200" r="120" fill="url(#gHalo)"/><circle id="disco" cx="720" cy="200" r="34" style="fill:var(--astro)"/></g>
+    <g class="capa" data-k=".1" style="opacity:.92">
+      <g class="nube" style="--v:140s"><path d="M380 150c-8-26 24-40 44-26 10-24 52-24 60 2 22-6 38 12 28 28H386c-8 0-10-2-6-4z" style="fill:var(--nube)"/></g>
+      <g class="nube" style="--v:170s"><path d="M860 110c-6-20 20-32 36-20 8-20 42-20 48 2 18-4 30 10 22 22H866c-6 0-8-2-6-4z" style="fill:var(--nube)"/></g>
+      <g class="nube" style="--v:120s"><path d="M1040 220c-7-22 20-34 38-22 9-22 46-21 52 2 20-5 34 11 25 24h-110c-7 0-8-2-5-4z" style="fill:var(--nube)" opacity=".8"/></g>
+    </g>
+
+    <g class="capa sube" data-k=".16" style="--d:.05s">
+      <path d="M0 440V372c70-14 128-50 206-38 64 10 104-34 176-40 70-6 104 30 158 24 64-8 96-58 170-60 76-2 112 40 176 36 58-4 90-36 150-30 70 8 110 50 182 46 70-4 110-26 222-8v138z" style="fill:var(--m1)"/>
+      <path d="M0 440V410c180-20 420-30 720-26s560 14 720 26v30z" fill="url(#gBruma)"/>
+    </g>
+
+    <g class="capa sube" data-k=".26" style="--d:.15s">
+      <path d="M0 520V452c90-4 150-40 240-40 80 0 120 30 200 26 70-4 110-44 190-44 90 0 120 44 200 42 80-2 120-36 210-34 90 2 130 40 210 40 60 0 110-12 190-10v88z" style="fill:var(--m2)"/>
+      <g style="fill:var(--m2b)">
+        <path d="M430 440c-6-18 10-30 24-24 4-16 28-18 34-2 14-4 24 8 18 20 12 6 8 20-6 20h-64c-12 0-14-10-6-14z"/>
+        <path d="M512 428c-6-16 8-26 22-22 4-14 26-16 30-2 14-2 22 8 16 18 10 6 6 18-6 18h-58c-10 0-12-8-4-12z"/>
+        <path d="M590 424c-5-15 9-24 21-19 4-14 25-14 29 0 13-3 21 7 15 17 10 5 6 17-6 17h-54c-10 0-11-8-5-15z"/>
+        <path d="M880 432c-6-16 8-27 22-22 4-15 27-16 31-1 14-3 22 8 16 18 11 6 7 19-6 19h-58c-11 0-12-9-5-14z"/>
+        <path d="M958 436c-5-15 9-25 21-20 4-14 25-15 29 0 13-3 21 7 15 17 10 5 6 17-6 17h-54c-10 0-11-8-5-14z"/>
+        <path d="M660 424c-5-14 8-23 20-18 4-13 24-14 28 0 12-3 20 7 14 16 10 5 6 16-6 16h-51c-10 0-11-8-5-14z"/>
+      </g>
+      <path id="quebrada" d="M636 438c-4 20 10 30 4 48s-22 26-16 46" fill="none" style="stroke:var(--agua)" stroke-width="4" stroke-linecap="round"/>
+      <path class="brillo-agua" d="M636 438c-4 20 10 30 4 48s-22 26-16 46" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <g class="capa sube" data-k=".4" style="--d:.28s">
+      <path d="M0 800V612c150-34 290-70 450-78 170-8 250 4 360-16 110-20 200-58 330-50 130 8 220 50 300 70v262z" style="fill:var(--m3)"/>
+      <g fill="none" style="stroke:var(--m3b)" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 11">
+        <path d="M830 556c90-20 170-50 290-44 110 6 190 38 320 70"/>
+        <path d="M820 584c100-22 180-48 300-42 110 6 190 40 320 72"/>
+        <path d="M800 614c110-24 200-48 320-42 110 6 200 40 320 74"/>
+        <path d="M780 646c120-26 220-50 340-44 110 6 210 42 320 74"/>
+        <path d="M60 640c120-30 240-58 380-64"/>
+        <path d="M40 674c130-32 260-60 400-66"/>
+        <path d="M30 708c140-32 270-60 420-66"/>
+      </g>
+
+      <g style="fill:var(--m3b)">
+        <path d="M934 548c-10-18 6-34 24-30 6-16 34-18 42 0 18-2 28 16 18 30 8 12-4 24-18 22h-58c-14 0-18-12-8-22z"/>
+        <path d="M1110 552c-9-17 6-31 22-27 6-15 31-17 38 0 17-2 26 14 17 27 7 11-4 22-17 20h-53c-13 0-16-11-7-20z"/>
+      </g>
+      <path d="M962 574v18M1144 574v16" style="stroke:var(--m4)" stroke-width="5" stroke-linecap="round"/>
+
+      <g transform="translate(560 44)"><g fill="none" style="stroke:var(--m3b)" stroke-width="4" stroke-linecap="round">
+        <path d="M560 560c-6-50 -2-90 18-130"/><path d="M570 560c0-46 10-86 36-118"/><path d="M552 560c-12-40-14-78-2-112"/><path d="M580 562c8-40 26-70 52-92"/>
+      </g>
+      <path d="M520 470c-8-30 22-46 42-40 10-22 44-22 58-4 24-6 40 14 30 32 16 12 4 32-16 30-20 14-60 12-76 0-22 6-44-2-38-18z" style="fill:var(--m3b)" opacity=".92"/></g>
+
+      <g id="casa" transform="translate(476 462)">
+        <path d="M6 44h128v52H6z" fill="#f3ead6"/>
+        <path d="M6 80h128v16H6z" fill="#2f7fa5"/>
+        <path d="M58 58h22v38H58z" fill="#c8452f"/><path d="M58 58h22v38H58z" fill="none" stroke="#5a3d25" stroke-width="2"/>
+        <path d="M18 56h24v18H18zM96 56h24v18H96z" style="fill:var(--ventana)" stroke="#5a3d25" stroke-width="2"/>
+        <path d="M30 56v18M108 56v18" stroke="#5a3d25" stroke-width="1.6"/>
+        <path d="M18 56h24v18H18zM96 56h24v18H96z" fill="none" stroke="#2e8a57" stroke-width="3"/>
+        <path d="M-10 48L28 10h86l40 38z" fill="#b8553a"/>
+        <path d="M-10 48L28 10h86l40 38" fill="none" stroke="#6b2f1d" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 36h134M16 24h112" stroke="#8e3e27" stroke-width="2"/>
+        <path d="M40 12v36M60 12v36M80 12v36M100 12v36" stroke="#cf6e4c" stroke-width="1.4" opacity=".7"/>
+        <path d="M8 48v48M132 48v48" stroke="#6b4428" stroke-width="4"/>
+        <path d="M-6 96h152v5H-6z" fill="#8a6a4a"/>
+        <g class="humo" style="fill:#f2efe8"><circle cx="100" cy="4" r="6"/><circle cx="100" cy="4" r="6" style="--d:1.8s"/><circle cx="100" cy="4" r="6" style="--d:3.6s"/></g>
+      </g>
+
+      <g transform="translate(662 560)">
+        <path d="M0 50V0" stroke="#7c8a3a" stroke-width="8" stroke-linecap="round"/>
+        <g style="fill:var(--m3b)">
+          <path d="M0 0c-20-26-50-30-70-20 20 8 44 16 70 20z"/><path d="M0 0c18-30 50-38 72-28-20 10-46 20-72 28z"/>
+          <path d="M0-2c-8-30-4-54 10-70 4 22 0 46-10 70z"/><path d="M0 2c-26-8-44-2-58 12 18 0 40-4 58-12z"/>
+        </g>
+      </g>
+    </g>
+
+    <g class="capa sube" data-k=".62" style="--d:.4s">
+      <path d="M0 800V706c150-14 300 12 480 8 220-6 330-24 520-14 190 10 300-6 440 0v100z" style="fill:var(--m4)"/>
+      <g id="maices">
+        <g id="planta-maiz" transform="translate(440 714)"><path d="M0 0V-118" stroke="#4f7a2a" stroke-width="6" stroke-linecap="round"/>
+          <path d="M0-30c-24-6-44-22-56-44 18 12 38 22 56 34zM0-48c26-6 48-22 60-46-18 14-40 28-60 38zM0-66c-20-8-34-24-40-44 14 14 28 26 40 36zM0-84c16-10 26-26 28-44-10 16-20 28-28 36zM0-100c-10-8-14-18-14-30 6 10 12 18 14 24z" fill="#5f8f34"/>
+          <path d="M2-62c10-4 14-16 12-30-10 6-14 16-12 30z" fill="#e9c46a" stroke="#b38a2e" stroke-width="1.5"/><path d="M0-118l-6-14M0-118l6-14M0-118v-16" stroke="#c9a24e" stroke-width="2.4"/></g>
+        <use href="#planta-maiz" transform="translate(506 720) scale(.84) translate(-440 -714)"/>
+      </g>
+      <g style="stroke:#4a3524" stroke-width="5" stroke-linecap="round"><path d="M880 718v-54M960 716v-52M1040 718v-54M1120 720v-54"/></g>
+      <path d="M880 676l240 0M880 694l240 0" style="stroke:#4a3524" stroke-width="1.5" opacity=".7"/>
+    </g>
+  </svg>
+  <div class="cab">
+    <div class="marca">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 44V20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M24 26c-2-9-11-13-18-10 1 8 9 12 18 10zM24 20c1-9 10-14 18-11-1 8-9 13-18 11z" fill="#6fae3e"/></svg>
+      <span>Chagra</span>
+      <span class="fecha" id="fecha"></span>
+    </div>
+    <h1 id="saludo">Buenos días. ¿Qué le toca hoy a la finca?</h1>
+    <p class="bajada" id="bajada">Aquí se organiza el día y el año de su finca: lo que no espera, lo que tiene, y todo lo demás a dos toques.</p>
+  </div>
+</header>
+
+<section class="buscador" id="buscador" aria-label="Buscar en Chagra">
+  <div class="buscador-in">
+    <div class="buscador-cab">
+      <label for="q">Buscar</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Nombre de la herramienta">
+      <button type="button" class="btn" id="buscar-cerrar">Limpiar</button>
+    </div>
+    <div class="buscador-lista" id="resultados" role="list" hidden></div>
+  </div>
+</section>
+
+<section class="hoy" id="g-1" data-g="1" aria-labelledby="t-hoy">
+  <div class="hoy-grid">
+    <div class="tarjeta no-espera" id="percha-hoy">
+      <span class="eyebrow">1 · Hoy en su finca</span>
+      <h2 id="t-hoy">Lo que no espera</h2>
+      <ul class="pendientes" id="pendientes"></ul>
+      <p class="nota-ejemplo">Consultando las tareas guardadas en este dispositivo.</p>
+    </div>
+    <div class="tarjeta">
+      <div class="a-un-toque" id="a-un-toque" aria-label="A un toque"></div>
+      <details class="anio"><summary>El año de la finca</summary>
+        <div class="anio-cab"><h3>El año de la finca</h3><span class="eyebrow" id="anio-ahora"></span></div>
+        <div class="meses" id="meses" role="img" aria-label="Registros del año"></div>
+        <div class="anio-pie">El clima se consulta para la ubicación de su finca.</div>
+        <div class="enlaces-anio" id="enlaces-anio"></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<nav class="trocha" id="trocha" aria-label="Los diez lugares de la finca"><button class="home-back" type="button" data-home-back aria-label="Volver a la finca">← Finca</button><div class="trocha-in" id="trocha-in"></div></nav>
+
+<main id="grupos"></main>
+
+<footer class="pie">
+  <p>Su finca, a su ritmo.</p>
+  <p>Anote lo que pasa hoy y vuelva cuando lo necesite.</p>
+</footer>
+
+<div class="muelle" role="toolbar" aria-label="Acciones de siempre">
+  <button type="button" class="hablar" data-v="registro_voz"><svg class="ic"><use href="#i-mic"/></svg>Hablarle</button>
+  <button type="button" data-v="registro_unificado"><svg class="ic"><use href="#i-lapiz"/></svg>Anotar</button>
+  <button type="button" id="abrir-buscar"><svg class="ic"><use href="#i-lupa"/></svg>Buscar</button>
+</div>
+
+<dialog class="hoja" id="hoja" aria-labelledby="hoja-t">
+  <div class="hoja-in">
+    <div class="asa"></div>
+    <div class="grupo-de eyebrow" id="hoja-g"></div>
+    <h3 id="hoja-t"></h3>
+    <p id="hoja-d"></p>
+    <span class="ruta" id="hoja-r"></span>
+    <p id="hoja-n" style="font-size:.88rem;color:#4f4032"></p>
+    <div class="acciones"><button type="button" class="btn prim" id="hoja-cerrar">Listo</button></div>
+  </div>
+</dialog>
+
+
+
+<template data-banda="finca"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v34c-160 18-330-8-520 6S560 40 360 30 120 36 0 30z" fill="#f4ecd8"/>
+  <path d="M0 132c200-10 420 4 720-2s520-8 720 0v40H0z" fill="#d6c090"/>
+  <path d="M0 150c240-6 480 2 720-2s480-2 720 2v20H0z" fill="#c9b07c"/>
+  <g stroke="#6b4a2c" stroke-width="5" stroke-linecap="round"><path d="M300 136V86M380 134V84M460 134V84M1040 134V84M1120 134V84M1200 136V86"/></g>
+  <path d="M296 98h170M296 116h170M1036 98h170M1036 116h170" stroke="#6b4a2c" stroke-width="2" opacity=".75"/>
+
+  <g transform="translate(700 70)"><path d="M0 62h64v6H0z" fill="#6b4a2c"/><path d="M4 18h56v22H4zM4 40h56v22H4z" fill="#e9c46a" stroke="#6b4a2c" stroke-width="2.5"/><path d="M-2 10h68l-6 8H4z" fill="#b8553a" stroke="#6b4a2c" stroke-width="2.5" stroke-linejoin="round"/><path d="M26 56h12v4H26z" fill="#3a2a18"/><path d="M10 68v10M54 68v10" stroke="#6b4a2c" stroke-width="4"/></g>
+
+  <defs><g id="gallina"><path d="M0 0c-18 0-30 10-30 22 0 10 10 16 26 16 16 0 26-8 26-20 0-4-2-8-4-10 6-2 8-8 6-14-4 4-10 6-14 6-2 0-6 0-10 0z" fill="#8a4a24"/><path d="M-30 18c-10-10-12-22-6-28 2 10 8 18 14 22z" fill="#2f2a26"/><circle cx="20" cy="-6" r="7" fill="#8a4a24"/><path d="M17-13c1-5 5-6 6-2 2-3 5-2 4 2" fill="#d63a2b"/><path d="M26-6l6 2-6 2z" fill="#e9b949"/><circle cx="21" cy="-7" r="1.4" fill="#1b1510"/><path d="M-6 38v10M4 38v10" stroke="#c98a2e" stroke-width="2.5"/></g></defs>
+  <use href="#gallina" transform="translate(560 96)"/>
+  <use href="#gallina" transform="translate(905 102) scale(-.85 .85)"/>
+  <use href="#gallina" transform="translate(620 112) scale(.7)"/>
+  <use href="#gallina" transform="translate(240 104) scale(-.8 .8)"/>
+</svg></template>
+<template data-banda="suelo"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v26H0z" fill="#efe3c6"/>
+  <path d="M0 24c200-8 460 6 720 0s520-8 720 0v22H0z" fill="#5f9a3c"/>
+  <g stroke="#3f7428" stroke-width="3" stroke-linecap="round"><path d="M80 26l-4-12M120 26l3-14M430 26l-5-13M470 25l2-12M520 25l6-12M760 24l-4-13M800 24l3-14M980 24l-5-12M1030 25l4-13M1300 26l-4-12M1340 26l3-13"/></g>
+  <path d="M0 44h1440v40H0z" fill="#4f331e"/>
+  <path d="M0 84c240 6 480-4 720 2s480-6 720 0v44H0z" fill="#7a5030"/>
+  <path d="M0 128c240-4 480 4 720 0s480 4 720 0v42H0z" fill="#a47a4c"/>
+  <path d="M0 150c300 8 500-6 720 0s460 8 720 0v20H0z" fill="#e6d3b4"/>
+
+  <g fill="none" stroke="#e8d7b4" stroke-width="2.2" stroke-linecap="round" opacity=".9">
+    <path d="M500 44c2 20-6 36 0 60s-10 30-6 44M500 70c-14 8-22 22-24 36M502 88c14 6 24 18 28 34"/>
+    <path d="M780 44c-4 22 8 40 2 60M780 64c12 6 22 18 22 34M781 86c-16 10-22 24-22 40"/>
+    <path d="M1010 44c3 18-4 30 0 50M1010 62c-10 6-16 16-16 28"/>
+  </g>
+
+  <path d="M476 106c60-10 120 14 180 2s90-20 124-8M530 122c80 8 150-6 250-26M800 98c60 6 120-10 190-4" fill="none" stroke="#f3ead0" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>
+
+  <path d="M600 70c10-8 20 6 30-2s20 6 30-2" fill="none" stroke="#e59a9a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M880 118c8 6 18-6 26 0s18-6 26 0" fill="none" stroke="#e59a9a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M260 96c8-6 16 4 24-2" fill="none" stroke="#e59a9a" stroke-width="5" stroke-linecap="round"/>
+  <g fill="#c9b08a"><ellipse cx="690" cy="112" rx="10" ry="6"/><ellipse cx="940" cy="80" rx="8" ry="5"/><ellipse cx="560" cy="140" rx="12" ry="6"/><ellipse cx="360" cy="70" rx="9" ry="5"/><ellipse cx="1180" cy="100" rx="11" ry="6"/></g>
+  <ellipse cx="840" cy="60" rx="6" ry="4" fill="#e0b25a"/><path d="M840 56c0-6 4-10 8-12" stroke="#8cc152" stroke-width="2" fill="none"/>
+</svg></template>
+<template data-banda="sembrar"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v30c-200 16-460-8-720 4S220 24 0 36z" fill="#e6d3b4"/>
+  <path d="M0 132c240-6 480 6 720 0s480-8 720 0v38H0z" fill="#7a5030"/>
+  <path d="M0 150c240 6 480-4 720 0s480 6 720 0v20H0z" fill="#dde9c6"/>
+
+  <g transform="translate(300 134)"><ellipse rx="7" ry="4.5" fill="#e0b25a"/></g>
+  <g transform="translate(420 134)"><ellipse rx="6" ry="4" fill="#e0b25a"/><path d="M0-3c0-8 4-12 9-14" stroke="#6fae3e" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+  <g transform="translate(540 134)"><path d="M0 0v-28" stroke="#3f7428" stroke-width="3.5"/><path d="M0-20c-4-10-14-12-20-8 4 8 12 10 20 8zM0-26c3-10 12-13 19-9-3 8-11 11-19 9z" fill="#6fae3e"/></g>
+  <g transform="translate(670 134)"><path d="M0 0v-58" stroke="#3f7428" stroke-width="4"/><path d="M0-22c-10-8-26-8-34 0 12 4 24 4 34 0zM0-36c10-10 28-10 36-2-12 4-26 6-36 2zM0-48c-8-8-20-10-28-4 10 4 20 6 28 4zM0-56c4-8 14-12 22-8-6 6-14 8-22 8z" fill="#6fae3e"/></g>
+  <g transform="translate(820 134)"><path d="M0 0v-96" stroke="#5a8a2e" stroke-width="5"/><g fill="none" stroke="#6fae3e" stroke-width="5" stroke-linecap="round"><path d="M0-30c-20-4-36-16-44-30M0-46c22-6 38-18 46-34M0-62c-18-6-30-18-34-32M0-78c14-8 22-18 24-30"/></g><path d="M3-66c8-4 12-14 10-26-8 4-12 14-10 26z" fill="#e9c46a"/><path d="M0-96l-6-12M0-96l6-12M0-96v-14" stroke="#c9a24e" stroke-width="2"/></g>
+  <g transform="translate(960 134)"><path d="M0 0v-80" stroke="#5a8a2e" stroke-width="5"/><g fill="none" stroke="#6fae3e" stroke-width="5" stroke-linecap="round"><path d="M0-26c-18-4-32-14-38-26M0-40c20-6 34-16 40-30M0-56c-16-6-26-16-30-28"/></g><path d="M-2-22c-18 4-30 12-34 24" stroke="#4f8a2e" stroke-width="3" fill="none"/><ellipse cx="-30" cy="-2" rx="16" ry="10" fill="#e98b2a"/><path d="M-30-12v-4" stroke="#3f7428" stroke-width="2"/><path d="M4-6c14 2 24-8 30-20" stroke="#5a8a2e" stroke-width="2.5" fill="none"/><g fill="#7a3b2a"><ellipse cx="26" cy="-18" rx="3" ry="7" transform="rotate(20 26 -18)"/><ellipse cx="32" cy="-24" rx="3" ry="7" transform="rotate(30 32 -24)"/></g></g>
+  <g transform="translate(1110 134)"><path d="M0 0v-40" stroke="#3f7428" stroke-width="4"/><path d="M0-18c-12-8-26-6-32 2 12 4 22 4 32-2zM0-30c10-10 26-8 32 0-12 4-22 4-32 0zM0-40c-4-8-2-16 4-20 4 8 2 14-4 20z" fill="#8cc152"/></g>
+  <g transform="translate(180 134)"><path d="M0 0v-44" stroke="#3f7428" stroke-width="4"/><path d="M0-20c-12-8-26-6-32 2 12 4 22 4 32-2zM0-34c10-10 26-8 32 0-12 4-22 4-32 0z" fill="#8cc152"/></g>
+</svg></template>
+<template data-banda="sanidad"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v28c-240 18-480-10-720 2S240 20 0 30z" fill="#dde9c6"/>
+  <g fill="#5f9a3c"><path d="M380 170C380 100 440 50 540 34c10 70-40 124-160 136z"/><path d="M1060 170c0-70-50-120-150-136-10 70 40 124 150 136z"/></g>
+  <path d="M390 164c40-44 90-88 146-124M1050 164c-40-44-90-88-140-124" stroke="#3f7428" stroke-width="3" fill="none"/>
+  <path d="M560 170c20-80 90-120 190-118-6 70-70 112-190 118z" fill="#6fae3e"/>
+  <path d="M570 166c50-40 110-80 172-106" stroke="#3f7428" stroke-width="3" fill="none"/>
+  <path d="M750 170c0-60 40-96 110-104 4 60-40 98-110 104z" fill="#8cc152"/>
+
+  <g fill="#9bc36a" stroke="#56802c" stroke-width="1"><ellipse cx="640" cy="112" rx="4" ry="3"/><ellipse cx="652" cy="106" rx="4" ry="3"/><ellipse cx="664" cy="100" rx="4" ry="3"/><ellipse cx="676" cy="95" rx="3.5" ry="2.6"/></g>
+  <g transform="translate(700 84) rotate(-24)"><ellipse rx="15" ry="12" fill="#d63a2b" stroke="#2a1a14" stroke-width="2"/><path d="M0-12v24" stroke="#2a1a14" stroke-width="2"/><circle cx="-6" cy="-3" r="2.6" fill="#2a1a14"/><circle cx="6" cy="-3" r="2.6" fill="#2a1a14"/><circle cx="-6" cy="6" r="2.2" fill="#2a1a14"/><circle cx="6" cy="6" r="2.2" fill="#2a1a14"/><path d="M-9-10a9 7 0 0 1 18 0z" fill="#2a1a14"/><circle cx="-4" cy="-14" r="1.6" fill="#fff"/><circle cx="4" cy="-14" r="1.6" fill="#fff"/></g>
+
+  <g transform="translate(900 54)"><path d="M0 0c-10-10-32-16-44-10 10 8 28 12 44 10zM0 0c-8 8-28 16-40 12 8-8 26-12 40-12z" fill="#dff3d0" stroke="#7ab04c" stroke-width="1.2" opacity=".95"/><path d="M0 0h22" stroke="#6fae3e" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="0" r="3" fill="#e0b040"/><path d="M26-2c8-6 14-8 20-8M26 2c8 6 14 6 20 6" stroke="#7ab04c" stroke-width="1" fill="none"/></g>
+  <circle cx="470" cy="80" r="3" fill="#2a1a14" opacity=".5"/>
+</svg></template>
+<template data-banda="cosecha"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v44c-200-12-420 18-720 6S220 30 0 48z" fill="#d7e6c2"/>
+  <path d="M0 78c160-24 300-30 460-18s260-20 420-22 320 26 560 18v64H0z" fill="#b7c98a"/>
+  <path d="M0 118h1440v26H0z" fill="#c9a06a"/>
+  <path d="M0 131h1440" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="26 22"/>
+  <path d="M0 144c240 4 480-4 720 0s480 4 720 0v26H0z" fill="#f3dfab"/>
+
+  <g transform="translate(470 92)"><path d="M0 26c-2-18 4-26 14-26s16 8 14 26z" fill="#e8d7b0" stroke="#8a6a3a" stroke-width="2"/><path d="M26 26c-2-16 4-22 12-22s14 6 12 22z" fill="#ddc99a" stroke="#8a6a3a" stroke-width="2"/><path d="M60 0v26" stroke="#5a3d25" stroke-width="3"/><g fill="#9ab83a" stroke="#56802c" stroke-width="1"><ellipse cx="54" cy="10" rx="4" ry="9" transform="rotate(20 54 10)"/><ellipse cx="60" cy="12" rx="4" ry="9"/><ellipse cx="66" cy="10" rx="4" ry="9" transform="rotate(-20 66 10)"/><ellipse cx="57" cy="20" rx="4" ry="8" transform="rotate(20 57 20)"/><ellipse cx="63" cy="20" rx="4" ry="8" transform="rotate(-20 63 20)"/></g></g>
+
+  <g class="chiva"><g transform="translate(0 64)">
+    <path d="M8 16h176v44H8z" fill="#f6efe0" stroke="#2a1a14" stroke-width="2.5"/>
+    <path d="M8 44h176v8H8z" fill="#d63a2b"/><path d="M8 52h176v8H8z" fill="#2f7fa5"/><path d="M8 40h176v4H8z" fill="#f2b632"/>
+    <g fill="#3a4a52"><path d="M20 20h18v18H20zM44 20h18v18H44zM68 20h18v18H68zM92 20h18v18H92zM116 20h18v18H116z"/></g>
+    <path d="M140 20h26l14 18v2h-40z" fill="#9fd0ee" stroke="#2a1a14" stroke-width="2"/>
+    <path d="M166 16h18v44h14l6-12v-10l-8-6h-12z" fill="#e6532e" stroke="#2a1a14" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M4 12h184v6H4z" fill="#6b4a2c"/>
+    <path d="M24 12c0-12 10-14 16-14h22c8 0 12 6 10 14zM80 12c2-10 12-12 24-10 10 2 12 6 12 10zM124 12c0-8 8-12 20-10 10 2 12 6 10 10z" fill="#d8c08a" stroke="#6b4a2c" stroke-width="2"/>
+    <circle cx="40" cy="62" r="11" fill="#2a1a14"/><circle cx="40" cy="62" r="4" fill="#b8b0a0"/><circle cx="166" cy="62" r="11" fill="#2a1a14"/><circle cx="166" cy="62" r="4" fill="#b8b0a0"/>
+  </g></g>
+
+  <g transform="translate(920 96)"><circle cx="12" cy="0" r="9" fill="#e6532e"/><circle cx="28" cy="-2" r="10" fill="#f2b632"/><circle cx="20" cy="-10" r="8" fill="#7cb342"/><path d="M-2 2h46l-6 26H4z" fill="#c68a45" stroke="#6b4428" stroke-width="2" stroke-linejoin="round"/><path d="M1 12h40M3 20h36" stroke="#8a5a2b" stroke-width="1.8"/></g>
+</svg></template>
+<template data-banda="monte"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v40c-240-10-480 16-720 4S200 30 0 42z" fill="#f3dfab"/>
+  <g fill="#6f9a5c"><path d="M0 90c40-40 100-50 140-30 30-40 100-44 130-10 40-30 110-24 130 16 40-24 100-16 120 20 30-30 90-30 120 0 40-40 120-40 150 0 30-26 90-30 120 0 40-34 110-30 140 6 40-30 100-26 130 10 30-20 80-20 110 4 40-30 100-26 130 8v96H0z"/></g>
+  <g fill="#3f7c35"><path d="M0 118c30-30 80-34 110-14 30-36 100-36 124-2 34-24 90-18 110 14 30-20 80-16 104 10 30-34 100-32 124 0 36-20 90-16 110 10 30-30 96-30 120 0 30-22 84-22 110 4 34-26 96-22 118 6 30-20 80-18 104 6 30-26 90-24 116 4v84H0z"/></g>
+
+  <path d="M640 170c10-20-8-34 4-52s28-22 22-44" fill="none" stroke="#a9d4ea" stroke-width="10" stroke-linecap="round"/>
+  <path class="brillo-agua" d="M640 170c10-20-8-34 4-52s28-22 22-44" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M0 150c240 6 480-6 720 0s480 6 720 0v20H0z" fill="#c9ddc4"/>
+
+  <g fill="none" stroke="#2e4a2a" stroke-width="2.4" stroke-linecap="round"><path d="M820 58q8-8 16 0q8-8 16 0"/><path d="M866 44q6-6 12 0q6-6 12 0"/><path d="M500 66q7-7 14 0q7-7 14 0"/></g>
+</svg></template>
+<template data-banda="aprender"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <path d="M0 0h1440v34c-240 16-480-12-720 2S240 26 0 38z" fill="#c9ddc4"/>
+
+  <path d="M0 40q180 44 360 8t360 8 360-8 360 8" fill="none" stroke="#6b4a2c" stroke-width="2"/>
+  <g stroke="#2a1a14" stroke-width="1.2" stroke-linejoin="round">
+    <path d="M430 50l14 26 12-24z" fill="#e6532e"/><path d="M480 54l12 26 14-24z" fill="#f2b632"/><path d="M530 56l12 26 14-24z" fill="#2f7fa5"/><path d="M580 56l12 26 14-24z" fill="#5f9a3c"/><path d="M630 54l12 26 14-24z" fill="#e6532e"/><path d="M680 50l12 26 14-24z" fill="#f2b632"/>
+    <path d="M760 50l14 26 12-24z" fill="#2f7fa5"/><path d="M810 54l12 26 14-24z" fill="#5f9a3c"/><path d="M860 56l12 26 14-24z" fill="#e6532e"/><path d="M910 56l12 26 14-24z" fill="#f2b632"/><path d="M960 54l12 26 14-24z" fill="#2f7fa5"/>
+    <path d="M100 48l14 26 12-24z" fill="#f2b632"/><path d="M160 54l12 26 14-24z" fill="#2f7fa5"/><path d="M220 56l12 26 14-24z" fill="#e6532e"/><path d="M1100 50l14 26 12-24z" fill="#5f9a3c"/><path d="M1160 54l12 26 14-24z" fill="#e6532e"/><path d="M1220 56l12 26 14-24z" fill="#f2b632"/>
+  </g>
+
+  <g class="cometa"><g transform="translate(560 96)"><path d="M0-40l22 30-22 34-22-34z" fill="#e6532e" stroke="#2a1a14" stroke-width="2"/><path d="M0-40v64M-22-10h44" stroke="#2a1a14" stroke-width="1.4"/><path d="M0 24c-6 12 6 18 0 30s6 18 0 26" fill="none" stroke="#6b4a2c" stroke-width="1.6"/><g fill="#f2b632"><path d="M-4 36l8-3-2 7zM-4 52l8-3-2 7zM-4 68l8-3-2 7z"/></g></g></g>
+  <path d="M0 140c240-6 480 6 720 0s480-6 720 0v30H0z" fill="#e2c7a6"/>
+  <path d="M0 154c240 4 480-4 720 0s480 4 720 0v16H0z" fill="#f0d9c2"/>
+
+  <g transform="translate(860 112)"><path d="M-16 0h32c0 12-8 22-16 28-8-6-16-16-16-28z" fill="#e6532e"/><path d="M-13 9h26M-9 17h18" stroke="#f2b632" stroke-width="3"/><ellipse cx="0" cy="0" rx="16" ry="5" fill="#f7c85a" stroke="#8a4a1f" stroke-width="1.6"/><path d="M0-4v-8" stroke="#8a4a1f" stroke-width="3" stroke-linecap="round"/><path d="M0 28v5" stroke="#444" stroke-width="2"/></g>
+  <path d="M324 102h112v42H324z" fill="#f6efe0" stroke="#6b4a2c" stroke-width="2"/><path d="M324 132h112v12H324z" fill="#e9b949"/><path d="M312 104l68-34 68 34z" fill="#b8553a" stroke="#6b2f1d" stroke-width="2" stroke-linejoin="round"/><path d="M368 114h24v30h-24z" fill="#2f7fa5" stroke="#6b4a2c" stroke-width="1.6"/><path d="M336 112h20v14h-20zM404 112h20v14h-20z" fill="#9fd0ee" stroke="#6b4a2c" stroke-width="1.6"/><path d="M380 70V44" stroke="#6b4a2c" stroke-width="2"/><path d="M380 44h22v8h-22z" fill="#f2b632"/><path d="M380 52h22v4h-22z" fill="#2f7fa5"/><path d="M380 56h22v4h-22z" fill="#d63a2b"/>
+</svg></template>
+<template data-banda="memoria"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <defs><linearGradient id="gTarde" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8906c"/><stop offset=".45" stop-color="#8a5a78"/><stop offset="1" stop-color="#39365a"/></linearGradient></defs>
+  <rect width="1440" height="170" fill="url(#gTarde)"/>
+  <path d="M0 0h1440v26c-240 14-480-10-720 2S240 20 0 28z" fill="#f0d9c2"/>
+  <g fill="#fff"><circle cx="520" cy="70" r="1.6"/><circle cx="880" cy="60" r="1.4"/><circle cx="1000" cy="84" r="1.2"/><circle cx="300" cy="66" r="1.3"/><circle cx="1200" cy="58" r="1.5"/></g>
+  <path d="M0 132c120-40 260-54 400-36 120-30 260-36 380-10 120-26 280-30 400 0 100-20 200-16 260-4v88H0z" fill="#2a2846"/>
+
+  <g transform="translate(640 92)"><path d="M0 22h100v40H0z" fill="#1c1a30"/><path d="M-10 26L20 2h60l30 24z" fill="#1c1a30"/><path d="M14 34h18v14H14z" fill="#ffc862"/><path d="M68 34h18v14H68z" fill="#ffc862" opacity=".8"/><path d="M42 38h16v24H42z" fill="#ffb14a" opacity=".9"/>
+    <g class="humo" style="fill:#c8c2d8"><circle cx="72" cy="0" r="5"/><circle cx="72" cy="0" r="5" style="--d:1.8s"/><circle cx="72" cy="0" r="5" style="--d:3.6s"/></g></g>
+
+  <g fill="#f7f08a"><circle class="luciernaga" cx="480" cy="120" r="3"/><circle class="luciernaga" cx="560" cy="104" r="2.6" style="--d:.8s"/><circle class="luciernaga" cx="800" cy="112" r="3" style="--d:1.4s"/><circle class="luciernaga" cx="900" cy="96" r="2.4" style="--d:.4s"/><circle class="luciernaga" cx="960" cy="124" r="3" style="--d:2s"/><circle class="luciernaga" cx="260" cy="110" r="2.6" style="--d:1.1s"/><circle class="luciernaga" cx="1160" cy="116" r="3" style="--d:.2s"/></g>
+  <path d="M0 150c240 6 480-6 720 0s480 6 720 0v20H0z" fill="#39365a"/>
+</svg></template>
+<template data-banda="cuenta"><svg viewBox="0 0 1440 170" preserveAspectRatio="xMidYMax slice">
+  <rect width="1440" height="170" fill="#1b2140"/>
+  <path d="M0 0h1440v30c-240 14-480-10-720 2S240 22 0 32z" fill="#39365a"/>
+  <g fill="#fff"><circle cx="460" cy="60" r="1.5"/><circle cx="600" cy="48" r="1.2"/><circle cx="700" cy="76" r="1.6"/><circle cx="930" cy="56" r="1.3"/><circle cx="1010" cy="92" r="1.1"/><circle cx="240" cy="80" r="1.4"/><circle cx="1260" cy="64" r="1.5"/><circle cx="820" cy="96" r="1"/></g>
+  <path d="M830 70a22 22 0 1 0 18 34 18 18 0 1 1-18-34z" fill="#f3eed8"/>
+  <path d="M0 150c160-50 300-70 460-46 140-40 300-44 440-10 160-36 360-40 540 0v76H0z" fill="#12172e"/>
+  <path d="M0 158c240 6 480-6 720 0s480 6 720 0v12H0z" fill="#1b2140"/>
+</svg></template>
+
+
+<script id="lamina" type="application/json">{"decir":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(-1.9 .6) scale(0.84 .84) rotate(0)\"><path d=\"M0 0 C-1.71 .96 -5.47 3.56 -7.13 5.46 C-8.01 6.47 -8.47 7.59 -7.95 7.84 C-7.13 8.21 -4.6 7.13 -2.86 5.44 C-1.02 3.7 .27 1.64 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.18 .51 C-1.86 3.16 -5.38 6.62 -7.68 7.61 Q-4.6 6.83 -2.8 4.85 Q-.74 2.63 -.18 .51Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.22 .43 C-1.66 2.3 -5.98 5.69 -7.81 7.61 M-.69 1.09 C-1.75 3.2 -3.7 5.8 -6.75 7.48 M-1.04 2.31 Q-2.2 4.9 -4.86 6.9 M-2.77 3.36 Q-3.02 4.49 -4.31 5.01 M-4.47 4.71 Q-5.36 5.08 -6.08 5.35 M-2.77 4.98 Q-3.6 5.13 -3.95 5.86 M-5.47 6.33 Q-5.65 6.84 -6.02 7.18\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-1.8 1.5 Q-5.86 4.45 -7.4 6.54 M-7.23 7.66 Q-5.78 7.28 -4.72 6.5\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><g data-anatomia=\"ala\" transform=\"translate(1.7 .6) scale(-0.84 .84) rotate(0)\"><path d=\"M0 0 C-1.01 .98 -2.55 3.25 -3.88 5.16 C-4.49 6.1 -5.03 7.25 -4.72 7.78 C-4.34 8.26 -2.69 7.65 -1.81 6.46 C-.49 4.75 .35 2.1 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.14 .49 C-1.29 3.55 -3.42 6.71 -4.5 7.59 Q-2.72 7.31 -1.35 4.86 Q-.22 2.42 -.14 .49Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.18 .45 C-.86 2.63 -3.78 6.45 -4.59 7.55 M-.46 1.04 Q-1.07 4.18 -3.11 7.19 M-.4 2.2 Q-.82 5.25 -2.24 6.92 M-1.62 3.21 Q-1.71 4.42 -2.82 4.98 M-2.18 5.4 Q-2.75 5.69 -3.39 5.81 M-1.03 4.52 Q-1.63 4.66 -2.02 4.2\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-.97 1.55 Q-2.73 4.04 -4.06 6.23 M-4.14 7.66 Q-3.07 7.3 -2.39 6.6\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><\/g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-1.5 5.2) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><g data-anatomia=\"pata-posterior\" transform=\"translate(1.85 5.2) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><\/g><g data-anatomia=\"abdomen\"><path d=\"M-2.2 2.25 C-4.07 3.39 -4.35 6.9 -2.34 9.3 Q-1.79 9.99 -1.49 10.12 C.1 9.63 2.79 7.93 3.08 5.28 Q3.4 3.48 1.81 2.33Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"><\/path><path d=\"M-2.8 3.07 Q-3.42 3.52 -3.59 4.38 Q-2.62 5.7 -.68 5.63 Q1.93 5.48 3.06 4.32 L2.94 3.51 Q1.92 4.47 .05 4.55 L-.55 4.25 L-1.09 4.56 L-1.48 4.09 L-1.83 4.31 Q-2.38 3.94 -2.8 3.07Z M-3.65 5.26 Q-3.86 6.11 -3.36 7.05 Q-1.95 8.07 -.49 7.74 Q1.68 7.29 2.48 6.38 L2.86 5.49 Q1.67 6.25 .18 6.49 L-.28 6.2 L-.75 6.55 L-1.35 6.26 L-1.79 6.42 Q-2.98 6.36 -3.65 5.26Z M-2.98 7.9 Q-2.55 8.68 -1.86 9.35 Q-.47 9.57 1.25 8.05 L1.78 7.45 Q.32 8.39 -.9 8.5 L-1.3 8.27 L-1.67 8.51Z\" fill=\"#c58f42\"><\/path><path d=\"M-2.91 3.53 Q-3.27 4 -3.09 4.39 M-3.33 5.85 L-3.01 6.47 M-2.59 8.17 L-2.12 8.69\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"><\/path><path d=\"M-3.68 4.78 Q-1.38 6.79 2.92 4.96 M-3.31 7.39 Q-.45 8.85 2.13 6.97 M-2.3 9.19 Q-.65 9.66 .52 8.98\" stroke=\"#88603a\" stroke-width=\".1\" fill=\"none\"><\/path><path d=\"M1.59 3.39 Q2.74 7.19 -1.49 10.12 Q2.75 8.34 3.08 5.28 Q3.38 3.58 1.81 2.33Z\" fill=\"#30251b\" opacity=\".26\"><\/path><\/g><g data-anatomia=\"torax\"><path d=\"M-2.56 -2.16 Q-2.98 -2.18 -3.26 -1.82 L-3.08 -1.79 L-3.49 -1.43 L-3.26 -1.44 L-3.6 -.98 L-3.43 -1.04 L-3.73 -.45 L-3.51 -.6 L-3.75 .03 L-3.57 -.08 Q-3.82 .74 -3.48 1.57 L-3.59 1.48 L-3.31 2.12 L-3.42 2.07 L-3.02 2.66 L-3.12 2.71 L-2.57 3.13 L-2.69 3.18 L-2.05 3.51 L-2.12 3.66 L-1.56 3.8 L-1.63 3.94 L-1.04 3.94 L-.91 4.12 L-.63 3.99 L-.32 4.05 L-.06 3.85 L.22 3.9 L.5 3.64 L.77 3.7 L1.02 3.36 L1.28 3.41 L1.48 3.07 L1.75 3.01 L1.86 2.71 L2.12 2.57 L2.18 2.25 L2.49 2.04 L2.49 1.77 L2.81 1.52 L2.72 1.34 L3.01 .95 L2.91 .8 L3.17 .37 L3.03 .25 L3.29 -.24 L3.12 -.24 L3.31 -.8 L3.07 -.67 L3.17 -1.14 L2.94 -1.03 Q2.79 -1.65 2.39 -1.83 Q.03 -3.08 -2.56 -2.16Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"><\/path><path d=\"M-3.24 -1.3 Q-3.49 -.65 -3.2 .2 C-2.78 1.16 -2.07 1.47 -1.29 1.94 Q.19 2.62 1.19 1.4 Q2.36 .4 2.85 -1.09 L2.99 -.46 Q2.9 .53 2.34 1.24 L2.32 1.5 Q1.68 2.75 .44 3.27 L.19 3.21 L-.32 3.63 L-.76 3.48 L-1.19 3.61 Q-2.9 2.86 -3.33 1.42 Q-3.86 -.12 -3.24 -1.3Z\" fill=\"#c58f42\"><\/path><path d=\"M-3.03 -1.55 Q-3.36 -.61 -2.77 .36 Q-2.39 1.16 -1.3 1.63 L-.99 1.56 Q.11 2.2 1.13 1.11 Q2.09 .47 2.76 -.93 L2.69 -.15 Q2.21 1.25 1.32 1.66 L1.27 1.85 L.63 2.2 L.32 2.12 L-.14 2.38 L-.34 2.17 L-.77 2.27 L-1.11 2.05 L-1.42 2.05 Q-2.69 1.47 -3.05 .54 Q-3.68 -.67 -3.03 -1.55Z\" fill=\"#edc67d\"><\/path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-2.79 -1.72 q-.4 .18 -.59 .68 M-2.62 -1.3 q-.55 .57 -.44 1.12 M-3.04 -.83 q-.36 .35 -.4 .69 M-2.79 -.51 q-.18 .38 -.08 .78 M-2.38 -.6 q-.3 .54 -.06 1.11 M-2.1 -.38 q-.09 .27 .12 .61 M-1.8 -.29 q-.19 .53 .16 1.06 M-1.23 -.06 q-.2 .42 .05 .81 M-.92 .05 q-.04 .25 .18 .47 M-.6 .03 q-.16 .52 .03 .84 M-.04 -.04 q.08 .55 -.13 1.05 M.39 .02 q.22 .18 .03 .57 M.96 -.21 q.22 .4 -.18 .98 M1.44 -.35 q.24 .17 -.01 .69 M1.83 -.63 q.09 .5 -.27 .99 M2.36 -.94 q.02 .34 -.14 .5 M2.59 -1.12 q.24 .32 -.04 .73\"><\/path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-3.24 -1.35 l-.21 .36 M-3.17 -.51 q-.06 .43 .18 .68 M-2.77 -.23 l.06 .53 M-2.63 .23 q.11 .48 .45 .72 M-2.23 .71 l.22 .58 M-1.89 .88 q.12 .46 .52 .69 M-1.43 1.24 l.15 .38 M-1.07 1.44 q.07 .41 .29 .5 M-.48 1.58 l.02 .46 M-.13 1.53 q.15 .3 -.01 .65 M.28 1.55 q.01 .38 -.24 .58 M.63 1.31 l-.09 .43 M1.05 1.04 q-.1 .57 -.34 .76 M1.49 .85 l-.11 .31 M1.71 .54 q.09 .3 -.3 .68 M2.03 .23 l-.12 .39 M2.42 -.22 q.02 .35 -.28 .75 M2.8 -.62 l-.18 .31\"><\/path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-3.41 .08 q.03 .37 .19 .53 M-3.21 .78 q.02 .62 .45 .97 M-2.91 1.17 l.14 .37 M-2.58 1.54 q.24 .55 .6 .75 M-2.2 1.82 l.14 .4 M-1.84 2.11 q.25 .4 .55 .5 M-1.28 2.26 l.06 .42 M-.96 2.48 q.05 .31 .24 .55 M-.49 2.51 l-.03 .65 M-.14 2.67 q-.02 .25 -.19 .46 M.31 2.51 l-.13 .39 M.67 2.21 q-.12 .51 -.52 .87 M1.12 1.9 q-.12 .37 -.35 .57 M1.65 1.64 l-.22 .52 M2.06 1.1 q-.05 .58 -.38 .88 M2.31 .74 l-.03 .3 M2.74 .23 q-.02 .54 -.3 .8\"><\/path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-3.37 1.28 q-.06 .5 .18 .87 M-2.97 1.92 l.36 .61 M-2.73 2.34 q.1 .42 .55 .7 M-2.27 2.63 l.31 .48 M-1.95 2.9 q.08 .46 .47 .81 M-1.48 3.11 l.23 .38 M-1.13 3.16 q.04 .51 .35 .8 M-.73 3.26 l-.06 .58 M-.28 3.21 q-.03 .4 -.33 .8 M.17 3.12 l-.2 .42 M.51 2.81 q-.05 .45 -.39 .78 M.92 2.62 l-.08 .33 M1.38 2.15 q-.12 .67 -.45 1.01 M1.81 1.92 l-.2 .46 M2.2 1.33 q.12 .35 -.19 .79\"><\/path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-3.56 -.6 l-.23 .35 M-3.58 -.13 l-.16 .4 M-3.58 .54 l.09 .52 M-3.28 1.79 l.18 .31 M-2.94 2.41 l.13 .29 M-2.45 2.81 l.12 .42 M-2.06 3.19 l.17 .29 M-1.7 3.3 l.19 .41 M-1.21 3.54 l.09 .4 M-.87 3.6 l-.06 .47 M-.38 3.59 l-.14 .32 M.17 3.42 l-.06 .33 M.61 3.12 l-.12 .47 M1.12 2.86 l-.18 .4 M1.57 2.42 l-.07 .35 M2.01 2.14 l-.17 .37 M2.48 1.56 l-.21 .38 M2.85 .88 l-.08 .28 M3.05 -.04 l-.14 .42\"><\/path><path stroke=\"#bd914b\" stroke-width=\".04\" d=\"M-2.92 -1.19 q-.35 .39 -.3 .83 M-2.82 -.93 l-.31 .4 M-2.57 -.85 q-.26 .42 -.11 .81 M-2.19 -.63 l-.12 .61 M-1.98 -.36 q-.18 .41 .08 .91 M-1.6 -.23 l.04 .52 M-1.32 .14 q-.13 .3 .13 .68 M-.97 .36 l.13 .41 M-.71 -.04 q-.07 .32 .08 .64 M-.35 .19 l.03 .74 M.18 .24 q.1 .45 -.08 .91 M.56 -.09 l.03 .51 M.83 .22 q.04 .31 -.21 .76 M1.17 -.27 l.05 .63 M1.51 -.19 q.05 .44 -.18 .78 M1.91 -.48 l-.04 .56 M2.22 -.74 q.14 .26 -.13 .82 M2.69 -.91 l-.01 .43 M-3.36 .41 l.12 .46 M-3.08 .85 l.2 .36 M-2.84 1.41 q.15 .46 .32 .59 M-2.62 1.93 l.21 .44 M-2.29 2.08 q.04 .35 .29 .6 M-1.91 2.47 l.19 .46 M-1.62 2.67 q.08 .41 .37 .67 M-1.24 2.91 l.21 .49 M-.92 3.1 l.15 .54 M-.61 3.25 l.01 .38 M-.27 3.34 l-.1 .31 M.1 3.21 l-.07 .29 M.42 2.88 l-.15 .37 M.8 2.65 q-.04 .5 -.28 .66 M1.23 2.27 l-.17 .51 M1.64 1.95 q-.06 .34 -.28 .68 M2.07 1.56 l-.18 .41 M2.42 1.14 l-.17 .49\"><\/path><path stroke=\"#f0cc80\" stroke-width=\".035\" d=\"M-3.39 -.91 l-.12 .31 M-3.08 -.12 l.06 .24 M-2.92 .25 l.16 .39 M-2.46 .62 l.15 .28 M-2.04 1.11 l.21 .31 M-1.64 1.22 l.06 .36 M-1.17 1.65 l.13 .43 M-.79 1.72 l.04 .26 M-.36 1.82 l.11 .48 M.15 1.62 l-.03 .29 M.57 1.71 l-.13 .29 M.87 1.45 l-.04 .38 M1.25 1.12 l-.16 .33 M1.56 .93 l-.03 .29 M1.93 .54 l-.18 .46 M2.22 .06 l-.03 .29 M2.62 -.3 l-.12 .48 M-2.61 2.59 l.29 .33 M-2.24 2.9 l.13 .34 M-1.88 3.25 l.29 .31 M-1.38 3.47 l.12 .31 M-.99 3.48 l.09 .35 M-.47 3.49 l-.07 .37 M.03 3.32 l-.12 .43 M.49 3.02 l-.11 .41 M1.01 2.81 l-.18 .27 M1.47 2.33 l-.13 .5 M1.89 1.83 l-.09 .27 M2.38 1.44 l-.18 .29\"><\/path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-2.83 .6 q.07 .26 .21 .38 M-2.12 .14 l.11 .56 M-1.47 .27 q-.04 .31 .19 .62 M-.75 .61 l.15 .32 M-.03 .29 q.17 .33 -.06 .67 M.62 .31 l-.12 .59 M1.22 .17 q.09 .3 -.18 .66 M2.08 -.12 l-.2 .57 M-2.79 1.85 l.2 .36 M-1.96 2.36 l.27 .31 M-1.47 2.68 q-.04 .25 .18 .56 M-.62 2.9 l.05 .43 M.13 2.88 l-.12 .44 M.9 2.47 l-.2 .4 M1.7 2.09 l-.27 .37\"><\/path><\/g><\/g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-media\" transform=\"translate(-3.25 1.65) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><g data-anatomia=\"pata-media\" transform=\"translate(3 1.65) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><\/g><g data-anatomia=\"cabeza\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"><\/path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"><\/path><\/g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"><\/path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"><\/path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"><\/path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"><\/path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"-0.7752\" cy=\"-4.1028\" r=\"0.6324\" fill=\"#20130a\"><\/circle><circle cx=\"-1.02816\" cy=\"-4.4190000000000005\" r=\"0.26560799999999996\" fill=\"#fffdf7\"><\/circle><\/g><\/g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"2.2028\" cy=\"-4.2308\" r=\"0.44639999999999996\" fill=\"#20130a\"><\/circle><circle cx=\"2.02424\" cy=\"-4.454000000000001\" r=\"0.187488\" fill=\"#fffdf7\"><\/circle><\/g><\/g><\/g><\/g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-1.96 -5.64 Q-1.3 -6.68 -.42 -5.88 Q-1.25 -6.25 -1.96 -5.64Z\"><\/path><\/g><g><path d=\"M1.05 -6.03 Q1.85 -6.92 2.55 -5.87 Q1.84 -6.38 1.05 -6.03Z\"><\/path><\/g><\/g><\/g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"><\/ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"><\/ellipse><\/g><\/g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"><\/path><g><g data-anatomia=\"boca\"><path d=\"M.05 -1.61 C.4 -2.34 1.53 -2.35 1.69 -1.78 Q1.69 -1.16 .63 -1.18 Q.08 -1.19 .05 -1.61Z\" fill=\"#30251b\"><\/path><path d=\"M.64 -1.48 Q1.16 -1.87 1.47 -1.56 Q1.12 -1.27 .64 -1.48Z\" fill=\"#ae7753\"><\/path><\/g><\/g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"><\/path><\/g><\/g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-3.91 4.79 -7.2 .38\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(-7.2 0.38) rotate(0) scale(1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.57 3.6 7.5 -.05\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(7.5 -0.05) rotate(0) scale(-1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><\/g><\/svg>","volar":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(.2 -2.05) rotate(4) scale(.9)\"><path d=\"M0 0 C-1.6 -1.16 -3.42 -3.55 -6.3 -5.72 C-7.77 -6.83 -8.9 -7.13 -9.03 -6.43 C-9.2 -5.64 -7.34 -3.56 -5.43 -2.05 C-3.39 -.44 -1.02 .63 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.24 -.31 Q-4.16 -4.68 -8.47 -6.49 Q-5.05 -3.55 -1.1 -.04Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.25 -.24 Q-3.51 -3.72 -8.53 -6.47 M-.83 -.12 Q-3.99 -2.78 -7.03 -5.55 M-1.52 -.05 Q-3.77 -1.7 -5.96 -4.48 M-2.31 -.32 Q-3.47 -1.03 -4.77 -2.65\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-1.53 -.55 Q-4.74 -3.75 -7.98 -5.99\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><g data-anatomia=\"ala\" transform=\"translate(.75 -2.35) rotate(16) scale(.95)\"><path d=\"M0 0 C-1.05 -.9 -2.1 -3.22 -4.2 -5.48 C-5.33 -6.7 -6.12 -7.27 -6.39 -6.78 C-6.73 -6.12 -5.58 -4.1 -4.1 -2.27 C-2.53 -.34 -.72 .55 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.2 -.31 Q-2.72 -4.36 -5.94 -6.5 Q-3.62 -3.58 -1.06 -.01Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.2 -.25 Q-2.43 -3.25 -5.94 -6.5 M-.71 -.16 Q-3.21 -2.53 -5.34 -5.3 M-1.33 -.08 Q-3.55 -1.69 -4.62 -4.13 M-2.02 -.4 Q-3.28 -1.03 -3.93 -2.49\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-1.03 -.55 Q-3.14 -3.62 -5.54 -5.97\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><\/g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(0.45 2.2) scale(.9)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.6 1.4 -1.9 2.2 Q-3.1 3 -4.1 4.2 L-5 4.9\" stroke=\"#30251b\" stroke-width=\"0.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-1.5 1.9 Q-3 2.1 -4.3 3.6 L-4.5 4.4 Q-3.3 3.8 -2.1 2.8 Q-1.7 2.4 -1.5 1.9Z\" fill=\"#5e4329\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-2.1 2.35 L-2.2 2.8 M-2.7 2.7 L-2.75 3.2 M-3.3 3.15 L-3.3 3.65 M-3.85 3.65 L-3.8 4.1\" fill=\"none\" stroke=\"#a7834f\" stroke-width=\".085\"><\/path><path d=\"M-4.75 4.6 Q-5.45 4.6 -5.8 5.1 Q-5.45 5.42 -5.05 5.18 Q-4.75 5.4 -4.42 5.12 Q-4.35 4.8 -4.75 4.6Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><\/g><g data-anatomia=\"pata-media\" transform=\"translate(1.95 2.45) scale(.9)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.3 1.3 -1.2 2.1 Q-2 2.9 -2.4 4 L-3 4.8\" stroke=\"#30251b\" stroke-width=\"0.45\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.9 1.8 Q-1.9 2.2 -2.5 3.3 L-2.7 4.2 Q-1.9 3.8 -1.4 2.8 Q-1.1 2.3 -.9 1.8Z\" fill=\"#5e4329\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-1.45 2.4 L-1.4 2.85 M-1.85 2.85 L-1.75 3.3 M-2.2 3.35 L-2.1 3.8\" fill=\"none\" stroke=\"#a7834f\" stroke-width=\".085\"><\/path><path d=\"M-2.78 4.52 Q-3.4 4.55 -3.7 5.02 Q-3.36 5.32 -3.02 5.1 Q-2.74 5.3 -2.46 5.05 Q-2.4 4.72 -2.78 4.52Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><\/g><\/g><g data-anatomia=\"abdomen\"><path d=\"M-1.3 -1.9 C-3.3 -2.9 -6.9 -2.6 -8.9 -.9 C-10.2 .3 -10.7 2.1 -10.6 3.5 Q-10.75 4.3 -10.05 4.55 Q-9.5 4.66 -9 4.5 C-6.6 5.2 -3.6 4.6 -2.1 3.2 Q-.9 2.1 -.8 .5 Q-.8 -1.1 -1.3 -1.9Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"><\/path><path d=\"M-4.08 -2.47 L-3.98 -1.69 L-3.86 -.99 L-3.65 -.03 L-3.45 .72 L-3.24 1.39 L-3 2.05 L-2.74 2.7 L-2.39 3.45 L-2.95 3.82 L-3.32 3.31 L-3.59 2.14 L-4.16 1.06 L-4.28 -.16 L-4.69 -1.29 L-4.69 -2.45Z M-6.13 -2.07 L-6.03 -1.05 L-5.91 -.3 L-5.7 .74 L-5.52 1.42 L-5.3 2.11 L-4.94 3.07 L-4.66 3.71 L-4.32 4.41 L-5 4.59 L-5.42 4.02 L-5.69 2.85 L-6.27 1.77 L-6.38 .54 L-6.78 -.59 L-6.75 -1.86 L-6.15 -2.06Z M-8.15 -1.39 L-8.07 -.68 L-7.94 .19 L-7.76 1.06 L-7.59 1.75 L-7.37 2.48 L-7.05 3.41 L-6.79 4.06 L-6.46 4.78 L-7.26 4.78 L-7.34 4.67 L-7.62 3.49 L-8.19 2.42 L-8.3 1.19 L-8.72 .07 L-8.72 -1.05 L-8.3 -1.34 L-8.17 -1.38Z M-9.83 .27 L-9.62 1.32 L-9.36 2.34 L-9.05 3.34 L-8.58 4.61 L-9.13 4.54 L-9.24 4.04 L-9.81 2.97 L-9.94 1.75 L-10.21 1.06Z\" fill=\"#c58f42\"><\/path><path d=\"M-4.18 -2.12 Q-4.45 -2.25 -4.66 -2.1 M-6.2 -1.55 Q-6.48 -1.7 -6.72 -1.52 M-8.2 -.88 Q-8.45 -1 -8.68 -.82\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"><\/path><path d=\"M-10.6 3.6 Q-6.8 5.4 -2.1 3.2 Q-.9 2.1 -.8 .5 Q-1.4 2.6 -3.4 3.45 Q-6.8 4.55 -10.6 3.6Z\" fill=\"#30251b\" opacity=\".26\"><\/path><\/g><g data-anatomia=\"torax\"><path d=\"M2.72 -2.26 L2.41 -2.56 L1.93 -2.54 L1.58 -2.84 L1.12 -2.71 L.69 -2.89 L.28 -2.7 L-.2 -2.82 L-.5 -2.44 L-1.05 -2.54 L-1.19 -2.04 L-1.76 -2.03 L-1.78 -1.53 L-2.35 -1.39 L-2.14 -.87 L-2.73 -.63 L-2.33 -.16 L-2.82 .2 L-2.38 .57 L-2.71 1.02 L-2.14 1.27 L-2.37 1.8 L-1.74 1.9 L-1.79 2.45 L-1.2 2.45 L-1.08 2.98 L-.48 2.8 L-.23 3.32 L.3 3 L.69 3.42 L1.11 3.06 L1.61 3.36 L1.9 2.87 L2.49 3.08 L2.62 2.52 Q4.55 2.06 4.22 .2 Q4.55 -1.66 2.72 -2.26Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"><\/path><path d=\"M-2.3 -.55 Q-2.1 -2.3 .25 -2.62 Q2.6 -2.7 3.75 -1.2 Q4.25 .15 3.65 1.35 Q2.7 .3 1.25 .08 Q-.55 -.12 -2.3 -.55Z\" fill=\"#c58f42\"><\/path><path d=\"M-1.35 -1.35 Q-.45 -2.18 1.08 -2.15 Q2.42 -2.08 3.1 -1.22 Q2.12 -1.52 1.02 -1.45 Q-.18 -1.5 -1.35 -1.35Z\" fill=\"#edc67d\"><\/path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-1.51 .83 q-.23 .12 -.5 .14 M-1.61 .15 q-.38 -.1 -.77 -.02 M-1.47 -.53 q-.3 -.03 -.57 -.18 M-1.1 -1.13 q-.28 -.32 -.67 -.47 M-.79 -1.42 q-.27 -.19 -.45 -.46 M-.14 -1.79 q-.05 -.24 -.2 -.43 M.6 -1.95 q-.1 -.34 -.06 -.69 M1.05 -1.95 q.1 -.26 .06 -.54 M1.79 -1.77 q.1 -.38 .35 -.7 M2.43 -1.39 q.29 -.17 .46 -.45\"><\/path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-1.85 -.81 q-.28 -.05 -.51 -.2 M-1.64 -1.17 q-.16 -.15 -.37 -.21 M-1.1 -1.74 q-.25 -.17 -.41 -.42 M-.4 -2.15 q-.05 -.23 -.21 -.41 M.03 -2.29 q-.08 -.15 -.1 -.33 M.86 -2.38 q.07 -.25 .01 -.5 M1.68 -2.26 q.03 -.2 .13 -.37 M2.43 -1.92 q.23 -.19 .35 -.46 M2.78 -1.67 q.14 -.2 .34 -.32 M3.3 -1.08 q.18 -.04 .33 -.17\"><\/path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-.25 2.14 q-.19 .21 -.26 .49 M-.88 1.75 q-.24 .33 -.59 .55 M-1.34 1.2 q-.34 .07 -.61 .28 M2.42 .99 q.16 .13 .37 .18 M2.3 1.16 q.28 .11 .5 .32 M1.98 1.47 q.12 .2 .31 .33 M1.58 1.69 q.2 .25 .29 .56 M1.13 1.82 q-.01 .26 .1 .49 M.44 1.82 q-.13 .26 -.12 .54 M-.01 1.68 q-.07 .22 -.21 .39\"><\/path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-.94 2.25 q-.22 .16 -.34 .4 M-1.53 1.72 q-.15 .15 -.35 .23 M-1.77 1.37 q-.31 .06 -.55 .25 M-2.03 .66 q-.24 .09 -.49 .08 M-2.06 -.09 q-.18 -.06 -.37 -.04 M2.8 2.06 q.16 .1 .26 .24 M3.31 1.46 q.19 .16 .43 .22\"><\/path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-.06 2.85 q-.02 .16 -.1 .3 M-.87 2.52 q-.1 .08 -.15 .2 M-1.55 1.99 q-.13 .15 -.3 .23 M-1.83 1.63 q-.15 .04 -.27 .14 M-2.18 .89 q-.2 .09 -.43 .1 M-2.28 .09 q-.18 -.05 -.35 -.01 M-2.22 -.34 q-.14 0 -.26 -.05 M-1.92 -1.1 q-.16 -.13 -.35 -.17 M-1.39 -1.74 q-.13 -.08 -.22 -.2 M-.67 -2.23 q-.06 -.2 -.21 -.35 M-.23 -2.4 q-.09 -.14 -.12 -.3 M.65 -2.56 q.02 -.12 -.01 -.24 M1.55 -2.48 q.01 -.18 .1 -.34 M2.01 -2.34 q.09 -.11 .12 -.26 M2.77 -1.92 q.11 -.18 .28 -.3\"><\/path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-.56 1.31 q-.17 .21 -.41 .33 M-.83 .97 q-.21 .04 -.37 .17 M-1 .57 q-.29 .12 -.6 .12 M.91 1.85 q.05 .18 .03 .37 M-.2 1.58 q-.25 .21 -.37 .52 M3.33 1.78 q.16 .06 .29 .18 M2.71 2.36 q.06 .11 .17 .19\"><\/path><\/g><\/g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-0.45 2.4)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.6 1.4 -1.9 2.2 Q-3.1 3 -4.1 4.2 L-5 4.9\" stroke=\"#30251b\" stroke-width=\"0.5\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-1.5 1.9 Q-3 2.1 -4.3 3.6 L-4.5 4.4 Q-3.3 3.8 -2.1 2.8 Q-1.7 2.4 -1.5 1.9Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-2.1 2.35 L-2.2 2.8 M-2.7 2.7 L-2.75 3.2 M-3.3 3.15 L-3.3 3.65 M-3.85 3.65 L-3.8 4.1\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><path d=\"M-4.75 4.6 Q-5.45 4.6 -5.8 5.1 Q-5.45 5.42 -5.05 5.18 Q-4.75 5.4 -4.42 5.12 Q-4.35 4.8 -4.75 4.6Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><\/g><g data-anatomia=\"pata-media\" transform=\"translate(1.15 2.75)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.3 1.3 -1.2 2.1 Q-2 2.9 -2.4 4 L-3 4.8\" stroke=\"#30251b\" stroke-width=\"0.45\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.9 1.8 Q-1.9 2.2 -2.5 3.3 L-2.7 4.2 Q-1.9 3.8 -1.4 2.8 Q-1.1 2.3 -.9 1.8Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-1.45 2.4 L-1.4 2.85 M-1.85 2.85 L-1.75 3.3 M-2.2 3.35 L-2.1 3.8\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><path d=\"M-2.78 4.52 Q-3.4 4.55 -3.7 5.02 Q-3.36 5.32 -3.02 5.1 Q-2.74 5.3 -2.46 5.05 Q-2.4 4.72 -2.78 4.52Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><\/g><\/g><g data-anatomia=\"cabeza\" transform=\"translate(5.55 1.95) rotate(7) scale(.9)\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"><\/path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"><\/path><\/g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"><\/path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"><\/path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"><\/path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"><\/path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"-0.714\" cy=\"-3.9192\" r=\"0.6324\" fill=\"#20130a\"><\/circle><circle cx=\"-0.96696\" cy=\"-4.2354\" r=\"0.26560799999999996\" fill=\"#fffdf7\"><\/circle><\/g><\/g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"2.246\" cy=\"-4.1011999999999995\" r=\"0.44639999999999996\" fill=\"#20130a\"><\/circle><circle cx=\"2.06744\" cy=\"-4.3244\" r=\"0.187488\" fill=\"#fffdf7\"><\/circle><\/g><\/g><\/g><\/g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-1.96 -5.64 Q-1.3 -6.68 -.42 -5.88 Q-1.25 -6.25 -1.96 -5.64Z\"><\/path><\/g><g><path d=\"M1.05 -6.03 Q1.85 -6.92 2.55 -5.87 Q1.84 -6.38 1.05 -6.03Z\"><\/path><\/g><\/g><\/g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"><\/ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"><\/ellipse><\/g><\/g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"><\/path><g><g data-anatomia=\"boca\"><path d=\"M-.27 -1.75 Q.57 -1.08 1.4 -1.88 Q.81 -.76 -.27 -1.75Z\" fill=\"#30251b\"><\/path><\/g><\/g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"><\/path><\/g><\/g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M3.7 1.5 Q4.7 2.9 3.5 3.9\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M3.7 1.5 Q4.7 2.9 3.5 3.9\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(3.3 4.1) scale(1 1)\"><path d=\"M-.28 .48 Q-.82 .24 -1.08 -.23 Q-1.3 -.62 -.99 -.79 Q-.72 -.91 -.47 -.56 L-.1 -.24 Q.12 -.43 .03 -.78 Q-.04 -1.08 .27 -1.12 Q.58 -1.12 .67 -.7 Q.78 -.08 .47 .37 Q.19 .67 -.28 .48Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.74 -.2 Q-.43 .08 -.08 .1 M.03 -.27 Q.25 -.08 .43 -.06 M-.78 -.55 Q-.55 -.38 -.34 -.37\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M3 1.9 Q3.9 3.4 2.6 4.5\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M3 1.9 Q3.9 3.4 2.6 4.5\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(2.4 4.7) scale(1 1)\"><path d=\"M-.28 .48 Q-.82 .24 -1.08 -.23 Q-1.3 -.62 -.99 -.79 Q-.72 -.91 -.47 -.56 L-.1 -.24 Q.12 -.43 .03 -.78 Q-.04 -1.08 .27 -1.12 Q.58 -1.12 .67 -.7 Q.78 -.08 .47 .37 Q.19 .67 -.28 .48Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.74 -.2 Q-.43 .08 -.08 .1 M.03 -.27 Q.25 -.08 .43 -.06 M-.78 -.55 Q-.55 -.38 -.34 -.37\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><\/g><\/svg>","pensar":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(-1.9 .6) scale(0.84 .84) rotate(15)\"><path d=\"M0 0 C-1.71 .96 -5.47 3.56 -7.13 5.46 C-8.01 6.47 -8.47 7.59 -7.95 7.84 C-7.13 8.21 -4.6 7.13 -2.86 5.44 C-1.02 3.7 .27 1.64 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.18 .51 C-1.86 3.16 -5.38 6.62 -7.68 7.61 Q-4.6 6.83 -2.8 4.85 Q-.74 2.63 -.18 .51Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.22 .43 C-1.66 2.3 -5.98 5.69 -7.81 7.61 M-.69 1.09 C-1.75 3.2 -3.7 5.8 -6.75 7.48 M-1.04 2.31 Q-2.2 4.9 -4.86 6.9 M-2.77 3.36 Q-3.02 4.49 -4.31 5.01 M-4.47 4.71 Q-5.36 5.08 -6.08 5.35 M-2.77 4.98 Q-3.6 5.13 -3.95 5.86 M-5.47 6.33 Q-5.65 6.84 -6.02 7.18\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-1.8 1.5 Q-5.86 4.45 -7.4 6.54 M-7.23 7.66 Q-5.78 7.28 -4.72 6.5\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><g data-anatomia=\"ala\" transform=\"translate(1.7 .6) scale(-0.84 .84) rotate(10)\"><path d=\"M0 0 C-1.01 .98 -2.55 3.25 -3.88 5.16 C-4.49 6.1 -5.03 7.25 -4.72 7.78 C-4.34 8.26 -2.69 7.65 -1.81 6.46 C-.49 4.75 .35 2.1 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.14 .49 C-1.29 3.55 -3.42 6.71 -4.5 7.59 Q-2.72 7.31 -1.35 4.86 Q-.22 2.42 -.14 .49Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.18 .45 C-.86 2.63 -3.78 6.45 -4.59 7.55 M-.46 1.04 Q-1.07 4.18 -3.11 7.19 M-.4 2.2 Q-.82 5.25 -2.24 6.92 M-1.62 3.21 Q-1.71 4.42 -2.82 4.98 M-2.18 5.4 Q-2.75 5.69 -3.39 5.81 M-1.03 4.52 Q-1.63 4.66 -2.02 4.2\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-.97 1.55 Q-2.73 4.04 -4.06 6.23 M-4.14 7.66 Q-3.07 7.3 -2.39 6.6\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><\/g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-1.5 5.2) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><g data-anatomia=\"pata-posterior\" transform=\"translate(1.85 5.2) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><\/g><g data-anatomia=\"abdomen\"><path d=\"M-2.2 2.25 C-4.07 3.39 -4.35 6.9 -2.34 9.3 Q-1.79 9.99 -1.49 10.12 C.1 9.63 2.79 7.93 3.08 5.28 Q3.4 3.48 1.81 2.33Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"><\/path><path d=\"M-2.8 3.07 Q-3.42 3.52 -3.59 4.38 Q-2.62 5.7 -.68 5.63 Q1.93 5.48 3.06 4.32 L2.94 3.51 Q1.92 4.47 .05 4.55 L-.55 4.25 L-1.09 4.56 L-1.48 4.09 L-1.83 4.31 Q-2.38 3.94 -2.8 3.07Z M-3.65 5.26 Q-3.86 6.11 -3.36 7.05 Q-1.95 8.07 -.49 7.74 Q1.68 7.29 2.48 6.38 L2.86 5.49 Q1.67 6.25 .18 6.49 L-.28 6.2 L-.75 6.55 L-1.35 6.26 L-1.79 6.42 Q-2.98 6.36 -3.65 5.26Z M-2.98 7.9 Q-2.55 8.68 -1.86 9.35 Q-.47 9.57 1.25 8.05 L1.78 7.45 Q.32 8.39 -.9 8.5 L-1.3 8.27 L-1.67 8.51Z\" fill=\"#c58f42\"><\/path><path d=\"M-2.91 3.53 Q-3.27 4 -3.09 4.39 M-3.33 5.85 L-3.01 6.47 M-2.59 8.17 L-2.12 8.69\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"><\/path><path d=\"M-3.68 4.78 Q-1.38 6.79 2.92 4.96 M-3.31 7.39 Q-.45 8.85 2.13 6.97 M-2.3 9.19 Q-.65 9.66 .52 8.98\" stroke=\"#88603a\" stroke-width=\".1\" fill=\"none\"><\/path><path d=\"M1.59 3.39 Q2.74 7.19 -1.49 10.12 Q2.75 8.34 3.08 5.28 Q3.38 3.58 1.81 2.33Z\" fill=\"#30251b\" opacity=\".26\"><\/path><\/g><g data-anatomia=\"torax\"><path d=\"M-2.56 -2.16 Q-2.98 -2.18 -3.26 -1.82 L-3.08 -1.79 L-3.49 -1.43 L-3.26 -1.44 L-3.6 -.98 L-3.43 -1.04 L-3.73 -.45 L-3.51 -.6 L-3.75 .03 L-3.57 -.08 Q-3.82 .74 -3.48 1.57 L-3.59 1.48 L-3.31 2.12 L-3.42 2.07 L-3.02 2.66 L-3.12 2.71 L-2.57 3.13 L-2.69 3.18 L-2.05 3.51 L-2.12 3.66 L-1.56 3.8 L-1.63 3.94 L-1.04 3.94 L-.91 4.12 L-.63 3.99 L-.32 4.05 L-.06 3.85 L.22 3.9 L.5 3.64 L.77 3.7 L1.02 3.36 L1.28 3.41 L1.48 3.07 L1.75 3.01 L1.86 2.71 L2.12 2.57 L2.18 2.25 L2.49 2.04 L2.49 1.77 L2.81 1.52 L2.72 1.34 L3.01 .95 L2.91 .8 L3.17 .37 L3.03 .25 L3.29 -.24 L3.12 -.24 L3.31 -.8 L3.07 -.67 L3.17 -1.14 L2.94 -1.03 Q2.79 -1.65 2.39 -1.83 Q.03 -3.08 -2.56 -2.16Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"><\/path><path d=\"M-3.24 -1.3 Q-3.49 -.65 -3.2 .2 C-2.78 1.16 -2.07 1.47 -1.29 1.94 Q.19 2.62 1.19 1.4 Q2.36 .4 2.85 -1.09 L2.99 -.46 Q2.9 .53 2.34 1.24 L2.32 1.5 Q1.68 2.75 .44 3.27 L.19 3.21 L-.32 3.63 L-.76 3.48 L-1.19 3.61 Q-2.9 2.86 -3.33 1.42 Q-3.86 -.12 -3.24 -1.3Z\" fill=\"#c58f42\"><\/path><path d=\"M-3.03 -1.55 Q-3.36 -.61 -2.77 .36 Q-2.39 1.16 -1.3 1.63 L-.99 1.56 Q.11 2.2 1.13 1.11 Q2.09 .47 2.76 -.93 L2.69 -.15 Q2.21 1.25 1.32 1.66 L1.27 1.85 L.63 2.2 L.32 2.12 L-.14 2.38 L-.34 2.17 L-.77 2.27 L-1.11 2.05 L-1.42 2.05 Q-2.69 1.47 -3.05 .54 Q-3.68 -.67 -3.03 -1.55Z\" fill=\"#edc67d\"><\/path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-2.79 -1.72 q-.4 .18 -.59 .68 M-2.62 -1.3 q-.55 .57 -.44 1.12 M-3.04 -.83 q-.36 .35 -.4 .69 M-2.79 -.51 q-.18 .38 -.08 .78 M-2.38 -.6 q-.3 .54 -.06 1.11 M-2.1 -.38 q-.09 .27 .12 .61 M-1.8 -.29 q-.19 .53 .16 1.06 M-1.23 -.06 q-.2 .42 .05 .81 M-.92 .05 q-.04 .25 .18 .47 M-.6 .03 q-.16 .52 .03 .84 M-.04 -.04 q.08 .55 -.13 1.05 M.39 .02 q.22 .18 .03 .57 M.96 -.21 q.22 .4 -.18 .98 M1.44 -.35 q.24 .17 -.01 .69 M1.83 -.63 q.09 .5 -.27 .99 M2.36 -.94 q.02 .34 -.14 .5 M2.59 -1.12 q.24 .32 -.04 .73\"><\/path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-3.24 -1.35 l-.21 .36 M-3.17 -.51 q-.06 .43 .18 .68 M-2.77 -.23 l.06 .53 M-2.63 .23 q.11 .48 .45 .72 M-2.23 .71 l.22 .58 M-1.89 .88 q.12 .46 .52 .69 M-1.43 1.24 l.15 .38 M-1.07 1.44 q.07 .41 .29 .5 M-.48 1.58 l.02 .46 M-.13 1.53 q.15 .3 -.01 .65 M.28 1.55 q.01 .38 -.24 .58 M.63 1.31 l-.09 .43 M1.05 1.04 q-.1 .57 -.34 .76 M1.49 .85 l-.11 .31 M1.71 .54 q.09 .3 -.3 .68 M2.03 .23 l-.12 .39 M2.42 -.22 q.02 .35 -.28 .75 M2.8 -.62 l-.18 .31\"><\/path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-3.41 .08 q.03 .37 .19 .53 M-3.21 .78 q.02 .62 .45 .97 M-2.91 1.17 l.14 .37 M-2.58 1.54 q.24 .55 .6 .75 M-2.2 1.82 l.14 .4 M-1.84 2.11 q.25 .4 .55 .5 M-1.28 2.26 l.06 .42 M-.96 2.48 q.05 .31 .24 .55 M-.49 2.51 l-.03 .65 M-.14 2.67 q-.02 .25 -.19 .46 M.31 2.51 l-.13 .39 M.67 2.21 q-.12 .51 -.52 .87 M1.12 1.9 q-.12 .37 -.35 .57 M1.65 1.64 l-.22 .52 M2.06 1.1 q-.05 .58 -.38 .88 M2.31 .74 l-.03 .3 M2.74 .23 q-.02 .54 -.3 .8\"><\/path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-3.37 1.28 q-.06 .5 .18 .87 M-2.97 1.92 l.36 .61 M-2.73 2.34 q.1 .42 .55 .7 M-2.27 2.63 l.31 .48 M-1.95 2.9 q.08 .46 .47 .81 M-1.48 3.11 l.23 .38 M-1.13 3.16 q.04 .51 .35 .8 M-.73 3.26 l-.06 .58 M-.28 3.21 q-.03 .4 -.33 .8 M.17 3.12 l-.2 .42 M.51 2.81 q-.05 .45 -.39 .78 M.92 2.62 l-.08 .33 M1.38 2.15 q-.12 .67 -.45 1.01 M1.81 1.92 l-.2 .46 M2.2 1.33 q.12 .35 -.19 .79\"><\/path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-3.56 -.6 l-.23 .35 M-3.58 -.13 l-.16 .4 M-3.58 .54 l.09 .52 M-3.28 1.79 l.18 .31 M-2.94 2.41 l.13 .29 M-2.45 2.81 l.12 .42 M-2.06 3.19 l.17 .29 M-1.7 3.3 l.19 .41 M-1.21 3.54 l.09 .4 M-.87 3.6 l-.06 .47 M-.38 3.59 l-.14 .32 M.17 3.42 l-.06 .33 M.61 3.12 l-.12 .47 M1.12 2.86 l-.18 .4 M1.57 2.42 l-.07 .35 M2.01 2.14 l-.17 .37 M2.48 1.56 l-.21 .38 M2.85 .88 l-.08 .28 M3.05 -.04 l-.14 .42\"><\/path><path stroke=\"#bd914b\" stroke-width=\".04\" d=\"M-2.92 -1.19 q-.35 .39 -.3 .83 M-2.82 -.93 l-.31 .4 M-2.57 -.85 q-.26 .42 -.11 .81 M-2.19 -.63 l-.12 .61 M-1.98 -.36 q-.18 .41 .08 .91 M-1.6 -.23 l.04 .52 M-1.32 .14 q-.13 .3 .13 .68 M-.97 .36 l.13 .41 M-.71 -.04 q-.07 .32 .08 .64 M-.35 .19 l.03 .74 M.18 .24 q.1 .45 -.08 .91 M.56 -.09 l.03 .51 M.83 .22 q.04 .31 -.21 .76 M1.17 -.27 l.05 .63 M1.51 -.19 q.05 .44 -.18 .78 M1.91 -.48 l-.04 .56 M2.22 -.74 q.14 .26 -.13 .82 M2.69 -.91 l-.01 .43 M-3.36 .41 l.12 .46 M-3.08 .85 l.2 .36 M-2.84 1.41 q.15 .46 .32 .59 M-2.62 1.93 l.21 .44 M-2.29 2.08 q.04 .35 .29 .6 M-1.91 2.47 l.19 .46 M-1.62 2.67 q.08 .41 .37 .67 M-1.24 2.91 l.21 .49 M-.92 3.1 l.15 .54 M-.61 3.25 l.01 .38 M-.27 3.34 l-.1 .31 M.1 3.21 l-.07 .29 M.42 2.88 l-.15 .37 M.8 2.65 q-.04 .5 -.28 .66 M1.23 2.27 l-.17 .51 M1.64 1.95 q-.06 .34 -.28 .68 M2.07 1.56 l-.18 .41 M2.42 1.14 l-.17 .49\"><\/path><path stroke=\"#f0cc80\" stroke-width=\".035\" d=\"M-3.39 -.91 l-.12 .31 M-3.08 -.12 l.06 .24 M-2.92 .25 l.16 .39 M-2.46 .62 l.15 .28 M-2.04 1.11 l.21 .31 M-1.64 1.22 l.06 .36 M-1.17 1.65 l.13 .43 M-.79 1.72 l.04 .26 M-.36 1.82 l.11 .48 M.15 1.62 l-.03 .29 M.57 1.71 l-.13 .29 M.87 1.45 l-.04 .38 M1.25 1.12 l-.16 .33 M1.56 .93 l-.03 .29 M1.93 .54 l-.18 .46 M2.22 .06 l-.03 .29 M2.62 -.3 l-.12 .48 M-2.61 2.59 l.29 .33 M-2.24 2.9 l.13 .34 M-1.88 3.25 l.29 .31 M-1.38 3.47 l.12 .31 M-.99 3.48 l.09 .35 M-.47 3.49 l-.07 .37 M.03 3.32 l-.12 .43 M.49 3.02 l-.11 .41 M1.01 2.81 l-.18 .27 M1.47 2.33 l-.13 .5 M1.89 1.83 l-.09 .27 M2.38 1.44 l-.18 .29\"><\/path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-2.83 .6 q.07 .26 .21 .38 M-2.12 .14 l.11 .56 M-1.47 .27 q-.04 .31 .19 .62 M-.75 .61 l.15 .32 M-.03 .29 q.17 .33 -.06 .67 M.62 .31 l-.12 .59 M1.22 .17 q.09 .3 -.18 .66 M2.08 -.12 l-.2 .57 M-2.79 1.85 l.2 .36 M-1.96 2.36 l.27 .31 M-1.47 2.68 q-.04 .25 .18 .56 M-.62 2.9 l.05 .43 M.13 2.88 l-.12 .44 M.9 2.47 l-.2 .4 M1.7 2.09 l-.27 .37\"><\/path><\/g><\/g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-media\" transform=\"translate(-3.25 1.65) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><g data-anatomia=\"pata-media\" transform=\"translate(3 1.65) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><\/g><g data-anatomia=\"cabeza\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"><\/path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"><\/path><\/g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"><\/path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"><\/path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"><\/path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"><\/path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"-0.7956\" cy=\"-4.2966\" r=\"0.6324\" fill=\"#20130a\"><\/circle><circle cx=\"-1.04856\" cy=\"-4.6128\" r=\"0.26560799999999996\" fill=\"#fffdf7\"><\/circle><\/g><\/g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"2.1883999999999997\" cy=\"-4.3675999999999995\" r=\"0.44639999999999996\" fill=\"#20130a\"><\/circle><circle cx=\"2.0098399999999996\" cy=\"-4.5908\" r=\"0.187488\" fill=\"#fffdf7\"><\/circle><\/g><\/g><\/g><\/g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-2.02 -5.95 Q-1.18 -6.65 -.37 -5.96 Q-1.2 -6.30 -2.02 -5.95Z\"><\/path><\/g><g><path d=\"M1.06 -6.02 Q1.97 -6.87 2.6 -5.9 Q1.9 -6.42 1.06 -6.02Z\"><\/path><\/g><\/g><\/g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"><\/ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"><\/ellipse><\/g><\/g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"><\/path><g><g data-anatomia=\"boca\"><path d=\"M.12 -1.7 Q.84 -1.1 1.67 -1.68 Q.84 -1.34 .12 -1.7Z\" fill=\"#30251b\"><\/path><\/g><\/g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"><\/path><\/g><\/g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-4.4 3.67 -.3 3.4\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-4.4 3.67 -.3 3.4\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(-0.3 3.4) rotate(-10) scale(1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q5.28 3.74 1.75 -.9\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q5.28 3.74 1.75 -.9\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(1.75 -0.9) rotate(95) scale(-1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><\/g><\/svg>","hablar":"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-13.1 -13.1 26.2 26.2\"><g stroke-linecap=\"round\" stroke-linejoin=\"round\"><g data-anatomia=\"alas\"><g data-anatomia=\"ala\" transform=\"translate(-1.9 .6) scale(0.84 .84) rotate(106)\"><path d=\"M0 0 C-1.71 .96 -5.47 3.56 -7.13 5.46 C-8.01 6.47 -8.47 7.59 -7.95 7.84 C-7.13 8.21 -4.6 7.13 -2.86 5.44 C-1.02 3.7 .27 1.64 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.18 .51 C-1.86 3.16 -5.38 6.62 -7.68 7.61 Q-4.6 6.83 -2.8 4.85 Q-.74 2.63 -.18 .51Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.22 .43 C-1.66 2.3 -5.98 5.69 -7.81 7.61 M-.69 1.09 C-1.75 3.2 -3.7 5.8 -6.75 7.48 M-1.04 2.31 Q-2.2 4.9 -4.86 6.9 M-2.77 3.36 Q-3.02 4.49 -4.31 5.01 M-4.47 4.71 Q-5.36 5.08 -6.08 5.35 M-2.77 4.98 Q-3.6 5.13 -3.95 5.86 M-5.47 6.33 Q-5.65 6.84 -6.02 7.18\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-1.8 1.5 Q-5.86 4.45 -7.4 6.54 M-7.23 7.66 Q-5.78 7.28 -4.72 6.5\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><g data-anatomia=\"ala\" transform=\"translate(1.7 .6) scale(-0.84 .84) rotate(100)\"><path d=\"M0 0 C-1.01 .98 -2.55 3.25 -3.88 5.16 C-4.49 6.1 -5.03 7.25 -4.72 7.78 C-4.34 8.26 -2.69 7.65 -1.81 6.46 C-.49 4.75 .35 2.1 0 0Z\" fill=\"#f0e4c6\" fill-opacity=\".48\" stroke=\"#67533c\" stroke-width=\".13\"><\/path><path d=\"M-.14 .49 C-1.29 3.55 -3.42 6.71 -4.5 7.59 Q-2.72 7.31 -1.35 4.86 Q-.22 2.42 -.14 .49Z\" fill=\"#cdb989\" opacity=\".18\"><\/path><path d=\"M-.18 .45 C-.86 2.63 -3.78 6.45 -4.59 7.55 M-.46 1.04 Q-1.07 4.18 -3.11 7.19 M-.4 2.2 Q-.82 5.25 -2.24 6.92 M-1.62 3.21 Q-1.71 4.42 -2.82 4.98 M-2.18 5.4 Q-2.75 5.69 -3.39 5.81 M-1.03 4.52 Q-1.63 4.66 -2.02 4.2\" fill=\"none\" stroke=\"#967f58\" stroke-width=\".075\" stroke-opacity=\".82\"><\/path><path d=\"M-.97 1.55 Q-2.73 4.04 -4.06 6.23 M-4.14 7.66 Q-3.07 7.3 -2.39 6.6\" fill=\"none\" stroke=\"#fff7df\" stroke-width=\".11\" stroke-opacity=\".7\"><\/path><\/g><\/g><g data-anatomia=\"patas\"><g data-anatomia=\"pata-posterior\" transform=\"translate(-1.5 5.2) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><g data-anatomia=\"pata-posterior\" transform=\"translate(1.85 5.2) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q.51 2.3 .87 3.42 Q1.3 4.2 1.03 5.33 L1.35 6.7\" stroke=\"#30251b\" stroke-width=\"0.54\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M.57 2.42 Q1.7 2.9 1.5 4.2 L1.16 5.5 Q.5 5.12 .51 4.33 L.27 3.33Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M.6 3.11 L.94 3.8 M.49 3.72 L.85 4.39 M.67 4.45 L.95 4.98 M1.3 3.38 L1.16 4.17\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><g data-anatomia=\"tarso\"><path d=\"M1.11 5.68 Q1.24 6.16 1.47 6.28 L1.88 6.33 Q2.12 6.02 2.37 6.4 Q2.69 6.15 2.87 6.47 Q3.26 6.35 3.32 6.64 Q3.12 7.04 2.71 6.86 Q2.36 7.01 2.06 6.83 Q1.71 7.04 1.43 6.76 Q.93 6.8 .79 6.39Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".14\"><\/path><path d=\"M1.43 6.39 L1.42 6.61 M1.94 6.47 L1.89 6.68 M2.41 6.49 L2.38 6.73 M2.88 6.59 L2.87 6.76\" stroke=\"#c58f42\" stroke-width=\".09\"><\/path><\/g><\/g><\/g><g data-anatomia=\"abdomen\"><path d=\"M-2.2 2.25 C-4.07 3.39 -4.35 6.9 -2.34 9.3 Q-1.79 9.99 -1.49 10.12 C.1 9.63 2.79 7.93 3.08 5.28 Q3.4 3.48 1.81 2.33Z\" fill=\"#30251b\" stroke=\"#30251b\" stroke-width=\".17\"><\/path><path d=\"M-2.8 3.07 Q-3.42 3.52 -3.59 4.38 Q-2.62 5.7 -.68 5.63 Q1.93 5.48 3.06 4.32 L2.94 3.51 Q1.92 4.47 .05 4.55 L-.55 4.25 L-1.09 4.56 L-1.48 4.09 L-1.83 4.31 Q-2.38 3.94 -2.8 3.07Z M-3.65 5.26 Q-3.86 6.11 -3.36 7.05 Q-1.95 8.07 -.49 7.74 Q1.68 7.29 2.48 6.38 L2.86 5.49 Q1.67 6.25 .18 6.49 L-.28 6.2 L-.75 6.55 L-1.35 6.26 L-1.79 6.42 Q-2.98 6.36 -3.65 5.26Z M-2.98 7.9 Q-2.55 8.68 -1.86 9.35 Q-.47 9.57 1.25 8.05 L1.78 7.45 Q.32 8.39 -.9 8.5 L-1.3 8.27 L-1.67 8.51Z\" fill=\"#c58f42\"><\/path><path d=\"M-2.91 3.53 Q-3.27 4 -3.09 4.39 M-3.33 5.85 L-3.01 6.47 M-2.59 8.17 L-2.12 8.69\" stroke=\"#edc67d\" stroke-width=\".23\" fill=\"none\"><\/path><path d=\"M-3.68 4.78 Q-1.38 6.79 2.92 4.96 M-3.31 7.39 Q-.45 8.85 2.13 6.97 M-2.3 9.19 Q-.65 9.66 .52 8.98\" stroke=\"#88603a\" stroke-width=\".1\" fill=\"none\"><\/path><path d=\"M1.59 3.39 Q2.74 7.19 -1.49 10.12 Q2.75 8.34 3.08 5.28 Q3.38 3.58 1.81 2.33Z\" fill=\"#30251b\" opacity=\".26\"><\/path><\/g><g data-anatomia=\"torax\"><path d=\"M-2.56 -2.16 Q-2.98 -2.18 -3.26 -1.82 L-3.08 -1.79 L-3.49 -1.43 L-3.26 -1.44 L-3.6 -.98 L-3.43 -1.04 L-3.73 -.45 L-3.51 -.6 L-3.75 .03 L-3.57 -.08 Q-3.82 .74 -3.48 1.57 L-3.59 1.48 L-3.31 2.12 L-3.42 2.07 L-3.02 2.66 L-3.12 2.71 L-2.57 3.13 L-2.69 3.18 L-2.05 3.51 L-2.12 3.66 L-1.56 3.8 L-1.63 3.94 L-1.04 3.94 L-.91 4.12 L-.63 3.99 L-.32 4.05 L-.06 3.85 L.22 3.9 L.5 3.64 L.77 3.7 L1.02 3.36 L1.28 3.41 L1.48 3.07 L1.75 3.01 L1.86 2.71 L2.12 2.57 L2.18 2.25 L2.49 2.04 L2.49 1.77 L2.81 1.52 L2.72 1.34 L3.01 .95 L2.91 .8 L3.17 .37 L3.03 .25 L3.29 -.24 L3.12 -.24 L3.31 -.8 L3.07 -.67 L3.17 -1.14 L2.94 -1.03 Q2.79 -1.65 2.39 -1.83 Q.03 -3.08 -2.56 -2.16Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".15\"><\/path><path d=\"M-3.24 -1.3 Q-3.49 -.65 -3.2 .2 C-2.78 1.16 -2.07 1.47 -1.29 1.94 Q.19 2.62 1.19 1.4 Q2.36 .4 2.85 -1.09 L2.99 -.46 Q2.9 .53 2.34 1.24 L2.32 1.5 Q1.68 2.75 .44 3.27 L.19 3.21 L-.32 3.63 L-.76 3.48 L-1.19 3.61 Q-2.9 2.86 -3.33 1.42 Q-3.86 -.12 -3.24 -1.3Z\" fill=\"#c58f42\"><\/path><path d=\"M-3.03 -1.55 Q-3.36 -.61 -2.77 .36 Q-2.39 1.16 -1.3 1.63 L-.99 1.56 Q.11 2.2 1.13 1.11 Q2.09 .47 2.76 -.93 L2.69 -.15 Q2.21 1.25 1.32 1.66 L1.27 1.85 L.63 2.2 L.32 2.12 L-.14 2.38 L-.34 2.17 L-.77 2.27 L-1.11 2.05 L-1.42 2.05 Q-2.69 1.47 -3.05 .54 Q-3.68 -.67 -3.03 -1.55Z\" fill=\"#edc67d\"><\/path><g fill=\"none\" stroke-linecap=\"round\"><path stroke=\"#c79a50\" stroke-width=\".09\" d=\"M-2.79 -1.72 q-.4 .18 -.59 .68 M-2.62 -1.3 q-.55 .57 -.44 1.12 M-3.04 -.83 q-.36 .35 -.4 .69 M-2.79 -.51 q-.18 .38 -.08 .78 M-2.38 -.6 q-.3 .54 -.06 1.11 M-2.1 -.38 q-.09 .27 .12 .61 M-1.8 -.29 q-.19 .53 .16 1.06 M-1.23 -.06 q-.2 .42 .05 .81 M-.92 .05 q-.04 .25 .18 .47 M-.6 .03 q-.16 .52 .03 .84 M-.04 -.04 q.08 .55 -.13 1.05 M.39 .02 q.22 .18 .03 .57 M.96 -.21 q.22 .4 -.18 .98 M1.44 -.35 q.24 .17 -.01 .69 M1.83 -.63 q.09 .5 -.27 .99 M2.36 -.94 q.02 .34 -.14 .5 M2.59 -1.12 q.24 .32 -.04 .73\"><\/path><path stroke=\"#edca82\" stroke-width=\".065\" d=\"M-3.24 -1.35 l-.21 .36 M-3.17 -.51 q-.06 .43 .18 .68 M-2.77 -.23 l.06 .53 M-2.63 .23 q.11 .48 .45 .72 M-2.23 .71 l.22 .58 M-1.89 .88 q.12 .46 .52 .69 M-1.43 1.24 l.15 .38 M-1.07 1.44 q.07 .41 .29 .5 M-.48 1.58 l.02 .46 M-.13 1.53 q.15 .3 -.01 .65 M.28 1.55 q.01 .38 -.24 .58 M.63 1.31 l-.09 .43 M1.05 1.04 q-.1 .57 -.34 .76 M1.49 .85 l-.11 .31 M1.71 .54 q.09 .3 -.3 .68 M2.03 .23 l-.12 .39 M2.42 -.22 q.02 .35 -.28 .75 M2.8 -.62 l-.18 .31\"><\/path><path stroke=\"#765027\" stroke-width=\".07\" d=\"M-3.41 .08 q.03 .37 .19 .53 M-3.21 .78 q.02 .62 .45 .97 M-2.91 1.17 l.14 .37 M-2.58 1.54 q.24 .55 .6 .75 M-2.2 1.82 l.14 .4 M-1.84 2.11 q.25 .4 .55 .5 M-1.28 2.26 l.06 .42 M-.96 2.48 q.05 .31 .24 .55 M-.49 2.51 l-.03 .65 M-.14 2.67 q-.02 .25 -.19 .46 M.31 2.51 l-.13 .39 M.67 2.21 q-.12 .51 -.52 .87 M1.12 1.9 q-.12 .37 -.35 .57 M1.65 1.64 l-.22 .52 M2.06 1.1 q-.05 .58 -.38 .88 M2.31 .74 l-.03 .3 M2.74 .23 q-.02 .54 -.3 .8\"><\/path><path stroke=\"#b58a46\" stroke-width=\".075\" d=\"M-3.37 1.28 q-.06 .5 .18 .87 M-2.97 1.92 l.36 .61 M-2.73 2.34 q.1 .42 .55 .7 M-2.27 2.63 l.31 .48 M-1.95 2.9 q.08 .46 .47 .81 M-1.48 3.11 l.23 .38 M-1.13 3.16 q.04 .51 .35 .8 M-.73 3.26 l-.06 .58 M-.28 3.21 q-.03 .4 -.33 .8 M.17 3.12 l-.2 .42 M.51 2.81 q-.05 .45 -.39 .78 M.92 2.62 l-.08 .33 M1.38 2.15 q-.12 .67 -.45 1.01 M1.81 1.92 l-.2 .46 M2.2 1.33 q.12 .35 -.19 .79\"><\/path><path stroke=\"#edc67d\" stroke-width=\".045\" d=\"M-3.56 -.6 l-.23 .35 M-3.58 -.13 l-.16 .4 M-3.58 .54 l.09 .52 M-3.28 1.79 l.18 .31 M-2.94 2.41 l.13 .29 M-2.45 2.81 l.12 .42 M-2.06 3.19 l.17 .29 M-1.7 3.3 l.19 .41 M-1.21 3.54 l.09 .4 M-.87 3.6 l-.06 .47 M-.38 3.59 l-.14 .32 M.17 3.42 l-.06 .33 M.61 3.12 l-.12 .47 M1.12 2.86 l-.18 .4 M1.57 2.42 l-.07 .35 M2.01 2.14 l-.17 .37 M2.48 1.56 l-.21 .38 M2.85 .88 l-.08 .28 M3.05 -.04 l-.14 .42\"><\/path><path stroke=\"#bd914b\" stroke-width=\".04\" d=\"M-2.92 -1.19 q-.35 .39 -.3 .83 M-2.82 -.93 l-.31 .4 M-2.57 -.85 q-.26 .42 -.11 .81 M-2.19 -.63 l-.12 .61 M-1.98 -.36 q-.18 .41 .08 .91 M-1.6 -.23 l.04 .52 M-1.32 .14 q-.13 .3 .13 .68 M-.97 .36 l.13 .41 M-.71 -.04 q-.07 .32 .08 .64 M-.35 .19 l.03 .74 M.18 .24 q.1 .45 -.08 .91 M.56 -.09 l.03 .51 M.83 .22 q.04 .31 -.21 .76 M1.17 -.27 l.05 .63 M1.51 -.19 q.05 .44 -.18 .78 M1.91 -.48 l-.04 .56 M2.22 -.74 q.14 .26 -.13 .82 M2.69 -.91 l-.01 .43 M-3.36 .41 l.12 .46 M-3.08 .85 l.2 .36 M-2.84 1.41 q.15 .46 .32 .59 M-2.62 1.93 l.21 .44 M-2.29 2.08 q.04 .35 .29 .6 M-1.91 2.47 l.19 .46 M-1.62 2.67 q.08 .41 .37 .67 M-1.24 2.91 l.21 .49 M-.92 3.1 l.15 .54 M-.61 3.25 l.01 .38 M-.27 3.34 l-.1 .31 M.1 3.21 l-.07 .29 M.42 2.88 l-.15 .37 M.8 2.65 q-.04 .5 -.28 .66 M1.23 2.27 l-.17 .51 M1.64 1.95 q-.06 .34 -.28 .68 M2.07 1.56 l-.18 .41 M2.42 1.14 l-.17 .49\"><\/path><path stroke=\"#f0cc80\" stroke-width=\".035\" d=\"M-3.39 -.91 l-.12 .31 M-3.08 -.12 l.06 .24 M-2.92 .25 l.16 .39 M-2.46 .62 l.15 .28 M-2.04 1.11 l.21 .31 M-1.64 1.22 l.06 .36 M-1.17 1.65 l.13 .43 M-.79 1.72 l.04 .26 M-.36 1.82 l.11 .48 M.15 1.62 l-.03 .29 M.57 1.71 l-.13 .29 M.87 1.45 l-.04 .38 M1.25 1.12 l-.16 .33 M1.56 .93 l-.03 .29 M1.93 .54 l-.18 .46 M2.22 .06 l-.03 .29 M2.62 -.3 l-.12 .48 M-2.61 2.59 l.29 .33 M-2.24 2.9 l.13 .34 M-1.88 3.25 l.29 .31 M-1.38 3.47 l.12 .31 M-.99 3.48 l.09 .35 M-.47 3.49 l-.07 .37 M.03 3.32 l-.12 .43 M.49 3.02 l-.11 .41 M1.01 2.81 l-.18 .27 M1.47 2.33 l-.13 .5 M1.89 1.83 l-.09 .27 M2.38 1.44 l-.18 .29\"><\/path><path stroke=\"#30251b\" stroke-width=\".06\" d=\"M-2.83 .6 q.07 .26 .21 .38 M-2.12 .14 l.11 .56 M-1.47 .27 q-.04 .31 .19 .62 M-.75 .61 l.15 .32 M-.03 .29 q.17 .33 -.06 .67 M.62 .31 l-.12 .59 M1.22 .17 q.09 .3 -.18 .66 M2.08 -.12 l-.2 .57 M-2.79 1.85 l.2 .36 M-1.96 2.36 l.27 .31 M-1.47 2.68 q-.04 .25 .18 .56 M-.62 2.9 l.05 .43 M.13 2.88 l-.12 .44 M.9 2.47 l-.2 .4 M1.7 2.09 l-.27 .37\"><\/path><\/g><\/g><g data-anatomia=\"patas-medias\"><g data-anatomia=\"pata-media\" transform=\"translate(-3.25 1.65) scale(-1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><g data-anatomia=\"pata-media\" transform=\"translate(3 1.65) scale(1 1)\"><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M0 0 Q-.7 .65 -.29 2.85 Q-.96 4.42 -.61 5.96\" stroke=\"#30251b\" stroke-width=\"0.47\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><path d=\"M-.55 2.33 Q-.01 3.07 -.24 4.31 L-.58 5.69 Q-1.14 5.39 -1.24 4.45 L-1.07 2.83Z\" fill=\"#826039\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.86 3.13 L-.68 3.77 M-.97 3.89 L-.76 4.61 M-.81 4.65 L-.67 5.24\" fill=\"none\" stroke=\"#d6ab68\" stroke-width=\".085\"><\/path><\/g><\/g><g data-anatomia=\"cabeza\"><g data-anatomia=\"antenas\" transform=\"scale(.4)\"><g><path d=\"M-2.8 -17 Q-4.05 -20.3 -4.3 -23.55 Q-1.9 -26.7 -.3 -29.4\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"-0.3\" cy=\"-29.4\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><g><path d=\"M3.5 -17 Q3.75 -20.8 5 -23.25 Q10.35 -24.4 11.6 -25.95\" stroke=\"#30251b\" stroke-width=\"1.1\" fill=\"none\" stroke-linecap=\"round\"><\/path><circle cx=\"11.6\" cy=\"-25.95\" r=\"0.55\" fill=\"#30251b\"><\/circle><\/g><path d=\"M-4.3 -23.55 Q-1.9 -26.7 -.3 -29.4 Q.8 -29.82 .46 -28.29 Q-.38 -25.94 -4.3 -23.55Z M5 -23.25 Q10.35 -24.4 11.6 -25.95 Q12.42 -26.45 12.03 -25.11 Q10.82 -23.43 5 -23.25Z\" fill=\"#30251b\"><\/path><path d=\"M-3.2 -22.85 L-.23 -27.87 M5.58 -22.8 L10.58 -24.83\" stroke=\"#a18b5f\" stroke-width=\".22\" fill=\"none\"><\/path><\/g><g data-anatomia=\"cara\"><path d=\"M-3.03 -4.8 C-3.15 -6.96 -.97 -7.98 1.15 -7.2 C2.75 -6.77 3.29 -4.97 3.35 -3.13 C3.62 -1.28 1.74 -.48 .19 -.65 C-1.47 -.79 -2.75 -1.72 -3.09 -3.16 Q-3.27 -4.02 -3.03 -4.8Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".2\"><\/path><path d=\"M-.34 -7.14 C-2.77 -6.97 -3.1 -4.38 -1.76 -2.46 Q-2.7 -5.6 -.1 -6.57 Q1.1 -6.92 2.02 -6.15 Q1.28 -7.05 -.34 -7.14Z\" fill=\"#ab7c3d\"><\/path><path d=\"M-.41 -6.57 Q.4 -6.67 .85 -5.67 Q1.36 -6.62 2.19 -6 C2.83 -5.39 2.91 -3.63 3.13 -2.84 C3.59 -1.14 1.7 -.64 .26 -.94 C-1.17 -1.14 -2.2 -2.56 -2.12 -4.17 Q-2.16 -6.32 -.41 -6.57Z\" fill=\"#d9a355\" stroke=\"#30251b\" stroke-width=\".11\"><\/path><path d=\"M-1.76 -4.4 Q-1.7 -6.14 -.54 -6.21 Q.08 -6.16 .35 -5.56 Q-.79 -6.25 -1.76 -4.4Z M1.33 -5.65 Q1.82 -6.27 2.29 -5.68 L2.57 -5 Q1.98 -5.8 1.33 -5.65Z\" fill=\"#edc67d\"><\/path><g data-anatomia=\"ojos\" transform=\"translate(.1 1.89) scale(1 1.55)\"><g style=\"transform-box:fill-box;transform-origin:center\"><g><g transform=\"translate(-1.02 -3.96) scale(1.02)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"-0.7242\" cy=\"-3.858\" r=\"0.6324\" fill=\"#20130a\"><\/circle><circle cx=\"-0.97716\" cy=\"-4.1742\" r=\"0.26560799999999996\" fill=\"#fffdf7\"><\/circle><\/g><\/g><g><g transform=\"translate(2.03 -4.13) scale(0.72)\"><circle r=\"1\" fill=\"#f0e0bc\"><\/circle><path d=\"M0 -1.14 C.7 -1.17 1.11 -.6 1.08 .06 C1.05 .77 .58 1.07 0 1.05 C-.67 1.02 -1.07 .58 -1.06 -.05 C-1.04 -.74 -.64 -1.12 0 -1.14Z M0 -.94 C-.53 -.94 -.94 -.5 -.93 .04 C-.91 .61 -.53 .97 0 .98 C.53 .99 .97 .58 .95 .04 C.94 -.53 .54 -.94 0 -.94Z\" fill=\"#30251b\" fill-rule=\"evenodd\"><\/path><\/g><g><circle cx=\"2.2388\" cy=\"-4.058\" r=\"0.44639999999999996\" fill=\"#20130a\"><\/circle><circle cx=\"2.06024\" cy=\"-4.2812\" r=\"0.187488\" fill=\"#fffdf7\"><\/circle><\/g><\/g><\/g><\/g><g data-anatomia=\"cejas\"><g fill=\"#30251b\" stroke-linecap=\"round\" style=\"transform-box:fill-box;transform-origin:center bottom\"><g><path d=\"M-2.03 -5.73 Q-1.16 -6.6 -.38 -5.7 Q-1.2 -6.15 -2.03 -5.73Z\"><\/path><\/g><g><path d=\"M1.05 -5.98 Q1.95 -6.54 2.64 -5.75 Q1.88 -6.18 1.05 -5.98Z\"><\/path><\/g><\/g><\/g><g data-anatomia=\"mejillas\"><g fill=\"#bc8050\" opacity=\"0.72\"><ellipse cx=\"-1.09\" cy=\"-2.44\" rx=\"0.61\" ry=\"0.4392\"><\/ellipse><ellipse cx=\"2.59\" cy=\"-2.68\" rx=\"0.35\" ry=\"0.252\"><\/ellipse><\/g><\/g><path data-anatomia=\"nariz\" d=\"M.68 -2.96 Q1.05 -3.37 1.57 -3.05 Q1.9 -2.73 1.43 -2.58 Q.91 -2.5 .68 -2.96Z\" fill=\"#a3793c\" stroke=\"#30251b\" stroke-width=\".1\"><\/path><g><g data-anatomia=\"boca\"><path d=\"M-.75 -1.96 Q.46 -1.33 1.8 -2.1 C1.56 -.29 -.3 -.23 -.75 -1.96Z\" fill=\"#30251b\"><\/path><path d=\"M-.38 -1.77 Q.62 -1.37 1.51 -1.87 L1.32 -1.45 Q.45 -1.13 -.2 -1.48Z\" fill=\"#f0e0bc\"><\/path><path d=\"M.22 -1.02 Q.7 -1.38 1.21 -1.01 Q.71 -.55 .22 -1.02Z\" fill=\"#af7657\"><\/path><\/g><\/g><path d=\"M-2.64 -5.76 L-2.87 -6.12 M-2.27 -6.23 L-2.4 -6.73 M-1.9 -6.6 L-1.98 -7.06 M-1.47 -6.82 L-1.58 -7.26 M-.99 -6.97 L-1.09 -7.47 M-.48 -7.04 L-.54 -7.49 M.02 -7.04 L.02 -7.47 M.49 -6.96 L.58 -7.41 M.96 -6.82 L1.09 -7.25\" fill=\"none\" stroke=\"#edc67d\" stroke-width=\".07\"><\/path><\/g><\/g><g data-anatomia=\"brazo-izquierdo\" style=\"transform-box:view-box;transform-origin:-2.7px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-4.8 2.1 -3.7 2.4\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M-2.7 .4 Q-4.8 2.1 -3.7 2.4\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(-3.7 2.4) rotate(-35) scale(1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><g data-anatomia=\"brazo-derecho\" style=\"transform-box:view-box;transform-origin:2.6px .4px\"><g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.64 1.9 6.9 -1.15\" stroke=\"#30251b\" stroke-width=\"0.84\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g style=\"transform-box:fill-box;transform-origin:top center\"><path d=\"M2.6 .4 Q4.64 1.9 6.9 -1.15\" stroke=\"#8c643b\" stroke-width=\"0.51\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><\/path><\/g><g data-anatomia=\"mano\" transform=\"translate(6.9 -1.15) rotate(35) scale(-1 1)\"><path d=\"M-.49 .47 Q-.94 .35 -1.49 .31 L-2.02 .09 Q-2.31 -.1 -2.14 -.31 Q-2.05 -.4 -1.57 -.25 L-.7 -.16 L-2.1 -.58 Q-2.37 -.7 -2.22 -.88 Q-2.09 -1.01 -1.7 -.81 L-.49 -.46 L-1.58 -1.04 Q-1.84 -1.25 -1.63 -1.39 Q-1.48 -1.48 -1.12 -1.21 L-.12 -.66 Q.3 -.55 .51 -.93 Q.59 -1.12 .24 -1.49 Q.04 -1.8 .27 -1.89 Q.49 -1.98 .85 -1.51 Q1.19 -1.07 1.08 -.62 Q.96 .04 .47 .43Z\" fill=\"#493322\" stroke=\"#30251b\" stroke-width=\".16\"><\/path><path d=\"M-.49 .23 Q-.15 -.23 .48 -.35 M-1.58 -.09 L-.72 .06 M-1.7 -.68 L-.72 -.35 M.34 -1.51 L.64 -1.16\" fill=\"none\" stroke=\"#ae945d\" stroke-width=\".1\"><\/path><\/g><\/g><\/g><\/g><\/svg>"}</script>
+<script>
+'use strict';
+/* =====================================================================================================
+   LOS DATOS: las funciones de Chagra, en diez lugares. v = vista de App.jsx; t = cómo se llama aquí;
+   d = qué hace, leído de su componente. alias = otras vistas que abren la misma pantalla.
+   ===================================================================================================== */
+const GRUPOS = [
+  { n: 1, id: 'hoy', icono: 'i-hoy', corto: 'Hoy', titulo: 'Hoy en su finca',
+    lema: 'El día empieza mirando: el tiempo, las tareas y lo que la finca le pide hoy.',
+    angelita: 'Antes de salir, mire el tiempo y lo que no espera.',
+    destacadas: ['hoy_finca', 'clima_boletin', 'task_log', 'calendario_finca'],
+    pantallas: [
+      { v: 'hoy_finca', t: 'Hoy en finca', d: 'Lo que toca hoy: avisos, tareas y accesos del día en una sola pantalla.', k: 'dia inicio avisos' },
+      { v: 'clima_boletin', t: 'El tiempo', d: 'Hoy, los próximos días y el clima que viene (El Niño, La Niña), traducido a qué hacer con cada cultivo.', k: 'lluvia helada sol pronostico clima niño niña agua' },
+      { v: 'task_log', t: 'Tareas de la finca', d: 'La lista de lo pendiente; márquelas hechas cuando las termine.', k: 'pendientes oficio' },
+      { v: 'calendario_finca', alias: ['calendario'], t: 'Calendario de la finca', d: 'Planta por planta: cuándo florece, cuándo abonar, sembrar, cosechar y vigilar plagas.', k: 'fechas cuando siembra cosecha' },
+      { v: 'registro_voz', t: 'Registrar hablando', d: 'Cuéntele a Chagra lo que hizo, como a un amigo; usted revisa antes de guardar.', k: 'voz hablar anotar microfono' },
+      { v: 'registro_unificado', t: 'Anotar a mano', d: 'Una sola puerta para anotar cosecha, abono, siembra o labor, sin hablar.', k: 'registrar escribir formulario' },
+      { v: 'agente', t: 'Pregúntele a Chagra', d: 'El agente responde sobre su finca; si no hay señal, se lo dice claro en vez de fallar.', k: 'preguntar ayuda asistente ia' },
+      { v: 'puerta_hoy', t: 'El recorrido de hoy', d: 'La próxima parada del día: tareas con fecha y sugerencias por revisar.', k: 'recorrido ronda' },
+      { v: 'almanaque', t: 'Almanaque', d: 'El año campesino: aguas y secas, qué crece según el frío o el calor y el saber de la luna.', k: 'luna lunar año temporada' },
+      { v: 'mantenimiento', t: 'Labores de la finca', d: 'Arreglos, mantenimiento y trabajos del día, con su foto.', k: 'arreglo cerca trabajo oficio' },
+      { v: 'new_task', t: 'Nueva tarea', d: 'Agende una labor: qué, dónde, cuándo y qué tan urgente.', k: 'agendar' },
+      { v: 'edit_task', t: 'Cambiar una tarea', d: 'Corrija una tarea ya agendada (se abre desde la lista de tareas).', k: 'editar' },
+      { v: 'voz', t: 'La grabadora', d: 'Hable, se pasa a texto y usted confirma; queda en cola hasta que haya señal.', k: 'grabar audio' },
+      { v: 'vista_trabajador', t: 'Vista del trabajador', d: 'Para quien trabaja en campo: las tareas pendientes ordenadas por cercanía.', k: 'trabajador jornalero cerca gps', nota: 'Id provisional: en Chagra esta vista (WorkerDashboard) lleva hoy el nombre de una persona y conviene renombrarla.' },
+    ] },
+  { n: 2, id: 'finca', icono: 'i-casa', corto: 'Mi finca', titulo: 'Mi finca', fondo: '#efe3c6',
+    lema: 'Lo que hay en la finca: plantas, animales, zonas y bodega. Cada cosa cuenta.',
+    angelita: 'Esto es lo que tiene: cada planta y cada animal cuentan.',
+    destacadas: ['plantas-v2', 'animales', 'puerta_zonas', 'bodega'],
+    pantallas: [
+      { v: 'plantas-v2', t: 'Mis plantas', d: 'Todas sus plantas, cada una con su año.', k: 'plantas cultivos' },
+      { v: 'animales', t: 'Los animales', d: 'La cría campesina y el ciclo cerrado: el animal también alimenta la tierra.', k: 'cria' },
+      { v: 'puerta_zonas', t: 'Mis zonas', d: 'Lotes, camas y potreros. Una planta puede existir sin zona.', k: 'lote potrero cama mapa' },
+      { v: 'bodega', t: 'La bodega', d: 'Cuánto queda de cada abono o preparado de la finca, con aviso cuando se acaba.', k: 'inventario existencias stock' },
+      { v: 'voz_planta', t: 'Agregar una planta hablando', d: 'Diga qué sembró y dónde; Chagra sugiere buenas vecinas y advierte las que no.', k: 'voz nueva planta' },
+      { v: 'activos', alias: ['gestionar', 'plant_asset'], t: 'Todo lo registrado', d: 'Los activos de la finca, plantas, zonas y equipos, con su foto.', k: 'gestionar activos' },
+      { v: 'animales_gallinas', t: 'Gallinas y aves', d: 'Cama profunda, pastoreo y sanidad real (Newcastle, coccidiosis), sin inventar dosis.', k: 'pollos huevos gallinaza' },
+      { v: 'animales_abejas', t: 'Abejas y polinización', d: 'Sin polinizadores no hay cosecha: cómo cuidarlos en la finca.', k: 'miel colmena' },
+      { v: 'animales_vacas', t: 'Vacas y ganado', d: 'Pastoreo rotacional y silvopastoreo; la aftosa se notifica al ICA.', k: 'leche ganado bovino' },
+      { v: 'animales_conejos', t: 'Conejos de patio', d: 'Cría barata que cabe en el patio y da conejaza, abono de primera.', k: 'conejaza' },
+      { v: 'animales_caprinos', t: 'Cabras y ovejas', d: 'Ramonean lo que la vaca no aprovecha; aprisco alto y seco.', k: 'chivos ovejas' },
+      { v: 'puerta_animales', t: 'El patio', d: 'A quién va a mirar hoy y qué vio al volver.', k: 'animales observar' },
+      { v: 'auditoria_inventario', t: 'Cuadrar el inventario', d: 'El cuaderno de cada material y la cuenta de lo que hay.', k: 'auditoria' },
+    ] },
+  { n: 3, id: 'suelo', icono: 'i-suelo', corto: 'Suelo', titulo: 'Suelo vivo', fondo: '#e6d3b4',
+    lema: 'La base de todo: primero se alimenta la tierra, y la tierra alimenta la planta.',
+    angelita: 'Sin suelo vivo no hay planta que aguante. Aquí se empieza.',
+    destacadas: ['suelo', 'compost', 'salud_suelo', 'ciclo_nutrientes'],
+    pantallas: [
+      { v: 'suelo', t: 'Mi suelo', d: 'Diagnóstico guiado, sin laboratorio: cuente cómo está su tierra o toque los síntomas.', k: 'tierra diagnostico' },
+      { v: 'compost', t: 'El compost, paso a paso', d: 'Del estiércol crudo, que quema la planta, al abono maduro y al lombricompuesto.', k: 'abono lombriz lombricompost' },
+      { v: 'salud_suelo', t: 'Cuaderno del suelo', d: 'Leer la tierra con la pala, el color y el olor; reconocer compactación y erosión.', k: 'erosion compactacion' },
+      { v: 'ciclo_nutrientes', t: 'El ciclo de nutrientes', d: 'Cómo el estiércol de cerdos y gallinas llega, por el biopreparado, a la comida de la planta.', k: 'abono ciclo cerrado' },
+      { v: 'estiercol', t: 'Del corral al abono', d: 'Quitarle el olor a la gallinaza y volver el estiércol abono, gas y suelo.', k: 'gallinaza olor biogas' },
+      { v: 'cromatografia', t: 'Cromatografía de suelo', d: 'La prueba en papel que muestra la vida del suelo en colores.', k: 'prueba papel' },
+      { v: 'insumos', t: 'Abonos e insumos', d: 'Anote qué le echó a la finca, dónde y cuánto gastó.', k: 'abono gasto aplicar' },
+      { v: 'subsuelo', t: 'Debajo de la tierra', d: 'Raíces, hongos y lombrices: el subsuelo se teje o se apaga según la vida del suelo.', k: 'raices lombriz simulador' },
+      { v: 'mundo3d_micorrizas', t: 'La red de hongos', d: 'Las micorrizas, en edu.chagra.bio: el hilo que une las raíces y reparte agua y alimento.', k: 'hongos micorriza 3d' },
+    ] },
+  { n: 4, id: 'sembrar', icono: 'i-sembrar', corto: 'Sembrar', titulo: 'Sembrar y cuidar', fondo: '#dde9c6',
+    lema: 'El ciclo de la planta: de la semilla guardada a la planta que da, siempre en buena compañía.',
+    angelita: 'La semilla guardada es la que ya conoce su tierra.',
+    destacadas: ['semilla', 'sembrar', 'asociaciones', 'mundo_cultivos'],
+    pantallas: [
+      { v: 'semilla', t: 'La semilla', d: 'Guardar, escoger y calcular cuánta necesita: la semilla es de quien la siembra.', k: 'semillas soberania' },
+      { v: 'sembrar', t: 'Anotar una siembra', d: 'Qué sembró, dónde y cuánto, para que el calendario la siga.', k: 'siembra registrar' },
+      { v: 'asociaciones', t: 'Buenas vecinas', d: 'Qué plantas se ayudan sembradas juntas, con cifras cuando las hay.', k: 'asociacion policultivo compañeras' },
+      { v: 'mundo_cultivos', t: 'Todos los cultivos', d: 'Cultivos y semillas, con cálculo del calor que necesita una planta para crecer.', k: 'cultivos' },
+      { v: 'germinacion', t: '¿Todavía nace?', d: 'Semilleros: la prueba de germinación casera en papel húmedo, y cómo leer el resultado.', searchTerms: ['Semilleros', 'germinación', 'germinar'], k: 'semillero semillas prueba' },
+      { v: 'milpa_cultivo', t: 'La milpa', d: 'Maíz, fríjol y calabaza juntos: por qué se ayudan y cómo sembrarlos.', k: 'maiz frijol ahuyama tres hermanas' },
+      { v: 'mono_vs_poli', t: '¿Una sola planta o muchas?', d: 'Compare monocultivo y policultivo lado a lado, y decida.', k: 'monocultivo policultivo simulador' },
+      { v: 'ciclo', t: 'Seguimiento por etapas', d: 'Cada ciclo registrado con su etapa, sus tareas y los riesgos de plaga.', k: 'fenologia etapa' },
+      { v: 'procesos', t: 'Procesos por voz', d: 'Describa una labor en voz alta y Chagra le arma el ciclo productivo para confirmar.', k: 'voz ciclo proceso' },
+      { v: 'ciclo_vivo', t: 'Ciclo del cultivo', d: 'El cultivo en siete fases, y en cada una lo que Chagra le ayuda a hacer.', k: 'rueda fases' },
+      { v: 'cafe', t: 'El café', d: 'Del almácigo a la cosecha: variedad, sombra, broca y roya sin receta química.', k: 'cafetal broca roya' },
+      { v: 'cacao', t: 'El cacao', d: 'Bajo sombra y con plantas de distintas alturas; el árbol, el grano y su beneficio.', k: 'chocolate' },
+      { v: 'platano', t: 'Plátano y banano', d: 'Hartón, dominico, cachaco: el pancoger que no falta.', k: 'platano guineo colino' },
+      { v: 'cana', t: 'La caña y la panela', d: 'Del cañaveral en ladera al bloque de panela en el trapiche.', k: 'trapiche panela' },
+      { v: 'hortalizas', t: 'La huerta', d: 'Tomate, cebolla, zanahoria, repollo, cilantro: la comida de todos los días.', k: 'huerta verduras' },
+      { v: 'tuberculos', t: 'Tubérculos y raíces', d: 'Papa, yuca, arracacha, ñame, cubio y chugua, cada uno con su forma de sembrar.', k: 'papa yuca arracacha' },
+      { v: 'frutales', t: 'Frutales de la finca', d: 'Guayaba, mora, lulo, tomate de árbol, papaya, cada uno con su ficha.', k: 'frutas' },
+      { v: 'citricos', t: 'Los cítricos', d: 'Naranja, mandarina, limón y lima: el solar de tierra caliente.', k: 'naranja limon mandarina' },
+      { v: 'aguacate', t: 'El aguacate', d: 'Hass y criollos de montaña: variedad según la altura, injerto y patrón.', k: 'hass' },
+      { v: 'mango', t: 'El mango', d: 'El frutal de la tierra cálida, de pepa o injertado.', k: 'mango' },
+      { v: 'uchuva', t: 'La uchuva', d: 'La fruta andina de clima frío, contada por su ciclo.', k: 'uchuva physalis' },
+      { v: 'quinua', t: 'Quinua y granos andinos', d: 'Quinua, amaranto, chía y tarwi: los granos de la montaña que vuelven.', k: 'amaranto chia granos' },
+      { v: 'aromaticas', t: 'Aromáticas', d: 'La huerta de la cocina: para qué sirve cada hierba en el fogón y cómo sembrarla.', k: 'cilantro poleo hierbas condimento' },
+      { v: 'botica', t: 'La botica campesina', d: 'La huerta medicinal: cómo se cultiva cada planta y su uso tradicional, sin prometer curas.', k: 'medicinal remedio plantas' },
+      { v: 'fique', t: 'El fique', d: 'La planta de ladera que cuida el suelo y da la cabuya.', k: 'cabuya fibra' },
+    ] },
+  { n: 5, id: 'sanidad', icono: 'i-sanidad', corto: 'Sanidad', titulo: 'Sanidad sin veneno', fondo: '#d7e6c2',
+    lema: 'Primero mirar, luego entender, y controlar con la vida: el que se come a la plaga también es de la finca.',
+    angelita: 'Antes de fumigar, mire quién se está comiendo a quién.',
+    destacadas: ['sanidad_sintoma', 'plaga_biopreparado', 'biopreparados', 'plagas'],
+    pantallas: [
+      { v: 'sanidad_sintoma', t: '¿Qué le pasa a mi planta?', d: 'Cuéntelo con sus palabras (gota, candelilla, polvillo) y le muestra la causa y el manejo sin veneno.', k: 'enfermedad hongo amarilla gota enferma' },
+      { v: 'plaga_biopreparado', t: 'Foto de la plaga', d: 'Tome una foto: le propone qué puede ser y qué controles conoce. Usted confirma.', k: 'foto camara bicho gusano' },
+      { v: 'biopreparados', t: 'Biopreparados', d: 'Caldos, purines, biofermentos y extractos para proteger o nutrir la planta.', k: 'caldo bordeles supermagro biol purin' },
+      { v: 'seguimiento_biopreparados', t: 'Seguir una preparación', d: 'Anote bocashi, biol o supermagro, sus cantidades, revisiones y recordatorios.', searchTerms: ['Bocashi', 'Biol', 'Supermagro', 'recordatorio', 'volteo'], k: 'lote fermentación fecha de inicio listo' },
+      { v: 'plagas', t: 'Directorio de plagas', d: 'Cada plaga y enfermedad: a qué le pega, cómo reconocerla, cuándo actuar y cómo manejarla.', k: 'insectos hongos broca' },
+      { v: 'observacion', t: 'Anotar lo que vio', d: 'Una observación con lugar, planta y gravedad; si es grave, abre un caso.', k: 'observar' },
+      { v: 'casos', t: 'Casos de la finca', d: 'Los problemas activos, ordenados por gravedad, con su historia de tratamientos.', k: 'problemas seguimiento' },
+      { v: 'caso_detail', t: 'Un caso por dentro', d: 'La línea de tiempo de un caso: qué se hizo y cómo va (se abre desde Casos).', k: 'caso' },
+      { v: 'toxicologia', t: 'Toxicología', d: 'Qué tan peligroso es cada insumo, qué protección pide y qué dice la norma del ICA.', k: 'veneno peligro proteccion' },
+    ] },
+  { n: 6, id: 'cosecha', icono: 'i-cosecha', corto: 'Cosecha', titulo: 'Cosechar y vender', fondo: '#f3dfab',
+    lema: 'Lo que da la finca: recogerlo en su punto, guardarlo bien, comerlo en casa y venderlo cerca.',
+    angelita: 'Lo que se vende cerca llega fresco a la mesa de otros.',
+    destacadas: ['cosechar', 'mi_cosecha', 'mercados', 'poscosecha'],
+    pantallas: [
+      { v: 'cosechar', t: 'Anotar la cosecha', d: 'El formulario para anotar lo que recogió hoy; Chagra le sugiere la cantidad de siempre.', searchTerms: ['Cosechar', 'Registrar cosecha'], k: 'recoger huevos kilos' },
+      { v: 'mi_cosecha', t: 'Mi cosecha', d: 'Cuánto produce cada cultivo, cómo va el año y el rendimiento por lote.', k: 'produccion rendimiento' },
+      { v: 'mercados', alias: ['mercado'], t: 'Mercado campesino', d: 'Ofrezca su cosecha y vea lo que ofrecen otras fincas, en circuito corto.', k: 'vender venta precio plata' },
+      { v: 'poscosecha', t: 'Después de cosechar: guardar y despensa', d: 'Cosechar en punto, secar el grano y transformar, para no perder lo que ya dio la planta.', k: 'secar grano transformar' },
+      { v: 'almacenamiento', t: 'Guardar y conservar', d: 'Almacenar a mediano y largo plazo, con seguridad.', k: 'guardar conservar' },
+      { v: 'nutricion', t: 'La comida que alimenta', d: 'Qué le da de comer a su familia cada cultivo de la finca.', k: 'nutricion alimento familia' },
+      { v: 'fermentos', t: 'Fermentos de la cocina', d: 'Fermentos tradicionales de la cocina, con sus reglas de seguridad.', k: 'chicha fermentar' },
+      { v: 'crm', t: 'Red de la finca', d: 'Sus compradores y contactos, y cada trato con ellos.', k: 'clientes compradores contactos', gated: 'según su cuenta' },
+    ] },
+  { n: 7, id: 'monte', icono: 'i-monte', corto: 'Monte y agua', titulo: 'El monte y el agua', fondo: '#c9ddc4',
+    lema: 'El territorio: el agua nace en el monte, y el monte vuelve si se le deja.',
+    angelita: 'El agua nace en el monte. Cuide el monte y tendrá agua.',
+    destacadas: ['agua', 'biodiversidad', 'restauracion', 'directorio'],
+    pantallas: [
+      { v: 'agua', t: 'El agua de la finca', d: 'Cosechar la lluvia, regar con medida y cuidar el nacimiento.', k: 'riego lluvia nacimiento quebrada' },
+      { v: 'biodiversidad', t: 'Biodiversidad', d: 'Cuántas especies hay en la finca, a qué altura crecen y qué oficio cumplen.', k: 'especies estratos' },
+      { v: 'restauracion', t: 'Bosque de alimentos', d: 'Plantas a distintas alturas y cómo cambia el bosque con el tiempo: recuperar el terreno sembrando comida.', k: 'restaurar bosque sucesion agroforesteria' },
+      { v: 'directorio', alias: ['especies'], t: 'Directorio de especies', d: 'Busque una planta: frío o calor que necesita, plantas vecinas, preparados para cuidarla, plagas y saberes.', k: 'buscar planta especie' },
+      { v: 'herbario_vivo', t: 'Herbario vivo', d: 'Su cuaderno de plantas: una foto por hallazgo, que usted revisa.', k: 'foto herbario' },
+      { v: 'foto_grafo', t: '¿Qué planta es?', d: 'La foto propone una especie con sus fuentes a la vista; usted decide antes de anotarla.', k: 'identificar foto' },
+      { v: 'mision_campo', t: 'Misión de campo', d: 'El próximo recorrido: las especies que aún no tienen foto en su finca.', k: 'recorrido fotos faltan' },
+      { v: 'reportar_invasora', t: 'Reportar una invasora', d: 'Avise de una planta o animal que desplaza a otros; primero salen los de su clima.', k: 'invasora' },
+      { v: 'monte_vuelve', t: 'El monte que vuelve', d: 'El potrero volviéndose monte con el paso del tiempo, en edu.chagra.bio.', k: 'potrero 3d restauracion' },
+      { v: 'valle3d', t: 'El valle de Chagra', d: 'Entre al valle vivo de Chagra: se abre en edu.chagra.bio.', k: '3d valle' },
+      { v: 'glaciar', t: 'Punto glaciar', d: 'Para guías de montaña: reporte sin señal del borde del hielo, con foto y GPS.', k: 'nevado hielo' },
+      { v: 'glaciar_historial', t: 'Historial del glaciar', d: 'Los reportes guardados, punto por punto, para ver cuánto retrocede.', k: 'nevado reportes' },
+    ] },
+  { n: 8, id: 'aprender', icono: 'i-aprender', corto: 'Aprender', titulo: 'Aprender y jugar', fondo: '#f0d9c2',
+    lema: 'Se aprende haciendo y jugando: para los grandes, y para la niñez de la finca.',
+    angelita: 'Aprender jugando también es oficio de la finca.',
+    destacadas: ['curso', 'aprende', 'hub_juegos', 'juego'],
+    pantallas: [
+      { v: 'descenso_control-biologico', t: 'Ver la lección: El control biológico', d: 'Recorra este mundo de su finca.', k: 'control biologico' },
+      { v: 'descenso_frijol-nodulo', t: 'Ver la lección: El fríjol y el nitrógeno', d: 'Recorra este mundo de su finca.', k: 'frijol nodulo' },
+      { v: 'descenso_bayas', t: 'Ver la lección: Las bayas', d: 'Recorra este mundo de su finca.', k: 'bayas' },
+      { v: 'descenso_aguacate', t: 'Ver la lección: El aguacate', d: 'Recorra este mundo de su finca.', k: 'aguacate' },
+      { v: 'descenso_citricos-hlb', t: 'Ver la lección: Los cítricos y el HLB', d: 'Recorra este mundo de su finca.', k: 'citricos hlb' },
+      { v: 'descenso_pasifloras', t: 'Ver la lección: Las pasifloras', d: 'Recorra este mundo de su finca.', k: 'pasifloras' },
+      { v: 'descenso_platano', t: 'Ver la lección: El plátano y el banano', d: 'Recorra este mundo de su finca.', k: 'platano' },
+      { v: 'descenso_ovinos-carne', t: 'Ver la lección: Los ovinos de carne', d: 'Recorra este mundo de su finca.', k: 'ovinos carne' },
+      { v: 'descenso_lombricompost', t: 'Ver la lección: El lombricompost', d: 'Recorra este mundo de su finca.', k: 'lombricompost' },
+      { v: 'descenso_biodigestor', t: 'Ver la lección: El biodigestor', d: 'Recorra este mundo de su finca.', k: 'biodigestor' },
+      { v: 'descenso_arvenses', t: 'Ver la lección: Las arvenses', d: 'Recorra este mundo de su finca.', k: 'arvenses' },
+      { v: 'descenso_micorrizas', t: 'Ver la lección: Las micorrizas', d: 'Recorra este mundo de su finca.', k: 'micorrizas' },
+      { v: 'descenso_erosion-ladera', t: 'Ver la lección: La erosión en ladera', d: 'Recorra este mundo de su finca.', k: 'erosion ladera' },
+      { v: 'descenso_microorganismos', t: 'Ver la lección: Los microorganismos de montaña', d: 'Recorra este mundo de su finca.', k: 'microorganismos' },
+      { v: 'descenso_cuyes-conejos', t: 'Ver la lección: Los cuyes y conejos', d: 'Recorra este mundo de su finca.', k: 'cuyes conejos' },
+      { v: 'descenso_forrajes', t: 'Ver la lección: Los forrajes', d: 'Recorra este mundo de su finca.', k: 'forrajes' },
+      { v: 'descenso_helada', t: 'Ver la lección: La helada', d: 'Recorra este mundo de su finca.', k: 'helada' },
+      { v: 'descenso_riego-goteo', t: 'Ver la lección: El riego por goteo', d: 'Recorra este mundo de su finca.', k: 'riego goteo' },
+      { v: 'descenso_yuca', t: 'Ver la lección: La yuca', d: 'Recorra este mundo de su finca.', k: 'yuca' },
+      { v: 'descenso_tuberculos-andinos', t: 'Ver la lección: Los tubérculos andinos', d: 'Recorra este mundo de su finca.', k: 'tuberculos andinos' },
+      { v: 'descenso_maiz-cogollero', t: 'Ver la lección: El maíz y el gusano cogollero', d: 'Recorra este mundo de su finca.', k: 'maiz cogollero' },
+      { v: 'descenso_aromaticas', t: 'Ver la lección: Las aromáticas', d: 'Recorra este mundo de su finca.', k: 'aromaticas botica olor' },
+      { v: 'descenso_agua', t: 'Descenso del agua', d: 'Siga la lluvia desde la loma hasta el poro, con agua medida y fuentes.', k: 'agua lluvia techo nacimiento' },
+      { v: 'descenso_suelo', t: 'Descenso del suelo', d: 'Baje del lote hasta la raíz fina y descubra la vida que sostiene la tierra.', k: 'suelo raíz vida tierra' },
+      { v: 'descenso_roya', t: 'Descenso de la roya', d: 'Mire la roya del café desde la hoja hasta la espora y aprenda a reconocerla.', k: 'roya café hongo hoja' },
+      { v: 'descenso_compost', t: 'Descenso del compost', d: 'Acompañe el compost desde el corral hasta la tierra negra.', k: 'compost estiércol tierra abono' },
+      { v: 'descenso_silvopastoreo', t: 'Descenso del silvopastoreo', d: 'Recorra el potrero arbolado y sus relaciones entre pasto, árboles y ganado.', k: 'silvopastoreo ganado árboles pasto' },
+      { v: 'descenso_ciclo-anio', t: 'El año de la finca', d: 'Siga el ciclo de la finca a lo largo de sus estaciones.', k: 'año finca estaciones ciclo' },
+      { v: 'descenso_cacao', t: 'Descenso del cacao', d: 'Del árbol al grano fermentado, recorra el cultivo de cacao.', k: 'cacao cultivo fermentación' },
+      { v: 'descenso_cana', t: 'Descenso de la caña', d: 'Siga la caña desde la estaca hasta la panela.', k: 'caña panela trapiche' },
+      { v: 'descenso_restauracion', t: 'Descenso de la restauración', d: 'Recorra la recuperación del suelo y el bosque de alimentos.', k: 'restauración suelo bosque' },
+      { v: 'descenso_semilla', t: 'Descenso de la semilla', d: 'De la mazorca guardada a la plántula.', k: 'semilla germinación' },
+      { v: 'descenso_abejas', t: 'Descenso de las abejas', d: 'De la flor a la semilla, con las abejas.', k: 'abejas polinización' },
+      { v: 'descenso_poscosecha', t: 'Descenso de la poscosecha', d: 'Del maíz cosechado al grano y de vuelta al silo.', k: 'poscosecha grano silo' },
+      { v: 'descenso_biopreparados', t: 'Descenso de los biopreparados', d: 'Del patio de la finca a la hoja.', k: 'biopreparados hoja' },
+      { v: 'descenso_cerdos', t: 'Descenso de los cerdos', d: 'De la porqueriza al cerdo y de vuelta a la tierra.', k: 'cerdos porqueriza' },
+      { v: 'descenso_gallinas', t: 'Descenso de las gallinas', d: 'Del potrero a la gallina y al huevo.', k: 'gallinas huevo gallinaza' },
+      { v: 'descenso_tomate-invernadero', t: 'Descenso del tomate', d: 'Del invernadero al hongo.', k: 'tomate invernadero' },
+      { v: 'descenso_papa', t: 'Descenso de la papa', d: 'De la planta al tubérculo.', k: 'papa tubérculo' },
+      { v: 'descenso_paramo', t: 'Descenso del páramo', d: 'De la niebla al agua de su finca.', k: 'páramo agua niebla' },
+      { v: 'descenso_cafe-exportacion', t: 'Ver la lección: El café, taza y exportación', d: 'Recorra este mundo de su finca.', k: 'cafe exportacion' },
+      { v: 'descenso_olor-corrales', t: 'Ver la lección: El olor de los corrales', d: 'Recorra este mundo de su finca.', k: 'olor corrales' },
+      { v: 'descenso_peces', t: 'Ver la lección: Los peces', d: 'Recorra este mundo de su finca.', k: 'peces' },
+      { v: 'descenso_hortalizas', t: 'Ver la lección: Las hortalizas', d: 'Recorra este mundo de su finca.', k: 'hortalizas' },
+      { v: 'curso', t: 'Aprenda a usar Chagra', d: 'Cinco pasos, del primer registro a la venta, con videos y práctica en su finca.', k: 'curso tutorial' },
+      { v: 'aprende', t: 'Aprender con Chagra', d: 'Lecciones de agroecología, con lo que pasa en su cultivo al final de cada una.', k: 'lecciones' },
+      { v: 'hub_juegos', alias: ['juegos', 'sala_juegos'], t: 'La sala de juegos', d: 'Todos los juegos de la finca, como en feria de pueblo.', k: 'juegos niños' },
+      { v: 'juego', t: 'Mi finca viva', d: 'La finca florece a medida que mejoran sus datos reales; hecho para la niñez.', k: 'niña niño juego' },
+      { v: 'milpa', t: 'Simulador de la milpa', d: 'Siembre las tres hermanas y vea qué pasa con el nitrógeno, el carbono y la cosecha.', k: 'juego milpa' },
+      { v: 'defensores', t: 'Defensores de la finca', d: 'Defienda la huerta con los aliados del control biológico.', k: 'juego plagas' },
+      { v: 'metal_slug_campo', t: document.querySelector('meta[name="home-companion-title"]')?.content || 'Angelita en la huerta', d: 'Corra y salte: venza plagas con el control biológico correcto, sin violencia.', k: 'juego angelita' },
+      { v: 'finca_odyssey', t: 'El túnel de la loma', d: 'Entre por el túnel a su finca: se abre en edu.chagra.bio.', k: 'juego tunel' },
+      { v: 'doom_finca', t: 'La finca en primera persona', d: 'Recorra la finca en un juego de pasillos y corrales.', k: 'juego' },
+      { v: 'ahorcado_contaminado', t: 'La chagra contaminada', d: 'Adivine la palabra antes de que el veneno acabe con la chagra.', k: 'ahorcado palabras juego' },
+      { v: 'mundo_casa_adentro', t: 'La casa por dentro', d: 'El fogón, la luz de la ventana y la mesa: lo que cuenta la casa campesina.', k: 'casa fogon 3d' },
+      { v: 'espiritu_pro', t: 'La finca viva, inmersiva', d: 'Una experiencia inmersiva de la finca; aparece si su cuenta la incluye.', k: 'inmersivo', gated: 'según su cuenta' },
+    ] },
+  { n: 9, id: 'memoria', icono: 'i-memoria', corto: 'Memoria', titulo: 'La memoria de la finca', fondo: '#39365a', noche: true,
+    lema: 'Lo que se anota no se olvida: al final del día, junto al fogón, la finca va dejando su historia.',
+    angelita: 'Lo que se anota no se olvida. ¿Ya anotó lo de hoy?',
+    destacadas: ['bitacora', 'ano_finca', 'evolucion', 'informes'],
+    pantallas: [
+      { v: 'bitacora', alias: ['historial'], t: 'Cuaderno de labores', d: 'Todo lo anotado, pendiente o ya guardado, día por día.', k: 'historial registros' },
+      { v: 'ano_finca', t: 'El año de la finca', d: 'Lo vivido hasta hoy y lo que viene, mes a mes: sembró, cosechó, floreció.', k: 'linea tiempo año' },
+      { v: 'evolucion', t: 'Cómo va la finca', d: 'La salud de su sistema con indicadores reales; dice «sin datos» cuando no los hay.', k: 'indicadores transicion evaluacion' },
+      { v: 'informes', t: 'Informes', d: 'Descargue los reportes de la finca, cada uno con lo que incluye.', k: 'reporte descargar csv' },
+      { v: 'puerta_bitacora', t: 'Las huellas de la semana', d: 'Siete días, tres hilos: lo que quedó escrito.', k: 'semana' },
+      { v: 'bitacora_detail', t: 'Un apunte por dentro', d: 'El detalle de cualquier registro (se abre desde el cuaderno de labores).', k: 'detalle' },
+      { v: 'mapa', t: 'El mapa de sus fotos', d: 'Cada foto con GPS es un punto; los huecos son lugares para volver a mirar.', k: 'mapa gps fotos' },
+      { v: 'fenologia_lapso', t: 'La misma planta en el tiempo', d: 'Compare fotos tomadas en el mismo punto, recorrido tras recorrido.', k: 'fotos comparar tiempo' },
+    ] },
+  { n: 10, id: 'cuenta', icono: 'i-cuenta', corto: 'Cuenta', titulo: 'Cuenta y ayuda', fondo: '#1b2140', noche: true,
+    lema: 'Su cuenta, la gente de su finca y la ayuda cuando la necesite.',
+    angelita: 'Si se enreda, aquí estoy. Tóqueme y me pregunta.',
+    destacadas: ['perfil', 'ayuda', 'faq', 'usuarios'],
+    pantallas: [
+      { v: 'perfil', t: 'Mi Chagra', d: 'Su morral: los datos de la finca, la letra grande y su animal compañero.', k: 'perfil cuenta letra grande' },
+      { v: 'ayuda', alias: ['help'], t: 'Manual de uso', d: 'Cómo se usa Chagra, con un tutorial de voz.', k: 'manual ayuda' },
+      { v: 'faq', t: 'Preguntas frecuentes', d: 'Busque su duda por palabra.', k: 'preguntas dudas' },
+      { v: 'usuarios', t: 'La gente de la finca', d: 'Quién más entra a su finca y qué puede hacer cada quien.', k: 'usuarios familia trabajadores permisos' },
+      { v: 'extensionista', t: 'Modo extensionista', d: 'Para quien acompaña varias fincas: el estado de cada una.', k: 'tecnico asesor' },
+    ] },
+];
+
+/* a un toque de la entrada */
+const TOQUES = [
+  { v: 'registro_voz', t: 'Hablarle a Chagra', i: 'i-mic', fuerte: true },
+  { v: 'hub_juegos', t: 'Jugar', i: 'i-aprender' },
+  { v: 'sembrar', t: 'Anotar una siembra', i: 'i-sembrar' },
+  { v: 'agente', t: 'Preguntar por escrito', i: 'i-lapiz' },
+  { v: 'clima_boletin', t: 'El tiempo', i: 'i-nube' },
+  { v: 'task_log', t: 'Tareas', i: 'i-lista' },
+  { v: 'plantas-v2', t: 'Mis plantas', i: 'i-hoja' },
+  { v: 'sanidad_sintoma', t: '¿Qué tiene mi planta?', i: 'i-lupa-hoja' },
+  { v: 'mercados', t: 'Vender', i: 'i-cosecha', grande: true },
+];
+/* lo que no espera: EJEMPLO, marcado como tal en pantalla */
+const PENDIENTES = [];
+
+/* =====================================================================================================
+   UTILIDADES
+   ===================================================================================================== */
+const $ = s => document.querySelector(s);
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+const quieto = () => mqRM.matches;
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const eIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const TAU = Math.PI * 2;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sinTilde = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const icono = (id, cls = 'ic') => `<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
+
+const POR_VISTA = new Map();
+for (const g of GRUPOS) for (const p of g.pantallas){ p.g = g; POR_VISTA.set(p.v, p); for (const a of p.alias || []) POR_VISTA.set(a, p); }
+
+/* =====================================================================================================
+   LA HORA: el cielo, el saludo y la fecha salen del reloj de quien abre
+   ===================================================================================================== */
+const params = new URLSearchParams(location.search);
+const ahora = new Date();
+const hora = params.has('hora') ? +params.get('hora') : ahora.getHours() + ahora.getMinutes() / 60;
+function franja(h){
+  if (h >= 4.5 && h < 6.5) return 'madrugada';
+  if (h >= 6.5 && h < 11) return 'manana';
+  if (h >= 11 && h < 14) return 'mediodia';
+  if (h >= 14 && h < 17.5) return 'tarde';
+  if (h >= 17.5 && h < 19) return 'anochecer';
+  return 'noche';
+}
+const FR = franja(hora);
+document.documentElement.dataset.hora = FR;
+if (params.has('sinanim')) document.documentElement.classList.add('sin-anim'); // solo para medir: apaga animaciones y paralaje
+const SALUDOS = {
+  madrugada: ['Buenos días. Ya cantó el gallo.', 'Antes de que salga el sol, vea qué le toca hoy.'],
+  manana: ['Buenos días. ¿Qué le toca hoy a la finca?', 'Aquí se organiza el día y el año de su finca: lo que no espera, lo que tiene, y todo lo demás a dos toques.'],
+  mediodia: ['Buen provecho. ¿Cómo va la mañana?', 'Anote lo que ya hizo y mire lo que falta para la tarde.'],
+  tarde: ['Buenas tardes. ¿Cómo le fue en la finca?', 'Todavía hay luz para lo que falta. Lo demás, a dos toques.'],
+  anochecer: ['Buenas tardes. Ya se va la luz.', 'Buen momento para anotar el día antes de que se le olvide.'],
+  noche: ['Buenas noches. La finca descansa.', 'Anote lo del día junto al fogón, y mire lo que viene mañana.'],
+};
+$('#saludo').textContent = SALUDOS[FR][0];
+$('#bajada').textContent = SALUDOS[FR][1];
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+$('#fecha').textContent = `${DIAS[ahora.getDay()]} ${ahora.getDate()} de ${MESES[ahora.getMonth()]}`;
+document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue('--s1').trim() || '#a9d4ea';
+
+/* el sol o la luna en su sitio */
+(function astro(){
+  const disco = $('#disco'), halo = $('#halo');
+  let x, y;
+  if (FR === 'noche'){ x = 900; y = 150; }
+  else { const t = clamp((hora - 5.5) / 13); x = 850 + t * 150; y = 330 - Math.sin(t * Math.PI) * 190; }
+  disco.setAttribute('cx', x); disco.setAttribute('cy', y); halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+  if (FR === 'noche'){ disco.setAttribute('r', 26); }
+  const g = $('#estrellas'); let s = '';
+  let semilla = 7; const azar = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 70; i++) s += `<circle cx="${(azar() * 1440).toFixed(0)}" cy="${(azar() * 330).toFixed(0)}" r="${(azar() * 1.6 + .5).toFixed(1)}" fill="#fff" style="--d:${(azar() * 3).toFixed(2)}s"/>`;
+  g.innerHTML = s;
+})();
+
+/* =====================================================================================================
+   HOY: lo que no espera, a un toque, el año
+   ===================================================================================================== */
+$('#pendientes').innerHTML = PENDIENTES.map(p => `<li><button type="button" class="pendiente" data-v="${p.v}">
+  <span class="marca-p" style="background:${p.color}">${icono(p.icono)}</span>
+  <span><b>${esc(p.t)}</b><span class="d">${esc(p.d)}</span></span>${icono('i-fl', 'ic fl')}</button></li>`).join('');
+$('#a-un-toque').innerHTML = TOQUES.map(q => `<button type="button" class="toque${q.fuerte ? ' fuerte' : ''}" data-v="${q.v}">${icono(q.i)}<span>${esc(q.t)}</span></button>`).join('');
+(function anio(){
+  $('#meses').textContent = 'Sin registros mensuales de lluvia';
+  $('#meses').setAttribute('aria-label', 'Sin registros mensuales de lluvia');
+  $('#anio-ahora').textContent = String(ahora.getFullYear());
+  $('#enlaces-anio').innerHTML = [['almanaque', 'Almanaque'], ['calendario_finca', 'Calendario de la finca'], ['ano_finca', 'Lo vivido este año']]
+    .map(([v, t]) => `<button type="button" class="chip" data-v="${v}">${t}</button>`).join('');
+})();
+
+/* =====================================================================================================
+   LA TROCHA Y LOS GRUPOS
+   ===================================================================================================== */
+$('#trocha-in').innerHTML = GRUPOS.map(g => `<button type="button" class="paso" data-ir="${g.n}" aria-label="${g.n}. ${esc(g.titulo)}">${icono(g.icono)}<span class="n">${g.n}</span>${esc(g.corto)}</button>`).join('')
+  + `<button type="button" class="buscar-btn" id="abrir-buscar-2">${icono('i-lupa')}Buscar</button>`;
+
+function pantallaHTML(p){
+  return `<li><button type="button" class="pant" data-v="${p.v}"><span><span class="pt">${esc(p.t)}${p.gated ? `<span class="gated">${esc(p.gated)}</span>` : ''}</span><span class="pd">${esc(p.d)}</span></span>${icono('i-fl', 'ic fl')}</button></li>`;
+}
+const BANDAS = {};
+document.querySelectorAll('template[data-banda]').forEach(t => { BANDAS[t.dataset.banda] = t.innerHTML; });
+$('#grupos').innerHTML = GRUPOS.filter(g => g.n > 1).map(g => {
+  const dest = g.destacadas.map(v => POR_VISTA.get(v));
+  const resto = g.pantallas.filter(p => !g.destacadas.includes(p.v));
+  return `<details class="grupo${g.noche ? ' noche' : ''}" id="g-${g.n}" data-g="${g.n}" style="--fondo:${g.fondo}">
+    <summary class="grupo-cab grupo-resumen" data-percha="${g.n}">
+      <span class="ic-g">${icono(g.icono)}</span>
+      <h2 id="t-${g.id}">${esc(g.titulo)}</h2>
+    </summary>
+    <div class="banda" aria-hidden="true">${BANDAS[g.id] || ''}</div>
+    <div class="grupo-in">
+      <p class="lema">${esc(g.lema)}</p>
+      <div class="grupo-cuerpo">
+        <ul class="pantallas destacadas">${dest.map(pantallaHTML).join('')}</ul>
+        ${resto.length ? `<details class="mas"><summary>${icono('i-fl')}${resto.length === 1 ? 'Una más' : `Las otras ${resto.length}`} de ${esc(g.titulo)}</summary><ul class="pantallas">${resto.map(pantallaHTML).join('')}</ul></details>` : ''}
+      </div>
+    </div>
+  </details>`;
+}).join('');
+/* el grupo 1 vive arriba (la tarjeta de hoy); su lista completa va en su propio cajón */
+(function hoyCompleto(){
+  const g = GRUPOS[0], resto = g.pantallas;
+  const d = document.createElement('details'); d.className = 'mas'; d.style.margin = '12px 2px 0';
+  d.innerHTML = `<summary>${icono('i-fl')}Todo lo de hoy (${resto.length})</summary><ul class="pantallas" style="grid-template-columns:1fr">${resto.map(pantallaHTML).join('')}</ul>`;
+  $('#percha-hoy').appendChild(d);
+})();
+
+/* =====================================================================================================
+   LA HOJA: qué abre cada botón · EL BUSCADOR
+   ===================================================================================================== */
+const hoja = $('#hoja');
+function abrir(v){ window.parent.postMessage({channel:'home-a',action:'view',value:v}, '*'); }
+function cerrarHoja(){ if (hoja.open) hoja.close(); }
+hoja.addEventListener('close', () => { if (location.hash.startsWith('#/v/')) history.replaceState(null, '', location.pathname + location.search); });
+hoja.addEventListener('click', e => { if (e.target === hoja) cerrarHoja(); });
+$('#hoja-cerrar').addEventListener('click', cerrarHoja);
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-v]'); if (b && !b.closest('dialog.hoja')){ abrir(b.dataset.v); return; }
+  const ir = e.target.closest('[data-ir]'); if (ir){ const s = document.getElementById('g-' + ir.dataset.ir); if (s instanceof HTMLDetailsElement) s.open = true; s.scrollIntoView({ behavior: quieto() ? 'auto' : 'smooth', block: 'start' }); }
+});
+const buscador = $('#buscador'), q = $('#q'), res = $('#resultados');
+const INDICE = [];
+for (const g of GRUPOS) for (const p of g.pantallas) INDICE.push({ p, txt: sinTilde([p.t, p.d, p.v, (p.alias || []).join(' '), (p.searchTerms || []).join(' '), p.k || '', g.titulo].join(' ')) });
+function buscar(){
+  const t = sinTilde(q.value.trim());
+  const palabras = t.split(/\s+/).filter(Boolean);
+  res.hidden = !palabras.length;
+  if (!palabras.length) { res.replaceChildren(); return; }
+  const exactos = INDICE.filter(x => sinTilde(x.p.t) === t || (x.p.searchTerms || []).some(term => sinTilde(term) === t));
+  const encontrados = exactos.length ? exactos : INDICE.filter(x => palabras.every(w => x.txt.includes(w)));
+  const hits = [...new Map(encontrados.map(x => [x.p.v, x])).values()];
+  res.innerHTML = hits.length ? hits.map(({ p }) => `<button type="button" class="pant" role="listitem" data-v="${p.v}"><span><span class="de">${p.g.n} · ${esc(p.g.titulo)}</span><span class="pt">${esc(p.t)}</span><span class="pd">${esc(p.d)}</span></span>${icono('i-fl', 'ic fl')}</button>`).join('')
+    : `<p class="vacio">No encontramos «${esc(q.value)}». Pruebe con otra palabra, o pregúntele a Chagra con el botón de hablar.</p>`;
+}
+let buscarOrigen = null;
+function abrirBuscar(event){ buscarOrigen = event.currentTarget; buscar(); q.focus({preventScroll:true}); window.parent.postMessage({channel:'home-a',action:'search'}, '*'); }
+function cerrarBuscar(){ q.value = ''; buscar(); (buscarOrigen || q).focus({preventScroll:true}); }
+buscador.addEventListener('cancel', event => { event.preventDefault(); cerrarBuscar(); });
+buscador.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  event.preventDefault(); event.stopPropagation(); cerrarBuscar();
+});
+buscador.addEventListener('close', () => buscarOrigen?.focus({ preventScroll: true }));
+q.addEventListener('input', buscar);
+$('#abrir-buscar').addEventListener('click', abrirBuscar);
+$('#abrir-buscar-2').addEventListener('click', abrirBuscar);
+$('#buscar-cerrar').addEventListener('click', cerrarBuscar);
+
+/* =====================================================================================================
+   LA TROCHA SIGUE EL SCROLL · EL PAISAJE EN CAPAS (2.5D)
+   ===================================================================================================== */
+const secciones = [$('#g-1'), ...document.querySelectorAll('.grupo')];
+const pasos = [...document.querySelectorAll('.paso')];
+let grupoActual = 1;
+function marcarPaso(n){
+  if (n === grupoActual && pasos[n - 1].getAttribute('aria-current')) return;
+  grupoActual = n;
+  pasos.forEach((b, i) => b.setAttribute('aria-current', i === n - 1 ? 'true' : 'false'));
+  const b = pasos[n - 1], cont = $('#trocha-in');
+  const x = b.offsetLeft - cont.clientWidth / 2 + b.clientWidth / 2;
+  cont.scrollTo({ left: x, behavior: quieto() ? 'auto' : 'smooth' });
+}
+function grupoEnVista(){
+  const linea = innerHeight * .38; let n = 1;
+  for (const s of secciones){ if (s.getBoundingClientRect().top <= linea) n = +s.dataset.g; }
+  return n;
+}
+const capas = [...document.querySelectorAll('#cielo .capa')];
+const cielo = $('#cielo');
+let rafS = 0;
+function alScroll(){
+  rafS = 0;
+  const y = scrollY;
+  if (!quieto() && !document.documentElement.classList.contains('sin-anim') && y < cielo.offsetHeight + 40) for (const c of capas){ c.style.transform = `translate3d(0,${(y * +c.dataset.k).toFixed(1)}px,0)`; }
+  marcarPaso(grupoEnVista());
+}
+addEventListener('scroll', () => { if (!rafS) rafS = requestAnimationFrame(alScroll); }, { passive: true });
+
+alScroll();
+window.__home = { GRUPOS, POR_VISTA, abrir, estado: () => ({ grupo: grupoActual, hora: FR }) };
+</script>
+</body>
+</html>

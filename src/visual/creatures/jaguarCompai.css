@@ -1,0 +1,113 @@
+/* A registered phase lets the foot follow a straight support trajectory. */
+@property --jc-step { syntax: '<number>'; inherits: true; initial-value: -1; }
+.jc-avatar { overflow: visible; }
+.jc-avatar .jc-columna { transform-origin: 125px 175px; }
+.jc-avatar .jc-cola { transform-origin: 184px 145px; }
+.jc-avatar .jc-atlas { transform-origin: 78px 125px; }
+.jc-avatar .jc-cabeza { transform-origin: 78px 125px; }
+.jc-avatar .jc-oreja-i { transform-origin: 52px 72px; }
+.jc-avatar .jc-oreja-d { transform-origin: 99px 72px; }
+.jc-avatar .jc-ojos { transform-origin: 74px 89px; }
+.jc-avatar .jc-pupilas { transform: translate(var(--rh-mx, 0px), var(--rh-my, 0px)); }
+.jc-avatar .jc-pata { transform-origin: 0 0; }
+.jc-avatar .jc-canilla { transform-origin: 0 32px; }
+.jc-avatar .jc-zarpa { transform-origin: 0 54px; }
+.jc-avatar .jc-mandibula { transform: translateY(var(--jc-boca, 0px)); }
+.jc-avatar[data-vivo="1"] .jc-columna { animation: jc-respira 5.9s ease-in-out infinite; }
+.jc-avatar[data-vivo="1"] .jc-cola { animation: jc-cola 7.1s ease-in-out infinite; }
+.jc-avatar[data-vivo="1"] .jc-ojos { animation: jc-parpadea var(--rh-blink-dur, 6.7s) infinite; }
+.jc-avatar[data-jc-estado="escucha"] .jc-atlas { transform: rotate(-5deg); }
+.jc-avatar[data-jc-estado="escucha"] .jc-oreja-d { transform: rotate(12deg); }
+.jc-avatar[data-jc-estado="piensa"] .jc-atlas { transform: rotate(4deg); }
+.jc-avatar[data-vida="acecha"] .jc-columna { transform: translateY(3px) rotate(-2deg); }
+.jc-avatar[data-vida="ruge"] .jc-atlas { transform: rotate(-4deg); }
+/* Counter the torso at the existing anchors, preserving their SVG transforms. */
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-columna { animation: jc-cuerpo .65s ease-in-out infinite; }
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-columna > g:has(> .jc-pata) { animation: jc-apoyo-cuerpo .65s ease-in-out infinite; }
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-pata {
+  --jc-foot-x: 0px;
+  --jc-foot-y: 64px;
+  --jc-angle: calc(var(--jc-step) * -9deg);
+  /* Forward kinematics compensation for the sole landmark (0,64).
+     Translation cancels the rotation arc during support, including rear skew. */
+  translate: calc(var(--jc-step) * 10px + sin(var(--jc-angle)) * var(--jc-foot-y) + (1 - cos(var(--jc-angle))) * var(--jc-foot-x))
+    calc((1 - cos(var(--jc-angle))) * var(--jc-foot-y) - sin(var(--jc-angle)) * var(--jc-foot-x));
+  rotate: var(--jc-angle);
+  animation: jc-paso 1.3s var(--jc-fase, 0s) linear infinite;
+}
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-columna > g:nth-of-type(3) > .jc-pata,
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-columna > g:nth-of-type(7) > .jc-pata {
+  --jc-foot-x: 10.3517px;
+  --jc-foot-y: 66px;
+}
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-canilla { animation: jc-rodilla 1.3s var(--jc-fase, 0s) ease-in-out infinite; }
+.jc-avatar[data-vivo="1"][data-jc-estado="camina"] .jc-zarpa { animation: jc-zarpa 1.3s var(--jc-fase, 0s) ease-in-out infinite; }
+/* Momentos sobre las articulaciones existentes. Ambos ojos cierran juntos.
+   Las poses también se conservan sin animación; no se altera la piel. */
+.jc-avatar[data-vida="reposo"] .jc-columna { transform: translateY(35px); }
+.jc-avatar[data-vida="reposo"] .jc-pata { rotate: 70deg; }
+.jc-avatar[data-vida="reposo"] .jc-canilla { rotate: 15deg; }
+.jc-avatar[data-vida="reposo"] .jc-zarpa { rotate: -85deg; }
+.jc-avatar[data-vida="reposo"] .jc-atlas { transform: translate(12px, 42px) rotate(-8deg); }
+.jc-avatar[data-vida="reposo"] .jc-ojos { animation: none; scale: 1 .35; }
+.jc-avatar[data-vida="reposo"] .jc-cola { animation: none; rotate: -12deg; }
+/* Las patas posteriores se recogen bajo la cadera, no como las delanteras.
+   Los índices identifican los anclajes existentes, sin modificar el rig. */
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(3) > .jc-pata,
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(7) > .jc-pata { rotate: -80deg; }
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(3) .jc-canilla,
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(7) .jc-canilla { rotate: 140deg; }
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(3) .jc-zarpa,
+.jc-avatar[data-vida="reposo"] .jc-columna > g:nth-of-type(7) .jc-zarpa { rotate: -60deg; }
+
+
+.jc-avatar[data-vida="bosteza"] .jc-atlas { transform: rotate(12deg); }
+.jc-avatar[data-vida="bosteza"] .jc-ojos { animation: none; scale: 1 .08; }
+.jc-avatar[data-vida="bosteza"] .jc-mandibula { transform: translateY(14px); }
+.jc-avatar[data-vida="bosteza"] .jc-mandibula > path[opacity] { opacity: 1; }
+.jc-avatar[data-vida="bosteza"] .jc-oreja-i { rotate: -9deg; }
+.jc-avatar[data-vida="bosteza"] .jc-oreja-d { rotate: 9deg; }
+.jc-avatar[data-vivo="1"][data-vida="bosteza"] .jc-mandibula { animation: jc-bostezo 2.6s ease-in-out both; }
+.jc-avatar[data-vivo="1"][data-vida="bosteza"] .jc-atlas { animation: jc-cabeza-bostezo 2.6s ease-in-out both; }
+
+.jc-avatar[data-vida="estira"] .jc-columna { transform: rotate(-8deg); }
+.jc-avatar[data-vida="estira"] .jc-atlas { transform: translate(-9px, 23px) rotate(-8deg); }
+/* Los grupos externos son los anclajes de las cuatro patas del rig. */
+.jc-avatar[data-vida="estira"] .jc-columna > g:nth-of-type(2) > .jc-pata,
+.jc-avatar[data-vida="estira"] .jc-columna > g:nth-of-type(9) > .jc-pata { rotate: 32deg; }
+.jc-avatar[data-vida="estira"] .jc-columna > g:nth-of-type(3) > .jc-pata,
+.jc-avatar[data-vida="estira"] .jc-columna > g:nth-of-type(7) > .jc-pata { rotate: -16deg; }
+.jc-avatar[data-vida="estira"] .jc-cola { animation: none; rotate: -22deg; }
+.jc-avatar[data-vida="estira"] .jc-ojos { animation: none; scale: 1 .5; }
+
+.jc-avatar[data-vida="slowBlink"] .jc-ojos { animation: none; scale: 1 .08; }
+.jc-avatar[data-vida="slowBlink"] .jc-atlas { transform: rotate(2deg); }
+.jc-avatar[data-vivo="1"][data-vida="slowBlink"] .jc-ojos { animation: jc-confianza 1.8s ease-in-out both; }
+@keyframes jc-confianza {
+  0%, 100% { scale: 1 1; }
+  35%, 65% { scale: 1 .08; }
+}
+@keyframes jc-bostezo {
+  0%, 100% { transform: translateY(0); }
+  35%, 65% { transform: translateY(14px); }
+}
+@keyframes jc-cabeza-bostezo {
+  0%, 100% { transform: rotate(0deg); }
+  35%, 65% { transform: rotate(12deg); }
+}
+@keyframes jc-respira { 0%, 100% { scale: 1 1; } 50% { scale: 1.006 1.012; } }
+@keyframes jc-cola { 0%, 100% { rotate: -2deg; } 50% { rotate: 3deg; } }
+@keyframes jc-parpadea { 0%, 43%, 47%, 100% { scale: 1 1; } 45% { scale: 1 .06; } }
+@keyframes jc-cuerpo { 0%, 100% { translate: 0 0; } 50% { translate: 0 1.5px; } }
+@keyframes jc-apoyo-cuerpo { 0%, 100% { translate: 0 0; } 50% { translate: 0 -1.5px; } }
+/* 780ms support, 520ms recovery. No easing on the support interval. */
+@keyframes jc-paso {
+  0%, 100% { --jc-step: -1; transform: translateY(0); }
+  60% { --jc-step: 1; transform: translateY(0); animation-timing-function: ease-out; }
+  78% { transform: translateY(-8px); animation-timing-function: ease-in; }
+}
+@keyframes jc-rodilla { 0%, 60%, 100% { rotate: 0deg; } 74% { rotate: -18deg; } }
+@keyframes jc-zarpa { 0%, 60%, 100% { rotate: 0deg; } 84% { rotate: 14deg; } }
+@media (prefers-reduced-motion: reduce) {
+  .jc-avatar *, .jc-avatar[data-vivo="1"] * { animation: none !important; }
+}

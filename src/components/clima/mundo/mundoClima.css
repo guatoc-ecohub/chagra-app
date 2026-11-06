@@ -1,0 +1,413 @@
+/* Mundo del clima en 2.5D. Prefijo mc- para no tocar nada de «El tiempo». */
+
+.mc-mundo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: #f4f1e8;
+  font-family: Inter, system-ui, sans-serif;
+  background: #1d2a26;
+}
+
+/* ── Escena ─────────────────────────────────────────────────────────── */
+
+.mc-escena {
+  --mc-px: 0;
+  --mc-py: 0;
+  /* Paleta por defecto (día despejado); cada cielo la cambia abajo. */
+  --mc-cielo-alto: #3f86c9;
+  --mc-cielo-bajo: #c3e2ee;
+  --mc-lejos: #7fa3b8;
+  --mc-lejos2: #5f8a8f;
+  --mc-cerro: #4a7a5c;
+  --mc-bosque: #2f5e43;
+  --mc-ladera: #6d9a4b;
+  --mc-surco: #6b4a32;
+  --mc-matas: #3f7a37;
+  --mc-pasto: #4f8a3a;
+  --mc-matojo: #3e7430;
+  --mc-muro: #f1ebdc;
+  --mc-teja: #b1553a;
+  --mc-aliso: #3b6e3a;
+  --mc-aliso-luz: #5b9150;
+  --mc-luz-tierra: 1;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.mc-cielo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--mc-cielo-alto) 0%, var(--mc-cielo-bajo) 62%, var(--mc-cielo-bajo) 100%);
+  transition: background 1.2s ease;
+}
+
+.mc-capa {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Profundidad: cada capa se corre según su distancia. Un poco más grande que
+   el marco para que el corrimiento nunca deje ver el borde. */
+.mc-tierra {
+  width: 104%;
+  height: 104%;
+  left: -2%;
+  top: 0;
+  transform: translate3d(calc(var(--mc-px) * var(--mc-k, 0) * -1px), calc(var(--mc-py) * var(--mc-k, 0) * -0.3px), 0);
+  transition: transform 0.25s ease-out;
+  filter: brightness(var(--mc-luz-tierra));
+}
+.mc-tierra--lejos { --mc-k: 4; }
+.mc-tierra--lejos2 { --mc-k: 8; }
+.mc-tierra--medio { --mc-k: 14; }
+.mc-tierra--cerca { --mc-k: 22; }
+.mc-tierra--frente { --mc-k: 34; overflow: visible; }
+
+.mc-lejos { fill: var(--mc-lejos); }
+.mc-lejos2 { fill: var(--mc-lejos2); }
+.mc-cerro { fill: var(--mc-cerro); }
+.mc-bosque { fill: var(--mc-bosque); }
+.mc-ladera { fill: var(--mc-ladera); }
+.mc-pasto { fill: var(--mc-pasto); }
+
+.mc-surco__tierra { fill: none; stroke: color-mix(in oklab, var(--mc-surco) 70%, var(--mc-ladera)); stroke-width: 11; stroke-linecap: round; opacity: 0.9; }
+.mc-matas { fill: var(--mc-matas); }
+.mc-matas:nth-of-type(odd) { fill: color-mix(in oklab, var(--mc-matas) 86%, #e8f0a0); }
+
+/* Potreros y parcelas del cerro: cuatro tonos que salen del verde del cerro
+   (así cambian con la luz y el cielo), y su cerca viva por el borde. */
+.mc-parcela { stroke: color-mix(in oklab, var(--mc-bosque) 80%, var(--mc-cerro)); stroke-width: 4; stroke-opacity: 0.8; stroke-linejoin: round; stroke-dasharray: 9 3 5 3; stroke-linecap: round; }
+.mc-parcela--0 { fill: color-mix(in oklab, var(--mc-cerro) 88%, #e9f2a0); }
+.mc-parcela--1 { fill: color-mix(in oklab, var(--mc-cerro) 78%, #c9a96a); }
+.mc-parcela--2 { fill: color-mix(in oklab, var(--mc-cerro) 92%, #1e3a24); }
+.mc-parcela--3 { fill: color-mix(in oklab, var(--mc-cerro) 84%, #b8d68a); }
+.mc-bosque { fill: var(--mc-bosque); }
+
+.mc-matojo {
+  fill: none;
+  stroke: color-mix(in oklab, var(--mc-matojo) 45%, var(--mc-pasto));
+  stroke-width: 2;
+  opacity: 0.85;
+  stroke-linecap: round;
+  transform-box: view-box;
+  animation: mc-balanceo 3.2s ease-in-out infinite;
+  animation-play-state: var(--mc-anima, running);
+}
+.mc-escena[data-viento='no'] .mc-matojo { animation: none; }
+
+@keyframes mc-balanceo {
+  0%, 100% { transform: rotate(calc(var(--mc-balanceo) * -2deg)); }
+  50% { transform: rotate(calc(var(--mc-balanceo) * 6deg * var(--mc-deriva, 1) + var(--mc-balanceo) * 1deg)); }
+}
+
+.mc-casa__muro { fill: var(--mc-muro); }
+.mc-casa__muro-sombra { fill: #000; opacity: 0.12; }
+.mc-casa__teja { fill: var(--mc-teja); }
+.mc-casa__teja-borde { fill: #000; opacity: 0.22; }
+.mc-casa__puerta { fill: #5b3b26; }
+.mc-casa__ventana { fill: #3d4a52; }
+.mc-casa__ventana--luz { fill: #ffcf6b; filter: drop-shadow(0 0 6px rgba(255, 196, 90, 0.9)); }
+.mc-casa__chimenea { fill: #8d7d70; }
+
+.mc-aliso__tronco { fill: #8f877a; }
+.mc-aliso__copa { fill: var(--mc-aliso); }
+.mc-aliso__luz { fill: var(--mc-aliso-luz); opacity: 0.8; }
+.mc-aliso__sombra { fill: #0b1d10; opacity: 0.28; }
+
+.mc-humo {
+  fill: none;
+  stroke: rgba(235, 235, 230, 0.55);
+  stroke-width: 9;
+  stroke-linecap: round;
+  filter: blur(3px);
+}
+
+/* Estrellas: titilan despacio. */
+.mc-estrellas { height: 60%; }
+.mc-estrella {
+  position: absolute;
+  border-radius: 50%;
+  background: #fffbe8;
+  box-shadow: 0 0 4px rgba(255, 251, 232, 0.8);
+  animation: mc-titilar 4s ease-in-out infinite;
+}
+.mc-estrellas[data-cantidad='pocas'] .mc-estrella { opacity: 0.6; }
+@keyframes mc-titilar { 0%, 100% { opacity: 0.95; } 50% { opacity: 0.45; } }
+
+/* Astro: el sol con halo, la luna con su fase. */
+.mc-astro {
+  position: absolute;
+  width: clamp(64px, 11vmin, 118px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  transform: translate3d(calc(var(--mc-px) * -2px), calc(var(--mc-py) * -1px), 0);
+}
+.mc-sol, .mc-sol__halo, .mc-sol__disco { position: absolute; inset: 0; border-radius: 50%; }
+.mc-sol__halo {
+  inset: -70%;
+  background: radial-gradient(circle, rgba(255, 239, 186, 0.75) 0%, rgba(255, 220, 140, 0.32) 32%, rgba(255, 220, 140, 0) 68%);
+}
+.mc-sol__disco {
+  inset: 18%;
+  background: radial-gradient(circle at 42% 38%, #fffdf0 0%, #ffe9a6 55%, #ffd36b 100%);
+  box-shadow: 0 0 28px 8px rgba(255, 225, 140, 0.55);
+}
+.mc-escena[data-luz='amanecer'] .mc-sol__disco,
+.mc-escena[data-luz='atardecer'] .mc-sol__disco { background: radial-gradient(circle at 42% 38%, #fff4d6 0%, #ffbf72 60%, #f39a52 100%); }
+.mc-luna { width: 72%; height: 72%; margin: 14%; overflow: visible; filter: drop-shadow(0 0 14px rgba(230, 236, 255, 0.55)); }
+.mc-luna .ca-luna__halo { fill: rgba(220, 230, 255, 0.12); }
+.mc-luna .ca-luna__ceniza { fill: #3a4560; opacity: 0.85; }
+.mc-luna .ca-luna__luz { fill: #f3f1e4; }
+.mc-velo {
+  position: absolute;
+  inset: -10% -45%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 55%, rgba(236, 240, 244, 0.82) 0%, rgba(236, 240, 244, 0.55) 38%, rgba(236, 240, 244, 0) 70%);
+  filter: blur(4px);
+}
+.mc-escena[data-luz='noche'] .mc-velo { background: radial-gradient(ellipse at 50% 55%, rgba(80, 92, 118, 0.85) 0%, rgba(80, 92, 118, 0.5) 40%, rgba(80, 92, 118, 0) 70%); }
+.mc-astro--velado .mc-sol__disco { opacity: 0.75; }
+
+/* Nubes sueltas: cúmulos que derivan con el viento. */
+.mc-nube {
+  position: absolute;
+  width: calc(clamp(120px, 20vmin, 230px) * var(--mc-s, 1));
+  translate: -50% 0;
+  animation: mc-deriva 70s linear infinite alternate;
+}
+.mc-escena[data-viento='no'] .mc-nube { animation: none; }
+@keyframes mc-deriva { from { transform: translateX(0); } to { transform: translateX(calc(var(--mc-deriva, 0) * 9vw)); } }
+.mc-cumulo { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 8px 14px rgba(30, 50, 70, 0.16)) blur(0.4px); }
+.mc-cumulo__luz { stop-color: #e4e9ee; }
+.mc-cumulo__base { stop-color: #a9b5c1; }
+.mc-cumulo__brillo { fill: #ffffff; opacity: 0.35; }
+.mc-cumulo--claro .mc-cumulo__luz { stop-color: #ffffff; }
+.mc-cumulo--claro .mc-cumulo__base { stop-color: #cfd9e3; }
+.mc-escena[data-luz='amanecer'] .mc-cumulo--claro .mc-cumulo__base,
+.mc-escena[data-luz='atardecer'] .mc-cumulo--claro .mc-cumulo__base { stop-color: #f0c6a2; }
+.mc-escena[data-luz='noche'] .mc-cumulo__luz { stop-color: #59668a; }
+.mc-escena[data-luz='noche'] .mc-cumulo__base { stop-color: #2d3650; }
+.mc-escena[data-luz='noche'] .mc-cumulo__brillo { opacity: 0.08; }
+
+/* Techo de nubes: el cielo tapado. */
+.mc-nubes--techo { height: 48%; }
+.mc-techo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mc-techo__alto { fill: #aab4bd; }
+.mc-techo__medio { fill: #bcc5cc; opacity: 0.92; }
+.mc-techo__bajo { fill: #cfd6db; opacity: 0.85; }
+.mc-techo--oscuro .mc-techo__alto { fill: #4e5965; }
+.mc-techo--oscuro .mc-techo__medio { fill: #5f6a76; }
+.mc-techo--oscuro .mc-techo__bajo { fill: #737e89; }
+.mc-escena[data-luz='noche'] .mc-techo__alto { fill: #222a3c; }
+.mc-escena[data-luz='noche'] .mc-techo__medio { fill: #2c3549; }
+.mc-escena[data-luz='noche'] .mc-techo__bajo { fill: #384257; }
+.mc-escena[data-condicion='tormenta'] .mc-techo__alto { fill: #2b2d40; }
+.mc-escena[data-condicion='tormenta'] .mc-techo__medio { fill: #383a50; }
+.mc-escena[data-condicion='tormenta'] .mc-techo__bajo { fill: #474a61; }
+
+/* Niebla: bancos blandos al fondo del valle y al ras del suelo. */
+.mc-niebla { opacity: var(--mc-niebla, 0.7); }
+.mc-niebla span {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(233, 237, 238, 0.95) 0%, rgba(233, 237, 238, 0.7) 45%, rgba(233, 237, 238, 0) 72%);
+  filter: blur(6px);
+  animation: mc-niebla 38s ease-in-out infinite alternate;
+}
+.mc-niebla--valle span:nth-child(1) { top: 40%; height: 22%; }
+.mc-niebla--valle span:nth-child(2) { top: 50%; height: 18%; animation-delay: -12s; }
+.mc-niebla--ras span:nth-child(1) { top: 68%; height: 26%; opacity: 0.75; }
+.mc-niebla--ras span:nth-child(2) { top: 80%; height: 26%; opacity: 0.6; animation-delay: -20s; }
+.mc-escena[data-luz='noche'] .mc-niebla span { background: radial-gradient(ellipse at 50% 50%, rgba(140, 152, 174, 0.85) 0%, rgba(140, 152, 174, 0.55) 45%, rgba(140, 152, 174, 0) 72%); }
+@keyframes mc-niebla { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+
+/* Lluvia: trazos que caen; más milímetros, más trazos. */
+.mc-lluvia line {
+  stroke: rgba(225, 235, 245, 0.62);
+  stroke-width: 0.18;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  animation: mc-caer 0.9s linear infinite;
+}
+.mc-lluvia line { stroke-width: 1.4px; }
+.mc-escena[data-luz='noche'] .mc-lluvia line { stroke: rgba(170, 190, 220, 0.55); }
+@keyframes mc-caer { from { transform: translateY(0); } to { transform: translateY(112px); } }
+.mc-lluvia { transform: none; }
+
+/* Tormenta: el rayo y el destello del cielo. */
+.mc-relampago path {
+  fill: none;
+  stroke: #fffbe0;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px #fff7c4);
+  opacity: 0;
+  animation: mc-rayo 7s steps(1) infinite;
+}
+.mc-destello { background: rgba(240, 240, 255, 0.5); opacity: 0; animation: mc-destello 7s ease-out infinite; }
+@keyframes mc-rayo { 0%, 100% { opacity: 0; } 62% { opacity: 1; } 64% { opacity: 0; } 66% { opacity: 1; } 68% { opacity: 0; } }
+@keyframes mc-destello { 0%, 61%, 72%, 100% { opacity: 0; } 62% { opacity: 0.55; } 66% { opacity: 0.35; } }
+
+/* Escarcha: el blanco del hielo sobre los surcos y el pasto. */
+.mc-escarcha__matas { fill: #f2f8ff; opacity: 0.7; transform: translateY(-3px) scale(1, 0.92); transform-box: fill-box; transform-origin: bottom; }
+.mc-escarcha .mc-escarcha__pasto, .mc-escarcha__frente { fill: rgba(236, 245, 255, 0.5); }
+
+/* Zonas para tocar cada capa (invisibles, accesibles). */
+.mc-zona {
+  position: absolute;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.mc-zona:focus-visible { outline: 3px solid #ffe08a; outline-offset: 2px; }
+.mc-zona--astro { width: 110px; height: 110px; translate: -50% -50%; }
+.mc-zona--nubes { left: 4%; top: 4%; width: 92%; height: 24%; }
+.mc-zona--lluvia { left: 10%; top: 30%; width: 80%; height: 22%; }
+.mc-zona--niebla { left: 0; top: 44%; width: 100%; height: 14%; }
+.mc-zona--escarcha { left: 25%; top: 70%; width: 50%; height: 12%; }
+
+/* ── Paletas por cielo y luz (las claves de claveCielo) ──────────────── */
+
+.mc-escena[data-clave='dorada'] {
+  --mc-cielo-alto: #4b6ea6; --mc-cielo-bajo: #f2c58e;
+  --mc-lejos: #9c8fa6; --mc-lejos2: #7c7f8c; --mc-cerro: #4d6b52; --mc-bosque: #304f3c;
+  --mc-ladera: #6f8f45; --mc-pasto: #5a7d36; --mc-luz-tierra: 0.92;
+}
+.mc-escena[data-clave='noche'] {
+  --mc-cielo-alto: #0a1430; --mc-cielo-bajo: #2a3a63;
+  --mc-lejos: #2d3b5c; --mc-lejos2: #25344d; --mc-cerro: #1f3238; --mc-bosque: #15262a;
+  --mc-ladera: #23392c; --mc-surco: #2b2420; --mc-matas: #1d3424; --mc-pasto: #1f3325; --mc-matojo: #182b1f;
+  --mc-muro: #9aa0aa; --mc-teja: #5d3a33; --mc-aliso: #172b1d; --mc-aliso-luz: #22382a;
+}
+.mc-escena[data-clave='nublado'] {
+  --mc-cielo-alto: #7d8b97; --mc-cielo-bajo: #c6cdd1;
+  --mc-lejos: #98a6ad; --mc-lejos2: #7f9393; --mc-cerro: #587a63; --mc-bosque: #3b5f48;
+  --mc-ladera: #6b8c4e; --mc-pasto: #557e3e; --mc-luz-tierra: 0.94;
+}
+.mc-escena[data-clave='lluvia'] {
+  --mc-cielo-alto: #4f5c68; --mc-cielo-bajo: #96a2aa;
+  --mc-lejos: #7b8a93; --mc-lejos2: #66787b; --mc-cerro: #48685a; --mc-bosque: #304f40;
+  --mc-ladera: #587a43; --mc-pasto: #476d36; --mc-luz-tierra: 0.88;
+}
+.mc-escena[data-clave='niebla'] {
+  --mc-cielo-alto: #aeb8bc; --mc-cielo-bajo: #e0e5e4;
+  --mc-lejos: #c9d1d2; --mc-lejos2: #b4c0bf; --mc-cerro: #8ea597; --mc-bosque: #6d8e7a;
+  --mc-ladera: #7c9a62; --mc-pasto: #6a8c52;
+}
+.mc-escena[data-clave='tormenta'] {
+  --mc-cielo-alto: #262a3e; --mc-cielo-bajo: #5e6076;
+  --mc-lejos: #4f5468; --mc-lejos2: #434b58; --mc-cerro: #34503f; --mc-bosque: #223a2d;
+  --mc-ladera: #3f5c34; --mc-pasto: #36522c; --mc-luz-tierra: 0.85;
+}
+.mc-escena[data-clave='helada'] {
+  --mc-cielo-alto: #8fb6da; --mc-cielo-bajo: #edf4fa;
+  --mc-lejos: #b6c7d6; --mc-lejos2: #9fb4bf; --mc-cerro: #7c9a8e; --mc-bosque: #587a6a;
+  --mc-ladera: #8aa07a; --mc-pasto: #93a98a; --mc-matojo: #7d9476;
+}
+/* Sin dato: un cielo neutro, sin astro, nubes ni lluvia; la tierra sigue ahí. */
+.mc-escena[data-clave='sin-dato'] {
+  --mc-cielo-alto: #59666a; --mc-cielo-bajo: #9ba5a4;
+  --mc-lejos: #8a9596; --mc-lejos2: #75827f; --mc-cerro: #5a6f62; --mc-bosque: #42584a;
+  --mc-ladera: #637855; --mc-pasto: #536a47; --mc-luz-tierra: 0.9;
+}
+/* De noche con nubes o lluvia la tierra se oscurece igual. */
+.mc-escena[data-luz='noche'] { --mc-luz-tierra: 0.95; }
+
+/* ── Panel, herramientas y nombres ───────────────────────────────────── */
+
+.mc-panel {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  max-height: 46%;
+  overflow-y: auto;
+  padding: 16px 18px 14px;
+  border-radius: 18px;
+  background: rgba(16, 24, 28, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+.mc-panel__aviso { font-size: 1rem; line-height: 1.5; }
+.mc-panel__hora { margin: 0; font-size: 0.85rem; color: #c5ccc8; }
+.mc-panel__cielo { display: flex; align-items: baseline; gap: 12px; margin: 2px 0 8px; flex-wrap: wrap; }
+.mc-panel__temp { font-size: 2.4rem; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
+.mc-panel__rotulo { font-family: 'Noto Serif', Georgia, serif; font-size: 1.45rem; line-height: 1.15; }
+.mc-panel__dice { display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 10px; }
+.mc-panel__dice p { margin: 0; font-family: 'Noto Serif', Georgia, serif; font-size: 1.02rem; line-height: 1.45; }
+.mc-panel__respuestas { display: grid; gap: 8px; margin: 0 0 8px; }
+.mc-panel__respuestas > div { padding: 8px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); }
+.mc-panel__respuestas dt { font-size: 0.82rem; color: #b9c4bf; }
+.mc-panel__respuestas dd { margin: 2px 0 0; font-size: 0.98rem; font-weight: 600; line-height: 1.35; }
+.mc-panel__etiqueta { margin: 0 0 8px; padding: 8px 10px; border-radius: 12px; background: rgba(255, 224, 138, 0.14); border: 1px solid rgba(255, 224, 138, 0.35); line-height: 1.4; }
+.mc-panel__fuente { margin: 0; font-size: 0.78rem; color: #aeb8b3; line-height: 1.4; }
+.mc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.mc-herramientas { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; }
+.mc-boton {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; min-width: 44px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(16, 24, 28, 0.72); color: #f4f1e8; font-size: 0.92rem;
+  justify-content: center;
+}
+.mc-boton[aria-pressed='true'] { background: #c4dd7a; color: #1b2a12; border-color: transparent; }
+.mc-boton:disabled { opacity: 0.5; }
+
+.mc-nombres { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+.mc-nombre { position: absolute; pointer-events: auto; translate: -50% -50%; }
+.mc-nombre button {
+  padding: 4px 10px; min-height: 32px; border-radius: 8px; background: rgba(12, 18, 22, 0.88); color: #fff;
+  font-weight: 600; font-size: 0.92rem; border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mc-nombre--astro { left: 50%; top: 8%; }
+.mc-nombre--nubes { left: 28%; top: 16%; }
+.mc-nombre--lluvia { left: 64%; top: 38%; }
+.mc-nombre--niebla { left: 32%; top: 47%; }
+.mc-nombre--escarcha { left: 46%; top: 50%; }
+.mc-nombre--relampago { left: 70%; top: 22%; }
+
+/* Teléfono vertical: el panel ocupa el pie; la tierra sube para que la
+   finca quede a la vista sobre él. */
+@media (orientation: portrait) {
+  .mc-tierra { top: -30%; }
+  .mc-nubes--techo { height: 36%; }
+  .mc-panel { max-height: 54%; padding: 12px 14px 10px; }
+  .mc-panel__temp { font-size: 2rem; }
+  .mc-panel__rotulo { font-size: 1.25rem; }
+  .mc-panel__dice p { font-size: 0.95rem; line-height: 1.38; }
+  .mc-panel__respuestas { gap: 6px; }
+  .mc-panel__respuestas dd { font-size: 0.92rem; }
+  .mc-panel__fuente { display: none; }
+  .mc-niebla--ras span:nth-child(1) { top: 46%; }
+  .mc-niebla--ras span:nth-child(2) { top: 56%; }
+  .mc-niebla--valle span:nth-child(1) { top: 22%; }
+  .mc-niebla--valle span:nth-child(2) { top: 30%; }
+  .mc-zona--escarcha { top: 50%; }
+  .mc-zona--niebla { top: 26%; }
+}
+
+/* Escritorio: el panel a la izquierda abajo, como en los descensos. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .mc-panel { left: 28px; bottom: 28px; right: auto; width: min(560px, 44vw); max-height: 60%; padding: 20px 22px 16px; }
+  .mc-herramientas { top: 24px; right: 24px; }
+  .mc-nombre--escarcha { top: 76%; }
+  .mc-nombre--niebla { top: 52%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-escena * { animation: none !important; transition: none !important; }
+  .mc-relampago path { opacity: 1; }
+}

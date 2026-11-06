@@ -1,0 +1,967 @@
+import { newId } from '../utils/id.js';
+import React, { useState, useEffect } from 'react';
+import { MSG } from '../config/messages.js';
+import { Info } from 'lucide-react';
+import { assetCache } from '../db/assetCache';
+import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
+import AIStreamPanel from './common/AIStreamPanel';
+import IoTSensorCard from './IoTSensorCard';
+import ChagraGrowLoader from './ChagraGrowLoader';
+import { streamOllama } from '../services/ollamaStream';
+import { ENV } from '../config/env';
+import ExternalAiButton from './common/ExternalAiButton';
+import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuilder';
+import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
+import {
+  generateMockSensorReadings,
+  generateMockHistory,
+  isSensorUnavailable,
+  isMockActive,
+  setMockActive,
+} from '../services/iotMockService';
+
+/**
+ * TelemetryAlerts, análisis agronómico de telemetría IoT con asistencia LLM.
+ *
+ * Flujo:
+ *   1. Suscripción WebSocket a Home Assistant para sensores configurados.
+ *   2. Detección de valor anormal (umbral por especie/zona).
+ *   3. Streaming de análisis agronómico via Ollama (modelo configurado).
+ *   4. Acción dispatched por operador → log--maintenance + cooldown idempotente.
+ *
+ * LLM constraints (v0.7.2):
+ *   - num_predict: 200, temperature: 0.3, repeat_penalty: 1.15
+ *   - prompt instruye respuesta concisa, sin superlativos, sin loops.
+ *   - post-procesamiento detecta repetición y trunca via detectAndTruncateRepetition.
+ *
+ * Telemetría observability:
+ *   - eventos farmosLog: telemetry:* (ver logTelemetryEvent helper).
+ *   - debug verbose: localStorage 'chagra:debug:telemetry'.
+ *
+ * Tests: tests/telemetry-streaming.spec.js, tests/telemetry-llm-bounds.spec.js.
+ */
+
+// Constantes de Infraestructura Segura (API Gateway Local)
+const HA_URL = '/api/ha';
+const OLLAMA_URL = '/api/ollama';
+const MOCK_DISCLOSURE = 'Estas lecturas son simuladas; no provienen de sensores reales.';
+
+// Cooldown de idempotencia persistente (delegado a sync_meta vía assetCache)
+const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos
+
+// Utilidades de formateo condicional (SOLO presentación — mismos umbrales).
+// Devuelven meta visual { tone, cls, label } por lectura:
+//   tone  → estado semántico (ok | warn | alert | nodata) que IoTSensorCard
+//           usa para diferenciar el contenedor del readout (borde/fondo).
+//   cls   → clase de color del número. Se eligen clases del "safe set"
+//           theme-aware: emerald-* va por tokens CSS-var y rose-300/sky-300
+//           tienen override global en themes.css para los temas claros.
+//   label → etiqueta corta de estado, legible al sol (no solo color).
+const getHumidityMeta = (humidity) => {
+  const value = parseFloat(humidity);
+  if (isNaN(value)) return { tone: 'nodata', cls: 'text-slate-400', label: 'Sin dato' };
+
+  if (value < 40) return { tone: 'alert', cls: 'text-rose-300', label: 'Crítica' }; // Humedad crítica
+  if (value <= 70) return { tone: 'ok', cls: 'text-emerald-300', label: 'Óptima' }; // Humedad óptima
+  return { tone: 'warn', cls: 'text-sky-300', label: 'Saturada' }; // Humedad saturada
+};
+
+const getTemperatureMeta = (temperature) => {
+  const value = parseFloat(temperature);
+  if (isNaN(value)) return { tone: 'nodata', cls: 'text-slate-400', label: 'Sin dato' };
+
+  if (value < 12) return { tone: 'warn', cls: 'text-sky-300', label: 'Fría' }; // Frío
+  if (value <= 28) return { tone: 'ok', cls: 'text-emerald-300', label: 'Óptima' }; // Óptimo
+  return { tone: 'alert', cls: 'text-rose-300', label: 'Calor crítico' }; // Calor crítico
+};
+
+export default function TelemetryAlerts() {
+  const [sensors, setSensors] = useState({
+    invernaderoHumidity: null,
+    invernaderoTemperature: null,
+    tabacoHumidity: null,
+    tabacoTemperature: null
+  });
+  const [aiAlert, setAiAlert] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [aiStatus, setAiStatus] = useState('idle'); // idle | thinking | done | error
+  const [sensorHistory, setSensorHistory] = useState({});
+  const [telemetryStatus, setTelemetryStatus] = useState('loading'); // loading | empty | live | simulated
+  const [usingMockSensors, setUsingMockSensors] = useState(false);
+  const [aiMeta, setAiMeta] = useState(null); // { model, evalDuration, totalDuration }
+  // Texto acumulado del LLM durante el analisis agronomico (streaming NDJSON).
+  // Se muestra con efecto typewriter mientras aiStatus === 'thinking'.
+  const [liveAnalysis, setLiveAnalysis] = useState('');
+  // Texto final consolidado de la IA tras terminar el stream. Se separa de
+  // aiAlert (que solo contiene reglas deterministas) para que el AIStreamPanel
+  // lo renderice en su propio bloque cyberpunk diferenciado.
+  const [aiFinalText, setAiFinalText] = useState('');
+  // 2026-05-18: efecto del botón "Programar Riego" sobre los sensores
+  // visibles. Cuando el operador acciona riego, mostramos cambio en stats
+  // por 30s (humedad +13%, temperatura -2.5°C) como feedback del cambio.
+  const [wateringEffect, setWateringEffect] = useState(null);
+
+  // Authorization header se inyecta server-side en Nginx desde SOPS
+  // (audit #2). VITE_HA_ACCESS_TOKEN ya no se lee — el token vivía en el
+  // bundle JS y era leak Ley 1581. Ahora /api/ha/ proxy de app.example.co
+  // agrega `proxy_set_header Authorization "Bearer ..."` con el secret.
+
+  // Helper de observabilidad (v0.7.2)
+  const logTelemetryEvent = (kind, payload = {}, level = 'info') => {
+    const isDebug = localStorage.getItem('chagra:debug:telemetry') === '1';
+    const detail = `[${kind}] ${typeof payload === 'string' ? payload : JSON.stringify(payload)}`;
+
+    if (isDebug) console[level](detail);
+
+    window.dispatchEvent(new CustomEvent('farmosLog', {
+      detail: `${kind}: ${payload.message || payload.action || 'evento general'}`
+    }));
+  };
+
+  // Enrutador genérico de acciones de telemetría con idempotencia persistente.
+  // Cooldown y encolado son atómicos (IDB transaction sobre pending_tx + sync_meta).
+  const handleTelemetryAction = async (sensorId, alertType, payloadBuilder, options = {}) => {
+    const { endpoint = '/api/log/maintenance', type = 'maintenance', navigateTo = null } = options;
+    setLoading(true);
+    try {
+      const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+      const now = Date.now();
+
+      if (now - lastTrigger < COOLDOWN_MS) {
+        console.warn(`[Telemetry] Acción ${alertType} para ${sensorId} bloqueada por cooldown.`);
+        return;
+      }
+
+      const payload = payloadBuilder();
+      const pendingTx = {
+        id: newId(),
+        type,
+        endpoint,
+        payload,
+        method: 'POST'
+      };
+
+      await assetCache.commitAlertWithCooldown(sensorId, alertType, pendingTx);
+
+      logTelemetryEvent('telemetry:action_dispatched', { action: alertType, sensor_id: sensorId });
+
+      window.dispatchEvent(new CustomEvent('taskAdded'));
+      console.info(`[Telemetry] Alerta ${alertType} procesada y encolada.`);
+      if (navigateTo) window.location.hash = navigateTo;
+    } catch (error) {
+      console.error('[Telemetry] Fallo al procesar alerta:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderActionButton = () => {
+    if (!aiAlert) return null;
+
+    const alertText = aiAlert.toLowerCase();
+
+    if (alertText.includes('estrés hídrico') || alertText.includes('humedad') || alertText.includes('humedad crítica')) {
+      // Feedback piloto #105: "Ejecutar Riego no realiza ninguna acción".
+      // Reemplazado por "Programar Riego" → abre TaskScreen pre-llenado
+      // con título, prioridad y notas. Operario confirma + persiste.
+      // El handle anterior (handleTelemetryAction → log--input) era opaco
+      // (sin feedback al usuario, sin trazabilidad de quién/cuándo).
+      const handleProgramarRiego = () => {
+        const today = new Date().toISOString().split('T')[0];
+        // Efecto visual demo (operator feedback 2026-05-18): mostrar cambio
+        // en stats al accionar riego. Humedad +13%, temperatura -2.5°C por 30s.
+        setWateringEffect({
+          appliedAt: Date.now(),
+          deltaHumidity: 13,
+          deltaTemperature: -2.5,
+          durationMs: 30000,
+        });
+        setTimeout(() => setWateringEffect(null), 30000);
+        window.dispatchEvent(new CustomEvent('chagraNavigate', {
+          detail: {
+            view: 'new_task',
+            initialData: {
+              name: 'Riego programado (Alerta IA)',
+              severity: 'high',
+              notes: `Disparado por alerta IA: ${aiAlert}`,
+              due: today,
+              status: 'pending'
+            }
+          }
+        }));
+      };
+
+      return (
+        <button
+          onClick={handleProgramarRiego}
+          title="Abre el formulario de tarea pre-llenado para programar un riego en respuesta a la alerta"
+          className="mt-3 w-full p-3 rounded-xl bg-cyan-950 border border-cyan-500 text-cyan-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:bg-cyan-900 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Programar Riego
+        </button>
+      );
+    }
+
+    if (alertText.includes('temperatura') || alertText.includes('calor') || alertText.includes('térmica')) {
+      const handleTemperatureAction = () => handleTelemetryAction(
+        FARM_CONFIG.LOCATION_ID,
+        'control_termico',
+        () => ({
+          data: {
+            type: "log--maintenance",
+            attributes: {
+              name: "Control Climático (Alerta IA)",
+              timestamp: new Date().toISOString().split('.')[0] + '+00:00',
+              status: "pending",
+              notes: { value: `Emergencia. Ejecutado en respuesta a alerta IA: ${aiAlert}`, format: 'plain_text' }
+            }
+          }
+        }),
+        { type: 'maintenance', endpoint: '/api/log/maintenance', navigateTo: '#mantenimiento' }
+      );
+
+      return (
+        <button
+          onClick={handleTemperatureAction}
+          className="mt-3 w-full p-3 rounded-xl bg-orange-950 border border-orange-500 text-orange-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)] hover:bg-orange-900 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Control Climático
+        </button>
+      );
+    }
+
+    if (alertText.includes('hongos') || alertText.includes('enfermedad') || alertText.includes('plagas')) {
+      const handleFungicidalAction = () => handleTelemetryAction(
+        FARM_CONFIG.LOCATION_ID,
+        'aplicacion_fitosanitaria',
+        () => ({
+          data: {
+            type: "log--input",
+            attributes: {
+              // Legacy copy retained until the i18n refactor touches this flow.
+              // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+              name: "Aplicación Fitosanitaria (Alerta IA)",
+              timestamp: new Date().toISOString().split('.')[0] + '+00:00',
+              status: "pending",
+              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`
+            },
+            relationships: {
+              location: {
+                data: [{ type: "asset--land", id: FARM_CONFIG.LOCATION_ID }]
+              },
+              category: {
+                data: [{
+                  type: "taxonomy_term--material",
+                  attributes: { name: "Caldo sulfocálcico" }
+                }]
+              },
+              quantity: {
+                data: [{
+                  type: "quantity--standard",
+                  attributes: {
+                    measure: "volume",
+                    value: { decimal: "0" },
+                    label: "Concentrado (L)"
+                  }
+                }]
+              }
+            }
+          }
+        }),
+        { type: 'input', endpoint: '/api/log/input', navigateTo: '#insumos' }
+      );
+
+      return (
+        <button
+          onClick={handleFungicidalAction}
+          className="mt-3 w-full p-3 rounded-xl bg-rose-950 border border-rose-500 text-rose-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] hover:bg-rose-900 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.932-3.131L13.068 4.632c-.667 1.239-2.003 1.239l3.035 14.872c-.57 1.464.391 3.131h13.866z" />
+          </svg>
+          Aplicar Fitosanitario
+        </button>
+      );
+    }
+
+    return null;
+  };
+
+  const fetchTelemetryAndAnalyze = async (parentSignal) => {
+    setTelemetryStatus('loading');
+    setLoading(true);
+    setError(null);
+    setAiAlert('');
+    setAiFinalText('');
+    setLiveAnalysis('');
+    setAiStatus('idle');
+    setAiMeta(null);
+
+    if (!navigator.onLine && !isMockActive()) {
+      setSensors({
+        invernaderoHumidity: null,
+        invernaderoTemperature: null,
+        tabacoHumidity: null,
+        tabacoTemperature: null,
+      });
+      setSensorHistory({});
+      setUsingMockSensors(false);
+      setTelemetryStatus('empty');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos.
+      // Authorization se inyecta server-side via Nginx (audit #2 leak fix).
+      //
+      // Las lecturas simuladas solo se usan cuando el modo de demostración se
+      // activó explícitamente. En los demás casos, la falta de sensores es un
+      // estado vacío y no alimenta reglas ni análisis de IA.
+      const haOpts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: parentSignal };
+      let invernaderoHumData;
+      let invernaderoTempData;
+      let tabacoHumData;
+      let tabacoTempData;
+      let usingMockSensors = false;
+
+      try {
+        const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
+          fetch(`${HA_URL}/states/sensor.matera_cocina_humidity`, haOpts),
+          fetch(`${HA_URL}/states/sensor.matera_cocina_temperature`, haOpts),
+          fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
+          fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
+        ]);
+
+        if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
+          throw new Error('Fetch HA falló (status no OK), fallback a mock.');
+        }
+
+        [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData] = await Promise.all([
+          invernaderoHum.json(),
+          invernaderoTemp.json(),
+          tabacoHum.json(),
+          tabacoTemp.json()
+        ]);
+
+        const haReadings = [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData];
+        const allUnavailable = haReadings.every(isSensorUnavailable);
+        if (allUnavailable) {
+          throw new Error('Todos los sensores HA en unavailable, fallback a mock.');
+        }
+      } catch {
+        if (parentSignal?.aborted) return;
+
+        if (!isMockActive()) {
+          logTelemetryEvent('telemetry:ha_offline_no_readings', {
+            message: 'Home Assistant no disponible; no hay lecturas para analizar',
+          }, 'warn');
+          setSensors({
+            invernaderoHumidity: null,
+            invernaderoTemperature: null,
+            tabacoHumidity: null,
+            tabacoTemperature: null,
+          });
+          setSensorHistory({});
+          setUsingMockSensors(false);
+          setTelemetryStatus('empty');
+          setLoading(false);
+          return;
+        }
+
+        usingMockSensors = true;
+        logTelemetryEvent('telemetry:ha_offline_mock_fallback', {
+          message: 'Modo de demostración activo; se usan lecturas simuladas',
+        }, 'warn');
+        const mock = generateMockSensorReadings();
+        invernaderoHumData = { state: mock.invernaderoHumidity.state, _mock: true };
+        invernaderoTempData = { state: mock.invernaderoTemperature.state, _mock: true };
+        tabacoHumData = { state: mock.tabacoHumidity.state, _mock: true };
+        tabacoTempData = { state: mock.tabacoTemperature.state, _mock: true };
+      }
+      setUsingMockSensors(usingMockSensors);
+      setTelemetryStatus(usingMockSensors ? 'simulated' : 'live');
+
+      // Detección de sensores no disponibles (unavailable, null, unknown)
+      const sensorReadings = [
+        { name: 'Invernadero Zona A Humedad', data: invernaderoHumData, key: 'Invernadero Zona A' },
+        { name: 'Invernadero Zona A Temperatura', data: invernaderoTempData, key: 'Invernadero Zona A' },
+        { name: 'Matera Tabaco Humedad', data: tabacoHumData, key: 'Matera Tabaco' },
+        { name: 'Matera Tabaco Temperatura', data: tabacoTempData, key: 'Matera Tabaco' },
+      ];
+
+      const unavailableSensors = sensorReadings.filter(s =>
+        !s.data.state || s.data.state === 'unavailable' || s.data.state === 'unknown'
+      );
+
+      // Nota prependible al análisis cuando hay sensores offline parciales.
+      let offlineNotice = usingMockSensors ? `${MOCK_DISCLOSURE}\n` : '';
+
+      if (unavailableSensors.length > 0) {
+        logTelemetryEvent('telemetry:sensor_disconnected', {
+          message: `${unavailableSensors.length} sensores offline`,
+          sensors: unavailableSensors.map(s => s.name)
+        }, 'warn');
+        // Idempotencia persistente por (sensor.key, 'conectividad') vía sync_meta.
+        let dispatched = 0;
+        for (const sensor of unavailableSensors) {
+          const sensorId = sensor.key;
+          const alertType = 'conectividad';
+          const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+          if (Date.now() - lastTrigger < COOLDOWN_MS) {
+            console.warn(`[Telemetry] Alerta de conectividad para ${sensorId} bloqueada por cooldown.`);
+            continue;
+          }
+
+          const taskName = `Revisión de conectividad de sensor en ${sensor.name}`;
+          const taskPayload = {
+            data: {
+              type: 'log--maintenance',
+              attributes: {
+                name: taskName,
+                timestamp: Math.floor(Date.now() / 1000),
+                status: 'pending',
+                notes: { value: `Sensor ${sensor.key} reporta estado "${sensor.data.state || 'null'}". Verificar alimentación, alcance Zigbee y estado en Home Assistant.` },
+              },
+              relationships: {
+                location: {
+                  data: [{ type: 'asset--land', id: FARM_CONFIG.LOCATION_ID }],
+                },
+              },
+            },
+          };
+
+          await assetCache.commitAlertWithCooldown(sensorId, alertType, {
+            id: newId(),
+            type: 'maintenance',
+            endpoint: '/api/log/maintenance',
+            payload: taskPayload,
+            method: 'POST',
+          });
+          dispatched++;
+        }
+
+        if (dispatched > 0) {
+          window.dispatchEvent(new CustomEvent('taskAdded'));
+        }
+
+        // Persistimos el aviso de conectividad pero no hacemos early-return:
+        // si al menos un sensor responde, seguimos al análisis + IA para no
+        // perder visibilidad agronómica sobre la parte operativa.
+        const namesOffline = unavailableSensors.map(s => s.name).join(', ');
+        offlineNotice = `⚠️ ${unavailableSensors.length} sensor(es) offline (${namesOffline}). Tarea de revisión despachada.\n`;
+
+        setSensors({
+          invernaderoHumidity: invernaderoHumData.state !== 'unavailable' ? invernaderoHumData.state : null,
+          invernaderoTemperature: invernaderoTempData.state !== 'unavailable' ? invernaderoTempData.state : null,
+          tabacoHumidity: tabacoHumData.state !== 'unavailable' ? tabacoHumData.state : null,
+          tabacoTemperature: tabacoTempData.state !== 'unavailable' ? tabacoTempData.state : null,
+        });
+
+        // Una lectura simulada solo existe tras activar explícitamente el modo
+        // de demostración. Sin ese modo, la ruta de sensores caídos ya retornó.
+        if (unavailableSensors.length === sensorReadings.length && !usingMockSensors) {
+          setAiAlert(offlineNotice);
+          setLoading(false);
+          return;
+        }
+      }
+
+      setSensors({
+        invernaderoHumidity: invernaderoHumData.state,
+        invernaderoTemperature: invernaderoTempData.state,
+        tabacoHumidity: tabacoHumData.state,
+        tabacoTemperature: tabacoTempData.state
+      });
+
+      // Histórico 24h, HA History API (no bloquea análisis)
+      const historyStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const entityIds = [
+        'sensor.matera_cocina_humidity',
+        'sensor.matera_cocina_temperature',
+        'sensor.hobeian_zg_303z_humidity',
+        'sensor.hobeian_zg_303z_temperature'
+      ];
+      if (usingMockSensors) {
+        // El histórico simulado solo aparece en el modo de demostración.
+        setSensorHistory(generateMockHistory());
+      } else {
+        try {
+          const histResp = await fetch(
+            `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
+            { headers: { 'Content-Type': 'application/json' }, signal: parentSignal }
+          );
+          if (histResp.ok) {
+            const histData = await histResp.json();
+            const histMap = {};
+            for (const series of histData) {
+              if (series.length > 0) histMap[series[0].entity_id] = series;
+            }
+            setSensorHistory(histMap);
+          }
+        } catch (histErr) {
+          console.warn('[Telemetry] Histórico 24h no disponible:', histErr.message);
+          setSensorHistory({});
+        }
+      }
+
+      // 2. Análisis determinista por reglas (siempre se ejecuta)
+      const inv1Hum = parseFloat(invernaderoHumData.state);
+      const inv1Temp = parseFloat(invernaderoTempData.state);
+      const tabHum = parseFloat(tabacoHumData.state);
+      const tabTemp = parseFloat(tabacoTempData.state);
+
+      const alerts = [];
+
+      // Invernadero Zona A (formato abierto a Zona B, Zona C… en el futuro).
+      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Invernadero Zona A (${inv1Hum}%). Riego inmediato requerido.`);
+      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Invernadero Zona A (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
+      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Invernadero Zona A (${inv1Temp}°C). Activar ventilación.`);
+      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Invernadero Zona A (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
+
+      // Matera Tabaco (ubicada en cocina)
+      if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Matera Tabaco (${tabHum}%). Riego inmediato requerido.`);
+      if (tabHum > 80) alerts.push(`💧 Exceso de humedad en Matera Tabaco (${tabHum}%). Riesgo de hongos. Monitorear.`);
+      if (tabTemp > 30) alerts.push(`🔥 Temperatura elevada en Matera Tabaco (${tabTemp}°C). Activar ventilación.`);
+      if (tabTemp < 5) alerts.push(`❄️ Temperatura baja en Matera Tabaco (${tabTemp}°C). Riesgo de helada.`);
+
+      // Baseline si todo está en rango
+      const ruleAnalysis = alerts.length > 0
+        ? alerts.join('\n')
+        : `✅ Condiciones estables. Invernadero Zona A: ${inv1Hum}%H/${inv1Temp}°C. Matera Tabaco: ${tabHum}%H/${tabTemp}°C.`;
+
+      // Mostrar reglas INMEDIATAMENTE, sin esperar IA. Prepeende aviso de
+      // sensores offline (si hay alguno) para que quede visible incluso si la
+      // IA después falla o tarda.
+      if (parentSignal?.aborted) return;
+      setAiAlert(`${offlineNotice}${ruleAnalysis}`);
+      setLoading(false);
+      setAiStatus('thinking');
+      setLiveAnalysis('');
+
+      // 3. Enriquecimiento con IA en background vía streaming NDJSON (v0.6.0):
+      logTelemetryEvent('telemetry:llm_started', { sensor_id: FARM_CONFIG.LOCATION_ID });
+
+      try {
+        const ollamaTimeout = setTimeout(() => { if (!parentSignal?.aborted) setAiStatus('error'); }, 45000);
+        const userPrompt = (() => {
+          const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
+            : isNaN(h) ? `${t}°C (humedad sin dato)`
+              : isNaN(t) ? `${h}% humedad (temp sin dato)`
+                : `${h}% humedad, ${t}°C`;
+          const alertsLine = alerts.length > 0
+            ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
+            : 'Sin alertas.';
+          const simulationInstruction = usingMockSensors
+            ? `La primera frase debe decir: "${MOCK_DISCLOSURE}"\n`
+            : '';
+          return `${simulationInstruction}Datos actuales de sensores:\n- Invernadero Zona A: ${fmt(inv1Hum, inv1Temp)}\n- Matera Tabaco (cocina): ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
+        })();
+
+        const content = await streamOllama(
+          `${OLLAMA_URL}/api/chat`,
+          {
+            model: ENV.CHAT_MODEL,
+            messages: [
+              { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde en máximo 3 frases concisas, sin superlativos, sin repetir información.' },
+              { role: 'user', content: userPrompt },
+            ],
+            options: { num_predict: 200, temperature: 0.3, repeat_penalty: 1.15 },
+          },
+          (_chunk, full) => {
+            if (!parentSignal?.aborted) {
+              const streamedText = String(full || '');
+              const visibleText = usingMockSensors && !streamedText.trimStart().startsWith(MOCK_DISCLOSURE)
+                ? `${MOCK_DISCLOSURE} ${streamedText}`
+                : streamedText;
+              setLiveAnalysis(visibleText);
+            }
+          },
+          {
+            signal: parentSignal,
+            onDone: (parsed) => {
+              if (parentSignal?.aborted) return;
+              setAiMeta({
+                model: parsed.model || ENV.CHAT_MODEL,
+                totalDuration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : null,
+                evalCount: parsed.eval_count || null,
+                promptTokens: parsed.prompt_eval_count || null,
+              });
+              logTelemetryEvent('telemetry:llm_finished', {
+                duration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : '?',
+                tokens: parsed.eval_count || 0
+              });
+            },
+          },
+        );
+        clearTimeout(ollamaTimeout);
+        if (parentSignal?.aborted) return;
+
+        const trimmed = (content || '').trim();
+        const sanitized = detectAndTruncateRepetition(trimmed);
+
+        if (sanitized.length > 10) {
+          // aiAlert queda con solo reglas; el texto de IA va a aiFinalText y
+          // se renderiza abajo en su propio panel cyberpunk (AIStreamPanel).
+          const visibleText = usingMockSensors && !sanitized.startsWith(MOCK_DISCLOSURE)
+            ? `${MOCK_DISCLOSURE} ${sanitized}`
+            : sanitized;
+          setAiFinalText(visibleText);
+          setAiStatus('done');
+        } else {
+          console.warn('[Telemetry] IA sin contenido suficiente. Length:', trimmed.length);
+          setAiStatus('empty');
+        }
+      } catch (llmErr) {
+        if (parentSignal?.aborted) return;
+        console.warn('[Telemetry] IA no disponible:', llmErr.message);
+        setAiStatus('error');
+        logTelemetryEvent('telemetry:llm_failed', { message: llmErr.message }, 'error');
+      }
+
+    } catch (err) {
+      setError(err.message);
+
+      // Inyectar tarea de revisión física con idempotencia persistente por (telemetria_global, fallo_general).
+      try {
+        const sensorId = 'telemetria_global';
+        const alertType = 'fallo_general';
+        const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+        if (Date.now() - lastTrigger >= COOLDOWN_MS) {
+          const taskPayload = {
+            data: {
+              type: 'log--activity',
+              attributes: {
+                name: 'Revisión física de sensor offline',
+                timestamp: Math.floor(Date.now() / 1000),
+                status: 'pending',
+                notes: { value: `Error de telemetría: "${err.message}". Revisar alimentación y conectividad de sensores Zigbee en Home Assistant. Verificar también disponibilidad de Ollama.` },
+              },
+              relationships: {
+                location: {
+                  data: [{ type: 'asset--land', id: FARM_CONFIG.LOCATION_ID }],
+                },
+              },
+            },
+          };
+
+          await assetCache.commitAlertWithCooldown(sensorId, alertType, {
+            id: newId(),
+            type: 'activity',
+            endpoint: '/api/log/activity',
+            payload: taskPayload,
+            method: 'POST',
+          });
+
+          window.dispatchEvent(new CustomEvent('taskAdded'));
+        } else {
+          console.warn(`[Telemetry] Fallo general suprimido por cooldown.`);
+        }
+      } catch (txErr) {
+        console.error('Error inyectando tarea de revisión:', txErr);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    void Promise.resolve().then(() => fetchTelemetryAndAnalyze(ctrl.signal));
+    return () => ctrl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="px-5 py-4 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-6">
+      <h3 className="text-lg font-black mb-3 flex items-center gap-2">
+        <span className="w-2.5 h-2.5 bg-muzo rounded-full motion-safe:animate-pulse"></span>
+        Observabilidad Agronómica
+      </h3>
+
+      {error && (
+        <div className="p-4 mb-4 rounded-xl bg-red-900/30 border border-red-500 text-red-200 font-mono text-xs">
+          <div className="font-bold mb-2 flex items-center gap-2">
+            ⚠️ ERROR DE CONECTIVIDAD
+          </div>
+          <div className="space-y-1">
+            <div className="flex gap-2">
+              <span className="text-red-400 font-bold">DETALLE:</span>
+              <span>{error}</span>
+            </div>
+            <div className="flex gap-2">
+              <span className="text-red-400 font-bold">ACCIÓN:</span>
+              <span>Verifique que Nginx tenga configurado el proxy hacia Home Assistant</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Telemetria IoT, estilo HUD industrial, tipografia monoespaciada,
+           borde left accent morpho (cyan) para diferenciar visualmente del
+           panel cyberpunk de IA (orchid). Status dot parpadea sutilmente
+           como signo de conexion viva al sensor. */}
+      <div className="space-y-3 mb-6">
+        {telemetryStatus === 'loading' ? (
+          <p role="status" className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-300">
+            Consultando sensores conectados...
+          </p>
+        ) : telemetryStatus === 'empty' ? (
+          <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4">
+            <p role="status" className="font-bold text-slate-100">Sin sensores conectados</p>
+            <p className="mt-1 text-sm text-slate-400">No hay lecturas disponibles para mostrar o analizar.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setMockActive(true);
+                fetchTelemetryAndAnalyze();
+              }}
+              className="mt-4 rounded-lg border border-amber-500/50 bg-amber-950/30 px-3 py-2 text-sm font-bold text-amber-200 hover:bg-amber-900/40"
+            >
+              Activar demostración simulada
+            </button>
+          </div>
+        ) : (
+          <div className="motion-safe:animate-glitch-in space-y-3">
+            {usingMockSensors && (
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-950/25 px-3 py-2 text-xs text-amber-100">
+                <span>Modo de demostración: las lecturas visibles son simuladas.</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMockActive(false);
+                    fetchTelemetryAndAnalyze();
+                  }}
+                  className="shrink-0 rounded border border-amber-400/40 px-2 py-1 font-bold hover:bg-amber-900/40"
+                >
+                  Desactivar
+                </button>
+              </div>
+            )}
+            {wateringEffect && (
+              <div className="mb-3 p-3 rounded-xl bg-cyan-950/40 border border-cyan-700/50 text-cyan-200 text-xs flex items-center gap-2 motion-safe:animate-pulse">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21a8 8 0 100-16 8 8 0 000 16zm0-12v4l3 3" />
+                </svg>
+                <span>
+                  <b>Riego en curso:</b> humedad +{wateringEffect.deltaHumidity}% · temperatura {wateringEffect.deltaTemperature}°C ·
+                  efecto visible {Math.round(wateringEffect.durationMs / 1000)}s
+                </span>
+              </div>
+            )}
+            <IoTSensorCard
+              title="INVERNADERO, ZONA A"
+              deviceId="matera_cocina · zigbee"
+              humidity={wateringEffect && sensors.invernaderoHumidity != null
+                ? (parseFloat(sensors.invernaderoHumidity) + wateringEffect.deltaHumidity).toFixed(1)
+                : sensors.invernaderoHumidity}
+              temperature={wateringEffect && sensors.invernaderoTemperature != null
+                ? (parseFloat(sensors.invernaderoTemperature) + wateringEffect.deltaTemperature).toFixed(1)
+                : sensors.invernaderoTemperature}
+              humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
+              temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
+              getHumidityMeta={getHumidityMeta}
+              getTemperatureMeta={getTemperatureMeta}
+              simulated={usingMockSensors}
+            />
+            <IoTSensorCard
+              title="MATERA TABACO"
+              deviceId="cocina · hobeian_zg_303z"
+              humidity={wateringEffect && sensors.tabacoHumidity != null
+                ? (parseFloat(sensors.tabacoHumidity) + wateringEffect.deltaHumidity).toFixed(1)
+                : sensors.tabacoHumidity}
+              temperature={wateringEffect && sensors.tabacoTemperature != null
+                ? (parseFloat(sensors.tabacoTemperature) + wateringEffect.deltaTemperature).toFixed(1)
+                : sensors.tabacoTemperature}
+              humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
+              temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
+              getHumidityMeta={getHumidityMeta}
+              getTemperatureMeta={getTemperatureMeta}
+              simulated={usingMockSensors}
+            />
+          </div>
+        )}
+      </div>
+
+      {telemetryStatus === 'loading' ? (
+        <p role="status" className="mb-4 text-sm text-slate-400">Esperando lecturas para iniciar el análisis.</p>
+      ) : telemetryStatus === 'empty' ? (
+        <p className="mb-4 rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-400">
+          Sin análisis: no hay lecturas de sensores disponibles.
+        </p>
+      ) : (
+        <div className={`p-5 rounded-xl relative overflow-hidden border-l-8 shadow-neon-morpho ${loading ? 'bg-morpho/5 border-morpho' : 'bg-orchid/5 border-orchid'}`}>
+        <div className="absolute top-0 right-0 p-2 opacity-10">
+          <Info size={64} className="text-morpho" />
+        </div>
+        <div className="flex justify-between items-start mb-2">
+          <span className="font-black text-morpho block text-xs uppercase tracking-widest">Analisis Agronomico</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {aiStatus === 'thinking' && (
+              <span className="text-orchid text-2xs font-bold bg-orchid/10 px-2 py-1 rounded flex items-center gap-1 border border-orchid/30">
+                <ChagraGrowLoader size={20} />
+                IA analizando...
+              </span>
+            )}
+            {aiStatus === 'done' && aiMeta && (
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-muzo rounded-full inline-block"></span>
+                {aiMeta.model}
+                {aiMeta.totalDuration && <span className="text-slate-400 font-normal ml-1">{aiMeta.totalDuration}s</span>}
+                {aiMeta.evalCount && <span className="text-slate-500 font-normal">/{aiMeta.evalCount}tk</span>}
+              </span>
+            )}
+            {aiStatus === 'done' && !aiMeta && (
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">● IA completada</span>
+            )}
+            {aiStatus === 'error' && (
+              <span className="text-frog text-2xs font-bold bg-frog/10 px-2 py-1 rounded border border-frog/30">IA no disponible</span>
+            )}
+            {aiStatus === 'empty' && (
+              <span className="text-slate-400 text-2xs font-bold bg-slate-800 px-2 py-1 rounded border border-slate-700">IA sin aporte</span>
+            )}
+            {!loading && aiAlert && (
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">Reglas activas</span>
+            )}
+            {(aiStatus === 'error' || aiStatus === 'empty' || aiStatus === 'done') && (
+              <ExternalAiButton
+                buildPrompt={buildDiagnosticExternalPrompt}
+                label="Copiar prompt para IA externa"
+                context={{
+                  speciesName: 'cultivo en monitoreo',
+                  ...getContextoGeoParaIA(),
+                  speciesThermalZones: [],
+                  sintomas: aiAlert || '',
+                }}
+              />
+            )}
+          </div>
+        </div>
+        {loading ? (
+          <div className="flex gap-2 items-center">
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce"></div>
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce delay-75"></div>
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce delay-150"></div>
+            <span className="text-slate-400 text-sm italic font-medium">Analizando datos agronómicos...</span>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {aiAlert ? (
+              <>
+                {/* Render mejorado análisis determinista. Operator feedback
+                    2026-05-18: texto plano "✅ Condiciones estables..." se ve
+                    feo. Ahora card verde si estable / cards amber bullets si
+                    hay alertas. */}
+                {(() => {
+                  const text = (aiAlert || '').trim();
+                  const isStable = text.startsWith('✅');
+                  const lines = text.split('\n').filter(Boolean);
+                  if (isStable) {
+                    return (
+                      <div className="rounded-xl bg-emerald-950/30 border border-emerald-800/50 p-3 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-900/60 border border-emerald-700/60 flex items-center justify-center shrink-0">
+                          <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-emerald-200">Condiciones estables</div>
+                          <div className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                            Telemetría dentro de rangos óptimos. Chagra IA está observando sin alertas activas.
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  // Severidad visual por tipo de alerta (SOLO presentación):
+                  //   🚨/🔥 crítico  → rose (acción inmediata)
+                  //   💧/❄️ ambiental → sky (agua/frío)
+                  //   ⚠️ operativo    → amber (revisar)
+                  // Clases del safe set theme-aware (override en themes.css
+                  // para temas claros) + borde izquierdo grueso para que la
+                  // jerarquía se lea también al sol, no solo por el tinte.
+                  const severityCls = (line) => {
+                    if (/^(🚨|🔥)/.test(line))
+                      return 'bg-rose-950/20 border border-rose-500/40 border-l-4 border-l-rose-500 text-rose-200 font-semibold';
+                    if (/^(💧|❄️)/.test(line))
+                      return 'bg-sky-950/40 border border-sky-500/40 border-l-4 border-l-sky-400 text-sky-200 font-medium';
+                    if (/^⚠️/.test(line))
+                      return 'bg-amber-500/10 border border-amber-500/40 border-l-4 border-l-amber-400 text-amber-200 font-medium';
+                    return 'text-slate-300';
+                  };
+                  return (
+                    <ul className="space-y-1.5">
+                      {lines.map((line, idx) => (
+                        <li
+                          key={idx}
+                          className={`flex items-start gap-2 text-sm leading-relaxed rounded-lg px-3 py-2 ${severityCls(line)}`}
+                        >
+                          <span className="leading-snug">{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
+
+                {/* Bloque de IA (streaming + final) con efectos cyberpunk.
+                    Se muestra durante thinking (con liveAnalysis) y permanece
+                    visible en done (con aiFinalText consolidado). El panel
+                    dispara un spark flash al transicionar active→false. */}
+                {(aiStatus === 'thinking' || (aiStatus === 'done' && aiFinalText)) && (
+                  <AIStreamPanel
+                    text={aiStatus === 'thinking' ? liveAnalysis : aiFinalText}
+                    active={aiStatus === 'thinking'}
+                    label={aiStatus === 'thinking' ? 'IA generando' : 'Análisis IA'}
+                    accent="orchid"
+                    meta={aiMeta && (
+                      <span className="tabular-nums">
+                        {aiMeta.model}
+                        {aiMeta.totalDuration && <> · {aiMeta.totalDuration}s</>}
+                        {aiMeta.evalCount && <> · {aiMeta.evalCount}tk</>}
+                      </span>
+                    )}
+                  />
+                )}
+
+                {renderActionButton()}
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-amber-400">
+                <span className="text-xl">⚠️</span>
+                <span className="text-sm">Sistema de inferencia en modo de espera</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      )}
+
+      {/* Feedback piloto #105: "Sincronizar Telemetría" propósito unclear.
+          Renombrado a "Sincronizar Sensores" + tooltip explicativo.
+          Feedback "Cargando..." durante el fetch. */}
+      <button
+        onClick={() => {
+          const ctrl = new AbortController();
+          fetchTelemetryAndAnalyze(ctrl.signal);
+        }}
+        disabled={loading}
+        title="Forzar actualización de lecturas de sensores Zigbee desde Home Assistant + re-análisis IA"
+        aria-label="Sincronizar lecturas de sensores"
+        className="mt-6 w-full p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 transition-all border border-slate-600 font-bold text-slate-300 flex items-center justify-center gap-3 disabled:opacity-50"
+      >
+        <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        {loading ? MSG.ui.sincronizandoSensores : MSG.ui.sincronizarSensoresBtn}
+      </button>
+    </div>
+  );
+}

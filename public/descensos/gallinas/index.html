@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — del potrero a la gallina, al huevo por dentro y de vuelta con la gallinaza</title>
+<meta name="description" content="Una sola toma, sin cortes: del potrero con gallinero móvil a la gallina, al huevo que se forma por dentro en unas 25 horas y a su cáscara; luego por el tiempo, con la curva de postura y el pollo de engorde, y de vuelta al potrero con la gallinaza hecha abono. Newcastle y el registro del ICA. Cifras con fuente; glosario, lectura en voz alta y un repaso para jugar.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(24,17,11,.72); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#eaa83c; --acento-tinta:#ffd07c;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:#16110c;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#16110c;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#20301a}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#20301a;max-width:27rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#20301a;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista,#titulo h1{text-shadow:0 0 6px rgba(240,244,236,.95),0 0 16px rgba(240,244,236,.8)}
+
+/* La finca: altitud desde la URL, la ubicación o a mano */
+#ubicacion{position:fixed;z-index:5;right:var(--gut);top:var(--ubic-top,220px);width:min(24rem,calc(100vw - 2*var(--gut)));background:rgba(248,243,228,.96);color:#2a2213;border:1px solid #8a7348;border-radius:14px;padding:8px 14px;font-size:1rem;box-shadow:0 6px 22px rgba(20,14,6,.25);transition:opacity .3s ease}
+#ubicacion summary{cursor:pointer;font-weight:650;line-height:1.4;min-height:32px;display:flex;align-items:center}
+#ubicacion p{margin:.5em 0;line-height:1.4}
+#ubicacion input{font:inherit;width:8em;min-height:44px;border:1px solid #8a7348;border-radius:8px;padding:6px;background:#fff;color:#2a2213}
+#ubicacion button{font:inherit;background:#4a3a1c;color:#fff;border-radius:9px;padding:8px 12px;min-height:44px;border:0;cursor:pointer;margin:2px 4px 2px 0}
+#ubicacion label{display:block;margin:6px 0}
+#ubicacion.oculto{opacity:0;pointer-events:none}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline;line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(234,168,60,.3)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:var(--acento);color:#2a1a04;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(22,15,9,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(24,17,11,.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(48,36,24,.86);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:var(--acento);color:#2a1a04;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#f3bd5e}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:2px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:5px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+#riel.callado button span{opacity:0!important}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#1c1610;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(10,7,4,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#1c1610;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#281f16;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(234,168,60,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{grid-column:1 / -1;margin-top:4px;padding-top:4px}
+  #medidor .nota{display:none}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px;max-height:52vh;overflow:auto}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .btn{padding:10px 9px;font-size:.95rem}
+  #bSonido .lbl{display:none}
+  #riel{left:auto;right:4px;top:52%}
+  #riel button span{display:none}
+  #ubicacion{left:var(--gut);right:var(--gut);width:auto;padding:4px 12px}
+  #ubicacion[open]{max-height:56vh;overflow:auto}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 7px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo desde un potrero con gallinas hasta la cáscara del huevo, luego por el tiempo y de vuelta al potrero" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p>Del potrero a la gallina, al huevo que se forma por dentro en unas 25 horas y a su cáscara; luego por el tiempo, y de vuelta al potrero con la gallinaza.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<details id="ubicacion">
+  <summary id="origenPiso" aria-live="polite">Altitud de ejemplo</summary>
+  <p id="detallePiso">La altitud de su finca cambia lo que se enseña del pollo de engorde. Nada de esto se guarda ni se envía.</p>
+  <form id="alturaManual"><label>Altitud de su finca, en metros <input id="alturaFinca" type="number" min="0" max="6000" step="any" required></label><button type="submit">Usar esta altitud</button></form>
+  <p><button id="usarUbicacion" type="button">Usar mi ubicación</button></p>
+  <p id="estadoUbicacion" role="status"></p>
+</details>
+
+<aside id="medidor" aria-label="Medidor">
+  <div class="fila"><span class="rot" id="rEscala">Ancho de lo que ve</span><span class="val rueda" id="vEscala">24,0 m</span></div>
+  <div class="fila"><span class="rot" id="rAumento">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span id="rRegla">En su regla:</span><b id="vRegla">mide 24 000 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/8 · El potrero</span><span id="vMomento">franja de hoy</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 8</div>
+  <h2 id="fTit">El potrero</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el fondo del potrero"><span aria-hidden="true">♪</span><span class="lbl"> Sonido: <span class="est">no</span></span></button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>. El potrero, la gallina, el oviducto, el huevo y la cáscara son <b>dibujos</b>: el oviducto se dibuja más corto y enrollado de lo que es, y los colores por dentro son de dibujo. Las gráficas usan las cifras de las fuentes tal como están; la banda de la gallina criolla es un <b>promedio de fincas</b>, no una curva medida semana a semana. Las normas del ICA se resumen: lo que diga la oficina local del ICA manda sobre este resumen.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>Jacob J (s. f.).</b> <em>Avian Reproductive System — Female.</em> Small and Backyard Poultry, Cooperative Extension System (Universidad de Kentucky). poultry.extension.org/articles/poultry-anatomy/avian-reproductive-female — solo el ovario izquierdo funciona; la pollita nace con todos sus óvulos; del ovario a la puesta, unas 25 a 26 horas; la siguiente yema sale de 30 a 75 minutos después de la puesta y casi nunca después de las 3 de la tarde; infundíbulo 15 a 17 minutos, magno 3 horas, istmo 75 minutos, útero 20 horas o más; los huesos dan el 47 % del calcio de la cáscara y la comida el resto.</li>
+      <li id="f2"><b>USDA, Agricultural Marketing Service (2000).</b> <em>Egg-Grading Manual.</em> Agricultural Handbook 75, revisado en julio de 2000 — yema 31 %, clara 58 % y cáscara 11 % del peso; el disco germinal; la cáscara es 94 % carbonato de calcio; oviducto de 63,5 a 68,6 cm; infundíbulo unos 15 minutos, magno unas 3 horas, istmo 1¼ horas, útero unas 21 horas; la cutícula cubre los poros al poner; recién puesto no tiene cámara de aire: se forma al enfriarse; cáscara delgada por la dieta, la herencia o una enfermedad.</li>
+      <li id="f3"><b>McDermott T, Lobb J (2022).</b> <em>The Making of an Egg.</em> Ohioline VME-0021, Ohio State University Extension — de 24 a 26 horas por huevo; la puesta no depende de la fecundación; chalazas que sostienen la yema; la cutícula se pone en el útero; la cámara de aire se forma al enfriarse y sirve para respirar al pollito; orejilla roja, huevo de color casi siempre.</li>
+      <li id="f4"><b>Hincke MT, Nys Y, Gautron J, Mann K, Rodriguez-Navarro AB, McKee MD (2012).</b> <em>The eggshell: structure, composition and mineralization.</em> Frontiers in Bioscience 17: 1266–1280. doi:10.2741/3985 — la cáscara lleva unos 6 g de mineral y es 96 % carbonato de calcio; capas: mamilar, en empalizada, cristales verticales y cutícula; la permeabilidad depende de los poros.</li>
+      <li id="f5"><b>Altuntaş E, Şekeroğlu A (2010).</b> <em>Mechanical behavior and physical properties of chicken egg as affected by different egg weights.</em> Journal of Food Process Engineering 33: 115–127. doi:10.1111/j.1745-4530.2008.00263.x — grosor de cáscara de 0,387 a 0,400 mm en cuatro tamaños de huevo. <b>Solo se leyó el resumen.</b></li>
+      <li id="f6"><b>La Scala Jr N, Boleli IC, Ribeiro LT, Freitas D, Macari M (2000).</b> <em>Pore size distribution in chicken eggs as determined by mercury porosimetry.</em> Revista Brasileira de Ciência Avícola 2: 177–181. doi:10.1590/S1516-635X2000000200007 — la mayoría de los poros miden de 1 a 10 µm; citan a Baxter-Jones (1994): de 10 000 a 20 000 poros por cáscara.</li>
+      <li id="f7"><b>Hy-Line International (2026).</b> <em>Hy-Line Brown Commercial Layers, Alternative Systems: Performance Standards Guide</em> (mayo de 2026) — tabla semanal de postura de la semana 18 a la 100; pico de 93,2 a 97,1 %; 50 % de postura a los 140 días; de 485 a 509 huevos por gallina-día a las 100 semanas; de 116 a 121 g de alimento al día; de 1,55 a 1,61 kg por docena (semanas 20 a 60); de 4,0 a 4,7 g de calcio al día.</li>
+      <li id="f8"><b>Tovar-Paredes JL, Narváez-Solarte W, Agudelo-Giraldo L (2015).</b> <em>Tipificación de la gallina criolla en los agroecosistemas campesinos de producción en la zona de influencia de la selva de Florencia (Caldas).</em> Luna Azul 41: 57–72. doi:10.17151/luaz.2015.41.4 — 76 fincas de Samaná, de 700 a 2 300 m; primer huevo a los 180–210 días; postura promedio 46,3 % (de 28 a 59,1 % según el grupo); huevo de 58 g; gallina de 1,9 kg y gallo de 2,1 kg; se crían sueltas con maíz y sobras, y recogen arañas, lombrices e insectos; casi todas nacen por incubación natural en la finca; mortalidad cercana al 23 % por males respiratorios, diarrea, Newcastle y parásitos, sin vacunación.</li>
+      <li id="f9"><b>Aviagen (2022).</b> <em>Ross 308 / Ross 308 FF Broiler: Performance Objectives</em> — pollos mixtos: 44 g al nacer, 2 296 g a los 35 días y 2 998 g a los 42; consumo acumulado de 4 586 g y conversión de 1,531 a los 42 días.</li>
+      <li id="f10"><b>Hargis BM (2024).</b> <em>Ascites Syndrome in Poultry.</em> Merck Veterinary Manual (revisado en septiembre de 2024) — por encima de 3 000 pies (900 m) la altura no es buena para pollos de carne y hay que frenar su crecimiento; el frío en las tres primeras semanas predispone a la ascitis; se previene haciendo crecer más despacio.</li>
+      <li id="f11"><b>ICA, Resolución 103751 del 20 de agosto de 2021.</b> «Por la cual se actualizan las medidas sanitarias para el control y erradicación de la enfermedad de Newcastle Notificable…» — art. 4: los signos (respiratorios, nerviosos, diarrea verde blanquecina acompañada de otros signos, menos huevos y cáscaras finas, muertes inusuales); art. 6: avisar al ICA de inmediato; el ICA atiende en máximo 24 horas; art. 8: registrarse y aplicar el plan de vacunación. Texto leído en el anexo publicado por la OMSA.</li>
+      <li id="f12"><b>ICA (2023).</b> <em>Programa Nacional de Control y Erradicación de la Enfermedad de Newcastle Notificable</em>, PRA-SPA-PROG-2 V.1 — enfermedad viral de las aves; plan de vacunación obligatorio; cinco brotes en 2022 en aves de traspatio y de pelea en el Cauca; Colombia autodeclarada libre desde el 28 de septiembre de 2022.</li>
+      <li id="f13"><b>ICA, Resolución 090464 del 20 de enero de 2021.</b> «Por medio de la cual se establece el Registro Sanitario de Predio Pecuario — RSPP» — art. 3.13: el predio avícola incluye las aves de traspatio; art. 5: el trámite se presenta en cualquier oficina local del ICA; art. 12.9: avisar al ICA de inmediato ante signos de enfermedad de control oficial.</li>
+      <li id="f14"><b>ICA (consultada el 30 de septiembre de 2026).</b> <em>Requisitos para el R.S.P.P.</em> ica.gov.co/areas/pecuaria/registro-de-predios-ante-el-ica/requisitos-para-el-r-s-p-p — «Aviar: predio productor de aves con doscientos (200) o más animales».</li>
+      <li id="f15"><b>ICA (2020).</b> <em>El ICA y Fenavi realizarán jornada de vacunación contra el Newcastle en aves de traspatio</em> (22 de julio) — vacunación sin costo para predios de traspatio con menos de 200 aves; con más de 200, por cuenta del productor.</li>
+      <li id="f16"><b>Ministerio de Agricultura, Resolución 000253 del 29 de octubre de 2020.</b> Manual de condiciones de bienestar animal (bovinos, bufalinos, aves de corral y animales acuáticos), punto 9.2.2 — gallinas en producción: máximo 11 aves por m² en piso y máximo 4 aves por m² en el área de pastoreo.</li>
+      <li id="f17"><b>Unión Europea, Reglamento de Ejecución (UE) 2020/464.</b> Anexo I, parte IV, punto 3, y artículo 16 — gallinas ponedoras ecológicas: mínimo 4 m² de exterior por gallina, máximo 6 por m² adentro, 18 cm de percha y 7 gallinas por nido; el exterior con vegetación variada y con arbustos, árboles o refugios repartidos para que usen todo el terreno.</li>
+      <li id="f18"><b>Unión Europea, Reglamento (UE) 2018/848.</b> Anexo II, parte II, punto 1.9.4.4 — al terminar cada lote, el corral se deja vacío para que vuelva a crecer la vegetación.</li>
+      <li id="f19"><b>Pacher-Deutsch M, Meyer P, Meimberg H, Gierus M (2025).</b> <em>Enhancing range use in free-range laying hen systems: the impact of vegetation cover over time.</em> Animals 15: 1204. doi:10.3390/ani15091204 — las gallinas se amontonan cerca del gallinero: daño al pasto, exceso de abono, más parásitos y microbios; con arbustos nuevos, más gallinas usaron los cuadros lejanos.</li>
+      <li id="f20"><b>Singh M, Cowieson AJ (2013).</b> <em>Range use and pasture consumption in free-range poultry production.</em> Animal Production Science 53: 1202–1208. doi:10.1071/AN13199 — comer pasto diluye la energía y la proteína de la dieta. <b>Solo se leyó el resumen.</b></li>
+      <li id="f21"><b>Rodríguez L, Salazar P, Arango MF (1995).</b> <em>Lombriz roja californiana y azolla-anabaena como sustituto de la proteína convencional en dietas para pollos de engorde.</em> Livestock Research for Rural Development 7(3), CIPAV, Jamundí (Valle) — la lombriz reemplazó una parte de la proteína de la torta de soya; su carne tiene de 68 a 82 % de proteína en base seca, según Ferruzzi (1988), que ellos citan.</li>
+      <li id="f22"><b>USDA NRCS (2025).</b> <em>National Engineering Handbook, Part 651, Agricultural Waste Management Field Handbook, Subpart D</em> (enmienda de septiembre de 2025), figura 651D-12a — una gallina ponedora excreta 0,19 libras al día (86 g), con 75 % de agua.</li>
+      <li id="f23"><b>Sawyer J (2009).</b> <em>What are average manure nutrient analysis values?</em> Iowa State University, Soil Fertility — estiércol sólido de ponedora: 34 libras de nitrógeno por tonelada corta; de vaca de leche: 10.</li>
+      <li id="f24"><b>Estados Unidos, 7 CFR 205.203 (Programa Nacional Orgánico).</b> — estiércol crudo: compostado, o enterrado al menos 120 días antes de cosechar lo que toca el suelo y 90 días si no lo toca; compost con relación carbono:nitrógeno inicial de 25:1 a 40:1 y de 131 a 170 °F (55 a 77 °C) por 3 días en pila estática aireada o por 15 días en hilera, volteada al menos 5 veces.</li>
+      <li id="f25"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §4.1 «Studying Cells». OpenStax (CC BY 4.0) — una micra (µm) es la millonésima parte de un metro.</li>
+    </ol>
+    <p class="aviso"><b>Cuentas hechas con esas cifras.</b> Huevos por semana en el pico: 0,932 × 7 ≈ 6,5 y 0,971 × 7 ≈ 6,8 [7]. Criolla: 0,463 × 7 ≈ 3,2 [8]. Calcio de una cáscara: 6 g × 96 % de carbonato × 40 % de calcio en el carbonato ≈ 2,3 g [4]. Gallinaza: 0,19 lb = 86 g al día [22]; 10 gallinas × 86 g × 365 días ≈ 314 kg al año. Nitrógeno: 34 ÷ 10 ≈ 3 veces el de la boñiga de vaca [23]. Espacio: 20 gallinas × 4 m² = 80 m², un cuadro de unos 9 × 9 m [17]. Temperatura: 131 °F = 55 °C y 170 °F ≈ 77 °C [24]. «Kilo y medio por kilo»: conversión de 1,531 a los 42 días [9]. La línea «En su regla» del medidor divide un milímetro entre el ancho de la vista, que es aproximado.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso de las gallinas — una sola toma: el potrero, la
+   gallina, el oviducto (25 horas), el huevo y su cáscara; luego
+   por el tiempo (postura y engorde) y de vuelta al potrero.
+   La cámara se mueve por un parámetro p que solo mueve el usuario.
+   El motor (cámara por portales, medidor, tarjetas, voz, palabras,
+   fuentes, repaso) es el del Descenso del café.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const buf2 = document.createElement('canvas'); const b2ctx = buf2.getContext('2d');
+let RELOJ = 0; // segundos, solo para el picoteo; con movimiento reducido no corre
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const TAU = Math.PI * 2;
+function hex(h){ if (h[0] === 'r'){ const m = h.match(/\d+/g); return [+m[0], +m[1], +m[2]]; } h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function mixHex(a, b, t){ const A = hex(a), B = hex(b); return '#' + [0, 1, 2].map(i => Math.round(lerp(A[i], B[i], t)).toString(16).padStart(2, '0')).join(''); }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function h1(n){ const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+function blob(c, x, y, rx, ry, col, a){ const g = c.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry)); g.addColorStop(0, rgba(col, a)); g.addColorStop(0.6, rgba(col, a*0.5)); g.addColorStop(1, rgba(col, 0)); c.save(); c.translate(x, y); c.scale(1, ry/rx); c.translate(-x, -y); c.fillStyle = g; c.beginPath(); c.arc(x, y, rx, 0, TAU); c.fill(); c.restore(); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+/* Catmull-Rom → Bézier: curva suave por los puntos */
+function curva(c, pts, cerrada){
+  const n = pts.length; if (n < 2) return;
+  const P = i => cerrada ? pts[(i + n) % n] : pts[clamp(i, 0, n - 1)];
+  c.moveTo(pts[0][0], pts[0][1]);
+  const m = cerrada ? n : n - 1;
+  for (let i = 0; i < m; i++){
+    const p0 = P(i-1), p1 = P(i), p2 = P(i+1), p3 = P(i+2);
+    c.bezierCurveTo(p1[0] + (p2[0]-p0[0])/6, p1[1] + (p2[1]-p0[1])/6, p2[0] - (p3[0]-p1[0])/6, p2[1] - (p3[1]-p1[1])/6, p2[0], p2[1]);
+  }
+  if (cerrada) c.closePath();
+}
+function muestrea(pts, k){
+  const out = [], n = pts.length, P = i => pts[clamp(i, 0, n - 1)];
+  for (let i = 0; i < n - 1; i++){ const p0 = P(i-1), p1 = P(i), p2 = P(i+1), p3 = P(i+2);
+    for (let j = 0; j < k; j++){ const t = j/k, t2 = t*t, t3 = t2*t;
+      out.push([0.5*((2*p1[0]) + (-p0[0]+p2[0])*t + (2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2 + (-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),
+                0.5*((2*p1[1]) + (-p0[1]+p2[1])*t + (2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2 + (-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)]); } }
+  out.push(pts[n-1]); return out;
+}
+
+/* ============================================================
+   LA FINCA: altitud por la URL (?alt=&municipio=&lat=&lon=),
+   por la ubicación del aparato o a mano. Cambia lo que se enseña
+   del pollo de engorde: por encima de 900 m la altura no es buena
+   para el pollo de carne de crecimiento rápido [10].
+   ============================================================ */
+const numero = (v, min, max) => v !== null && v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const ALT_ASCITIS = 900;
+let altura = numero(qs.get('alt'), 0, 6000);
+let origenAlt = altura === null ? '' : 'Altitud de la app';
+const municipio = (qs.get('municipio') || '').trim().slice(0, 60);
+const ALTA = () => altura !== null && altura > ALT_ASCITIS;
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   0 potrero · 1 gallina · 2 por dentro · 3 huevo · 4 cáscara
+   5 postura (por el tiempo) · 6 engorde (por el tiempo)
+   ============================================================ */
+const F = [24, 0.9, 0.3, 0.07, 0.0012];
+const KG = 0.625;                    // la gallina de cerca: unidades del nivel 1 por unidad de su dibujo
+const HEN_Y = 0.25;                  // sus patas en el nivel 1
+const PORTAL = [];
+PORTAL[0] = { c:1, x: 0.035, y: 0.25 - HEN_Y*F[1]/F[0], s: F[1]/F[0] };
+PORTAL[1] = { c:2, x: -0.05, y: 0.03, s: F[2]/F[1] };
+PORTAL[2] = { c:3, x: -0.06, y: 0.14, s: F[3]/F[2] };
+PORTAL[3] = { c:4, x: 0, y: 0, s: F[4]/F[3] };           // se fija al borde de arriba del huevo (abajo)
+
+/* ============================================================
+   GUION DE CÁMARA
+   hold: se queda en un nivel · in: del padre al hijo por su portal
+   fade: se funde de un cuadro a otro (el tiempo no tiene tamaño)
+   ============================================================ */
+const val = v => typeof v === 'function' ? v() : (v || 0);
+const SEGS = [
+  { k:'hold', L:0, st:0, w:1.2, f0:() => PORT ? 1.0 : 1.0, f1:() => PORT ? 0.9 : 0.9, cx0:0, cx1:0.02, cy0:() => PORT ? 0.1 : 0.06, cy1:() => PORT ? 0.14 : 0.09 },
+  { k:'in',   L:0, w:1.35, e:'in' },
+  { k:'hold', L:1, st:1, w:1.9, f0:1.3, f1:1.2, cx0:-0.02, cx1:-0.02, cy0:0.0, cy1:() => PORT ? 0.04 : 0.02 },
+  { k:'in',   L:1, w:1.15, e:'both' },
+  { k:'hold', L:2, st:2, w:3.4, f0:() => PORT ? 1.4 : 1.0, f1:() => PORT ? 1.3 : 0.95, cx0:0, cx1:() => PORT ? -0.04 : -0.02, cy0:0, cy1:0.02 },
+  { k:'in',   L:2, w:1.2, e:'both' },
+  { k:'hold', L:3, st:3, w:1.8, f0:() => PORT ? 1.95 : 1.15, f1:() => PORT ? 1.9 : 1.1, cx0:0, cx1:0, cy0:0, cy1:0 },
+  { k:'in',   L:3, w:1.35, e:'both' },
+  { k:'hold', L:4, st:4, w:1.6, f0:1.0, f1:0.92, cx0:0, cx1:0, cy0:() => PORT ? 0.02 : 0.03, cy1:() => PORT ? 0.02 : 0.03 },
+  { k:'fade', L:4, L2:5, w:0.9 },
+  { k:'hold', L:5, st:5, w:2.8 },
+  { k:'fade', L:5, L2:6, w:0.9 },
+  { k:'hold', L:6, st:6, w:2.4 },
+  { k:'fade', L:6, L2:0, w:1.0 },
+  { k:'hold', L:0, st:7, w:1.6, f0:() => PORT ? 1.02 : 1.0, f1:() => PORT ? 1.02 : 0.98, cx0:() => PORT ? 0.06 : 0.02, cx1:() => PORT ? 0.06 : 0.02, cy0:() => PORT ? 0.18 : 0.12, cy1:() => PORT ? 0.18 : 0.12 },
+];
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc;
+const EST = SEGS.filter(s => s.k === 'hold').map(s => ({ a: s.a, b: s.b, st: s.st, L: s.L, seg: s }));
+const NEST = EST.length;
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const easeF = { '':u=>u, 'in':u=>2*u*u-u*u*u, 'out':u=>{const v=1-u; return 1-(2*v*v-v*v*v);}, 'both':u=>u*u*(3-2*u) };
+const holdIni = s => ({ f: val(s.f0) || 1, cx: val(s.cx0), cy: val(s.cy0) });
+const holdFin = s => ({ f: val(s.f1) || 1, cx: val(s.cx1), cy: val(s.cy1) });
+function camHold(s, u){
+  const a = holdIni(s), b = holdFin(s), e = sstep(0, 1, u);
+  return { k:'lvl', L:s.L, cx: lerp(a.cx, b.cx, e), cy: lerp(a.cy, b.cy, e), f: a.f * Math.pow(b.f/a.f, u), seg:s, u };
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let i = SEGS.length - 1; for (let j = 0; j < SEGS.length; j++){ if (p <= SEGS[j].b){ i = j; break; } }
+  const s = SEGS[i];
+  const u = clamp((p - s.a) / s.w, 0, 1);
+  if (s.k === 'hold') return camHold(s, u);
+  if (s.k === 'fade') return { k:'fade', A: camHold(SEGS[i-1], 1), B: camHold(SEGS[i+1], 0), t: easeF.both(u), seg:s, u };
+  // 'in': del final del hold anterior hasta el comienzo del hijo, visto desde el padre
+  const P = PORTAL[s.L], ini = holdFin(SEGS[i-1]), hijo = holdIni(SEGS[i+1]);
+  const fT = P.s * hijo.f, xT = P.x + hijo.cx * P.s, yT = P.y + hijo.cy * P.s;
+  const uu = easeF[s.e](u);
+  const f = ini.f * Math.pow(fT / ini.f, uu);
+  const k = (ini.f - f) / (ini.f - fT);
+  return { k:'lvl', L:s.L, cx: lerp(ini.cx, xT, k), cy: lerp(ini.cy, yT, k), f, seg:s, u };
+}
+function anchoVista(cam){
+  if (cam.k === 'fade') return anchoVista(cam.t < 0.5 ? cam.A : cam.B);
+  if (cam.L >= 5) return 0;
+  return F[cam.L] * cam.f * (W / S);
+}
+
+/* ---------- el estado del cuento, derivado solo de p ---------- */
+const segDe = st => EST[st].seg;
+function estado(p){
+  const e = {};
+  const h2 = segDe(2), i2 = SEGS[SEGS.indexOf(h2) - 1];
+  e.ventana = sstep(i2.a + i2.w*0.3, i2.b - i2.w*0.05, p);            // la gallina se abre
+  e.hora = lerp(-0.6, 24.2, clamp((p - h2.a - 0.15) / (h2.w - 0.45), 0, 1));
+  const h3 = segDe(3); e.enfria = sstep(h3.a + 0.25, h3.b - 0.25, p);  // el huevo, ya puesto, se enfría
+  const h5 = segDe(5); e.semana = lerp(18, 100, clamp((p - h5.a - 0.2) / (h5.w - 0.5), 0, 1));
+  const h6 = segDe(6); e.dia = lerp(0, 49, clamp((p - h6.a - 0.2) / (h6.w - 0.5), 0, 1));
+  return e;
+}
+let E = estado(0);
+
+/* ============================================================
+   LA GALLINA — un solo dibujo, del potrero a la mano.
+   Coordenadas propias: mira a +x, las patas tocan el suelo en y=0;
+   de la cresta a los dedos ≈ 0.78 y de la cola al pico ≈ 0.72.
+   ============================================================ */
+const PLUMAJE = {
+  colorada: { cuerpo:'#8a3718', claro:'#c2652b', oscuro:'#4e1b0a', golilla:'#e8a650', golillaO:'#b5641f', cola:'#171614', brillo:'#2f5a4c', ala:'#9c421b', cobija:'#7a2e12', remera:'#2a1a12', pata:'#d9b54b' },
+  negra:    { cuerpo:'#25211e', claro:'#4a423b', oscuro:'#100e0c', golilla:'#3b342d', golillaO:'#1d1a16', cola:'#121110', brillo:'#2c4d44', ala:'#2b2622', cobija:'#221e1b', remera:'#141210', pata:'#5f5b54' },
+  blanca:   { cuerpo:'#e6dece', claro:'#fcf9f0', oscuro:'#aa9d85', golilla:'#f7f0df', golillaO:'#d6caaf', cola:'#dbd1bb', brillo:'#cdc3ad', ala:'#ece5d5', cobija:'#ddd3c0', remera:'#cfc4ab', pata:'#e2c35a' },
+  jabada:   { cuerpo:'#87847e', claro:'#cdc9bf', oscuro:'#43403c', golilla:'#bcb7ac', golillaO:'#7a766d', cola:'#393733', brillo:'#53574f', ala:'#99958d', cobija:'#6f6c66', remera:'#3e3b37', pata:'#d4c078', barras:true },
+  canela:   { cuerpo:'#b07a3d', claro:'#e3b676', oscuro:'#68421b', golilla:'#eec98f', golillaO:'#c18a43', cola:'#4a3017', brillo:'#5f5236', ala:'#bb8547', cobija:'#9a6a33', remera:'#57391b', pata:'#d6b24c' },
+};
+function dentroPoli(pts, x, y){ let d = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++){ const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi)*(y - yi)/(yj - yi) + xi) d = !d; } return d; }
+const GAL = (() => {
+  const cuerpo = [[0.3,-0.6],[0.287,-0.525],[0.302,-0.45],[0.306,-0.37],[0.268,-0.285],[0.168,-0.215],[0.02,-0.19],[-0.14,-0.2],[-0.255,-0.243],[-0.33,-0.31],[-0.345,-0.395],[-0.28,-0.45],[-0.14,-0.478],[0.01,-0.498],[0.115,-0.53],[0.185,-0.598],[0.232,-0.663],[0.278,-0.696]];
+  const capa = [[0.3,-0.6],[0.287,-0.525],[0.296,-0.455],[0.22,-0.43],[0.13,-0.44],[0.07,-0.475],[0.115,-0.53],[0.185,-0.598],[0.232,-0.663],[0.278,-0.696]];
+  const ala = [[0.15,-0.455],[0.04,-0.478],[-0.1,-0.465],[-0.23,-0.425],[-0.305,-0.372],[-0.22,-0.318],[-0.07,-0.296],[0.08,-0.314],[0.16,-0.372]];
+  const lisa = muestrea(cuerpo.concat([cuerpo[0]]), 6);
+  const r = rng(71), plumas = [];
+  for (let j = 0, y = -0.7; y < -0.18; y += 0.018, j++){
+    for (let x = -0.36; x < 0.33; x += 0.021){
+      const xx = x + (j % 2 ? 0.0105 : 0) + (r()-.5)*0.006, yy = y + (r()-.5)*0.005;
+      if (!dentroPoli(lisa, xx, yy) || dentroPoli(capa, xx, yy)) continue;
+      plumas.push({ x: xx, y: yy, k: r(), s: 0.0145 + r()*0.004 + (yy > -0.3 ? 0.003 : 0) });
+    }
+  }
+  plumas.sort((a, b) => a.x - b.x || a.y - b.y); // de atrás hacia adelante: las de adelante tapan
+  const cobijas = [];
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 10 - j; i++){ const u = i/(9 - j); const x = lerp(0.13 - j*0.02, -0.17 + j*0.03, u), y = lerp(-0.452, -0.44, u) + j*0.024 + Math.sin(u*Math.PI)*-0.012; if (dentroPoli(ala, x, y)) cobijas.push({ x, y, s: 0.019 - j*0.0015, k: r() }); }
+  const remeras = []; for (let i = 0; i < 5; i++){ const u = i/4; remeras.push({ x: lerp(-0.1, -0.2, u), y: lerp(-0.335, -0.35, u), a: lerp(3.02, 2.96, u), L: lerp(0.13, 0.12, u), k: r() }); }
+  const secund = []; for (let i = 0; i < 11; i++){ const u = i/10; secund.push({ x: lerp(0.11, -0.17, u), y: lerp(-0.405, -0.43, u), a: lerp(2.62, 2.9, u), L: lerp(0.1, 0.15, u), k: r() }); }
+  const cola = []; for (let i = 0; i < 9; i++){ const u = i/8; cola.push({ a: lerp(-2.6, -1.98, u) + (r()-.5)*0.05, L: lerp(0.17, 0.23, Math.sin(u*Math.PI*0.9 + 0.2)) + r()*0.015, w: 0.032 + r()*0.008, k: r() }); }
+  const cobCola = []; for (let i = 0; i < 6; i++){ const u = i/5; cobCola.push({ a: lerp(-2.95, -2.35, u), L: 0.1 + r()*0.03, k: r() }); }
+  const golilla = []; for (let i = 0; i < 110; i++){ const v = Math.pow(r(), 0.7), u = r(); golilla.push({ v, u, L: lerp(0.06, 0.13, v) + r()*0.02, k: r() }); }
+  golilla.sort((a, b) => b.v - a.v); // de abajo hacia arriba: las de arriba tapan
+  const pecho = []; for (let i = 0; i < 26; i++){ pecho.push({ x: 0.24 + r()*0.06, y: -0.45 + r()*0.16, k: r() }); }
+  return { cuerpo, capa, ala, plumas, cobijas, remeras, secund, cola, cobCola, golilla, pecho };
+})();
+function plumaEscama(c, x, y, s){ c.moveTo(x + s*0.3, y - s); c.bezierCurveTo(x - s*0.8, y - s*1.05, x - s*1.2, y + s*0.25, x - s*1.3, y + s*0.4); c.bezierCurveTo(x - s*0.8, y + s*0.95, x + s*0.1, y + s*1.1, x + s*0.3, y + s); }
+function bordeEscama(c, x, y, s){ c.moveTo(x - s*0.15, y - s*0.95); c.bezierCurveTo(x - s*0.85, y - s*0.75, x - s*1.15, y + s*0.2, x - s*1.25, y + s*0.4); }
+function plumaLarga(c, x0, y0, a, L, w){
+  const ca = Math.cos(a), sa = Math.sin(a), nx = -sa, ny = ca;
+  const x1 = x0 + ca*L, y1 = y0 + sa*L;
+  c.moveTo(x0 + nx*w*0.3, y0 + ny*w*0.3);
+  c.quadraticCurveTo(x0 + ca*L*0.55 + nx*w, y0 + sa*L*0.55 + ny*w, x1, y1);
+  c.quadraticCurveTo(x0 + ca*L*0.55 - nx*w*0.8, y0 + sa*L*0.55 - ny*w*0.8, x0 - nx*w*0.3, y0 - ny*w*0.3);
+  c.closePath();
+}
+/* o: { v: plumaje, pk: picoteo 0..1, esp: mira a la izquierda, det: tamaño en px del dibujo, sombra, borde: alfa de los bordes de pluma } */
+function gallina(c, x, y, s, o){
+  const P = PLUMAJE[o.v || 'colorada'], pk = o.pk || 0, det = o.det === undefined ? 400 : o.det, ba = o.borde === undefined ? 0.5 : o.borde;
+  c.save(); c.translate(x, y); c.scale(o.esp ? -s : s, s);
+  if (o.sombra !== false){ const gs = c.createRadialGradient(0, 0, 0.02, 0, 0, 0.3); gs.addColorStop(0, 'rgba(18,28,8,.45)'); gs.addColorStop(1, 'rgba(18,28,8,0)'); c.fillStyle = gs; c.save(); c.scale(1, 0.16); c.beginPath(); c.arc(0.0, 0, 0.3, 0, TAU); c.fill(); c.restore(); }
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  // patas: tarso corto y dedos
+  const pata = (bx, dx, col, adel) => {
+    c.strokeStyle = col; c.lineWidth = 0.031; c.beginPath(); c.moveTo(bx, -0.2); c.lineTo(bx + dx, -0.03); c.stroke();
+    const ax = bx + dx, ay = -0.026;
+    c.lineWidth = 0.016; c.beginPath();
+    c.moveTo(ax, ay); c.quadraticCurveTo(ax + 0.045, ay + 0.012, ax + 0.09, ay + 0.022);
+    c.moveTo(ax, ay); c.quadraticCurveTo(ax + 0.025, ay + 0.022, ax + 0.055 + adel*0.01, ay + 0.036);
+    c.moveTo(ax, ay); c.quadraticCurveTo(ax + 0.03, ay + 0.004, ax + 0.06, ay + 0.004);
+    c.moveTo(ax, ay); c.lineTo(ax - 0.04, ay + 0.016); c.stroke();
+    if (det > 140){ c.strokeStyle = 'rgba(90,60,10,.4)'; c.lineWidth = 0.0035; c.beginPath(); for (let k = 0; k < 6; k++){ const t = 0.25 + k*0.12, yy = lerp(-0.2, -0.03, t), xx = lerp(bx, bx + dx, t); c.moveTo(xx - 0.011, yy); c.lineTo(xx + 0.011, yy + 0.004); } c.stroke();
+      c.fillStyle = 'rgba(40,30,20,.7)'; for (const [tx, ty] of [[ax + 0.09, ay + 0.022], [ax + 0.06, ay + 0.004], [ax + 0.055 + adel*0.01, ay + 0.036]]){ c.beginPath(); c.arc(tx, ty, 0.005, 0, TAU); c.fill(); } }
+  };
+  pata(0.07, 0.006, mix(P.pata, '#3a2a10', 0.35), 0);
+  pata(0.015, -0.004, P.pata, 1);
+  const hip = [0.04, -0.2], th = 0.72*pk;
+  c.save(); c.translate(hip[0], hip[1]); c.rotate(th); c.translate(-hip[0], -hip[1]);
+  // cola: plumas largas y cobertoras
+  c.save(); c.translate(-0.275, -0.425);
+  for (const q of GAL.cola){
+    let fill = P.cola;
+    if (det > 60){ const g = c.createLinearGradient(0, 0, Math.cos(q.a)*q.L, Math.sin(q.a)*q.L); g.addColorStop(0, P.cola); g.addColorStop(0.5, mix(P.cola, P.brillo, 0.5 + q.k*0.4)); g.addColorStop(1, P.cola); fill = g; }
+    c.fillStyle = fill; c.beginPath(); plumaLarga(c, 0, 0, q.a, q.L, q.w); c.fill();
+    if (det > 160){ c.strokeStyle = 'rgba(255,255,255,.12)'; c.lineWidth = 0.0025; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(q.a)*q.L*0.95, Math.sin(q.a)*q.L*0.95); c.stroke(); }
+  }
+  if (det > 60) for (const q of GAL.cobCola){ c.fillStyle = mix(P.cuerpo, P.cola, 0.4 + q.k*0.3); c.beginPath(); plumaLarga(c, 0.03, 0.02, q.a, q.L, 0.03); c.fill(); }
+  c.restore();
+  // cuerpo y cuello en una sola silueta
+  c.beginPath(); curva(c, GAL.cuerpo, true);
+  const gB = c.createLinearGradient(0, -0.7, 0, -0.19); gB.addColorStop(0, P.claro); gB.addColorStop(0.42, P.cuerpo); gB.addColorStop(1, P.oscuro);
+  c.fillStyle = gB; c.fill();
+  c.save(); c.beginPath(); curva(c, GAL.cuerpo, true); c.clip();
+  if (det > 160){
+    const oscuras = new Path2D(), claras = new Path2D(), bordes = new Path2D();
+    for (const q of GAL.plumas){ const pth = q.k < 0.4 ? oscuras : claras; plumaEscama(pth, q.x, q.y, q.s); bordeEscama(bordes, q.x, q.y, q.s); }
+    c.fillStyle = rgba(P.oscuro, 0.2); c.fill(oscuras);
+    c.fillStyle = rgba(P.claro, 0.14); c.fill(claras);
+    c.strokeStyle = rgba(P.oscuro, ba); c.lineWidth = 0.003; c.stroke(bordes);
+    if (P.barras){ c.strokeStyle = 'rgba(38,36,32,.5)'; c.lineWidth = 0.006; c.beginPath(); for (const q of GAL.plumas){ c.moveTo(q.x - q.s, q.y + q.s*0.1); c.lineTo(q.x + q.s*0.25, q.y + q.s*0.45); } c.stroke(); }
+  }
+  // volumen: luz de arriba a la izquierda y sombra en el vientre
+  if (det > 45){
+    const gl = c.createRadialGradient(-0.02, -0.52, 0.02, 0.0, -0.44, 0.34); gl.addColorStop(0, 'rgba(255,238,205,.28)'); gl.addColorStop(1, 'rgba(255,238,205,0)'); c.fillStyle = gl; c.fillRect(-0.4, -0.75, 0.8, 0.6);
+    const gv = c.createLinearGradient(0, -0.33, 0, -0.19); gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(20,6,0,.4)'); c.fillStyle = gv; c.fillRect(-0.4, -0.34, 0.8, 0.16);
+    const gr = c.createLinearGradient(-0.35, 0, -0.18, 0); gr.addColorStop(0, 'rgba(20,6,0,.3)'); gr.addColorStop(1, 'rgba(20,6,0,0)'); c.fillStyle = gr; c.fillRect(-0.36, -0.5, 0.2, 0.32);
+  }
+  // plumón de los muslos, que tapa el arranque de las patas
+  if (det > 45){ const gf = c.createRadialGradient(0.04, -0.23, 0.01, 0.04, -0.22, 0.09); gf.addColorStop(0, rgba(P.oscuro, 0.22)); gf.addColorStop(1, rgba(P.oscuro, 0)); c.fillStyle = gf; c.beginPath(); c.ellipse(0.04, -0.215, 0.1, 0.045, 0, 0, TAU); c.fill(); }
+  // la capa de la golilla, dorada, del cuello a los hombros
+  if (det > 45){
+    const gC = c.createLinearGradient(0.26, -0.7, 0.18, -0.43); gC.addColorStop(0, mix(P.golilla, '#ffffff', 0.08)); gC.addColorStop(0.55, P.golilla); gC.addColorStop(0.85, rgba(P.golillaO, 0.8)); gC.addColorStop(1, rgba(P.golillaO, 0));
+    c.fillStyle = gC; c.beginPath(); curva(c, GAL.capa, true); c.fill();
+  }
+  c.restore();
+  if (det > 130){ // plumas largas de la golilla, de abajo hacia arriba
+    for (const q of GAL.golilla){
+      const bx = lerp(0.27, 0.12, q.v) + (q.u - .5)*lerp(0.03, 0.1, q.v), by = lerp(-0.665, -0.5, q.v) + (q.u - .5)*0.03;
+      const a = lerp(1.95, 2.35, q.u) - 0.15*q.v;
+      c.fillStyle = q.k < 0.35 ? P.golillaO : q.k < 0.8 ? P.golilla : mix(P.golilla, '#ffffff', 0.2); c.beginPath(); plumaLarga(c, bx, by, a, q.L, 0.012); c.fill();
+      if (det > 250 && q.k < 0.5){ c.strokeStyle = rgba(P.oscuro, 0.35); c.lineWidth = 0.002; c.beginPath(); c.moveTo(bx, by); c.lineTo(bx + Math.cos(a)*q.L*0.8, by + Math.sin(a)*q.L*0.8); c.stroke(); }
+    }
+  }
+  // el ala plegada: primarias oscuras abajo y atrás, secundarias, y las cobijas arriba
+  if (det > 45){
+    c.fillStyle = P.remera; for (const q of GAL.remeras){ c.beginPath(); plumaLarga(c, q.x, q.y, q.a, q.L, 0.022); c.fill(); }
+    c.beginPath(); curva(c, GAL.ala, true);
+    const gA = c.createLinearGradient(0, -0.48, 0, -0.3); gA.addColorStop(0, rgba(mixHex(P.ala, P.cuerpo, 0.5), 0)); gA.addColorStop(0.3, rgba(mixHex(P.ala, P.cuerpo, 0.4), 0.85)); gA.addColorStop(1, rgba(mixHex(P.ala, P.oscuro, 0.3), 1));
+    c.fillStyle = gA; c.fill();
+    if (det > 110){
+      for (const q of GAL.secund){ c.fillStyle = q.k < 0.5 ? mix(P.ala, P.oscuro, 0.2) : mix(P.ala, P.oscuro, 0.4); c.beginPath(); plumaLarga(c, q.x, q.y, q.a, q.L, 0.026); c.fill();
+        c.strokeStyle = rgba(P.claro, 0.28); c.lineWidth = 0.0025; c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(q.x + Math.cos(q.a)*q.L*0.9, q.y + Math.sin(q.a)*q.L*0.9); c.stroke(); }
+    }
+    if (det > 160){
+      const cob = new Path2D(), bc = new Path2D(); for (const q of GAL.cobijas){ plumaEscama(cob, q.x, q.y, q.s); bordeEscama(bc, q.x, q.y, q.s); }
+      c.fillStyle = rgba(P.cobija, 0.3); c.fill(cob); c.strokeStyle = rgba(P.oscuro, 0.35); c.lineWidth = 0.003; c.stroke(bc);
+    }
+  }
+  // la cabeza
+  c.save(); c.translate(0.3, -0.662); c.rotate(0.45*pk);
+  c.fillStyle = '#c3281f'; c.beginPath(); c.ellipse(0.035, 0.046, 0.015, 0.025, 0.2, 0, TAU); c.fill(); // barbilla
+  const gH = c.createRadialGradient(-0.012, -0.018, 0.008, 0, 0, 0.06); gH.addColorStop(0, mix(P.golilla, '#ffffff', 0.18)); gH.addColorStop(1, P.golillaO);
+  c.fillStyle = gH; c.beginPath(); c.ellipse(0, 0, 0.052, 0.046, 0, 0, TAU); c.fill();
+  c.fillStyle = '#d4402c'; c.beginPath(); c.ellipse(0.02, 0.004, 0.029, 0.026, 0, 0, TAU); c.fill(); // cara
+  c.fillStyle = '#b9261f'; c.beginPath(); c.ellipse(-0.017, 0.02, 0.011, 0.015, 0.3, 0, TAU); c.fill(); // orejilla
+  c.fillStyle = '#cf2a20'; c.beginPath(); c.moveTo(-0.04, -0.03); // cresta sencilla
+  for (const [px, py] of [[-0.036,-0.064],[-0.018,-0.052],[-0.005,-0.084],[0.01,-0.058],[0.024,-0.086],[0.036,-0.06],[0.048,-0.072],[0.055,-0.042]]) c.lineTo(px, py);
+  c.quadraticCurveTo(0.05, -0.026, 0.026, -0.034); c.quadraticCurveTo(-0.01, -0.026, -0.04, -0.03); c.fill();
+  if (det > 160){ c.fillStyle = 'rgba(255,190,170,.35)'; c.beginPath(); c.ellipse(0.008, -0.06, 0.022, 0.007, -0.2, 0, TAU); c.fill(); }
+  const gP = c.createLinearGradient(0.04, -0.016, 0.085, 0.016); gP.addColorStop(0, '#cda54c'); gP.addColorStop(1, '#8a6628');
+  c.fillStyle = gP; c.beginPath(); c.moveTo(0.041, -0.017); c.quadraticCurveTo(0.076, -0.016, 0.089, 0.012); c.quadraticCurveTo(0.068, 0.01, 0.043, 0.013); c.closePath(); c.fill(); // pico
+  c.fillStyle = '#e39a2c'; c.beginPath(); c.arc(0.019, -0.007, 0.0105, 0, TAU); c.fill(); // ojo
+  c.fillStyle = '#140c06'; c.beginPath(); c.arc(0.021, -0.007, 0.0052, 0, TAU); c.fill();
+  if (det > 100){ c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(0.024, -0.0105, 0.0024, 0, TAU); c.fill(); }
+  c.restore();
+  c.restore(); // fin del cuerpo girado
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 0 · EL POTRERO  (1 unidad = 24 m)
+   Perspectiva sencilla: escala sc(y) = 1 donde está la gallina
+   que vamos a visitar (y = 0.25). Franjas de pastoreo que se van
+   juntando hacia el fondo.
+   ============================================================ */
+const YH = -0.1, YF = -0.02;          // horizonte y fondo del potrero
+const sc = y => (y - YH) / (0.25 - YH);
+const FR = [ // franjas: límites en u (= x / sc)
+  { u0:-0.66, u1:-0.5, t:'descanso2' }, { u0:-0.5, u1:-0.34, t:'descanso2' }, { u0:-0.34, u1:-0.2, t:'descanso1' },
+  { u0:-0.2, u1:-0.05, t:'ayer' }, { u0:-0.05, u1:0.13, t:'hoy' }, { u0:0.13, u1:0.3, t:'manana' }, { u0:0.3, u1:0.7, t:'alto' } ];
+const FRX = [{ u0:-4, u1:-0.66, t:'descanso2' }].concat(FR, [{ u0:0.7, u1:4, t:'alto' }]);
+const CERCA = [-0.05, 0.13];
+const COL_FR = { descanso2:['#4f8d3c','#3f7430'], descanso1:['#7fb556','#5e9a42'], ayer:['#a39653','#7d7440'], hoy:['#5c9a41','#467e33'], manana:['#467f31','#355f26'], alto:['#4a8034','#38632a'] };
+const franjaDe = u => { for (const f of FR) if (u >= f.u0 && u < f.u1) return f.t; return 'alto'; };
+const GALLINERO = { u: 0.055, y: 0.1 };
+const COMPOST = { x: 0.2, y: 0.2 };
+const P0 = () => ({ x: PORTAL[0].x, y: 0.25 });
+const POT = (() => {
+  const r = rng(5);
+  const matas = [];   // matas de pasto: u, y, tamaño
+  for (let i = 0; i < 1100; i++){ const v = Math.pow(r(), 1.2); const y = lerp(0.02, 0.75, v); matas.push({ u: lerp(-0.75, 0.75, r()), y, k: r(), a: r() }); }
+  matas.sort((a, b) => a.y - b.y);
+  const finas = [];   // matas finas alrededor de la gallina elegida (para cuando la cámara se acerca)
+  for (let i = 0; i < 900; i++){ finas.push({ x: 0.035 + (r() - .5)*0.1, y: 0.25 + (r() - .5)*0.06, k: r() }); }
+  finas.sort((a, b) => a.y - b.y);
+  const gallinas = [];
+  const vars = ['colorada','negra','jabada','canela','blanca','colorada','negra','canela'];
+  for (let i = 0; i < 22; i++){ const y = lerp(0.04, 0.5, Math.pow(r(), 0.9)); let u = lerp(-0.035, 0.115, r()); if (Math.abs(y - 0.25) < 0.03 && Math.abs(u*sc(y) - 0.035) < 0.03) u += 0.05; gallinas.push({ u, y, v: vars[i % vars.length], esp: r() < 0.5, fase: r()*10, pk: r() }); }
+  gallinas.push({ u: 0.035 / sc(0.25), y: 0.25, v: 'colorada', esp: false, fase: 0, pk: 0, elegida: true });
+  gallinas.sort((a, b) => a.y - b.y);
+  const bostas = [], tierra = [];
+  const arbustos = [{ u: 0.1, y: 0.005, r: 0.06 }, { u: 0.0, y: -0.012, r: 0.05 }, { u: 0.11, y: 0.17, r: 0.045 }, { u: 0.22, y: 0.03, r: 0.07 }, { u: -0.27, y: 0.02, r: 0.065 }, { u: -0.42, y: 0.0, r: 0.07 }, { u: 0.38, y: 0.06, r: 0.08 }, { u: -0.3, y: 0.3, r: 0.05 }];
+  const flores = [];
+  const tonos = []; for (let i = 0; i < 110; i++){ const y = lerp(0.0, 0.7, Math.pow(r(), 0.9)); const u = lerp(-0.8, 0.8, r()); const t = franjaDe(u); const osc = r() < 0.5;
+    tonos.push({ u, y, r: 0.03 + r()*0.05, col: osc ? '#1f3f14' : (t === 'ayer' ? (r() < 0.5 ? '#a89c62' : '#7fae4f') : '#a6cf72'), a: osc ? 0.16 : 0.14 }); }
+  const cercaViva = []; for (let i = 0; i < 260; i++){ const u = lerp(-1.6, 1.6, i/259) + (r() - .5)*0.01; cercaViva.push({ u, y: YF + 0.002, r: 0.012 + r()*0.012, col: ['#2e5a26','#3c6d31','#4a7d3a','#27501f'][Math.floor(r()*4)] }); }
+  return { matas, finas, gallinas, bostas, tierra, arbustos, flores, tonos, cercaViva };
+})();
+/* el pasto como masa: una textura por franja, puesta en perspectiva por bandas */
+const TEXN = 320, TW = 0.1, KV = 1/((TW/TEXN)*0.45*2.857);
+const TEX = {};
+function prepTexturas(){
+  const tipos = {
+    hoy:       { base:'#58913b', hojas:['#35682a','#45802f','#5a973c','#76ad4c','#98c468'], n:5600, L:[5,12], w:[1.5,2.8], manchas:['#4b8633','#6ea446'] },
+    manana:    { base:'#3c762c', hojas:['#214e18','#2f6523','#417c2f','#56923d','#74aa50'], n:6600, L:[11,26], w:[1.8,3.4], manchas:['#2f6424','#4a8634'], flor:40 },
+    alto:      { base:'#3f782e', hojas:['#234f19','#316624','#437e30','#5a953f','#76ab52'], n:6400, L:[11,25], w:[1.8,3.3], manchas:['#306526','#4a8434'] },
+    descanso2: { base:'#468435', hojas:['#285a1e','#367029','#4a8c36','#66a447','#86bb5d'], n:6000, L:[10,22], w:[1.7,3.2], manchas:['#3a7a2c','#5c9b40'] },
+    descanso1: { base:'#6aa446', hojas:['#4e8c37','#65a444','#80bb58','#9fd06f','#5a973d'], n:5000, L:[4,11], w:[1.4,2.6], manchas:['#5c9a3e','#88c05e'] },
+    ayer:      { base:'#7a9446', hojas:['#6a8a36','#86a147','#5a7a30','#a0aa5a','#78973f','#95b556','#4f7a2c'], n:6200, L:[2,7], w:[1.3,2.4], manchas:['#8e8250','#638a3a'], tierra:14, bosta:140 },
+  };
+  for (const k of Object.keys(tipos)){
+    const T = tipos[k], N = TEXN;
+    const cnv = document.createElement('canvas'); cnv.width = cnv.height = N; const c = cnv.getContext('2d');
+    const r = rng(k.length*131 + k.charCodeAt(0)*7);
+    const envuelve = (x, y, m, f) => { for (const dx of [-N, 0, N]) for (const dy of [-N, 0, N]){ const X = x + dx, Y = y + dy; if (X < -m || X > N + m || Y < -m || Y > N + m) continue; f(X, Y); } };
+    c.fillStyle = T.base; c.fillRect(0, 0, N, N);
+    for (let i = 0; i < 30; i++){ const x = r()*N, y = r()*N, rr = 20 + r()*50, col = T.manchas[i % 2]; envuelve(x, y, rr, (X, Y) => blob(c, X, Y, rr, rr*0.5, col, 0.35)); }
+    for (let i = 0; i < (T.tierra || 0); i++){ const x = r()*N, y = r()*N, rx = 8 + r()*22; envuelve(x, y, rx, (X, Y) => { c.fillStyle = r() < 0.5 ? 'rgba(128,96,58,.35)' : 'rgba(150,118,72,.3)'; c.beginPath(); c.ellipse(X, Y, rx, rx*0.4, 0, 0, TAU); c.fill(); }); }
+    const hojas = []; for (let i = 0; i < T.n; i++) hojas.push({ x: r()*N, y: r()*N, L: lerp(T.L[0], T.L[1], r()), w: lerp(T.w[0], T.w[1], r()), a: (r() - .5)*0.9, col: T.hojas[Math.floor(r()*T.hojas.length)] });
+    hojas.sort((a, b) => a.y - b.y);
+    for (const h of hojas){ envuelve(h.x, h.y, h.L + 4, (X, Y) => { const lx = Math.sin(h.a)*h.L; c.fillStyle = h.col; c.beginPath(); c.moveTo(X - h.w/2, Y); c.quadraticCurveTo(X + lx*0.35, Y - h.L*0.6, X + lx, Y - h.L); c.quadraticCurveTo(X + lx*0.35 + h.w*0.4, Y - h.L*0.55, X + h.w/2, Y); c.fill(); }); }
+    for (let i = 0; i < (T.flor || 0); i++){ const x = r()*N, y = r()*N; envuelve(x, y, 6, (X, Y) => { c.fillStyle = 'rgba(244,242,230,.55)'; for (let j = 0; j < 5; j++){ c.beginPath(); c.arc(X + Math.cos(j*1.26)*1.6, Y + Math.sin(j*1.26)*1.1, 1.1, 0, TAU); c.fill(); } }); }
+    for (let i = 0; i < (T.bosta || 0); i++){ const x = r()*N, y = r()*N; envuelve(x, y, 4, (X, Y) => { c.fillStyle = '#463620'; c.beginPath(); c.ellipse(X, Y, 3, 1.8, 0, 0, TAU); c.fill(); c.fillStyle = '#efe9da'; c.beginPath(); c.arc(X + 1, Y - 0.8, 1.1, 0, TAU); c.fill(); }); }
+    if (k === 'ayer'){ c.strokeStyle = 'rgba(96,72,40,.45)'; c.lineWidth = 1.2; for (let i = 0; i < 90; i++){ const x = r()*N, y = r()*N; envuelve(x, y, 10, (X, Y) => { c.beginPath(); c.moveTo(X, Y); c.lineTo(X + 6 + r()*6, Y + (r() - .5)*3); c.stroke(); }); } }
+    TEX[k] = ctx.createPattern(cnv, 'repeat');
+  }
+}
+function sueloBandas(c, v, px){
+  const yA = Math.max(YF, v[1]), yB = Math.min(v[3] + 0.01, 2);
+  let y = yA, n = 0;
+  while (y < yB && n++ < 500){
+    const y2 = Math.min(yB, y + Math.max(5*px, 0.0003)), ym = (y + y2)/2, sm = sc(ym);
+    const ws = sm*TW/TEXN, vh = Math.pow(ym - YH, 2)/(0.35*KV), j = (KV/sm) % TEXN;
+    const M = new DOMMatrix([ws, 0, 0, vh, 0, ym - j*vh]);
+    for (const f of FRX){ const x0 = Math.max(f.u0*sm, v[0] - 0.01), x1 = Math.min(f.u1*sm, v[2] + 0.01); if (x1 <= x0) continue; const P = TEX[f.t]; P.setTransform(M); c.fillStyle = P; c.fillRect(x0, y, x1 - x0, y2 - y + px*0.8); }
+    y = y2;
+  }
+}
+let fondo0 = null; const F0 = [-0.85, -0.95, 0.85, YF + 0.004];
+function prepFondo0(){
+  const ppu = Math.min(1500, Math.round(1.2 * S * DPR));
+  const cw = Math.round((F0[2] - F0[0]) * ppu), ch = Math.round((F0[3] - F0[1]) * ppu);
+  const k = document.createElement('canvas'); k.width = cw; k.height = ch; const c = k.getContext('2d');
+  c.setTransform(ppu, 0, 0, ppu, -F0[0]*ppu, -F0[1]*ppu);
+  // cielo de mañana en la montaña
+  const g = c.createLinearGradient(0, F0[1], 0, YH);
+  g.addColorStop(0, '#6fa9d6'); g.addColorStop(0.55, '#b4d4e8'); g.addColorStop(1, '#e6eee4');
+  c.fillStyle = g; c.fillRect(F0[0], F0[1], F0[2] - F0[0], YH - F0[1] + 0.2);
+  const rr = rng(3);
+  for (let i = 0; i < 9; i++){ const x = lerp(-0.8, 0.8, rr()), y = lerp(-0.7, -0.3, rr()), w = 0.12 + rr()*0.18;
+    for (let j = 0; j < 7; j++) blob(c, x + (rr()-.5)*w, y + (rr()-.5)*0.03, w*0.35, w*0.12, '#ffffff', 0.35); }
+  const sol = c.createRadialGradient(-0.35, -0.55, 0, -0.35, -0.55, 0.45); sol.addColorStop(0, 'rgba(255,248,222,.85)'); sol.addColorStop(0.1, 'rgba(255,244,210,.4)'); sol.addColorStop(1, 'rgba(255,244,210,0)');
+  c.fillStyle = sol; c.fillRect(F0[0], F0[1], 1.7, 1);
+  // cordilleras
+  const capas = [ ['#9dbbcb', -0.2, 0.16, 11, 0], ['#86a99a', -0.15, 0.11, 19, 0.3], ['#6e9868', -0.115, 0.07, 27, 0.7] ];
+  capas.forEach(([col, base, amp, sd, verde], kk) => {
+    const r2 = rng(sd); const pts = [];
+    for (let x = F0[0] - 0.02; x <= F0[2] + 0.021; x += 0.012){ const y = base - amp*(0.55 + 0.45*Math.sin(x*(2.4 + kk*1.3) + sd)) * (0.62 + 0.38*Math.sin(x*7.3 + kk*2)) - (r2() - .5)*0.004*(3 - kk); pts.push([x, y]); }
+    c.fillStyle = col; c.beginPath(); c.moveTo(F0[0] - 0.02, YF + 0.01); for (const [x, y] of pts) c.lineTo(x, y); c.lineTo(F0[2] + 0.02, YF + 0.01); c.closePath(); c.fill();
+    if (verde > 0){ // parcelas y montes sobre la ladera
+      c.save(); c.clip();
+      for (let i = 0; i < 140*verde; i++){ const x = lerp(F0[0], F0[2], r2()), yb = pts[Math.floor(clamp((x - F0[0] + 0.02)/0.012, 0, pts.length - 1))][1];
+        const y = lerp(yb + 0.01, YH + 0.01, Math.pow(r2(), 0.7)); const w = 0.02 + r2()*0.05, h = 0.006 + r2()*0.012;
+        const tonos = ['#7fa86a','#6b955a','#8fb277','#5f8a50','#a3b27a','#4f7a45'];
+        c.fillStyle = rgba(tonos[Math.floor(r2()*tonos.length)], 0.55); c.beginPath(); c.moveTo(x - w/2, y); c.lineTo(x + w/2, y - h*0.4); c.lineTo(x + w/2 + 0.004, y + h*0.6); c.lineTo(x - w/2 + 0.003, y + h); c.closePath(); c.fill(); }
+      for (let i = 0; i < 90*verde; i++){ const x = lerp(F0[0], F0[2], r2()), yb = pts[Math.floor(clamp((x - F0[0] + 0.02)/0.012, 0, pts.length - 1))][1];
+        const y = lerp(yb + 0.005, YH, Math.pow(r2(), 1.4)); blob(c, x, y, 0.012 + r2()*0.02, 0.008, '#3e6a38', 0.5); }
+      c.restore();
+    }
+    // bruma entre capas
+    const gb = c.createLinearGradient(0, base - 0.02, 0, YF); gb.addColorStop(0, 'rgba(232,240,236,0)'); gb.addColorStop(1, 'rgba(232,240,236,.35)'); c.fillStyle = gb; c.fillRect(F0[0], base - 0.02, F0[2] - F0[0], YF - base + 0.03);
+  });
+  // la vega al fondo: potreros lejanos y una cerca viva
+  const gf = c.createLinearGradient(0, YH, 0, YF); gf.addColorStop(0, '#89ad6c'); gf.addColorStop(1, '#6e9a50');
+  c.fillStyle = gf; c.fillRect(F0[0], YH, F0[2] - F0[0], YF - YH + 0.005);
+  const r3 = rng(9);
+  const filas = [YH + 0.012, YH + 0.028, YH + 0.05, YH + 0.072];
+  filas.forEach((yy, i) => { const tono = ['#9ab87c','#7fa864','#8db26f','#76a05a'][i]; c.fillStyle = tono; c.fillRect(F0[0], yy - 0.012 - i*0.004, F0[2] - F0[0], 0.016 + i*0.006); });
+  for (let i = 0; i < 40; i++){ const x0 = lerp(F0[0], F0[2], r3()), w = 0.05 + r3()*0.2, fi = Math.floor(r3()*4), yy = filas[fi]; c.fillStyle = rgba(['#a9c486','#6f9a55','#b9c98e','#86ad68'][Math.floor(r3()*4)], 0.6); c.fillRect(x0, yy - 0.01 - fi*0.004, w, 0.012 + fi*0.005); }
+  filas.forEach((yy, i) => { for (let x = F0[0]; x < F0[2]; x += 0.004 + i*0.0015){ const rr2 = (0.0022 + r3()*0.002)*(1 + i*0.5); c.fillStyle = r3() < 0.5 ? '#355f2c' : '#436f36'; c.beginPath(); c.arc(x, yy + 0.003 + i*0.002 - rr2*0.5, rr2, 0, TAU); c.fill(); } });
+  for (let i = 0; i < 26; i++){ const x = lerp(F0[0], F0[2], r3()), fi = Math.floor(r3()*4), yy = filas[fi] + 0.003, rr2 = 0.006*(1 + fi*0.6); blob(c, x, yy - rr2, rr2*1.2, rr2*1.1, '#2f5728', 0.9); c.fillStyle = '#4a3522'; c.fillRect(x - rr2*0.08, yy - rr2*0.3, rr2*0.16, rr2*0.4); }
+  fondo0 = k;
+}
+function arbusto(c, x, y, rr, det){
+  const r = rng(Math.round(x*1000 + y*7777));
+  c.fillStyle = 'rgba(25,40,15,.3)'; c.beginPath(); c.ellipse(x, y + rr*0.05, rr*0.9, rr*0.18, 0, 0, TAU); c.fill();
+  c.fillStyle = '#4a3522'; c.fillRect(x - rr*0.05, y - rr*0.35, rr*0.1, rr*0.36);
+  const tonos = ['#2f5a27','#3d6d31','#4c8039','#5d9244'];
+  for (let i = 0; i < (det > 30 ? 22 : 7); i++){ const a = r()*TAU, d = Math.sqrt(r())*rr*0.75; const px = x + Math.cos(a)*d, py = y - rr*0.75 + Math.sin(a)*d*0.7;
+    c.fillStyle = tonos[Math.min(3, Math.floor((1 - (py - (y - rr*1.4))/(rr*1.4))*3 + r()))]; c.beginPath(); c.arc(px, py, rr*(0.22 + r()*0.18), 0, TAU); c.fill(); }
+}
+function gallinero(c, x, y, s, det){ // gallinero con ruedas, visto de tres cuartos
+  c.save(); c.translate(x, y); c.scale(s, s); c.lineJoin = 'round';
+  c.fillStyle = 'rgba(20,30,10,.35)'; c.beginPath(); c.ellipse(0.0, 0.004, 0.07, 0.012, 0, 0, TAU); c.fill();
+  // cuerpo de tablas
+  c.fillStyle = '#9a7248'; c.beginPath(); c.moveTo(-0.055, -0.012); c.lineTo(0.035, -0.012); c.lineTo(0.035, -0.045); c.lineTo(-0.055, -0.045); c.closePath(); c.fill();
+  c.fillStyle = '#7e5a36'; c.beginPath(); c.moveTo(0.035, -0.012); c.lineTo(0.06, -0.02); c.lineTo(0.06, -0.05); c.lineTo(0.035, -0.045); c.closePath(); c.fill();
+  if (det > 40){ c.strokeStyle = 'rgba(60,38,18,.55)'; c.lineWidth = 0.0012; c.beginPath(); for (let i = 1; i < 5; i++){ const yy = lerp(-0.045, -0.012, i/5); c.moveTo(-0.055, yy); c.lineTo(0.035, yy); } c.stroke();
+    c.fillStyle = '#2b1f14'; c.fillRect(0.042, -0.04, 0.012, 0.016); // puertica
+    c.strokeStyle = '#b8b2a2'; c.lineWidth = 0.0008; c.beginPath(); for (let i = 0; i < 6; i++){ const xx = lerp(-0.05, 0.03, i/5); c.moveTo(xx, -0.04); c.lineTo(xx, -0.02); } c.stroke(); }
+  // techo de dos aguas, de lámina
+  c.fillStyle = '#8a9aa2'; c.beginPath(); c.moveTo(-0.062, -0.043); c.lineTo(-0.012, -0.075); c.lineTo(0.042, -0.043); c.closePath(); c.fill();
+  c.fillStyle = '#6d7d86'; c.beginPath(); c.moveTo(0.042, -0.043); c.lineTo(-0.012, -0.075); c.lineTo(0.02, -0.08); c.lineTo(0.068, -0.05); c.closePath(); c.fill();
+  if (det > 40){ c.strokeStyle = 'rgba(40,50,56,.4)'; c.lineWidth = 0.001; c.beginPath(); for (let i = 1; i < 7; i++){ const t = i/7; c.moveTo(lerp(0.042, -0.012, t), lerp(-0.043, -0.075, t)); c.lineTo(lerp(0.068, 0.02, t), lerp(-0.05, -0.08, t)); } c.stroke(); }
+  // rampa y ruedas
+  c.strokeStyle = '#7a5a36'; c.lineWidth = 0.004; c.beginPath(); c.moveTo(0.06, -0.022); c.lineTo(0.085, 0.004); c.stroke();
+  for (const [wx, wy] of [[-0.045, -0.006], [0.028, -0.006]]){ c.fillStyle = '#2c2a26'; c.beginPath(); c.arc(wx, wy, 0.012, 0, TAU); c.fill(); c.fillStyle = '#6b6559'; c.beginPath(); c.arc(wx, wy, 0.005, 0, TAU); c.fill(); }
+  // manija para arrastrarlo
+  c.strokeStyle = '#5a4128'; c.lineWidth = 0.003; c.beginPath(); c.moveTo(-0.055, -0.025); c.lineTo(-0.09, -0.012); c.stroke();
+  c.restore();
+}
+function compostera(c, x, y, s, det){
+  c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = 'rgba(20,20,8,.3)'; c.beginPath(); c.ellipse(0, 0.003, 0.07, 0.014, 0, 0, TAU); c.fill();
+  const g = c.createLinearGradient(0, -0.05, 0, 0); g.addColorStop(0, '#6a4c2c'); g.addColorStop(1, '#3a2716');
+  c.fillStyle = g; c.beginPath(); c.moveTo(-0.07, 0.002); c.quadraticCurveTo(-0.05, -0.05, 0.0, -0.052); c.quadraticCurveTo(0.05, -0.05, 0.07, 0.002); c.closePath(); c.fill();
+  if (det > 30){ const r = rng(44); c.strokeStyle = '#c9a458'; c.lineWidth = 0.0016; c.beginPath(); for (let i = 0; i < 40; i++){ const a = r()*Math.PI, d = r()*0.9, px = Math.cos(a)*0.065*d, py = -Math.sin(a)*0.048*d; c.moveTo(px, py); c.lineTo(px + (r() - .5)*0.02, py + (r() - .5)*0.008); } c.stroke();
+    c.fillStyle = 'rgba(245,245,240,.9)'; for (let i = 0; i < 16; i++){ const a = r()*Math.PI, d = r()*0.85; c.beginPath(); c.arc(Math.cos(a)*0.06*d, -Math.sin(a)*0.045*d, 0.0022, 0, TAU); c.fill(); }
+    if (!RM){ for (let i = 0; i < 3; i++){ const t = (RELOJ*0.25 + i/3) % 1; c.strokeStyle = `rgba(250,250,245,${0.35*(1 - t)})`; c.lineWidth = 0.004; c.beginPath(); const bx = -0.02 + i*0.02; c.moveTo(bx, -0.055 - t*0.05); c.quadraticCurveTo(bx + 0.01, -0.07 - t*0.05, bx - 0.004, -0.085 - t*0.05); c.stroke(); } }
+    // horquilla clavada
+    c.strokeStyle = '#6b5236'; c.lineWidth = 0.003; c.beginPath(); c.moveTo(0.045, -0.02); c.lineTo(0.075, -0.09); c.stroke();
+  }
+  c.restore();
+}
+function dibujaPotrero(c, env){
+  const v = env.view, px = env.px;
+  // cielo lejano (arriba del fondo pre-pintado)
+  c.fillStyle = '#6fa9d6'; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, F0[1] - v[1] + 1.01);
+  if (fondo0) c.drawImage(fondo0, F0[0], F0[1], F0[2] - F0[0], F0[3] - F0[1]);
+  c.fillStyle = '#6e9a50'; c.fillRect(v[0] - 1, F0[1], F0[0] - v[0] + 1, YF - F0[1]); c.fillRect(F0[2], F0[1], v[2] - F0[2] + 1, YF - F0[1]);
+  // las franjas: pasto en masa, con textura en perspectiva
+  sueloBandas(c, v, px);
+  for (const m of POT.tonos){ const s = sc(m.y), x = m.u*s; const rx = m.r*s, ry = m.r*s*s*0.35 + 0.002; if (x + rx < v[0] || x - rx > v[2] || m.y + ry < v[1] || m.y - ry > v[3]) continue; blob(c, x, m.y, rx, ry, m.col, m.a); }
+  // la cerca viva al fondo del potrero
+  for (const q of POT.cercaViva){ const s = sc(q.y), x = q.u*s; if (x < v[0] - 0.05 || x > v[2] + 0.05) continue; c.fillStyle = q.col; c.beginPath(); c.arc(x, q.y - q.r*s*0.6, q.r*s, 0, TAU); c.fill(); }
+  // matas de pasto (por color y grosor)
+  const cam = []; const lotes = new Map();
+  for (const q of POT.matas){
+    const s = sc(q.y), x = q.u*s; if (x < v[0] - 0.03 || x > v[2] + 0.03 || q.y < v[1] - 0.01 || q.y > v[3] + 0.04) continue;
+    const t = franjaDe(q.u); const alto = t === 'alto' || t === 'manana' ? 1 : t === 'ayer' ? 0.25 : t === 'descanso1' ? 0.55 : t === 'hoy' ? 0.7 : 0.85;
+    if (t === 'descanso1' || (t === 'ayer' && q.k < 0.7)) continue;
+    const hgt = 0.014*s*alto*(0.7 + q.k*0.6); if (hgt < px*3) continue;
+    const w = Math.max(px*0.7, 0.0016*s);
+    const col = t === 'ayer' ? (q.k < 0.8 ? '#8d8a45' : '#6b7a34') : t === 'descanso1' ? (q.k < 0.5 ? '#9ccc6a' : '#72aa4c') : (q.k < 0.4 ? '#2f5e22' : q.k < 0.75 ? '#4c8a34' : '#79ad4d');
+    const key = col + '|' + Math.round(w/px);
+    let L = lotes.get(key); if (!L){ L = { col, w, p: new Path2D() }; lotes.set(key, L); }
+    const sway = RM ? 0 : Math.sin(RELOJ*1.3 + q.u*9 + q.y*20)*0.15;
+    for (let j = 0; j < 3; j++){ const d = (j - 1)*0.004*s, a = (j - 1)*0.35 + (q.a - .5)*0.4 + sway;
+      L.p.moveTo(x + d, q.y); L.p.quadraticCurveTo(x + d + Math.sin(a)*hgt*0.3, q.y - hgt*0.6, x + d + Math.sin(a)*hgt*0.8, q.y - hgt); }
+  }
+  c.lineCap = 'round';
+  for (const L of lotes.values()){ c.strokeStyle = L.col; c.lineWidth = L.w; c.stroke(L.p); }
+  // trébol en flor en la franja que viene
+  c.fillStyle = 'rgba(248,246,236,.85)';
+  for (const q of POT.flores){ const s = sc(q.y), x = q.u*s; if (x < v[0] || x > v[2] || q.y < v[1] || q.y > v[3]) continue; const rr = 0.0018*s; if (rr < px*0.6) continue; c.beginPath(); c.arc(x, q.y - 0.006*s, rr, 0, TAU); c.fill(); }
+  // gallinaza en la franja de ayer
+  for (const q of POT.bostas){ const s = sc(q.y), x = q.u*s; if (x < v[0] || x > v[2] || q.y < v[1] || q.y > v[3]) continue; const rr = 0.0014*s; if (rr < px*0.5) continue;
+    c.fillStyle = '#4a3a22'; c.beginPath(); c.ellipse(x, q.y, rr*1.3, rr*0.8, 0, 0, TAU); c.fill(); c.fillStyle = '#efeadc'; c.beginPath(); c.arc(x + rr*0.4, q.y - rr*0.3, rr*0.45, 0, TAU); c.fill(); }
+  // matas finas junto a la gallina elegida
+  if (px < 0.0003){
+    c.strokeStyle = '#3f7a2c'; c.lineWidth = Math.max(px*0.8, 0.00012); c.beginPath();
+    for (const q of POT.finas){ if (q.x < v[0] || q.x > v[2] || q.y < v[1] || q.y > v[3]) continue; const hgt = 0.0045*(0.6 + q.k*0.8); c.moveTo(q.x, q.y); c.quadraticCurveTo(q.x + 0.0008, q.y - hgt*0.6, q.x + (q.k - .5)*0.004, q.y - hgt); }
+    c.stroke();
+  }
+  // objetos, del fondo hacia adelante
+  const obj = [];
+  for (const a of POT.arbustos) obj.push({ y: a.y, f: () => arbusto(c, a.u*sc(a.y), a.y, a.r*sc(a.y)*0.55, a.r*sc(a.y)/px) });
+  obj.push({ y: GALLINERO.y, f: () => gallinero(c, GALLINERO.u*sc(GALLINERO.y), GALLINERO.y, sc(GALLINERO.y), 0.08*sc(GALLINERO.y)/px) });
+  obj.push({ y: COMPOST.y, f: () => compostera(c, COMPOST.x, COMPOST.y, 0.7*sc(COMPOST.y), 0.06*sc(COMPOST.y)/px) });
+  // la malla móvil a los dos lados de la franja de hoy
+  for (const ub of CERCA){ for (let y = YF + 0.01; y < 0.72; y += 0.045 + y*0.05){ obj.push({ y, f: () => { const s = sc(y), x = ub*s, h = 0.045*s; c.strokeStyle = '#e8dcc0'; c.lineWidth = Math.max(px, 0.0015*s); c.beginPath(); c.moveTo(x, y); c.lineTo(x, y - h); c.stroke(); } }); } }
+  for (const g of POT.gallinas){
+    obj.push({ y: g.y, f: () => {
+      const s = sc(g.y), x = g.u*s, kk = KG*PORTAL[0].s*s;
+      if (x < v[0] - 0.05 || x > v[2] + 0.05 || g.y < v[1] - 0.02 || g.y > v[3] + 0.05) return;
+      const pk = g.elegida ? 0 : RM ? g.pk : 0.5 + 0.5*Math.sin(RELOJ*1.1 + g.fase)*Math.sin(RELOJ*0.37 + g.fase*2);
+      gallina(c, x, g.y, kk, { v: g.v, esp: g.esp, pk: clamp(pk, 0, 1), det: kk/px });
+    } });
+  }
+  obj.sort((a, b) => a.y - b.y); for (const o of obj) o.f();
+  // la red de la malla (dos hilos)
+  c.strokeStyle = 'rgba(238,228,200,.55)';
+  for (const ub of CERCA){ for (const hh of [0.02, 0.04]){ c.lineWidth = Math.max(px*0.7, 0.0008); c.beginPath(); c.moveTo(ub*sc(YF + 0.01), YF + 0.01 - hh*sc(YF + 0.01)); c.lineTo(ub*sc(0.8), 0.8 - hh*sc(0.8)); c.stroke(); } }
+  // bruma de la mañana sobre el fondo
+  const gm = c.createLinearGradient(0, YH - 0.02, 0, 0.05); gm.addColorStop(0, 'rgba(236,242,236,.0)'); gm.addColorStop(0.4, 'rgba(236,242,236,.18)'); gm.addColorStop(1, 'rgba(236,242,236,0)');
+  c.fillStyle = gm; c.fillRect(v[0], YH - 0.02, v[2] - v[0], 0.08);
+}
+
+/* ============================================================
+   NIVEL 1 · LA GALLINA  (1 unidad = 90 cm)
+   Una gallina criolla colorada en el kikuyo, con una lombriz.
+   ============================================================ */
+const G1 = (() => {
+  const r = rng(17);
+  const hojas = []; for (let i = 0; i < 520; i++){ const y = lerp(-0.1, 0.62, Math.pow(r(), 0.8)); hojas.push({ x: lerp(-0.9, 0.9, r()), y, k: r(), a: (r() - .5)*0.9, L: 0.03 + r()*0.05 }); }
+  hojas.sort((a, b) => a.y - b.y);
+  const lejos = []; for (let i = 0; i < 60; i++) lejos.push({ x: lerp(-1, 1, r()), y: lerp(-0.7, 0.1, r()), r: 0.04 + r()*0.1, k: r() });
+  const otras = [{ x: -0.55, y: -0.32, s: 0.2, v:'negra', esp: true, pk: 0.7 }, { x: 0.52, y: -0.38, s: 0.17, v:'canela', esp: false, pk: 0.3 }, { x: -0.22, y: -0.5, s: 0.13, v:'jabada', esp: false, pk: 0.8 }, { x: 0.25, y: -0.58, s: 0.11, v:'blanca', esp: true, pk: 0.2 }, { x: 0.78, y: -0.2, s: 0.22, v:'colorada', esp: true, pk: 0.6 }];
+  const lombriz = []; for (let i = 0; i <= 26; i++){ const t = i/26; lombriz.push([0.34 + t*0.16, 0.262 + Math.sin(t*7)*0.008 + t*0.01]); }
+  return { hojas, lejos, otras, lombriz };
+})();
+let fondo1 = null;
+function prepFondo1(){ // el potrero fuera de foco, detrás de la gallina
+  const ppu = Math.min(700, Math.round(0.5 * S * DPR)), box = [-1.2, -0.9, 1.2, 0.9];
+  const k = document.createElement('canvas'); k.width = Math.round((box[2] - box[0])*ppu); k.height = Math.round((box[3] - box[1])*ppu); const c = k.getContext('2d');
+  c.setTransform(ppu, 0, 0, ppu, -box[0]*ppu, -box[1]*ppu);
+  const g = c.createLinearGradient(0, -0.9, 0, 0.9); g.addColorStop(0, '#7fae5c'); g.addColorStop(0.45, '#5a9140'); g.addColorStop(1, '#3a6a2a');
+  c.fillStyle = g; c.fillRect(-1.2, -0.9, 2.4, 1.8);
+  for (const q of G1.lejos) blob(c, q.x, q.y, q.r, q.r*0.6, q.k < 0.5 ? '#9cc56e' : '#3f7030', 0.45);
+  // el gallinero, fuera de foco, arriba, y otras gallinas más atrás
+  blob(c, 0.42, -0.72, 0.28, 0.12, '#8a6a46', 0.55); blob(c, 0.4, -0.84, 0.3, 0.09, '#8d9ba2', 0.5);
+  for (const o of G1.otras) gallina(c, o.x, o.y, o.s, { v: o.v, esp: o.esp, pk: o.pk, det: 90 });
+  if (typeof c.filter === 'string'){ const k2 = document.createElement('canvas'); k2.width = k.width; k2.height = k.height; const c2 = k2.getContext('2d'); c2.filter = `blur(${Math.round(ppu*0.012)}px)`; c2.drawImage(k, 0, 0); fondo1 = k2; }
+  else fondo1 = k;
+  fondo1._box = box;
+}
+function lombrizDib(c, pts, px){
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = '#6e1d1d'; c.lineWidth = 0.0075; c.beginPath(); curva(c, pts, false); c.stroke();
+  c.strokeStyle = '#b23a3a'; c.lineWidth = 0.0058; c.beginPath(); curva(c, pts, false); c.stroke();
+  c.strokeStyle = 'rgba(255,200,190,.45)'; c.lineWidth = 0.0018; c.beginPath(); curva(c, pts.map(([x, y]) => [x, y - 0.0015]), false); c.stroke();
+  // anillos y el clitelo
+  c.strokeStyle = 'rgba(70,15,15,.5)'; c.lineWidth = Math.max(px*0.6, 0.0006); c.beginPath();
+  for (let i = 1; i < pts.length - 1; i++){ const [x, y] = pts[i]; c.moveTo(x, y - 0.0029); c.lineTo(x + 0.0005, y + 0.0029); } c.stroke();
+  const m = pts[7]; c.fillStyle = '#d98a6a'; c.beginPath(); c.ellipse(m[0], m[1], 0.009, 0.0036, 0.3, 0, TAU); c.fill();
+}
+function dibujaGallina(c, env){
+  const v = env.view, px = env.px;
+  if (fondo1){ const b = fondo1._box; c.drawImage(fondo1, b[0], b[1], b[2] - b[0], b[3] - b[1]); }
+  else { c.fillStyle = '#5a9140'; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]); }
+  // hojas del kikuyo
+  const lotes = new Map();
+  for (const q of G1.hojas){ if (q.x < v[0] - 0.1 || q.x > v[2] + 0.1 || q.y < v[1] - 0.1 || q.y > v[3] + 0.1) continue;
+    const col = q.k < 0.3 ? '#2d5a20' : q.k < 0.65 ? '#447f30' : q.k < 0.9 ? '#6aa546' : '#9bc86a';
+    let L = lotes.get(col); if (!L){ L = new Path2D(); lotes.set(col, L); }
+    const sway = RM ? 0 : Math.sin(RELOJ*1.4 + q.x*6)*0.05;
+    const a = q.a + sway, L2 = q.L*(0.6 + (q.y + 0.1));
+    L.moveTo(q.x - 0.004, q.y); L.quadraticCurveTo(q.x + Math.sin(a)*L2*0.4, q.y - L2*0.6, q.x + Math.sin(a)*L2, q.y - L2); L.quadraticCurveTo(q.x + Math.sin(a)*L2*0.4 + 0.006, q.y - L2*0.55, q.x + 0.004, q.y); }
+  for (const [col, L] of lotes){ c.fillStyle = col; c.fill(L); }
+  lombrizDib(c, G1.lombriz, px);
+  const pk = RM ? 0 : 0.06 + 0.06*Math.sin(RELOJ*0.9);
+  gallina(c, 0, HEN_Y, KG, { v: 'colorada', pk, det: KG/px });
+  // hojas de adelante, que tapan un poco las patas
+  c.fillStyle = '#3c7629';
+  for (let i = 0; i < 40; i++){ const x = -0.2 + i*0.012 + Math.sin(i*3.1)*0.004, y = HEN_Y + 0.01 + (i % 3)*0.004, L2 = 0.03 + (i % 5)*0.006; c.beginPath(); c.moveTo(x - 0.003, y); c.quadraticCurveTo(x + 0.004, y - L2*0.6, x + 0.01*Math.sin(i), y - L2); c.quadraticCurveTo(x + 0.006, y - L2*0.5, x + 0.003, y); c.fill(); }
+}
+
+/* ============================================================
+   NIVEL 2 · POR DENTRO  (1 unidad = 30 cm)
+   La gallina se abre como una lámina: el ovario, el oviducto y el
+   huevo que baja por él en unas 25 horas. El oviducto se dibuja
+   más corto y enrollado de lo que es.
+   ============================================================ */
+const OVI = (() => {
+  const tramos = [
+    { n:'infundíbulo', pts:[[0.03,-0.1],[-0.04,-0.085]], w:0.034, col:'#f2c4ad' },
+    { n:'magno', pts:[[-0.04,-0.085],[-0.14,-0.075],[-0.2,-0.025],[-0.14,0.025],[0.0,0.0],[0.14,-0.035],[0.22,0.015],[0.19,0.075],[0.09,0.07]], w:0.05, col:'#f6e4d0' },
+    { n:'istmo', pts:[[0.09,0.07],[0.055,0.115],[0.035,0.14]], w:0.03, col:'#e8bf9c' },
+    { n:'útero', pts:[[0.035,0.14],[-0.06,0.14],[-0.155,0.14]], w:0.07, col:'#d9796c' },
+    { n:'vagina', pts:[[-0.155,0.14],[-0.21,0.16],[-0.26,0.172]], w:0.032, col:'#c7646a' },
+  ];
+  let acc = 0; const todo = [];
+  for (const t of tramos){ t.m = muestrea(t.pts, 18); t.s0 = acc; for (let i = 1; i < t.m.length; i++) acc += Math.hypot(t.m[i][0] - t.m[i-1][0], t.m[i][1] - t.m[i-1][1]); t.s1 = acc; }
+  const r = rng(29);
+  const foliculos = [[0.085,-0.165,0.043],[0.14,-0.2,0.03],[0.04,-0.205,0.026],[0.135,-0.135,0.022],[0.035,-0.14,0.017],[0.175,-0.16,0.014],[0.08,-0.225,0.013],[0.11,-0.105,0.011]];
+  for (let i = 0; i < 26; i++) foliculos.push([0.09 + (r() - .5)*0.16, -0.17 + (r() - .5)*0.1, 0.004 + r()*0.006]);
+  const vasos = []; for (let i = 0; i < 26; i++){ const x = lerp(-0.3, 0.3, r()), y = lerp(-0.25, 0.25, r()); const pts = [[x, y]]; let a = r()*TAU; for (let j = 0; j < 6; j++){ a += (r() - .5)*0.9; pts.push([pts[j][0] + Math.cos(a)*0.03, pts[j][1] + Math.sin(a)*0.03]); } vasos.push(pts); }
+  return { tramos, total: acc, foliculos, vasos };
+})();
+function puntoEn(s){ // punto y dirección del oviducto a la distancia s
+  for (const t of OVI.tramos){ if (s > t.s1 && t !== OVI.tramos[OVI.tramos.length - 1]) continue;
+    let d = t.s0; for (let i = 1; i < t.m.length; i++){ const a = t.m[i-1], b = t.m[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (d + L >= s || i === t.m.length - 1){ const k = L > 0 ? clamp((s - d)/L, 0, 1) : 0; return { x: lerp(a[0], b[0], k), y: lerp(a[1], b[1], k), ang: Math.atan2(b[1] - a[1], b[0] - a[0]) }; } d += L; } }
+  const t = OVI.tramos[0]; return { x: t.m[0][0], y: t.m[0][1], ang: Math.PI };
+}
+const TR = n => OVI.tramos.find(t => t.n === n);
+/* dónde va el huevo y cómo está, según la hora (0 = la yema sale del ovario) */
+function huevoEn(h){
+  const e = { h, alb: 0, mem: 0, infla: 0.78, casca: 0, pig: 0, cut: 0 };
+  const inf = TR('infundíbulo'), mag = TR('magno'), ist = TR('istmo'), ut = TR('útero');
+  const sCentroUt = lerp(ut.s0, ut.s1, 0.5);
+  if (h < 0){ e.tramo = 'ovario'; e.enOvario = true; return e; }
+  if (h < 0.25){ e.tramo = 'infundíbulo'; e.s = lerp(inf.s0, inf.s1, h/0.25); }
+  else if (h < 3.25){ e.tramo = 'magno'; e.s = lerp(mag.s0, mag.s1, (h - 0.25)/3); e.alb = (h - 0.25)/3; }
+  else if (h < 4.5){ e.tramo = 'istmo'; e.s = lerp(ist.s0, ist.s1, (h - 3.25)/1.25); e.alb = 1; e.mem = (h - 3.25)/1.25; }
+  else { e.tramo = 'útero'; e.s = lerp(ut.s0, sCentroUt, sstep(4.5, 5.2, h)); e.alb = 1; e.mem = 1; e.infla = lerp(0.78, 1, sstep(4.5, 9, h)); e.casca = sstep(8, 23, h); e.pig = sstep(19, 23.5, h); e.cut = sstep(23.5, 24.2, h); }
+  return e;
+}
+function tuboEn(c, t, px, bulto){
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  c.strokeStyle = mix(t.col, '#5a2a24', 0.45); c.lineWidth = t.w + 0.008; c.beginPath(); curva(c, t.pts, false); c.stroke();
+  c.strokeStyle = t.col; c.lineWidth = t.w; c.beginPath(); curva(c, t.pts, false); c.stroke();
+  c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = t.w*0.28; c.beginPath(); curva(c, t.pts.map(([x, y]) => [x - t.w*0.12, y - t.w*0.18]), false); c.stroke();
+  // pliegues del magno y del útero
+  if (t.n === 'magno' || t.n === 'útero' || t.n === 'istmo'){
+    c.strokeStyle = rgba(mixHex(t.col, '#7a3a2a', 0.5), 0.5);
+    c.lineWidth = Math.max(px, 0.0025); c.beginPath();
+    for (let i = 2; i < t.m.length - 1; i += 2){ const a = t.m[i-1], b = t.m[i+1], m = t.m[i]; const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI/2; const L = t.w*0.42;
+      c.moveTo(m[0] - Math.cos(ang)*L, m[1] - Math.sin(ang)*L); c.quadraticCurveTo(m[0] + Math.cos(ang - 1.2)*L*0.2, m[1] + Math.sin(ang - 1.2)*L*0.2, m[0] + Math.cos(ang)*L, m[1] + Math.sin(ang)*L); }
+    c.stroke();
+  }
+}
+function dibujaDentro(c, env){
+  const v = env.view, px = env.px;
+  // afuera: la gallina misma, de muy cerca (sus plumas)
+  c.fillStyle = '#4c7a33'; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  if (fondo1){ const b = fondo1._box, k = 1/PORTAL[1].s; c.save(); c.translate(-PORTAL[1].x*k, -PORTAL[1].y*k); c.scale(k, k); c.drawImage(fondo1, b[0], b[1], b[2] - b[0], b[3] - b[1]); c.restore(); }
+  c.save(); const k = 1/PORTAL[1].s; c.translate(-PORTAL[1].x*k, -PORTAL[1].y*k); c.scale(k, k);
+  gallina(c, 0, HEN_Y, KG, { v: 'colorada', pk: 0, det: KG/(px/k), sombra: false, borde: 0.16 }); c.restore();
+  const a = E.ventana; if (a <= 0.001) return;
+  // la ventana: un corte en el costado
+  const VX = 0.0, VY = 0.0, RX = 0.335, RY = 0.29;
+  c.save(); c.globalAlpha = a;
+  c.fillStyle = 'rgba(40,15,8,.5)'; c.beginPath(); c.ellipse(VX + 0.006, VY + 0.01, RX + 0.012, RY + 0.012, 0, 0, TAU); c.fill();
+  c.beginPath(); c.ellipse(VX, VY, RX, RY, 0, 0, TAU); c.save(); c.clip();
+  const gt = c.createRadialGradient(0.03, -0.05, 0.02, 0, 0, 0.42); gt.addColorStop(0, '#f6dfcf'); gt.addColorStop(0.7, '#e9b9a4'); gt.addColorStop(1, '#c98672');
+  c.fillStyle = gt; c.fillRect(-0.4, -0.35, 0.8, 0.7);
+  c.strokeStyle = 'rgba(190,70,60,.35)'; c.lineWidth = Math.max(px, 0.0022); for (const pts of OVI.vasos){ c.beginPath(); curva(c, pts, false); c.stroke(); }
+  // el ovario: racimo de yemas de todos los tamaños
+  const hE = huevoEn(E.hora);
+  c.strokeStyle = 'rgba(170,70,50,.55)'; c.lineWidth = 0.003; c.beginPath(); for (const [x, y] of OVI.foliculos){ c.moveTo(0.095, -0.17); c.lineTo(x, y); } c.stroke();
+  OVI.foliculos.forEach(([x, y, rr], i) => {
+    if (i === 0 && !hE.enOvario) return; // la grande ya salió
+    const g = c.createRadialGradient(x - rr*0.35, y - rr*0.35, rr*0.1, x, y, rr); g.addColorStop(0, '#ffe07a'); g.addColorStop(0.6, '#f5b52e'); g.addColorStop(1, '#d98a17');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, rr, 0, TAU); c.fill();
+    if (rr > 0.02){ c.strokeStyle = 'rgba(190,60,40,.55)'; c.lineWidth = 0.0022; c.beginPath(); for (let j = 0; j < 5; j++){ const aa = j*1.3 + 0.4; c.moveTo(x + Math.cos(aa)*rr*0.2, y + Math.sin(aa)*rr*0.2); c.quadraticCurveTo(x + Math.cos(aa + 0.5)*rr*0.7, y + Math.sin(aa + 0.5)*rr*0.7, x + Math.cos(aa + 0.2)*rr*0.98, y + Math.sin(aa + 0.2)*rr*0.98); } c.stroke();
+      if (i === 0){ c.strokeStyle = 'rgba(255,245,220,.8)'; c.lineWidth = 0.003; c.beginPath(); c.arc(x, y, rr*0.8, -2.2, -1.2); c.stroke(); } }
+  });
+  // el oviducto, tramo por tramo
+  for (const t of OVI.tramos) tuboEn(c, t, px);
+  // la boca del infundíbulo, abierta hacia el ovario, con flecos
+  const i0 = TR('infundíbulo').pts[0];
+  c.fillStyle = '#f2c4ad'; c.beginPath(); c.ellipse(i0[0] + 0.012, i0[1] - 0.006, 0.03, 0.02, -0.5, 0, TAU); c.fill();
+  c.strokeStyle = '#c98a78'; c.lineWidth = 0.003; c.beginPath(); for (let j = 0; j < 9; j++){ const aa = -0.5 + (j - 4)*0.3; c.moveTo(i0[0] + 0.012 + Math.cos(aa - 1.2)*0.028, i0[1] - 0.006 + Math.sin(aa - 1.2)*0.02); c.lineTo(i0[0] + 0.012 + Math.cos(aa - 1.2)*0.04, i0[1] - 0.006 + Math.sin(aa - 1.2)*0.03); } c.stroke();
+  c.fillStyle = '#8a3f36'; c.beginPath(); c.ellipse(i0[0] + 0.012, i0[1] - 0.006, 0.016, 0.009, -0.5, 0, TAU); c.fill();
+  // la cloaca
+  const cl = TR('vagina').pts[2]; c.fillStyle = '#7a2e33'; c.beginPath(); c.ellipse(cl[0] - 0.01, cl[1] + 0.004, 0.022, 0.016, 0.2, 0, TAU); c.fill();
+  // el huevo que viaja
+  if (!hE.enOvario){
+    const q = puntoEn(hE.s), dir = q.ang;
+    const ks = PORTAL[2].s * hE.infla;
+    // el tubo se estira alrededor del huevo
+    const col = TR(hE.tramo === 'útero' ? 'útero' : hE.tramo).col;
+    c.fillStyle = mix(col, '#5a2a24', 0.35); c.beginPath(); c.ellipse(q.x, q.y, (HUEVO.a + 0.03)*ks + 0.004, (HUEVO.b + 0.03)*ks + 0.004, dir, 0, TAU); c.fill();
+    c.fillStyle = col; c.beginPath(); c.ellipse(q.x, q.y, (HUEVO.a + 0.03)*ks, (HUEVO.b + 0.03)*ks, dir, 0, TAU); c.fill();
+    c.save(); c.translate(q.x, q.y); c.rotate(dir - Math.PI); c.scale(ks, ks);
+    huevoEntero(c, hE, px/ks);
+    c.restore();
+  }
+  c.restore(); // fin del recorte de la ventana
+  // el borde del corte
+  c.strokeStyle = '#e8c9b6'; c.lineWidth = 0.008; c.beginPath(); c.ellipse(VX, VY, RX, RY, 0, 0, TAU); c.stroke();
+  c.strokeStyle = 'rgba(90,30,20,.6)'; c.lineWidth = 0.003; c.beginPath(); c.ellipse(VX, VY, RX - 0.005, RY - 0.005, 0, 0, TAU); c.stroke();
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 3 · EL HUEVO CORTADO  (1 unidad = 7 cm)
+   La punta angosta a la izquierda (así viajó), la ancha a la derecha.
+   ============================================================ */
+const HUEVO = (() => {
+  const a = 0.407, b = 0.31, n = 120, pts = [];
+  for (let i = 0; i < n; i++){ const t = i/n*TAU; const ct = Math.cos(t); pts.push([a*ct, b*Math.sin(t)*(1 + 0.1*ct)*(1 - 0.04*ct*ct)]); }
+  let top = pts[0]; for (const q of pts) if (q[1] < top[1]) top = q;
+  const casca = 0.39/70; // 0,39 mm en unidades del nivel (7 cm)
+  return { a, b, pts, top, casca, yema: { x: 0.02, y: 0.005, r: 0.2 } };
+})();
+PORTAL[3].x = HUEVO.top[0]; PORTAL[3].y = HUEVO.top[1] + HUEVO.casca/2;
+function contornoHuevo(c, k){ c.beginPath(); const p = HUEVO.pts; c.moveTo(p[0][0]*k, p[0][1]*k); curva(c, p.map(([x, y]) => [x*k, y*k]), true); }
+function yemaDib(c, px){
+  const Y = HUEVO.yema;
+  const g = c.createRadialGradient(Y.x - Y.r*0.3, Y.y - Y.r*0.35, Y.r*0.05, Y.x, Y.y, Y.r); g.addColorStop(0, '#ffd865'); g.addColorStop(0.7, '#f5a824'); g.addColorStop(1, '#e08a14');
+  c.fillStyle = g; c.beginPath(); c.arc(Y.x, Y.y, Y.r, 0, TAU); c.fill();
+  // anillos de la yema, como capas
+  if (Y.r/px > 60){ c.lineWidth = Math.max(px, Y.r*0.012);
+    for (let i = 2; i < 7; i++){ c.strokeStyle = i % 2 ? 'rgba(255,228,140,.16)' : 'rgba(200,110,10,.1)'; c.beginPath(); c.arc(Y.x, Y.y + i*0.003, Y.r*i/7.2, 0, TAU); c.stroke(); } }
+  // la latebra: del centro al disco germinal
+  c.fillStyle = 'rgba(255,238,185,.28)'; c.beginPath(); c.moveTo(Y.x - 0.007, Y.y + 0.02); c.quadraticCurveTo(Y.x - 0.012, Y.y - Y.r*0.55, Y.x - 0.004, Y.y - Y.r*0.96); c.lineTo(Y.x + 0.004, Y.y - Y.r*0.96); c.quadraticCurveTo(Y.x + 0.012, Y.y - Y.r*0.55, Y.x + 0.007, Y.y + 0.02); c.closePath(); c.fill();
+  c.beginPath(); c.arc(Y.x, Y.y + 0.02, 0.02, 0, TAU); c.fill();
+  // disco germinal
+  c.fillStyle = '#fffbe8'; c.beginPath(); c.ellipse(Y.x, Y.y - Y.r + 0.006, 0.02, 0.008, 0, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(220,180,90,.8)'; c.lineWidth = Math.max(px, 0.0018); c.beginPath(); c.ellipse(Y.x, Y.y - Y.r + 0.006, 0.02, 0.008, 0, 0, TAU); c.stroke();
+  // membrana brillante
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.arc(Y.x, Y.y, Y.r - 0.002, -2.6, -1.4); c.stroke();
+}
+function chalazas(c, px){
+  const Y = HUEVO.yema; c.lineCap = 'round';
+  for (const lado of [-1, 1]){
+    const x0 = Y.x + lado*Y.r*0.95, x1 = lado*0.3; const pts = [];
+    for (let i = 0; i <= 20; i++){ const t = i/20; pts.push([lerp(x0, x1, t), Y.y + Math.sin(t*14)*0.012*(1 - t*0.5)]); }
+    c.strokeStyle = 'rgba(255,255,250,.9)'; c.lineWidth = lerp(0.03, 0.012, 0.5); c.beginPath(); curva(c, pts, false); c.stroke();
+    c.strokeStyle = 'rgba(200,200,180,.6)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); for (let i = 0; i < 20; i += 2){ const [x, y] = pts[i]; c.moveTo(x - 0.006, y - 0.01); c.lineTo(x + 0.006, y + 0.01); } c.stroke();
+  }
+}
+/* el huevo entero, con la clara transparente (así se ve dentro del oviducto) */
+function huevoEntero(c, e, px){
+  const k = e.alb > 0 ? lerp(0.62, 1, e.alb) : 0.55;
+  if (e.alb > 0){
+    c.fillStyle = `rgba(250,246,226,${0.35 + 0.35*e.alb})`; contornoHuevo(c, k); c.fill();
+    c.strokeStyle = `rgba(255,255,255,${0.4*e.alb})`; c.lineWidth = Math.max(px, 0.006); contornoHuevo(c, k*0.8); c.stroke();
+  }
+  if (e.alb > 0.2){ c.save(); c.globalAlpha = e.alb; chalazas(c, px); c.restore(); }
+  yemaDib(c, px);
+  if (e.mem > 0){ c.strokeStyle = `rgba(255,255,255,${0.8*e.mem})`; c.lineWidth = Math.max(px*1.5, 0.012); contornoHuevo(c, k); c.stroke(); }
+  if (e.casca > 0){
+    const col = mix('#f3e7d3', '#c98e5a', e.pig);
+    c.save(); c.globalAlpha = 0.25 + 0.5*e.casca; c.fillStyle = col; contornoHuevo(c, 1.0); contornoHuevo(c, 0.96); c.fill('evenodd'); c.restore();
+    c.save(); c.globalAlpha = 0.25*e.casca; c.fillStyle = col; contornoHuevo(c, 1.0); c.fill(); c.restore();
+    c.strokeStyle = rgba('#7a4a28', 0.3 + 0.5*e.casca); c.lineWidth = Math.max(px, 0.008); contornoHuevo(c, 1.0); c.stroke();
+    if (e.cut > 0){ c.strokeStyle = `rgba(255,255,255,${0.5*e.cut})`; c.lineWidth = Math.max(px, 0.01); c.beginPath(); c.ellipse(-0.1, -0.2, 0.12, 0.04, -0.2, 0, TAU); c.stroke(); }
+  }
+}
+function dibujaHuevo(c, env){
+  const v = env.view, px = env.px;
+  const g = c.createRadialGradient(0, -0.1, 0.1, 0, 0, 1.4); g.addColorStop(0, '#3a2a22'); g.addColorStop(1, '#1b120d');
+  c.fillStyle = g; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  // cáscara (con su color) y membranas
+  const kc = 1 - HUEVO.casca/HUEVO.b, km = kc - 0.004;
+  const gC = c.createLinearGradient(-0.4, -0.3, 0.4, 0.3); gC.addColorStop(0, '#d9a878'); gC.addColorStop(1, '#b77c4d');
+  c.fillStyle = gC; contornoHuevo(c, 1); c.fill();
+  c.fillStyle = '#fbf6ec'; contornoHuevo(c, kc); c.fill();
+  // la clara: fluida afuera, densa en medio, fluida junto a la yema
+  const gA = c.createRadialGradient(0.02, 0, 0.05, 0, 0, 0.45); gA.addColorStop(0, 'rgba(236,236,205,1)'); gA.addColorStop(1, 'rgba(222,228,214,1)');
+  c.fillStyle = gA; contornoHuevo(c, km); c.fill();
+  // cámara de aire en la punta ancha: se forma al enfriarse
+  if (E.enfria > 0.01){
+    const d = 0.05*E.enfria, xr = HUEVO.a*km;
+    c.save(); contornoHuevo(c, km); c.clip();
+    c.fillStyle = '#c9d3d8'; c.beginPath(); c.moveTo(xr + 0.02, -0.3); c.lineTo(xr - d, -0.3); c.quadraticCurveTo(xr - d*1.6, 0, xr - d, 0.3); c.lineTo(xr + 0.02, 0.3); c.closePath(); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.moveTo(xr - d, -0.3); c.quadraticCurveTo(xr - d*1.6, 0, xr - d, 0.3); c.stroke();
+    c.restore();
+  }
+  c.fillStyle = 'rgba(240,238,196,.95)'; contornoHuevo(c, 0.74); c.fill();
+  c.strokeStyle = 'rgba(255,255,240,.55)'; c.lineWidth = Math.max(px, 0.004); contornoHuevo(c, 0.74); c.stroke();
+  c.fillStyle = 'rgba(248,246,226,.8)'; c.beginPath(); c.arc(HUEVO.yema.x, HUEVO.yema.y, HUEVO.yema.r + 0.035, 0, TAU); c.fill();
+  chalazas(c, px);
+  yemaDib(c, px);
+  // brillo de corte
+  c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = Math.max(px, 0.004); contornoHuevo(c, kc); c.stroke();
+  c.strokeStyle = 'rgba(80,40,15,.55)'; c.lineWidth = Math.max(px, 0.0025); contornoHuevo(c, 1); c.stroke();
+}
+
+/* ============================================================
+   NIVEL 4 · LA CÁSCARA DE LADO  (1 unidad = 1,2 mm)
+   0,39 mm de cáscara [5]: afuera la cutícula, luego la capa en
+   empalizada, los conos mamilares y las dos membranas.
+   ============================================================ */
+const CAS = (() => {
+  const t = 0.39/1.2, y0 = -t/2, y1 = t/2, yp = y0 + t*0.7;   // yp: donde la empalizada se apoya en los conos
+  const r = rng(61);
+  const mam = []; let x = -1.3; while (x < 1.3){ const w = 0.04 + r()*0.022; mam.push({ x: x + w/2, w, k: r() }); x += w; }
+  // columnas de calcita: nacen en cada cono y crecen hacia afuera, apretadas unas con otras
+  const cols = mam.map((m, i) => { const pts = []; const n = 7; for (let j = 0; j <= n; j++){ const yy = lerp(yp, y0, j/n); pts.push([m.x - m.w/2 + (r() - .5)*0.008, yy]); } return { m, izq: pts, k: r() }; });
+  const facetas = []; for (let i = 0; i < 420; i++) facetas.push({ x: lerp(-1.3, 1.3, r()), y: lerp(y0 + 0.01, yp - 0.01, r()), a: (r() < 0.5 ? 0.35 : -0.35) + (r() - .5)*0.2, L: 0.012 + r()*0.02, k: r() });
+  const fibras = []; for (let i = 0; i < 380; i++){ const x0 = lerp(-1.3, 1.3, r()), y = lerp(y1 + 0.004, y1 + 0.06, r()); const pts = [[x0, y]]; let a = (r() - .5)*0.5; for (let j = 0; j < 6; j++){ a += (r() - .5)*0.7; pts.push([pts[j][0] + Math.cos(a)*0.03, clamp(pts[j][1] + Math.sin(a)*0.01, y1 + 0.002, y1 + 0.064)]); } fibras.push({ pts, k: r() }); }
+  const poros = [{ x: -0.09, w: 0.009 }, { x: 0.38, w: 0.007 }, { x: -0.62, w: 0.008 }];
+  return { t, y0, y1, yp, cols, mam, facetas, fibras, poros };
+})();
+function dibujaCascara(c, env){
+  const v = env.view, px = env.px, { y0, y1, yp } = CAS;
+  // afuera: el aire
+  const g = c.createLinearGradient(0, v[1], 0, y0); g.addColorStop(0, '#1d1611'); g.addColorStop(1, '#3a2c22');
+  c.fillStyle = g; c.fillRect(v[0], v[1], v[2] - v[0], y0 - v[1] + 0.01);
+  // adentro: la clara
+  const gA = c.createLinearGradient(0, y1, 0, v[3]); gA.addColorStop(0, '#e2e6d2'); gA.addColorStop(1, '#cdd5c2');
+  c.fillStyle = gA; c.fillRect(v[0], y1, v[2] - v[0], v[3] - y1 + 0.01);
+  // las membranas: fibras entrelazadas
+  c.fillStyle = '#efe9da'; c.fillRect(v[0], y1 - 0.01, v[2] - v[0], 0.075);
+  c.lineCap = 'round';
+  for (const fb of CAS.fibras){ const x = fb.pts[0][0]; if (x < v[0] - 0.2 || x > v[2] + 0.2) continue; c.strokeStyle = fb.k < 0.5 ? 'rgba(206,196,172,.7)' : 'rgba(180,168,142,.55)'; c.lineWidth = Math.max(px, 0.0025); c.beginPath(); curva(c, fb.pts, false); c.stroke(); }
+  // entre los conos queda un hueco oscuro
+  c.fillStyle = '#6d5a45'; c.fillRect(v[0], yp, v[2] - v[0], y1 - yp);
+  // conos mamilares, con su núcleo y las fibras de afuera metidas en ellos
+  for (const m of CAS.mam){ if (m.x + m.w < v[0] || m.x - m.w > v[2]) continue;
+    const gm = c.createLinearGradient(m.x - m.w/2, 0, m.x + m.w/2, 0); gm.addColorStop(0, mix('#e7dac3', '#d5c2a3', m.k)); gm.addColorStop(0.5, '#f1e7d6'); gm.addColorStop(1, mix('#d8c6a8', '#c7b290', m.k));
+    c.fillStyle = gm; c.beginPath(); c.moveTo(m.x - m.w/2, yp); c.lineTo(m.x + m.w/2, yp); c.quadraticCurveTo(m.x + m.w*0.46, y1 - 0.02, m.x, y1 + 0.006); c.quadraticCurveTo(m.x - m.w*0.46, y1 - 0.02, m.x - m.w/2, yp); c.fill();
+    c.fillStyle = 'rgba(120,92,62,.5)'; c.beginPath(); c.arc(m.x, y1 - 0.014, 0.0055, 0, TAU); c.fill(); }
+  // la empalizada: columnas apretadas de calcita
+  const gP = c.createLinearGradient(0, y0, 0, yp); gP.addColorStop(0, '#e9dcc6'); gP.addColorStop(1, '#f2e9da');
+  c.fillStyle = gP; c.fillRect(v[0], y0, v[2] - v[0], yp - y0);
+  c.strokeStyle = 'rgba(150,124,92,.45)'; c.lineWidth = Math.max(px, 0.0022);
+  c.beginPath(); for (const q of CAS.cols){ const x = q.izq[0][0]; if (x < v[0] - 0.05 || x > v[2] + 0.05) continue; curva(c, q.izq, false); } c.stroke();
+  for (const q of CAS.cols){ const x = q.izq[0][0]; if (x < v[0] - 0.05 || x > v[2] + 0.05) continue; if (q.k < 0.45) continue; c.fillStyle = q.k < 0.7 ? 'rgba(255,250,240,.28)' : 'rgba(160,130,95,.12)'; c.fillRect(x + 0.004, y0, q.m.w - 0.008, yp - y0); }
+  c.strokeStyle = 'rgba(255,255,255,.3)'; c.lineWidth = Math.max(px, 0.0016); c.beginPath();
+  for (const q of CAS.facetas){ if (q.x < v[0] || q.x > v[2]) continue; c.moveTo(q.x, q.y); c.lineTo(q.x + Math.cos(q.a)*q.L, q.y + Math.sin(q.a)*q.L); } c.stroke();
+  // el color de la cáscara, en la parte de afuera
+  const gp = c.createLinearGradient(0, y0, 0, y0 + 0.13); gp.addColorStop(0, 'rgba(176,112,62,.5)'); gp.addColorStop(1, 'rgba(176,112,62,0)');
+  c.fillStyle = gp; c.fillRect(v[0], y0, v[2] - v[0], 0.13);
+  // poros: canales finos que atraviesan la cáscara
+  for (const P of CAS.poros){ if (P.x < v[0] - 0.05 || P.x > v[2] + 0.05) continue;
+    const pts = []; for (let j = 0; j <= 10; j++){ const t = j/10; pts.push([P.x + Math.sin(t*5 + P.x*9)*0.004, lerp(y0, yp + 0.01, t)]); }
+    c.strokeStyle = 'rgba(70,52,38,.9)'; c.lineWidth = P.w; c.beginPath(); curva(c, pts, false); c.stroke();
+    c.strokeStyle = 'rgba(40,28,20,.9)'; c.lineWidth = P.w*0.45; c.beginPath(); curva(c, pts, false); c.stroke(); }
+  // la cutícula, encima de todo: tapa los poros
+  c.fillStyle = 'rgba(206,160,112,.96)'; c.fillRect(v[0], y0 - 0.009, v[2] - v[0], 0.0095);
+  c.strokeStyle = 'rgba(255,240,220,.5)'; c.lineWidth = Math.max(px, 0.0015); c.beginPath(); c.moveTo(v[0], y0 - 0.009); c.lineTo(v[2], y0 - 0.009); c.stroke();
+}
+
+/* ============================================================
+   5 y 6 · POR EL TIEMPO: la postura por semanas y el pollo de
+   engorde por días. Se dibujan en píxeles, en el espacio libre.
+   ============================================================ */
+const HYL = [[18,5.5,7.5],[19,20.6,26.2],[20,46.7,55.9],[21,70.0,79.0],[22,83.2,88.3],[23,87.4,92.4],[24,89.5,94.2],[25,91.0,95.4],[26,91.8,95.9],[28,92.4,96.2],[30,92.8,96.6],[32,93.0,96.9],[34,93.2,97.0],[36,93.2,97.1],[38,93.1,97.0],[40,92.9,96.8],[45,92.2,96.2],[50,91.3,95.3],[55,90.2,94.2],[60,88.9,92.9],[65,87.2,91.2],[70,85.3,89.2],[75,83.2,87.1],[80,81.0,84.9],[85,78.8,82.5],[90,76.5,80.2],[95,74.1,77.7],[100,71.7,75.3]];
+const HYL_ACUM = [[60,259.6,272.4],[80,378.5,396.8],[100,485.2,508.6]];
+const CRIOLLA = { ini0: 180/7, ini1: 210/7, prom: 46.3, min: 28, max: 59.1 };
+const ROSS = [[0,44,0],[7,213,166],[14,533,535],[21,1012,1155],[28,1616,2051],[35,2296,3211],[42,2998,4586],[49,3681,6115],[56,4318,7733]];
+function interp(tab, x, i){ if (x <= tab[0][0]) return tab[0][i]; for (let k = 1; k < tab.length; k++){ if (x <= tab[k][0]){ const t = (x - tab[k-1][0])/(tab[k][0] - tab[k-1][0]); return lerp(tab[k-1][i], tab[k][i], t); } } return tab[tab.length - 1][i]; }
+function rectGrafica(){
+  if (W !== innerWidth || H !== innerHeight) return { x: W*0.1, y: H*0.08, w: W*0.84, h: H*0.78, mini: true };
+  const md = document.getElementById('medidor').getBoundingClientRect();
+  const fb = document.getElementById('frase').getBoundingClientRect(), ct = document.getElementById('controles').getBoundingClientRect();
+  const ub = document.getElementById('ubicacion'), ubr = ub.classList.contains('oculto') ? null : ub.getBoundingClientRect();
+  const top = Math.max(md.bottom, ubr && !PORT ? 0 : ubr ? ubr.bottom : 0) + 22, abajo = Math.min(fr.classList.contains('ver') && !fr.classList.contains('min') ? fb.top : ct.top, ct.top) - 18;
+  const izq = PORT ? 16 : 70, der = PORT ? W - 30 : (ubr ? ubr.left - 24 : W - 40);
+  const h = Math.max(160, abajo - top);
+  return { x: izq, y: top, w: der - izq, h, mini: false };
+}
+function fondoTiempo(c){
+  c.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#2b2117'); g.addColorStop(1, '#17110b');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  // un rastro de huevos, muy tenue
+  c.fillStyle = 'rgba(255,230,190,.035)'; for (let i = 0; i < 40; i++){ const x = h1(i*3.3)*W, y = h1(i*7.1 + 2)*H, r = 10 + h1(i)*18; c.beginPath(); c.ellipse(x, y, r*0.78, r, h1(i*5)*0.6, 0, TAU); c.fill(); }
+}
+function textoC(c, t, x, y, o){ c.font = `${o.peso || 600} ${o.tam || 15}px ` + getComputedStyle(document.body).getPropertyValue('--sans'); c.textAlign = o.al || 'left'; c.textBaseline = o.base || 'alphabetic'; c.fillStyle = o.col || '#f3f1e8'; c.fillText(t, x, y); }
+function ejes(c, R, xmax, ymax, xt, yt, xl, yl, fy){
+  c.strokeStyle = 'rgba(243,241,232,.14)'; c.lineWidth = 1; c.beginPath();
+  for (let v = 0; v <= ymax + 1e-6; v += yt){ const y = R.y + R.h - v/ymax*R.h; c.moveTo(R.x, y); c.lineTo(R.x + R.w, y); } c.stroke();
+  c.strokeStyle = 'rgba(243,241,232,.55)'; c.beginPath(); c.moveTo(R.x, R.y); c.lineTo(R.x, R.y + R.h); c.lineTo(R.x + R.w, R.y + R.h); c.stroke();
+  const tam = R.w < 380 ? 13 : 15;
+  for (let v = 0; v <= xmax + 1e-6; v += xt){ const x = R.x + v/xmax*R.w; textoC(c, String(v), x, R.y + R.h + tam + 4, { al:'center', tam, peso: 500, col:'rgba(243,241,232,.8)' }); }
+  for (let v = yt; v < ymax - 1e-6; v += yt){ const y = R.y + R.h - v/ymax*R.h; textoC(c, fy(v), R.x + 4, y - 4, { tam, peso: 500, col:'rgba(243,241,232,.75)' }); }
+  textoC(c, xl, R.x + R.w, R.y + R.h - 8, { al:'right', tam, peso: 600, col:'rgba(243,241,232,.9)' });
+  textoC(c, yl + ' (arriba: ' + fy(ymax) + ')', R.x + 4, R.y - 8, { tam, peso: 600, col:'rgba(243,241,232,.9)' });
+}
+function huevito(c, x, y, r, lleno, col){ c.beginPath(); c.ellipse(x, y, r*0.78, r, 0, 0, TAU); if (lleno){ c.fillStyle = col; c.fill(); } else { c.strokeStyle = 'rgba(243,241,232,.35)'; c.lineWidth = 1.2; c.stroke(); } }
+function dibujaPostura(c, env){
+  fondoTiempo(c);
+  const R0 = rectGrafica(), top = R0.mini ? 0 : PORT ? 62 : 34, R = { x: R0.x + 8, y: R0.y + top + 26, w: R0.w - 16, h: R0.h - top - 60 };
+  if (R.h < 80) return;
+  const sx = w => R.x + w/100*R.w, sy = v => R.y + R.h - v/100*R.h;
+  ejes(c, R, 100, 100, R.w < 380 ? 20 : 10, 25, 'semanas de vida', PORT ? '% de días que pone' : '% de los días que pone', v => v + ' %');
+  // criolla: promedio de fincas (banda y raya)
+  c.fillStyle = 'rgba(126,196,98,.22)'; c.beginPath(); c.moveTo(sx(CRIOLLA.ini1), sy(CRIOLLA.min)); c.lineTo(sx(100), sy(CRIOLLA.min)); c.lineTo(sx(100), sy(CRIOLLA.max)); c.lineTo(sx(CRIOLLA.ini1), sy(CRIOLLA.max)); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(126,196,98,.1)'; c.fillRect(sx(CRIOLLA.ini0), sy(CRIOLLA.max), sx(CRIOLLA.ini1) - sx(CRIOLLA.ini0), sy(CRIOLLA.min) - sy(CRIOLLA.max));
+  c.setLineDash([7, 6]); c.strokeStyle = '#9fd67e'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(sx(CRIOLLA.ini1), sy(CRIOLLA.prom)); c.lineTo(sx(100), sy(CRIOLLA.prom)); c.stroke(); c.setLineDash([]);
+  // línea: rango de la guía
+  c.fillStyle = 'rgba(234,168,60,.35)'; c.beginPath(); HYL.forEach(([w, lo], i) => i ? c.lineTo(sx(w), sy(lo)) : c.moveTo(sx(w), sy(lo))); for (let i = HYL.length - 1; i >= 0; i--) c.lineTo(sx(HYL[i][0]), sy(HYL[i][2])); c.closePath(); c.fill();
+  c.strokeStyle = '#f2b650'; c.lineWidth = 2.5; c.beginPath(); HYL.forEach(([w, lo, hi], i) => { const y = sy((lo + hi)/2); i ? c.lineTo(sx(w), y) : c.moveTo(sx(w), y); }); c.stroke();
+  // rótulos de las curvas
+  const tam = R.w < 380 ? 13 : 15;
+  textoC(c, 'Gallina de línea (guía)', sx(PORT ? 34 : 42), sy(PORT ? 84 : 97) + (PORT ? 22 : -10), { tam, col:'#ffd07c' });
+  textoC(c, 'Criolla en fincas (promedio)', sx(PORT ? 30 : 42), sy(CRIOLLA.max) - 8, { tam, col:'#b6e39a' });
+  // el cursor de la semana
+  const w = E.semana, lo = interp(HYL, w, 1), hi = interp(HYL, w, 2), x = sx(w);
+  c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, R.y); c.lineTo(x, R.y + R.h); c.stroke();
+  c.fillStyle = '#ffd07c'; c.beginPath(); c.arc(x, sy((lo + hi)/2), 5.5, 0, TAU); c.fill();
+  if (w >= CRIOLLA.ini1){ c.fillStyle = '#b6e39a'; c.beginPath(); c.arc(x, sy(CRIOLLA.prom), 5.5, 0, TAU); c.fill(); }
+  // una semana de huevos, arriba de la gráfica
+  if (!R0.mini){
+    const pl = Math.round((lo + hi)/2/100*7), pc = w >= CRIOLLA.ini0 ? Math.round(CRIOLLA.prom/100*7) : 0, r = 9, y1 = R0.y + 14, y2 = R0.y + 14 + (PORT ? 26 : 0);
+    const x0 = R0.x + 8; textoC(c, 'Una semana:', x0, y1 + 5, { tam, peso: 500, col:'rgba(243,241,232,.85)' });
+    c.font = `500 ${tam}px ` + getComputedStyle(document.body).getPropertyValue('--sans'); const bx = x0 + c.measureText('Una semana:').width + 18;
+    for (let i = 0; i < 7; i++) huevito(c, bx + i*20, y1, r, i < pl, '#f2b650');
+    textoC(c, 'línea', bx + 7*20 + 4, y1 + 5, { tam, peso: 500, col:'#ffd07c' });
+    const bx2 = PORT ? bx : bx + 7*20 + 60;
+    for (let i = 0; i < 7; i++) huevito(c, bx2 + i*20, y2, r, i < pc, '#9fd67e');
+    textoC(c, 'criolla', bx2 + 7*20 + 4, y2 + 5, { tam, peso: 500, col:'#b6e39a' });
+  }
+}
+function dibujaEngorde(c, env){
+  fondoTiempo(c);
+  const R0 = rectGrafica(), avisa = ALTA() && !R0.mini, R = { x: R0.x + 8, y: R0.y + 30 + (avisa ? 34 : 0), w: R0.w - 16, h: R0.h - 64 - (avisa ? 34 : 0) };
+  if (R.h < 80) return;
+  const YM = 8000, sx = d => R.x + d/56*R.w, sy = g => R.y + R.h - g/YM*R.h;
+  ejes(c, R, 56, YM, 7, 2000, 'días de vida', 'kilos', v => (v/1000).toLocaleString('es-CO') + ' kg');
+  const tam = R.w < 380 ? 13 : 15;
+  // comida acumulada (punteada)
+  c.setLineDash([3, 5]); c.strokeStyle = 'rgba(243,241,232,.6)'; c.lineWidth = 2; c.beginPath(); ROSS.forEach(([d, , f], i) => i ? c.lineTo(sx(d), sy(f)) : c.moveTo(sx(d), sy(f))); c.stroke(); c.setLineDash([]);
+  // peso del pollo de línea
+  c.strokeStyle = '#f2b650'; c.lineWidth = 3; c.beginPath(); for (let d = 0; d <= 56; d += 0.5){ const y = sy(interp(ROSS, d, 1)); d ? c.lineTo(sx(d), y) : c.moveTo(sx(d), y); } c.stroke();
+  // la gallina criolla adulta, como referencia
+  c.setLineDash([7, 6]); c.strokeStyle = '#9fd67e'; c.lineWidth = 2; c.beginPath(); c.moveTo(R.x, sy(1900)); c.lineTo(R.x + R.w, sy(1900)); c.stroke(); c.setLineDash([]);
+  textoC(c, 'criolla adulta: 1,9 kg', R.x + 6, sy(1900) + tam + 6, { tam, col:'#b6e39a' });
+  textoC(c, 'pollo de línea', sx(55), sy(interp(ROSS, 55, 1)) + tam + 8, { tam, col:'#ffd07c', al:'right' });
+  textoC(c, 'comida que lleva', sx(56) - 4, sy(7733) + 18, { tam, col:'rgba(243,241,232,.8)', al:'right' });
+  const d = E.dia, x = sx(d), pe = interp(ROSS, d, 1);
+  c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, R.y); c.lineTo(x, R.y + R.h); c.stroke();
+  c.fillStyle = '#ffd07c'; c.beginPath(); c.arc(x, sy(pe), 6, 0, TAU); c.fill();
+  if (avisa){
+    const t = `Su finca: ${fmtM(altura)} m. Por encima de 900 m, riesgo de ascitis.`;
+    c.font = `600 ${tam}px ` + getComputedStyle(document.body).getPropertyValue('--sans');
+    const tw = c.measureText(t).width; const bx = R0.x + 14, by = R0.y + tam + 4;
+    c.fillStyle = 'rgba(160,50,30,.85)'; c.beginPath(); c.roundRect ? c.roundRect(bx - 6, by - tam - 4, tw + 12, tam + 12, 8) : c.rect(bx - 6, by - tam - 4, tw + 12, tam + 12); c.fill();
+    textoC(c, t, bx, by + 2, { tam, col:'#fff4ea' });
+  }
+}
+
+/* ============================================================
+   REGISTRO DE NIVELES Y RENDER
+   ============================================================ */
+const LV = [dibujaPotrero, dibujaGallina, dibujaDentro, dibujaHuevo, dibujaCascara, dibujaPostura, dibujaEngorde];
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu){
+  const hw = W/2/ppu, hh = H/2/ppu;
+  return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - hw, cy - hh, cx + hw, cy + hh] };
+}
+function pintaNivel(c, L, cx, cy, f){
+  if (L >= 5){ LV[L](c, {}); return; }
+  const ppu = S / f;
+  c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(W/2 - cx*ppu), DPR*(H/2 - cy*ppu));
+  LV[L](c, envPara(L, cx, cy, f, ppu));
+  const P = PORTAL[L];
+  if (!P) return;
+  const pp = P.s * ppu;
+  const a = sstep(0.28*S, 0.92*S, pp);
+  if (a <= 0) return;
+  const ppu2 = ppu * P.s;
+  const ox = W/2 + (P.x - cx)*ppu, oy = H/2 + (P.y - cy)*ppu;
+  const cx2 = (cx - P.x) / P.s, cy2 = (cy - P.y) / P.s, f2 = f / P.s;
+  const rDisco = pp*lerp(0.22, 0.85, a) + pp*0.16;
+  const lejos = Math.max(Math.hypot(ox, oy), Math.hypot(W - ox, oy), Math.hypot(ox, H - oy), Math.hypot(W - ox, H - oy));
+  const cerca = Math.hypot(clamp(ox, 0, W) - ox, clamp(oy, 0, H) - oy);
+  if (cerca > rDisco) return;
+  const cubre = a >= 0.999 && pp*0.85 >= lejos;
+  const dst = cubre ? c : bctx;
+  if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+  dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*ox, DPR*oy);
+  LV[P.c](dst, envPara(P.c, cx2, cy2, f2, ppu2));
+  if (cubre) return;
+  bctx.setTransform(1,0,0,1,0,0);
+  bctx.globalCompositeOperation = 'destination-in';
+  const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+  const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+  gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+  bctx.globalCompositeOperation = 'source-over';
+  c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+}
+function pintaCam(c, cam){
+  if (cam.k !== 'fade'){ pintaNivel(c, cam.L, cam.cx, cam.cy, cam.f); return; }
+  // funde: el cuadro de antes en buf2, el de después encima con su opacidad
+  b2ctx.setTransform(1,0,0,1,0,0); pintaNivel(b2ctx, cam.A.L, cam.A.cx, cam.A.cy, cam.A.f);
+  pintaNivel(c, cam.B.L, cam.B.cx, cam.B.cy, cam.B.f);
+  c.setTransform(1,0,0,1,0,0); c.globalAlpha = 1 - cam.t; c.drawImage(buf2, 0, 0); c.globalAlpha = 1;
+}
+function render(pp){
+  E = estado(pp);
+  const cam = camAt(pp);
+  pintaCam(ctx, cam);
+  ctx.setTransform(1,0,0,1,0,0);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, 'rgba(12,8,4,.28)'); ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.k === 'lvl' && cam.L < 5){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k); ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+const animado = cam => cam.k === 'lvl' && cam.L <= 1;
+
+/* ============================================================
+   TEXTOS  [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   ============================================================ */
+const fmtM = n => Math.round(n).toLocaleString('es-CO').replace(/\./g, ' ');
+function paginaFinca(){
+  const regla = 'Por encima de unos 900 metros, la altura no es buena para el pollo de carne de crecimiento rápido: hay que frenar su crecimiento para que no se muera de [[ascitis|ascitis]]{10}.';
+  if (altura === null) return { k:'finca', s:['Si abre este recorrido desde Chagra, o escribe la altitud de su finca en el recuadro de arriba, esta página le dice si su finca está por encima de ese límite.', regla], nota:'El manual da el límite en pies: 3 000 pies, unos 900 metros.' };
+  if (ALTA()) return { k:'finca', s:[`Su finca está a unos ${fmtM(altura)} metros: por encima de los 900{10}.`, 'Allá, el pollo de línea a toda velocidad corre riesgo de ascitis; hay que hacerlo crecer más despacio{10}.', 'El frío de las tres primeras semanas también lo predispone: abrigue a los pollitos{10}.', 'La criolla crece despacio: llega a adulta hacia los 7 meses, con 1,9 kilos la gallina y 2,1 el gallo{8}.'], nota:'Crecer despacio es la regla del manual; cuánto frenar depende de la línea y del manejo.' };
+  return { k:'finca', s:[`Su finca está a unos ${fmtM(altura)} metros: por debajo de los 900{10}.`, 'Aun así, el frío de las tres primeras semanas predispone a la ascitis: abrigue a los pollitos{10}.'], nota:'El manual da el límite en pies: 3 000 pies, unos 900 metros.' };
+}
+function construyeEstaciones(){ return [
+  { t:'El potrero', c:'El potrero', pags:[
+    { s:['Este es un potrero de clima frío, partido en [[franja|franjas]].', 'Las gallinas pasan unos días en una franja, con su [[gallinero|gallinero móvil]], y luego se corren a la siguiente.', 'A eso se le llama [[pastoreo|pastoreo rotativo]].'], nota:'Cuántos días en cada franja depende del potrero y del lote: las fuentes de este recorrido no dan una cifra única.' },
+    { s:['Si no se mueven, las gallinas se amontonan cerca del gallinero{19}.', 'Ahí se pela el pasto y se juntan el abono, los parásitos y los microbios{19}.', 'Al correr el gallinero, la franja de ayer queda vacía y el pasto vuelve a crecer{18}.'] },
+    { k:'tam', s:['La norma ecológica europea pide al menos 4 metros cuadrados de potrero por gallina{17}.', 'Con 20 gallinas, son 80 metros cuadrados: un cuadro de unos 9 por 9 metros.', 'La norma de bienestar de Colombia pone un techo de 4 gallinas por metro cuadrado de pastoreo{16}.'], nota:'Una norma da el espacio mínimo por gallina; la otra, el máximo de gallinas por metro. No miden lo mismo.' },
+    { s:['Las gallinas salen más lejos si tienen arbustos y árboles donde esconderse{17,19}.', 'En un ensayo de dos años, los cuadros con arbustos recién sembrados se llenaron de gallinas{19}.'] },
+    { s:['En el potrero picotean lombrices, insectos y arañas{8}.', 'Pero el pasto rinde menos energía y proteína que una ración: la gallina que pastorea necesita también su comida{20}.', 'La [[lombriz|lombriz roja]] es casi toda proteína; en un ensayo en el Valle reemplazó parte de la torta de soya{21}.'] },
+    { k:'hacer', s:['Mire dónde se echan sus gallinas y dónde se pela el potrero.', '¿Dónde sembraría arbustos para que se repartan?'] } ] },
+  { t:'La gallina', c:'La gallina', pags:[
+    { s:['Esta es una gallina [[criolla|criolla]] colorada.', 'Las criollas son de muchos colores y se crían sueltas{8}.', 'Mire la orejilla: si es roja, casi siempre pone huevo de color{3}.'] },
+    { cab:'¿Criolla o de línea?', s:['La gallina de [[linea|línea]] viene de una casa genética: se cría para poner muchos huevos{7}.', 'La criolla pone menos, pero empolla y saca sus pollitos.', 'En las fincas de Samaná, en Caldas, casi todas las aves nacían de huevos empollados en la misma finca{8}.'], nota:'Más adelante, bajando por el tiempo, se comparan las dos con números.' },
+    { cab:'Una gallina enferma', s:['El [[newcastle|Newcastle]] es una enfermedad de las aves causada por un virus{12}.', 'El ICA pide vigilar: tos, ronquido, moco, cabeza hinchada{11}; cuello torcido, temblores o parálisis{11}.', 'También diarrea verde blanquecina junto con esos signos, menos huevos, cáscaras finas y muertes de repente{11}.'] },
+    { cab:'Qué hacer', s:['Ante esos signos, avise de inmediato al ICA{11,13}.', 'El ICA debe atender el aviso en máximo 24 horas{11}.', 'Quien tenga aves debe aplicar el plan de vacunación contra el Newcastle{11,12}.'] },
+    { s:['En 2022 hubo cinco brotes en aves de traspatio y de pelea en el Cauca{12}.', 'En 2020 hubo jornadas de vacunación sin costo para predios con menos de 200 aves{15}.', 'Pregunte en la oficina local del ICA si hay jornada en su municipio.'] },
+    { cab:'El registro del ICA', s:['El ICA lleva el [[rspp|Registro Sanitario de Predio Pecuario]]{13}.', 'Para esa norma, el predio avícola incluye las aves de traspatio{13}.', 'Según la página del ICA, deben registrarse los predios con 200 aves o más{14}.', 'El trámite se hace en la oficina local del ICA{13}.'], nota:'Lo que diga la oficina local del ICA manda sobre este resumen.' },
+    { k:'hacer', s:['Cada mañana, mire el lote: ¿alguna gallina estornuda, tuerce el cuello o dejó de comer?', 'Anote cuántos huevos recoge cada día: si bajan de golpe, es una señal{11}.'] } ] },
+  { t:'Por dentro: un huevo en 25 horas', c:'Por dentro', pags:[
+    { s:['Por dentro, la gallina tiene un solo [[ovario|ovario]] que funciona: el izquierdo{1}.', 'Ahí maduran las [[yema|yemas]], que son sus óvulos{1}.', 'Una pollita nace con todos los óvulos que tendrá en la vida{1}.'] },
+    { s:['Cuando una yema está lista, el ovario la suelta al [[oviducto|oviducto]]{1}.', 'Estirado, el oviducto mide de 63 a 69 centímetros{2}.', 'Siga bajando y mire la hora en el recuadro: el huevo avanza con ella.'], nota:'El oviducto se dibuja más corto y enrollado de lo que es.' },
+    { s:['En el [[infundibulo|infundíbulo]] la yema pasa unos 15 minutos{1,2}.', 'Si hubo gallo, ahí se fecunda{1}.', 'En el [[magno|magno]], unas 3 horas, se le pega la clara{1,2} y se forman las [[chalaza|chalazas]]{3}.'] },
+    { s:['En el [[istmo|istmo]], algo más de una hora, recibe sus dos [[membranas|membranas]]{1,2}.', 'En el [[utero|útero]] pasa unas 20 horas{1,2}: se llena con agua y sales, y ahí se hace la cáscara{2,3}.', 'Al final le ponen la [[cuticula|cutícula]]{3}.'] },
+    { k:'cuando', s:['Del ovario a la puesta: unas 25 a 26 horas{1}.', 'La siguiente yema sale de 30 a 75 minutos después de poner{1}.', 'Casi nunca sale después de las 3 de la tarde: si puso tarde, al otro día descansa{1}.'] },
+    { k:'pensar', s:['¿Por qué su gallina no pone todos los días a la misma hora?'] } ] },
+  { t:'El huevo', c:'El huevo', pags:[
+    { s:['Este es el huevo cortado por la mitad.', 'La [[yema|yema]] es un 31 % del peso; la clara, un 58 %; la cáscara, un 11 %{2}.'] },
+    { s:['Las [[chalaza|chalazas]] son dos cordoncitos que sostienen la yema en su puesto{3}.', 'El puntico blanco sobre la yema es el [[disco|disco germinal]]{2}.'] },
+    { s:['Para poner, la gallina no necesita gallo{3}.', 'Sin gallo, la yema no se fecunda{1,3}: ese huevo es para comer, no da pollito.'] },
+    { s:['Recién puesto, el huevo no tiene [[camara|cámara de aire]]{2}.', 'Se forma al enfriarse, casi siempre en la punta ancha{2}.', 'Siga bajando: el huevo se enfría y aparece.'] },
+    { k:'hacer', s:['Parta un huevo en un plato y busque las chalazas y el disco germinal.', 'Mire la punta ancha del cascarón: ahí estaba la cámara de aire.'] } ] },
+  { t:'La cáscara', c:'La cáscara', pags:[
+    { s:['Esta es la cáscara vista de lado, muy de cerca.', 'Es casi toda [[carbonato|carbonato de calcio]]: del 94 al 96 %{2,4}.', 'Afuera lleva la cutícula; adentro, las dos membranas{2,4}.'] },
+    { k:'tam', s:['Mide unos 0,4 milímetros de grueso{5}.', 'La atraviesan miles de [[poro|poros]]: se cuentan de 10 000 a 20 000{6}.', 'La mayoría mide de 1 a 10 [[micra|micras]]{6,25}.'], nota:'Los poros del dibujo se ven más anchos de lo que son.' },
+    { s:['La cáscara no es un muro cerrado: por sus poros se comunica con el aire{4,6}.', 'Al poner, la cutícula tapa los poros{2}.'] },
+    { cab:'El calcio', s:['Una cáscara lleva unos 6 gramos de mineral{4}: unos 2,3 gramos de calcio.', 'Casi la mitad lo saca la gallina de sus huesos; el resto, de la comida{1}.', 'La guía de una línea de postura pide de 4,0 a 4,7 gramos de calcio al día{7}.'] },
+    { k:'pensar', s:['Si la ración no trae calcio, ¿de dónde lo saca la gallina?', 'Una cáscara delgada puede venir de la comida, de la herencia o de una enfermedad{2}.'] } ] },
+  { t:'La postura, semana a semana', c:'La postura', pags:[
+    { s:['Ahora bajamos por el tiempo, no por el tamaño.', 'Abajo están las semanas de vida de la gallina; siga bajando y mire el recuadro.'] },
+    { s:['La gallina de línea empieza hacia la semana 18 y a los 140 días ya pone la mitad de los días{7}.', 'En su mejor época pone del 93 al 97 % de los días{7}: 6 o 7 huevos por semana.'] },
+    { s:['Después baja despacio: a la semana 100 pone del 72 al 75 % de los días{7}.', 'Hasta ahí suma de 485 a 509 huevos{7}.', 'Come de 116 a 121 gramos de alimento al día{7}.'], nota:'Es la guía de la casa genética; ella misma dice que ese resultado pide buen manejo{7}.' },
+    { s:['En las fincas de Samaná, la criolla empezó a poner a los 6 o 7 meses{8}.', 'Puso en promedio el 46 % de los días: unos 3 huevos por semana{8}.', 'Sus huevos pesaron 58 gramos{8}.'], nota:'La banda verde es un promedio de fincas, no una curva medida semana a semana.' },
+    { s:['En esas fincas se moría cerca de una de cada cuatro aves al año{8}.', 'Las causas: males respiratorios, diarrea, Newcastle y parásitos, sin vacunar{8}.'] },
+    { cab:'Para decidir', s:['La de línea da más huevos, pero pide ración cada día: de 1,55 a 1,61 kilos por docena{7}.', 'La criolla da menos, come maíz, sobras y lo que encuentra, y saca sus pollitos{8}.', '¿Qué tiene su finca para darles de comer?'] } ] },
+  { t:'El pollo de engorde, día a día', c:'El engorde', pags:[
+    { s:['Ahora, el pollo de engorde de línea: abajo, sus días de vida.', 'Nace pesando 44 gramos{9}.'] },
+    { s:['A los 35 días pesa 2,3 kilos; a los 42, 3 kilos{9}.', 'Hasta el día 42 se come 4,6 kilos de alimento: kilo y medio por cada kilo de pollo{9}.'] },
+    { s:['La gallina criolla adulta de Samaná pesaba 1,9 kilos, y el gallo 2,1{8}.', 'El pollo de línea pasa ese peso antes de cumplir un mes y medio{9}.'] },
+    paginaFinca(),
+    { s:['Crecer tan rápido tiene un costo: el corazón falla por la presión en los pulmones{10}.', 'A eso se le llama [[ascitis|ascitis]], y la altura y el frío la empeoran{10}.'] },
+    { cab:'Para decidir', s:['Para huevo, la gallina de línea trabaja unas 100 semanas{7}; para carne, el pollo sale en unas 6{9}.', '¿Qué le rinde más en su finca: vender huevos cada semana o pollos cada tanto?'] } ] },
+  { t:'De vuelta al potrero', c:'La gallinaza', pags:[
+    { s:['Volvemos al potrero.', 'Cada gallina deja al día unos 86 gramos de [[gallinaza|gallinaza]] fresca, tres cuartas partes agua{22}.', 'Diez gallinas dejan unos 314 kilos al año.'] },
+    { s:['La gallinaza es rica: trae unas tres veces más nitrógeno que la boñiga de vaca{23}.'], nota:'Son promedios de estiércol almacenado; el de su finca cambia con la comida y la cama.' },
+    { cab:'Cruda, no', s:['La norma orgánica de Estados Unidos acepta el estiércol crudo solo si se entierra 120 días antes de cosechar lo que toca el suelo, o 90 días si no lo toca{24}.', 'Si no, pide compostarlo{24}.'], nota:'Se cita como referencia: en Colombia manda lo que pida su certificador o la norma que le aplique.' },
+    { cab:'El compost', s:['Mezcle la gallinaza con material seco: hojarasca, paja o aserrín.', 'Arranque con una [[carbononitrogeno|relación carbono a nitrógeno]] de 25 a 40{24}.', 'En hilera, la pila debe pasar de 55 a 77 grados 15 días, y voltearse al menos 5 veces{24}.'] },
+    { s:['Moviendo el gallinero, el abono se reparte y no se amontona en un solo sitio{19}.', 'La franja que descansa vuelve a crecer{18}.'] },
+    { k:'hacer', s:['Cuente sus gallinas y mida su potrero: ¿cuántos metros le tocan a cada una?', 'Arme una compostera con la cama del gallinero.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>` } ] },
+]; }
+let ESTACIONES = construyeEstaciones();
+const GLOS = [
+  ['franja', 'Franja', 'Un pedazo del potrero, cercado con malla, donde las gallinas pasan unos días antes de correrse al siguiente.'],
+  ['gallinero', 'Gallinero móvil', 'Un gallinero con ruedas que se arrastra de franja en franja: las gallinas duermen y ponen ahí y salen al pasto.'],
+  ['pastoreo', 'Pastoreo rotativo', 'Mover a los animales de franja en franja para que cada pedazo descanse y el pasto vuelva a crecer{18}.'],
+  ['lombriz', 'Lombriz roja', 'La lombriz de los lombricultivos. Su carne es sobre todo proteína{21}.'],
+  ['criolla', 'Gallina criolla', 'La gallina de las fincas, de muchos colores, que se cría suelta y empolla sus huevos{8}.'],
+  ['linea', 'Gallina de línea', 'Una gallina de casa genética, criada para poner muchos huevos o, en el pollo de engorde, para crecer rápido{7,9}.'],
+  ['newcastle', 'Newcastle', 'Una enfermedad de las aves causada por un virus. Es de aviso obligatorio al ICA{11,12}.'],
+  ['rspp', 'Registro Sanitario de Predio Pecuario', 'El registro del ICA para los predios con animales, gallinas incluidas{13}.'],
+  ['ovario', 'Ovario', 'Donde maduran las yemas. En la gallina solo funciona el izquierdo{1}.'],
+  ['yema', 'Yema', 'El óvulo de la gallina, con su reserva. Es un 31 % del peso del huevo{2}.'],
+  ['oviducto', 'Oviducto', 'El tubo por donde baja la yema mientras se le pone todo lo demás. Mide de 63 a 69 cm{2}.'],
+  ['infundibulo', 'Infundíbulo', 'La boca del oviducto, que recoge la yema. Ahí se fecunda, si hubo gallo{1}.'],
+  ['magno', 'Magno', 'El tramo más largo del oviducto: ahí se pega la clara{1,2}.'],
+  ['istmo', 'Istmo', 'El tramo angosto donde el huevo recibe sus dos membranas{1,2}.'],
+  ['utero', 'Útero', 'El tramo donde el huevo pasa unas 20 horas y se le hace la cáscara{1,2}. También se llama glándula de la cáscara.'],
+  ['membranas', 'Membranas', 'Dos telitas de fibras debajo de la cáscara{2,4}.'],
+  ['cuticula', 'Cutícula', 'La capa de afuera de la cáscara. Al poner, tapa los poros{2}.'],
+  ['chalaza', 'Chalazas', 'Dos cordoncitos de clara que sostienen la yema{3}.'],
+  ['disco', 'Disco germinal', 'El puntico blanco sobre la yema{2}.'],
+  ['camara', 'Cámara de aire', 'El espacio de aire en la punta ancha del huevo. Se forma cuando el huevo, ya puesto, se enfría{2}.'],
+  ['carbonato', 'Carbonato de calcio', 'El mineral de la cáscara: del 94 al 96 % de ella{2,4}.'],
+  ['poro', 'Poros', 'Los huequitos que atraviesan la cáscara. La mayoría miden de 1 a 10 micras{6}.'],
+  ['micra', 'Micra (µm)', 'La milésima parte de un milímetro{25}.'],
+  ['ascitis', 'Ascitis', 'Una falla del corazón del pollo por la presión en los pulmones. Pasa más con crecimiento rápido, altura y frío{10}.'],
+  ['gallinaza', 'Gallinaza', 'El estiércol de las gallinas. Es rico en nitrógeno{23}.'],
+  ['carbononitrogeno', 'Relación carbono a nitrógeno', 'Cuánto carbono (lo seco: hojarasca, paja) hay por cada parte de nitrógeno (lo verde y el estiércol) en una pila de compost{24}.'],
+];
+
+/* ============================================================
+   INTERFAZ (del café): medidor, estaciones por páginas, palabras
+   ============================================================ */
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '').replace(/<[^>]+>/g, ''); }
+
+const riel = $('riel');
+function pintaRiel(){ riel.innerHTML = ''; ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); }); ultEst = -1; }
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿Cuánto?', finca:'Su finca', cuando:'¿Cuándo?' };
+const cabDe = P => P.cab || (P.k ? CAB[P.k] : '');
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (cabDe(P)) h += `<p class="cab-pag">${cabDe(P)}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' || P.k === 'finca' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length){ voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct], cab = cabDe(P);
+  if (conTitulo) di(estAct.t + '.' + (cab ? ' ' + cab + '.' : ''), turno, sigue);
+  else if (cab) di(cab + '.', turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #eaa83c'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click', () => abreRepaso());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } }
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6],['nm',1e-9]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'nm'){ const v = m/k; if (v >= 999.5 && u !== 'm') continue; return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){ if (x < 10) return '×' + fmt3(x); const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2); return '×' + miles(Math.round(r)); }
+function fmtRegla(m){
+  const mm = m * 1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1 / mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / q) * q; }
+  return `caben ${miles(r)} en 1 mm`;
+}
+function fmtHora(h){ if (h < 0) return '0 h'; const hh = Math.floor(h), mm = Math.floor((h - hh)*60/15)*15; return mm ? `${hh} h ${mm} min` : `${hh} h`; }
+function momento(cam, st){
+  const L = cam.k === 'fade' ? (cam.t < 0.5 ? cam.A.L : cam.B.L) : cam.L;
+  if (L === 0) return st >= 7 ? 'gallinaza al compost' : 'franja de hoy';
+  if (L === 1) return 'criolla colorada';
+  if (L === 2){ const e = huevoEn(E.hora); return E.hora < 0 ? 'la yema, en el ovario' : `hora ${fmtHora(E.hora)} · ${e.tramo}`; }
+  if (L === 3) return E.enfria < 0.05 ? 'recién hecho' : E.enfria < 0.95 ? 'puesto, se enfría' : 'ya frío';
+  if (L === 4) return 'cáscara y membranas';
+  if (L === 5) return `semana ${Math.round(E.semana)}`;
+  return `día ${Math.round(E.dia)}`;
+}
+function medidorModo(cam){
+  const L = cam.k === 'fade' ? (cam.t < 0.5 ? cam.A.L : cam.B.L) : cam.L;
+  const pon = (id, t) => { const el = $(id); if (el.textContent !== t) el.textContent = t; };
+  if (L === 5){
+    const w = E.semana, lo = interp(HYL, w, 1), hi = interp(HYL, w, 2);
+    pon('rEscala', 'Edad de la gallina'); rueda($('vEscala'), `semana ${Math.round(w)}`);
+    pon('rAumento', 'Pone (línea)'); rueda($('vAumento'), `${Math.round(lo)} a ${Math.round(hi)} %`);
+    pon('rRegla', 'Criolla (promedio):'); const t = w < CRIOLLA.ini0 ? 'aún no pone' : w < CRIOLLA.ini1 ? 'empieza a poner' : '46 % de los días'; const vR = $('vRegla'); if (vR._s !== t){ vR._s = t; vR.textContent = t; }
+    return;
+  }
+  if (L === 6){
+    const d = E.dia, g = interp(ROSS, d, 1), f = interp(ROSS, d, 2);
+    pon('rEscala', 'Edad del pollo'); rueda($('vEscala'), `día ${Math.round(d)}`);
+    pon('rAumento', 'Pesa (línea)'); rueda($('vAumento'), g < 1000 ? `${Math.round(g)} g` : `${fmt3(g/1000)} kg`);
+    pon('rRegla', 'Ha comido:'); const t = f < 1000 ? `${Math.round(f)} g de alimento` : `${fmt3(f/1000)} kg de alimento`; const vR = $('vRegla'); if (vR._s !== t){ vR._s = t; vR.textContent = t; }
+    return;
+  }
+  const ancho = anchoVista(cam);
+  pon('rEscala', 'Ancho de lo que ve'); rueda($('vEscala'), fmtEscala(ancho));
+  pon('rAumento', 'Aumento'); rueda($('vAumento'), fmtAumento(anchoInicial / ancho));
+  pon('rRegla', 'En su regla:'); const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+}
+let anchoInicial = 0;
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  medidorModo(cam);
+  let st = 0; for (let i = 0; i < NEST; i++){ if (p >= EST[i].a - 0.4) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const cap = vis ? 'e' + st : '';
+  $('vEstacion').textContent = `${st+1}/${NEST} · ${e.c}`;
+  const mo = momento(cam, st); if ($('vMomento').textContent !== mo) $('vMomento').textContent = mo;
+  const L = cam.k === 'fade' ? cam.B.L : cam.L;
+  const nota = L >= 5 ? 'Cifras de guías y de fincas; ver Fuentes.' : L >= 2 ? 'Tamaños aproximados. Colores de dibujo.' : 'Tamaños aproximados.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap;
+    detenVoz();
+    if (!cap){ fr.classList.remove('ver'); }
+    else {
+      estAct = e; pagAct = 0;
+      $('fNum').textContent = `Estación ${st+1} de ${NEST}`;
+      $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver');
+      $('anuncio').textContent = `Estación ${st+1}: ${estAct.t}`;
+    }
+  }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  const op = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.opacity = op; $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  riel.classList.toggle('callado', p < 0.6);
+  const enFinca = !!cap && estAct.pags[pagAct] && estAct.pags[pagAct].k === 'finca';
+  $('ubicacion').classList.toggle('oculto', p > 0.3 && !enFinca);
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena: señalan la parte de la que habla el texto ---------- */
+const enSuelo = (u, y) => [u*sc(y), y];
+function etqEstacion(st){
+  if (st === 0){ const g = GALLINERO; return [['Gallinero móvil', g.u*sc(g.y) - 0.01, g.y - 0.04*sc(g.y)], ['Franja de hoy', ...enSuelo(0.08, 0.33)], ['Franja de ayer', ...enSuelo(-0.13, 0.2)], ['Descansa', ...enSuelo(-0.27, 0.12)], ['Próxima franja', ...enSuelo(0.22, 0.3)]]; }
+  if (st === 1){ const hx = (x, y) => [KG*x, HEN_Y + KG*y]; return [['Cresta', ...hx(0.31, -0.74)], ['Orejilla roja', ...hx(0.283, -0.642)], ['Golilla', ...hx(0.2, -0.53)], ['Lombriz', G1.lombriz[18][0], G1.lombriz[18][1]]]; }
+  if (st === 2){ const out = [['Ovario', 0.14, -0.2], ['Infundíbulo', 0.035, -0.105], ['Magno', -0.19, -0.03], ['Istmo', 0.06, 0.11], ['Útero', -0.06, 0.2], ['Cloaca', -0.27, 0.176]]; return E.ventana > 0.8 ? out : []; }
+  if (st === 3){ const Y = HUEVO.yema; const out = [['Yema', Y.x + Y.r*0.5, Y.y + Y.r*0.4], ['Clara', 0.26, 0.14], ['Chalaza', -0.26, 0.0], ['Disco germinal', Y.x, Y.y - Y.r + 0.006], ['Cáscara', 0.05, HUEVO.b*1.02]]; if (E.enfria > 0.5) out.push(['Cámara de aire', HUEVO.a - 0.03, 0.12]); return out; }
+  if (st === 4){ const P = CAS.poros[0]; return [['Cutícula', 0.12, CAS.y0 - 0.005], ['Poro', P.x, CAS.y0 + 0.14], ['Calcita', 0.2, CAS.y0 + 0.08], ['Membranas', -0.25, CAS.y1 + 0.03], ['Clara', 0.05, CAS.y1 + 0.2]]; }
+  if (st === 7){ const g = GALLINERO; return [['Compostera', COMPOST.x, COMPOST.y - 0.035*sc(COMPOST.y)], ['Franja que descansa', ...enSuelo(-0.27, 0.1)], ['Gallinaza', ...enSuelo(-0.12, 0.12)], ['Gallinero móvil', g.u*sc(g.y) - 0.01, g.y - 0.04*sc(g.y)]]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(22,15,9,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(22,15,9,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); if (!$('ubicacion').classList.contains('oculto')) o.push($('ubicacion').getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  if (cam.k === 'lvl' && cap && cap[0] === 'e' && cam.L === EST[st].L && cam.L < 5 && !(st === 0 && p < 0.5)) lista = etqEstacion(st);
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const Ee = nodoEtq(i);
+    if (!it){ Ee.el.style.opacity = 0; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (Ee.txt !== txt){ Ee.txt = txt; Ee.el.textContent = txt; Ee.w = Ee.el.offsetWidth; Ee.h = Ee.el.offsetHeight; }
+    const w = Ee.w || 80, h = Ee.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break; } }
+    const op = ok ? 1 : 0;
+    Ee.el.style.opacity = op; Ee.ln.style.opacity = Ee.halo.style.opacity = Ee.pt.style.opacity = op;
+    if (!ok) continue;
+    Ee.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const Ln of [Ee.ln, Ee.halo]){ Ln.setAttribute('x1', ax.toFixed(1)); Ln.setAttribute('y1', ay.toFixed(1)); Ln.setAttribute('x2', lx.toFixed(1)); Ln.setAttribute('y2', ly.toFixed(1)); }
+    Ee.pt.setAttribute('cx', ax.toFixed(1)); Ee.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿Cuál de estas es la cáscara vista de muy cerca?', ops:[{ m:3, n:'El huevo' }, { m:4, n:'La cáscara' }, { m:0, n:'El potrero' }], ok:1, si:'Eso es: columnas de calcita, con la cutícula encima y las membranas debajo.', no:'Esa no. Busque la tajada con columnitas.' },
+  { q:'¿Cuánto tarda la gallina en hacer un huevo?', ops:[{ t:'Unas 25 horas' }, { t:'Una semana' }, { t:'Una hora' }], ok:0, si:'Eso es: unas 25 a 26 horas, del ovario a la puesta.', no:'Mire otra vez el reloj del recuadro, allá adentro.' },
+  { q:'¿Dónde pasa el huevo más tiempo?', ops:[{ t:'En el magno' }, { t:'En el útero' }, { t:'En el istmo' }], ok:1, si:'Eso es: unas 20 horas en el útero, donde se le hace la cáscara.', no:'Esa no. Piense en dónde se hace la cáscara.' },
+  { q:'¿Hace falta gallo para que la gallina ponga?', ops:[{ t:'Sí, siempre' }, { t:'No' }, { t:'Solo con frío' }], ok:1, si:'Eso es: pone igual. Sin gallo, el huevo no da pollito.', no:'Esa no. La gallina pone con gallo o sin gallo.' },
+  { q:'Una gallina tuerce el cuello y se empiezan a morir otras. ¿Qué hace?', ops:[{ t:'Avisar al ICA de inmediato' }, { t:'Esperar una semana' }, { t:'Venderlas rápido' }], ok:0, si:'Eso es: pueden ser signos de Newcastle, y el aviso al ICA es inmediato.', no:'Esa no. Esos son signos que el ICA pide avisar.' },
+  { q:'¿Qué hace con la gallinaza antes de abonar la huerta?', ops:[{ t:'Compostarla' }, { t:'Echarla fresca a la lechuga' }, { t:'Quemarla' }], ok:0, si:'Eso es: compostada, con material seco y bien caliente.', no:'Esa no. Cruda no va a lo que se come.' },
+];
+let mini = {};
+function miniatura(i, lado){
+  const k = i + ':' + lado; if (mini[k]) return mini[k];
+  const g = { W, H, S, DPR, PORT, bw: buf.width, bh: buf.height, E };
+  W = H = S = lado; DPR = 1; PORT = false; buf.width = buf.height = lado;
+  const c = document.createElement('canvas'); c.width = c.height = lado; const x = c.getContext('2d', { alpha: false });
+  const pp = estP(i); E = estado(pp); const cam = camAt(pp);
+  try { if (cam.k === 'lvl') pintaNivel(x, cam.L, cam.cx, cam.cy, cam.f); } finally { ({ W, H, S, DPR, PORT, E } = g); buf.width = g.bw; buf.height = g.bh; sucio = true; }
+  return (mini[k] = c);
+}
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó del potrero a la cáscara del huevo, pasó por el tiempo y volvió al potrero.</p><p>Mañana, al recoger los huevos, mire la hora y la punta ancha.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver al potrero</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80) / 3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){ b.appendChild(miniatura(o.m, lado)); const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+/* «Bajar» va de parada en parada y se detiene: quien lee despacio decide cuándo seguir.
+   En la estación de las 25 horas para también a mitad, con el huevo ya en el útero. */
+function paradas(){ const h2 = segDe(2); const out = []; for (let i = 0; i < NEST; i++){ out.push(estP(i)); if (i === 2) out.push(h2.b - 0.12); } return out.sort((a, b) => a - b); }
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un fondo sintetizado, suave, que se apaga al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+function rotuloSon(){ bSon.querySelector('.est').textContent = audio && audio.on ? 'sí' : 'no'; bSon.setAttribute('aria-pressed', String(!!(audio && audio.on))); bSon.setAttribute('aria-label', audio && audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar el fondo del potrero'); }
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC){ bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.frequency.value = 1400; filtro.connect(master);
+      const oscs = [[110, 'triangle', 0.3], [164.8, 'sine', 0.2], [220.6, 'sine', 0.12], [55, 'sine', 0.3]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.07 : 0, t, 0.25);
+    rotuloSon();
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(cam){
+  if (!audio || !audio.on) return; const t = audio.ac.currentTime;
+  const L = cam.k === 'fade' ? cam.B.L : cam.L;
+  const claro = L <= 1 ? 1 : L >= 5 ? 0.6 : 0.3;
+  audio.filtro.frequency.setTargetAtTime(300 + 1400*claro, t, 0.4);
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height; buf2.width = cv.width; buf2.height = cv.height;
+  anchoInicial = F[0] * holdIni(SEGS[0]).f * (W / S);
+  prepFondo0(); prepFondo1();
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom);
+  document.documentElement.style.setProperty('--ubic-top', (mb + 10) + 'px');
+  const ub = $('ubicacion'), abierto = ub.open; ub.open = false; const ubb = Math.round(ub.getBoundingClientRect().bottom); ub.open = abierto;
+  tt.style.top = W <= 640 ? (ubb + 10) + 'px' : '';
+  mini = {};
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   LA FINCA: interfaz de altitud
+   ============================================================ */
+function mostrarOrigen(){
+  const sum = altura === null ? 'Altitud de ejemplo · toque para poner la suya' : `${origenAlt} · ${fmtM(altura)} m${municipio ? ' · ' + municipio : ''}`;
+  $('origenPiso').textContent = sum;
+  $('alturaFinca').value = altura === null ? '' : altura;
+  $('detallePiso').textContent = altura === null ? 'La altitud de su finca cambia lo que se enseña del pollo de engorde. Nada de esto se guarda ni se envía.' : ALTA() ? 'Por encima de 900 m, el pollo de engorde de crecimiento rápido corre riesgo de ascitis.' : 'Por debajo de 900 m: el frío de los primeros días sigue contando.';
+}
+function cambiarAltura(alt, fuente){
+  altura = alt; origenAlt = fuente;
+  ESTACIONES = construyeEstaciones(); pintaRiel(); mini = {};
+  ultCap = ''; sucio = true; mostrarOrigen();
+}
+$('alturaManual').addEventListener('submit', e => { e.preventDefault(); const alt = numero($('alturaFinca').value, 0, 6000); if (alt !== null){ cambiarAltura(alt, 'Altitud que usted dio'); $('ubicacion').open = false; } });
+$('usarUbicacion').addEventListener('click', () => {
+  const estado2 = $('estadoUbicacion');
+  if (!navigator.geolocation){ estado2.textContent = 'Este navegador no ofrece ubicación. Escriba la altitud de su finca.'; return; }
+  estado2.textContent = 'Esperando su permiso de ubicación…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const alt = numero(pos.coords.altitude, 0, 6000);
+    if (alt === null){ estado2.textContent = 'El aparato dio coordenadas sin altitud. Escriba los metros de su finca.'; return; }
+    cambiarAltura(alt, 'Altitud del aparato (aproximada)'); estado2.textContent = 'La altitud del aparato puede ser distinta de la de la finca.'; $('ubicacion').open = false;
+  }, err => { estado2.textContent = err.code === 1 ? 'Permiso de ubicación no concedido. Escriba la altitud de su finca.' : 'No se pudo obtener la ubicación. Escriba la altitud de su finca.'; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+});
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+let congelado = qs.has('quieto');
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (!RM && !congelado) RELOJ += dt;
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 90) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i); if (rmHacia === null){ rmHacia = meta; p = meta; } if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; } }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (!RM && !congelado && animado(camAt(p))) sucio = true;
+  if (sucio){
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      cam = render(rmDesde); b2ctx.setTransform(1,0,0,1,0,0); b2ctx.clearRect(0, 0, buf2.width, buf2.height); b2ctx.drawImage(cv, 0, 0);
+      const copia = document.createElement('canvas'); copia.width = buf2.width; copia.height = buf2.height; copia.getContext('2d').drawImage(buf2, 0, 0);
+      cam = render(rmHacia);
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(copia, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render(p);
+    actualizaUI(cam); sonido(cam);
+    sucio = RM && rmT < 1;
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+pintaRiel();
+prepTexturas();
+redim();
+mostrarOrigen();
+if (altura === null){
+  const lat = numero(qs.get('lat'), -90, 90), lon = numero(qs.get('lon'), -180, 180);
+  if (lat !== null && lon !== null) $('estadoUbicacion').textContent = 'La app entregó coordenadas sin altitud. Escriba los metros de su finca.';
+  else if (qs.has('alt')) $('estadoUbicacion').textContent = 'La altitud de la dirección no es válida. Escriba los metros de su finca.';
+  if (qs.has('lat') || qs.has('alt')) $('ubicacion').open = true;
+}
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el FPS; no altera nada) */
+window.__descenso = {
+  T, SEGS, EST, estP, camAt, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  congelar(v){ congelado = !!v; sucio = true; },
+  get altura(){ return altura; }, get alta(){ return ALTA(); },
+  estado(){ return Object.assign({}, E); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, GLOS, PREG }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); const med = dts[Math.floor(dts.length/2)], p95 = dts[Math.floor(dts.length*0.95)]; res({ cuadros: marcas.length, ms: marcas[marcas.length-1] - marcas[0], fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: med, p95Ms: p95, dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

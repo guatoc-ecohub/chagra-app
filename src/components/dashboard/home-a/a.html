@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chagra. su finca</title>
+<meta name="description" content="La portada de Chagra con sesión iniciada: la finca entera en una ladera, y cada lugar lleva a su parte de la app.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#bcd9e6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 21V11%22 stroke=%22%232f5d1e%22 stroke-width=%222%22/%3E%3Cpath d=%22M12 12C12 7 8 4 3 4c0 5 4 8 9 8Z%22 fill=%22%236aa843%22/%3E%3Cpath d=%22M12 14c0-4 3-7 8-7 0 4-3 7-8 7Z%22 fill=%22%23a7c957%22/%3E%3C/svg%3E">
+<style>
+:root{
+  --tinta:#2b2118; --tinta-2:#4a3b2c; --papel:#f7efda; --papel-2:#efe4c6; --hueso:#fffdf4;
+  --verde:#2f5d1e; --verde-2:#3f6429; --verde-claro:#a7c957; --oro:#e9b949; --teja:#b5542c; --añil:#2f6f8f;
+  --noche:#16200f; --claro:#f3f1e8;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --borde:2px solid #3a2c1f; --sombra:0 3px 0 #3a2c1f;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-bottom:96px}
+body{margin:0;background:var(--papel);color:var(--tinta);font-family:var(--sans);font-size:16px;line-height:1.45;overflow-x:hidden}
+body.en-sala{overflow:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+.oculto{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- la ladera ---------- */
+.finca{position:relative;height:clamp(470px,64svh,640px);overflow:hidden;background:#bcd9e6;isolation:isolate;touch-action:pan-y}
+.capa{position:absolute;inset:0;width:100%;height:100%;display:block;will-change:transform;pointer-events:none}
+.capa.toca{pointer-events:auto}
+.capa .lugar{cursor:pointer;pointer-events:auto}
+@media (min-width:1000px){.finca{height:clamp(560px,70vh,700px)}}
+
+/* paralaje de scroll en el compositor (sin JS): cada plano sube según su profundidad --p */
+@supports (animation-timeline: scroll()){
+  .capa,.letrero{animation:subir linear both;animation-timeline:scroll(root block);animation-range:0 100vh}
+  @keyframes subir{to{translate:0 calc(var(--p,0) * -60px)}}
+}
+/* cielo por hora: las paradas del degradado leen estas variables */
+body{--c-alto:#8fc3dc;--c-medio:#bcdcea;--c-bajo:#f3e7c4;--sol:#f9d86b;--lejos:#a9c0cd;--lejos-2:#8eaab0;--paramo:#869f84;--luz:1}
+body[data-hora="amanecer"]{--c-alto:#7fa9cf;--c-medio:#e9c7b3;--c-bajo:#f6d59a;--sol:#fbc56a;--lejos:#b3b6c8;--lejos-2:#8fa2ab}
+body[data-hora="tarde"]{--c-alto:#6f8fbf;--c-medio:#e8b38c;--c-bajo:#f4c77b;--sol:#f7a94e;--lejos:#a4a3bd;--lejos-2:#83919f}
+body[data-hora="noche"]{--c-alto:#0b1430;--c-medio:#1c2c55;--c-bajo:#34466f;--sol:#f3eecf;--lejos:#2d3b5c;--lejos-2:#263552;--paramo:#2f3f47;--luz:.42}
+.estrellas,.luna,.ventana-luz,.luciernagas{opacity:0;transition:opacity 1.2s ease}
+body[data-hora="noche"] .estrellas,body[data-hora="noche"] .luna,body[data-hora="noche"] .ventana-luz,body[data-hora="noche"] .luciernagas{opacity:1}
+body[data-hora="noche"] .sol{opacity:0}
+.sol{transition:opacity 1.2s ease}
+/* de noche la tierra se oscurece sin redibujar: un filtro por capa, que el compositor aplica solo a lo que esa capa pinta */
+.tierra{transition:filter 1.2s ease}
+body[data-hora="noche"] .tierra{filter:brightness(.52) saturate(.7) hue-rotate(12deg)}
+body[data-hora="tarde"] .tierra{filter:sepia(.18) saturate(1.08)}
+body[data-hora="amanecer"] .tierra{filter:brightness(.96) sepia(.1)}
+
+/* movimiento de fondo (se apaga con reduced-motion) */
+.nube{animation:nube 90s linear infinite alternate}
+.nube.n2{animation-duration:120s;animation-delay:-40s}
+.nube.n3{animation-duration:75s;animation-delay:-20s}
+@keyframes nube{from{transform:translateX(-40px)}to{transform:translateX(60px)}}
+.humo circle{transform-box:fill-box;transform-origin:center;animation:humo 5.5s ease-out infinite;opacity:0}
+.humo circle:nth-child(2){animation-delay:1.8s}.humo circle:nth-child(3){animation-delay:3.6s}
+@keyframes humo{0%{transform:translate(0,0) scale(.5);opacity:0}15%{opacity:.75}100%{transform:translate(14px,-46px) scale(1.9);opacity:0}}
+.cola{transform-box:fill-box;transform-origin:0 0;animation:cola 3.2s ease-in-out infinite}
+@keyframes cola{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+.picotea{transform-box:fill-box;transform-origin:50% 100%;animation:pica 2.6s ease-in-out infinite}
+.picotea.p2{animation-delay:-1.1s}.picotea.p3{animation-delay:-.4s}
+@keyframes pica{0%,70%,100%{transform:rotate(0)}78%{transform:rotate(-24deg)}86%{transform:rotate(0)}}
+.bandera{transform-box:fill-box;transform-origin:0 50%;animation:flamea 2.4s ease-in-out infinite}
+@keyframes flamea{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-5deg) scaleX(.92)}}
+.luciernagas circle{animation:luz 3s ease-in-out infinite}
+.luciernagas circle:nth-child(2n){animation-delay:-1.3s}.luciernagas circle:nth-child(3n){animation-delay:-2.2s}
+@keyframes luz{0%,100%{opacity:.1}50%{opacity:1}}
+.niebla{transition:transform 2.2s cubic-bezier(.3,.1,.2,1),opacity 2s ease}
+.niebla.ida .banco-i{transform:translateX(-70%)}
+.niebla.ida .banco-d{transform:translateX(70%)}
+.niebla.ida{opacity:0}
+.niebla .banco-i,.niebla .banco-d{transition:transform 2.2s cubic-bezier(.3,.1,.2,1)}
+
+/* letreros: una tablita clavada en cada lugar */
+.letreros{position:absolute;inset:0;z-index:4;pointer-events:none}
+.letrero{position:absolute;left:0;top:0;pointer-events:auto;display:flex;flex-direction:column;align-items:center;text-decoration:none;
+  transform:translate3d(var(--x,0),var(--y,0),0);transition:opacity .45s ease,scale .45s cubic-bezier(.3,1.4,.5,1);touch-action:manipulation}
+.letrero .tabla{display:block;padding:5px 11px 6px;background:#f4e1b5;border:var(--borde);border-radius:7px;box-shadow:var(--sombra);text-align:center;white-space:nowrap;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 40%),repeating-linear-gradient(90deg,rgba(120,80,40,.07) 0 2px,transparent 2px 9px)}
+.letrero b{display:block;font-family:var(--serif);font-size:1.02rem;font-weight:700;line-height:1.15;color:var(--tinta)}
+.letrero small{display:block;font-size:.74rem;line-height:1.2;color:#47372a;margin-top:1px}
+.letrero .estaca{display:block;width:4px;height:16px;background:#5a3d22;border-radius:0 0 2px 2px}
+.letrero.abajo{flex-direction:column-reverse}
+.letrero.abajo .estaca{height:8px;background:transparent}
+.letrero:hover .tabla,.letrero:focus-visible .tabla{background-color:#fff2cc;translate:0 -2px}
+.letrero:active .tabla{translate:0 1px;box-shadow:0 1px 0 #3a2c1f}
+.letreros.antes .letrero{opacity:0;scale:.6}
+@media (min-width:1000px){.letrero b{font-size:1.18rem}.letrero small{font-size:.82rem}.letrero .tabla{padding:7px 14px 8px}}
+
+/* barra de arriba */
+.arriba{position:absolute;z-index:6;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;
+  padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left))}
+.marca{flex-shrink:0;display:flex;align-items:center;gap:7px;text-decoration:none;padding:4px 10px 4px 6px;border-radius:999px;background:rgba(255,253,244,.92);border:var(--borde)}
+.marca svg{width:24px;height:24px}
+.marca span{font-family:var(--serif);font-weight:700;font-size:1.12rem;letter-spacing:.01em}
+.ubicar{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:999px;background:rgba(255,253,244,.92);border:var(--borde);cursor:pointer;font-size:.86rem;font-weight:600;white-space:nowrap}
+.ubicar svg{width:16px;height:16px}
+.arriba .der{margin-left:auto;display:flex;gap:6px}
+.redondo{position:relative;flex-shrink:0;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,253,244,.92);border:var(--borde);cursor:pointer;padding:0}
+.redondo svg{width:20px;height:20px}
+.redondo .punto{position:absolute;top:-4px;right:-4px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#b3261e;color:#fff;font-size:.72rem;font-weight:700;line-height:19px;border:2px solid #fffdf4}
+@media (max-width:460px){.marca span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.marca{padding:0;width:44px;height:44px;justify-content:center}}
+@media (max-width:340px){.ubicar span{display:none}.ubicar{width:44px;padding:0;justify-content:center}}
+
+/* Angelita */
+#compai{position:absolute;left:0;top:0;z-index:5;cursor:pointer;touch-action:manipulation;will-change:transform}
+#compai-img{position:absolute;left:0;top:0;z-index:5;cursor:pointer;display:none;will-change:transform}
+#compai,#compai-img{display:none!important}
+
+/* ---------- el cuaderno (debajo de la ladera) ---------- */
+.cuaderno{position:relative;z-index:1;margin-top:-18px;padding:24px max(14px,env(safe-area-inset-left)) 120px;background:var(--papel);border-radius:22px 22px 0 0;
+  border-top:var(--borde);display:grid;gap:22px}
+@media (min-width:1000px){
+  .cuaderno{grid-template-columns:repeat(12,1fr);gap:26px;padding:34px max(32px,calc((100vw - 1240px)/2)) 60px}
+  .hoja-hoy{grid-column:1/6}.hoja-anote{grid-column:6/13}.hoja-rueda{grid-column:1/8}.hoja-lado{grid-column:8/13}
+}
+.hoja{background:var(--hueso);border:var(--borde);border-radius:16px;box-shadow:var(--sombra);padding:16px 16px 18px}
+.hoja h2{margin:0 0 4px;font-family:var(--serif);font-size:1.35rem;line-height:1.2;font-weight:700}
+.hoja .ante{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#5b4a38;margin-bottom:6px}
+.hoja p{margin:.3em 0}
+.suave{color:#4f4032}
+
+/* almanaque */
+.almanaque{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
+.dia{grid-row:span 2;width:84px;text-align:center;border:var(--borde);border-radius:10px;overflow:hidden;background:#fff}
+.dia .mes{display:block;background:#a8321f;color:#fff;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 0}
+.dia .num{display:block;font-family:var(--serif);font-size:2.4rem;font-weight:700;line-height:1.05;padding:3px 0 0;color:var(--tinta)}
+.dia .sem{display:block;font-size:.75rem;padding:0 0 5px;color:#4f4032}
+.luna-hoy{display:flex;align-items:center;gap:8px;font-size:.92rem}
+.luna-hoy svg{width:26px;height:26px;flex:none}
+.clima{font-size:.95rem}
+.recado{margin-top:14px;padding:12px 14px;border-radius:12px;background:#f1f6e4;border:1.5px solid #6f8f45;position:relative}
+.recado .quien{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#2f4a17;margin-bottom:4px}
+.recado .quien canvas{width:28px;height:28px}
+.recado p{font-family:var(--serif);font-size:1.06rem;line-height:1.35;margin:0}
+.fila{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.boton{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:var(--borde);background:#fff;cursor:pointer;font-size:.9rem;font-weight:600;text-decoration:none;box-shadow:0 2px 0 #3a2c1f}
+.boton:active{translate:0 1px;box-shadow:0 1px 0 #3a2c1f}
+.boton[aria-pressed="true"]{background:#2f5d1e;color:#fff}
+.boton svg{width:17px;height:17px}
+.boton.verde{background:#2f5d1e;color:#fff}
+.dos{display:inline-flex;border:var(--borde);border-radius:999px;overflow:hidden;box-shadow:0 2px 0 #3a2c1f}
+.dos button{border:0;background:#fff;min-height:38px;padding:0 13px;cursor:pointer;font-size:.88rem;font-weight:600}
+.dos button[aria-pressed="true"]{background:#2f5d1e;color:#fff}
+details.pronostico{margin-top:10px;border-top:1px dashed #b9a57f;padding-top:8px}
+details.pronostico summary{cursor:pointer;font-weight:600;font-size:.93rem;min-height:32px;display:flex;align-items:center;gap:6px}
+.siete{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;text-align:center;font-size:.78rem}
+.siete span{border:1px solid #cdbb95;border-radius:8px;padding:6px 0;background:#fbf6e8;color:#4f4032}
+.siete b{display:block;font-size:.8rem;color:var(--tinta)}
+.enlace{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-weight:600;font-size:.93rem;text-underline-offset:3px;cursor:pointer;background:none;border:0;padding:4px 0;text-decoration:underline}
+
+/* anote */
+.sellos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+@media (min-width:600px){.sellos{grid-template-columns:repeat(4,1fr)}}
+.sello{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 12px 13px;border:var(--borde);border-radius:14px;background:#fff;text-align:left;cursor:pointer;box-shadow:0 3px 0 #3a2c1f;min-height:128px;text-decoration:none}
+.sello:active{translate:0 2px;box-shadow:0 1px 0 #3a2c1f}
+.sello svg{width:46px;height:46px}
+.sello b{font-family:var(--serif);font-size:1.08rem;line-height:1.15}
+.sello small{font-size:.8rem;line-height:1.25;color:#4f4032}
+.bitacora{display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;padding:12px 14px;border:var(--borde);border-radius:14px;background:#2f5d1e;color:#fff;cursor:pointer;text-align:left;box-shadow:0 3px 0 #1b2c10}
+.bitacora svg{width:38px;height:38px;flex:none}
+.bitacora b{display:block;font-family:var(--serif);font-size:1.12rem}
+.bitacora small{display:block;font-size:.84rem;color:#e7efd7}
+.bitacora .flecha{margin-left:auto;font-size:1.3rem}
+
+/* rueda */
+.rueda-caja{display:grid;grid-template-columns:1fr;gap:12px;align-items:center}
+@media (min-width:600px){.rueda-caja{grid-template-columns:260px 1fr}}
+.rueda{width:min(260px,76vw);height:auto;justify-self:center;display:block}
+.rueda .fase{cursor:pointer}
+.rueda .fase path{transition:transform .3s ease;transform-box:fill-box;transform-origin:center}
+.rueda .fase:hover path,.rueda .fase[aria-pressed="true"] path{stroke-width:3}
+.rueda .fase[aria-pressed="true"] path{filter:brightness(1.08)}
+.rueda text{font-family:var(--sans);font-size:11.5px;font-weight:700;fill:#2b2118;pointer-events:none}
+.fase-info{font-size:.95rem}
+.fase-info b{font-family:var(--serif);font-size:1.15rem}
+.fichas{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:.78rem}
+.fichas span{padding:3px 9px;border-radius:999px;border:1px solid #9f8a62;background:#fbf6e8;color:#3f3124}
+
+/* compañero */
+.compas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.compa{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 8px;border:1.5px solid #b9a57f;border-radius:12px;background:#fff;cursor:pointer;font-size:.74rem;line-height:1.15;text-align:center;color:var(--tinta)}
+.compa img,.compa canvas{width:56px;height:56px;object-fit:contain}
+.compa[aria-pressed="true"]{border:var(--borde);background:#f1f6e4;box-shadow:0 2px 0 #3a2c1f}
+.pie{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;align-items:center;font-size:.86rem;color:#4f4032;padding-top:4px}
+.pie button,.pie a{background:none;border:0;padding:6px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;color:var(--tinta);font-size:.9rem}
+@media (min-width:1000px){.pie{grid-column:1/13}}
+
+/* ---------- el tablero (abajo en el teléfono, a un lado en escritorio) ---------- */
+.tablero{position:fixed;z-index:10;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;
+  padding:10px max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  background:#1b2415;color:var(--claro);border-top:2px solid #0e140a;box-shadow:0 -10px 30px -12px rgba(0,0,0,.55)}
+.hableme{display:flex;align-items:center;gap:12px;flex:1;min-width:0;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--claro)}
+.hableme .mic{flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--verde-claro);color:#16210f;box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+.hableme .mic svg{width:26px;height:26px}
+.hableme b{display:block;font-family:var(--serif);font-size:1.15rem;line-height:1.2}
+.hableme small{display:block;font-size:.8rem;color:#d4d8c8}
+.pendientes{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid #6d7a5c;background:transparent;color:var(--claro);cursor:pointer;font-size:.82rem}
+.pendientes i{width:9px;height:9px;border-radius:50%;background:#7bd389;flex:none}
+@media (min-width:1000px){
+  .tablero{padding:8px max(32px,calc((100vw - 1240px)/2))}
+  .hableme .mic{width:46px;height:46px}
+}
+@media (max-width:360px){.pendientes .txt{display:none}}
+
+/* ---------- la sala: a donde lleva cada lugar ---------- */
+#sala{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:var(--papel);clip-path:circle(0 at 50% 50%)}
+#sala.abierta{display:flex}
+#sala.anim{transition:clip-path .6s cubic-bezier(.5,0,.2,1)}
+#sala .barra{flex:none;display:flex;align-items:center;gap:12px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;border-bottom:var(--borde);background:#1b2415;color:var(--claro)}
+#salir{display:inline-flex;align-items:center;gap:.4em;min-height:40px;padding:0 1em;border-radius:999px;border:1px solid #9aa58a;background:transparent;color:var(--claro);cursor:pointer;font-weight:600;white-space:nowrap}
+#sala .titulo-barra{font-family:var(--serif);font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sala .cuerpo{flex:1;overflow:auto;padding:28px 18px;display:grid;place-content:start center;gap:14px;max-width:640px;margin:0 auto;width:100%}
+#sala h2{font-family:var(--serif);font-size:2rem;line-height:1.1;margin:0}
+#sala .pantalla{display:inline-block;font-family:var(--mono);font-size:.85rem;background:#fff;border:1.5px solid #9f8a62;border-radius:8px;padding:3px 8px}
+#sala .nota{font-size:.88rem;color:#4f4032;border-top:1px dashed #b9a57f;padding-top:10px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .niebla{display:none}
+}
+
+@media(max-width:999px){.finca{height:clamp(528.75px,72svh,720px)}}
+.letrero .tabla{padding:12px 18px;min-height:44px;display:grid;place-items:center}
+.letrero b{text-transform:uppercase;font-size:.9rem;letter-spacing:.035em}
+@media(max-width:360px){.letrero .tabla{padding-inline:12px}}
+@media(min-width:1000px){.letrero .tabla{padding:15px 22px}.letrero b{font-size:1.05rem}}
+</style>
+</head>
+<body data-hora="dia">
+
+<header class="finca" id="finca" aria-label="Su finca">
+
+  <svg class="capa" data-p="0" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:var(--c-alto)"/><stop offset=".55" style="stop-color:var(--c-medio)"/><stop offset="1" style="stop-color:var(--c-bajo)"/>
+      </linearGradient>
+      <radialGradient id="halo"><stop offset="0" stop-color="#fff6c8" stop-opacity=".9"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1200" height="600" fill="url(#cielo)"/>
+    <g class="estrellas" fill="#fffbe8" id="estrellas"></g>
+    <g class="sol"><circle cx="770" cy="118" r="92" fill="url(#halo)"/><circle cx="770" cy="118" r="34" style="fill:var(--sol)" stroke="#d99a36" stroke-width="2"/></g>
+    <g class="luna" id="luna-cielo" transform="translate(770 118) scale(3)"></g>
+  </svg>
+  <svg class="capa tierra" data-p=".04" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <g fill="#fffdf6" stroke="#c7d3d6" stroke-width="1.5" opacity=".93">
+      <g class="nube"><path d="M250 118c-4-18 14-30 30-24 6-18 34-22 44-6 16-8 36 4 32 22 14 2 18 20 4 26H262c-16 0-24-12-12-18z"/></g>
+      <g class="nube n2"><path d="M520 70c-3-14 11-22 23-18 5-14 27-17 35-4 13-6 28 3 25 17 11 2 14 16 3 20H530c-12 0-19-9-10-15z"/></g>
+      <g class="nube n3"><path d="M960 150c-4-16 12-27 27-22 6-16 31-20 40-6 15-7 33 4 29 20 13 2 16 18 3 23H972c-15 0-22-10-12-15z"/></g>
+    </g>
+  </svg>
+  <svg class="capa tierra" data-p=".1" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d="M0 262 80 226 150 244 250 196 320 222 410 188 500 228 590 206 690 234 770 196 870 226 980 190 1080 230 1200 208V600H0Z" style="fill:var(--lejos)"/>
+    <path d="M0 298C90 270 170 262 240 276S360 250 430 262 560 290 640 276 800 250 880 268 1050 290 1200 262V600H0Z" style="fill:var(--lejos-2)"/>
+
+    <path d="M0 318C60 300 140 292 220 300S330 290 400 296 470 310 520 318V600H0Z" style="fill:var(--paramo)"/>
+    <g fill="#5b6f4e" stroke="#3d4a33" stroke-width="1">
+      <g id="frailejon"><path d="M0 0v-14" stroke="#4a3a28" stroke-width="2.4"/><path d="M0-14c-5-2-7-6-6-9 3 1 5 4 6 6 1-3 3-6 6-6 1 3-1 7-6 9z" fill="#9fae7a"/></g>
+      <use href="#frailejon" x="70" y="304"/><use href="#frailejon" x="118" y="298" transform="scale(1)"/><use href="#frailejon" x="178" y="300"/><use href="#frailejon" x="262" y="298"/><use href="#frailejon" x="330" y="294"/><use href="#frailejon" x="402" y="298"/><use href="#frailejon" x="448" y="304"/>
+    </g>
+  </svg>
+
+  <svg class="capa tierra toca" data-p=".24" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs><clipPath id="loma"><path id="loma-p" d="M0 372C130 330 250 300 380 306S540 282 640 286 850 322 960 300 1130 296 1200 300V600H0Z"/></clipPath></defs>
+    <use href="#loma-p" fill="#7fa35a"/>
+    <g clip-path="url(#loma)" id="retazos"></g>
+    <path d="M0 372C130 330 250 300 380 306S540 282 640 286 850 322 960 300 1130 296 1200 300" fill="none" stroke="#4d6e36" stroke-width="2"/>
+
+    <g class="lugar" data-lugar="aprender" transform="translate(455 318)">
+      <path d="M-30 0V-24H30V0Z" fill="#f6f0e2" stroke="#3a2c1f" stroke-width="1.4"/>
+      <path d="M-36-22 0-42 36-22Z" fill="#a8432a" stroke="#3a2c1f" stroke-width="1.4"/>
+      <path d="M-30-6H30V0H-30Z" fill="#2f6f8f"/>
+      <rect x="-5" y="-17" width="10" height="17" fill="#2f6f8f" stroke="#3a2c1f" stroke-width="1"/>
+      <rect x="-24" y="-17" width="10" height="8" fill="#cfe3ea" stroke="#3a2c1f" stroke-width="1"/><rect x="14" y="-17" width="10" height="8" fill="#cfe3ea" stroke="#3a2c1f" stroke-width="1"/>
+      <path d="M44 0V-54" stroke="#3a2c1f" stroke-width="1.6"/>
+      <g transform="translate(44 -54)"><g class="bandera"><rect width="22" height="7" fill="#f2c318"/><rect y="7" width="22" height="3.5" fill="#1f4f9e"/><rect y="10.5" width="22" height="3.5" fill="#c1272d"/></g></g>
+      <rect x="-40" y="-2" width="92" height="30" fill="transparent"/>
+    </g>
+
+    <path id="camino" d="M1230 312C1120 322 1000 326 920 346S850 392 780 410 668 430 646 440" fill="none" stroke="#b39a6c" stroke-width="15" stroke-linecap="round"/>
+    <path d="M1230 312C1120 322 1000 326 920 346S850 392 780 410 668 430 646 440" fill="none" stroke="#e2cd9d" stroke-width="10" stroke-linecap="round"/>
+
+    <g class="lugar" data-lugar="vender" transform="translate(812 386)">
+      <path d="M-14 4H18" stroke="#6b4a2b" stroke-width="3"/><path d="M-12 4V-6H16V4" fill="#8a5f36" stroke="#3a2c1f" stroke-width="1.2"/>
+      <g fill="#d9dde0" stroke="#3a2c1f" stroke-width="1"><path d="M-10-6v-9l2-3h4l2 3v9z"/><path d="M0-6v-9l2-3h4l2 3v9z"/><path d="M9-6v-8l2-3h4l2 3v8z"/></g>
+      <path d="M26 6V-28" stroke="#3a2c1f" stroke-width="1.5"/><rect x="19" y="-38" width="16" height="11" rx="2" fill="#f2c318" stroke="#3a2c1f" stroke-width="1.2"/>
+      <rect x="-24" y="-44" width="70" height="56" fill="transparent"/>
+    </g>
+    <g id="chiva" class="lugar" data-lugar="vender">
+      <g transform="translate(-26 -30)">
+        <rect x="6" y="0" width="40" height="5" fill="#8a5f36" stroke="#3a2c1f" stroke-width="1"/>
+        <circle cx="14" cy="-2" r="4" fill="#c9a36a" stroke="#3a2c1f" stroke-width=".8"/><circle cx="24" cy="-3" r="4.5" fill="#6b8f3a" stroke="#3a2c1f" stroke-width=".8"/><circle cx="35" cy="-2" r="4" fill="#d06b3a" stroke="#3a2c1f" stroke-width=".8"/>
+        <path d="M2 5H48V26H2Z" fill="#f2c318" stroke="#3a2c1f" stroke-width="1.4"/>
+        <path d="M2 16H48V19H2Z" fill="#c1272d"/><path d="M2 21H48V23H2Z" fill="#1f4f9e"/><path d="M2 11H48V13H2Z" fill="#2f8f4a"/>
+        <g fill="#cfe3ea" stroke="#3a2c1f" stroke-width=".8"><rect x="6" y="7" width="7" height="6"/><rect x="15" y="7" width="7" height="6"/><rect x="24" y="7" width="7" height="6"/><rect x="33" y="7" width="7" height="6"/></g>
+        <path d="M48 9h6l3 7v10h-9z" fill="#c1272d" stroke="#3a2c1f" stroke-width="1.2"/>
+        <circle cx="13" cy="27" r="5" fill="#2b2118"/><circle cx="41" cy="27" r="5" fill="#2b2118"/><circle cx="13" cy="27" r="2" fill="#d9dde0"/><circle cx="41" cy="27" r="2" fill="#d9dde0"/>
+      </g>
+    </g>
+  </svg>
+
+  <svg class="capa tierra toca" data-p=".5" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="pasto" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93c45c"/><stop offset="1" stop-color="#5f9a3f"/></linearGradient>
+    </defs>
+    <path d="M0 436C160 404 330 404 480 400S690 384 820 398 1050 420 1200 404V600H0Z" fill="url(#pasto)"/>
+    <path d="M0 436C160 404 330 404 480 400S690 384 820 398 1050 420 1200 404" fill="none" stroke="#4d7a33" stroke-width="2"/>
+
+    <g id="cafetal"></g>
+
+    <g transform="translate(1040 430)" stroke="#2f5a26" stroke-width="1.2">
+      <path d="M0 0V-58" stroke="#6b7a3a" stroke-width="5"/>
+      <path d="M0-56C-20-70-44-64-54-50-34-56-18-54 0-50Z" fill="#6aa843"/><path d="M0-58C18-76 44-72 56-58 36-62 18-58 0-52Z" fill="#7cb74c"/><path d="M0-58C-6-80 4-96 16-100 8-84 6-72 2-56Z" fill="#5f9a3f"/><path d="M0-50C22-52 40-40 44-26 30-38 16-42 0-46Z" fill="#5f9a3f"/>
+    </g>
+
+    <g transform="translate(528 372)"><path d="M0 34V0" stroke="#5a3d22" stroke-width="5"/><path d="M-26 8C-40 0-36-22-22-26-22-44 2-50 12-38 30-44 42-24 32-10 42 2 30 18 14 14 4 24-18 22-26 8Z" fill="#4f8a3c" stroke="#2f5a26" stroke-width="1.4"/><path d="M-14-8c6-10 18-12 26-6" fill="none" stroke="#6fae4f" stroke-width="3" stroke-linecap="round"/></g>
+    <g transform="translate(716 368)"><path d="M0 36V0" stroke="#5a3d22" stroke-width="5"/><path d="M-24 10C-38 2-30-20-16-22-12-40 10-42 18-30 34-32 40-12 30-2 36 12 20 22 6 16-6 24-20 20-24 10Z" fill="#6c5aa6" stroke="#3b2d63" stroke-width="1.4"/><g fill="#9b86d6"><circle cx="-12" cy="-8" r="4"/><circle cx="6" cy="-20" r="4"/><circle cx="18" cy="-4" r="3.5"/><circle cx="-2" cy="6" r="3.5"/><circle cx="22" cy="10" r="3"/></g></g>
+
+    <g class="lugar" data-lugar="finca" transform="translate(615 404)">
+      <path d="M-50 0V-44H50V0Z" fill="#f4efe3" stroke="#3a2c1f" stroke-width="1.6"/>
+      <path d="M-50-12H50V0H-50Z" fill="#2f6f8f" stroke="#3a2c1f" stroke-width="1.2"/>
+      <path d="M-62-40 0-76 62-40Z" fill="#b5542c" stroke="#3a2c1f" stroke-width="1.6"/>
+      <g fill="none" stroke="#8a3b1e" stroke-width="1.3"><path d="M-50-47Q-44-44-38-47T-26-47-14-47-2-47 10-47 22-47 34-47 46-47"/><path d="M-36-55Q-30-52-24-55T-12-55 0-55 12-55 24-55 36-55"/><path d="M-22-63Q-16-60-10-63T2-63 14-63 24-63"/></g>
+      <path d="M-66-38H66" stroke="#3a2c1f" stroke-width="2"/>
+      <g stroke="#5a3d22" stroke-width="2.4"><path d="M-44-38V0"/><path d="M44-38V0"/></g>
+      <rect x="-8" y="-32" width="16" height="32" fill="#2f6f8f" stroke="#3a2c1f" stroke-width="1.2"/><circle cx="4" cy="-15" r="1.3" fill="#f2c318"/>
+      <g class="ventana"><rect x="-34" y="-32" width="16" height="13" fill="#cfe3ea" stroke="#3a2c1f" stroke-width="1.2"/><rect x="18" y="-32" width="16" height="13" fill="#cfe3ea" stroke="#3a2c1f" stroke-width="1.2"/></g>
+      <g stroke="#3a2c1f" stroke-width="1"><path d="M-26-32v13M26-32v13M-34-25.5h16M18-25.5h16"/></g>
+
+      <g stroke="#3a2c1f" stroke-width=".9"><rect x="-40" y="-8" width="7" height="8" fill="#b5542c"/><rect x="30" y="-8" width="7" height="8" fill="#d9dde0"/><rect x="-22" y="-8" width="7" height="8" fill="#d9dde0"/></g>
+      <g><circle cx="-36.5" cy="-11" r="3.5" fill="#d83a5a"/><circle cx="33.5" cy="-11" r="3.5" fill="#f2c318"/><circle cx="-18.5" cy="-11" r="3.5" fill="#e85d9a"/></g>
+      <path d="M30-68V-82H40V-62" fill="#8a7a6a" stroke="#3a2c1f" stroke-width="1.3"/>
+      <g class="humo" fill="#eef0f2"><circle cx="35" cy="-86" r="5"/><circle cx="35" cy="-86" r="5"/><circle cx="35" cy="-86" r="5"/></g>
+      <rect x="-68" y="-86" width="136" height="90" fill="transparent"/>
+    </g>
+
+    <g class="lugar" data-lugar="matas" transform="translate(468 492)">
+      <path d="M-80 34C-60 6-10-14 70-18L96 30C30 40-30 44-80 34Z" fill="#7a5433" stroke="#4d331e" stroke-width="1.4"/>
+      <g fill="none" stroke="#5c3d22" stroke-width="3" stroke-linecap="round"><path d="M-66 28C-40 10 0-2 72-8"/><path d="M-58 36C-30 20 14 10 84 6"/><path d="M-72 18C-48 0-10-8 64-14"/></g>
+      <g id="maices" stroke="#3f6a2a" stroke-width="1.3"></g>
+      <g fill="#8fc25a" stroke="#3f6a2a" stroke-width="1"><circle cx="-38" cy="30" r="6"/><circle cx="-16" cy="26" r="6.5"/><circle cx="8" cy="22" r="6"/><circle cx="32" cy="18" r="6.5"/><circle cx="56" cy="16" r="6"/><circle cx="78" cy="14" r="5.5"/></g>
+      <g fill="#b9dc86"><circle cx="-38" cy="29" r="2.4"/><circle cx="-16" cy="25" r="2.6"/><circle cx="8" cy="21" r="2.4"/><circle cx="32" cy="17" r="2.6"/><circle cx="56" cy="15" r="2.4"/></g>
+
+      <g transform="translate(-58 -6)">
+        <path d="M0 16V-26M-14-14H14" stroke="#6b4a2b" stroke-width="2.6"/>
+        <path d="M-16-16 16-16 10 6-10 6Z" fill="#a8432a" stroke="#3a2c1f" stroke-width="1.2"/><path d="M-12-10H12M-11-4H11M-10 2H10" stroke="#e2b04a" stroke-width="1.4"/>
+        <circle cx="0" cy="-24" r="6" fill="#e8d3a8" stroke="#3a2c1f" stroke-width="1.1"/>
+        <path d="M-12-28H12M-6-28C-6-38 6-38 6-28" fill="#d8c08a" stroke="#3a2c1f" stroke-width="1.3"/>
+      </g>
+      <rect x="-86" y="-60" width="186" height="104" fill="transparent"/>
+    </g>
+
+    <g class="lugar" data-lugar="animales" transform="translate(748 488)">
+      <g stroke="#5a3d22" stroke-width="3" stroke-linecap="round"><path d="M-78 34V-8M-30 36V-14M18 36V-14M66 32V-10"/></g>
+      <g stroke="#8a5f36" stroke-width="3.4" stroke-linecap="round"><path d="M-78 0C-40-6 20-8 66-2"/><path d="M-78 18C-40 14 20 14 66 18"/></g>
+
+      <g transform="translate(76 -2)"><path d="M-18 16V-8H18V16Z" fill="#c9a36a" stroke="#3a2c1f" stroke-width="1.3"/><path d="M-24-6 0-24 24-6Z" fill="#b5542c" stroke="#3a2c1f" stroke-width="1.3"/><path d="M-5 16V2H5V16" fill="#3a2c1f"/><path d="M-4 16 L-14 30" stroke="#8a5f36" stroke-width="2.4"/></g>
+
+      <g transform="translate(-4 8)">
+        <path class="cola" d="M-30-8C-38-4-38 8-36 16" fill="none" stroke="#3a2c1f" stroke-width="2"/>
+        <path d="M-32-12C-32-22 20-24 26-14 30-4 28 8 20 10H-26C-34 8-34-2-32-12Z" fill="#fbf7ee" stroke="#3a2c1f" stroke-width="1.5"/>
+        <path d="M-20-18C-12-22-4-16-8-8-14-4-24-8-20-18Z" fill="#8a4f2a"/><path d="M6-16C14-18 18-10 12-4 6-2 2-10 6-16Z" fill="#8a4f2a"/>
+        <g stroke="#3a2c1f" stroke-width="3.6" stroke-linecap="round"><path d="M-24 8V26M-14 9V27M10 9V27M18 8V26"/></g>
+        <g transform="translate(28 -16)">
+          <path d="M-4-2C0-10 14-10 18-2 20 6 16 14 8 14 0 14-6 6-4-2Z" fill="#fbf7ee" stroke="#3a2c1f" stroke-width="1.5"/>
+          <path d="M0-6C4-10 12-9 14-4 10-2 4-2 0-6Z" fill="#8a4f2a"/>
+          <ellipse cx="9" cy="10" rx="8" ry="5" fill="#e8b4a6" stroke="#3a2c1f" stroke-width="1.2"/>
+          <circle cx="4" cy="1" r="1.4" fill="#2b2118"/><circle cx="13" cy="1" r="1.4" fill="#2b2118"/>
+          <path d="M-2-6-8-10M18-5 24-9" stroke="#3a2c1f" stroke-width="2"/><path d="M-3-8C-4-14 0-16 2-12M19-7C20-13 16-15 15-11" fill="none" stroke="#e8dcc0" stroke-width="2"/>
+        </g>
+      </g>
+
+      <g id="gallina"><g class="picotea"><path d="M-7 0C-9-8-2-12 4-10 8-14 12-12 11-8 14-6 12-2 9-2Z" fill="#c9733a" stroke="#3a2c1f" stroke-width="1"/><path d="M8-12 10-15 12-12Z" fill="#c1272d"/><path d="M12-9 15-8 12-7Z" fill="#e2b04a"/></g><path d="M-1 0v4M3 0v4" stroke="#a36a2a" stroke-width="1.2"/></g>
+      <use href="#gallina" x="-60" y="34"/><use href="#gallina" x="-36" y="40" class="p2"/><use href="#gallina" x="44" y="36"/>
+      <rect x="-86" y="-40" width="190" height="84" fill="transparent"/>
+    </g>
+  </svg>
+
+  <svg class="capa" data-p=".5" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <g class="ventana-luz" fill="#ffd66b" stroke="#3a2c1f" stroke-width="1"><rect x="581" y="372" width="16" height="13"/><rect x="633" y="372" width="16" height="13"/><path d="M589 372v13M641 372v13M581 378.5h16M633 378.5h16" fill="none"/></g>
+    <g class="ventana-luz" fill="#ffd66b" fill-opacity=".16"><circle cx="589" cy="378" r="20"/><circle cx="641" cy="378" r="20"/></g>
+    <g class="luciernagas" fill="#f9f1a0"><circle cx="420" cy="440" r="2.6"/><circle cx="520" cy="470" r="2.4"/><circle cx="660" cy="452" r="2.8"/><circle cx="800" cy="430" r="2.4"/><circle cx="880" cy="470" r="2.6"/><circle cx="580" cy="520" r="2.4"/><circle cx="360" cy="500" r="2.6"/><circle cx="700" cy="420" r="2.2"/><circle cx="470" cy="410" r="2.2"/></g>
+  </svg>
+
+  <svg class="capa tierra" data-p=".85" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d="M0 574C200 556 400 560 600 566S1000 552 1200 568V600H0Z" fill="#4f8a36"/>
+    <g id="pastos" fill="none" stroke="#3d7a2a" stroke-width="2" stroke-linecap="round"></g>
+
+    <g transform="translate(606 590)">
+      <path d="M-58 4V-50M58 4V-54" stroke="#5a3d22" stroke-width="7" stroke-linecap="round"/>
+      <g stroke="#8a5f36" stroke-width="5" stroke-linecap="round"><path d="M-54-40H54"/><path d="M-54-24H54"/><path d="M-54-8H54"/><path d="M-50-8 50-40"/></g>
+      <g stroke="#3a2c1f" stroke-width="1" fill="none" opacity=".6"><path d="M-54-40H54M-54-24H54M-54-8H54"/></g>
+    </g>
+
+    <g transform="translate(418 590)" fill="#7aa08a" stroke="#3f5f4d" stroke-width="1.2">
+      <path d="M0 0C-8-16-26-30-40-34-26-24-14-12-6 0Z"/><path d="M0 0C4-20 0-44-8-58-2-40-2-20-4 0Z"/><path d="M0 0C10-18 28-30 42-32 28-22 16-10 6 0Z"/><path d="M0 0C-2-22 10-40 22-50 12-34 6-18 4 0Z"/>
+    </g>
+    <g transform="translate(792 590)" fill="#6aa843" stroke="#2f5a26" stroke-width="1"><path d="M0 0C-4-14-14-22-24-24-14-16-8-8-4 0Z"/><path d="M0 0C4-16 14-26 22-28 14-18 8-8 4 0Z"/><circle cx="-12" cy="-26" r="4" fill="#f2c318" stroke="#9a7a10"/><circle cx="14" cy="-30" r="4" fill="#fffdf4" stroke="#9aa0a4"/><circle cx="2" cy="-34" r="3.6" fill="#f2c318" stroke="#9a7a10"/></g>
+  </svg>
+
+  <svg class="capa niebla" id="niebla" data-p=".3" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <g class="banco-i" fill="#f4f6f4"><ellipse cx="300" cy="420" rx="520" ry="150" opacity=".92"/><ellipse cx="420" cy="260" rx="420" ry="110" opacity=".8"/></g>
+    <g class="banco-d" fill="#f4f6f4"><ellipse cx="900" cy="440" rx="520" ry="160" opacity=".92"/><ellipse cx="820" cy="250" rx="440" ry="120" opacity=".8"/></g>
+  </svg>
+
+  <nav class="letreros antes" id="letreros" aria-label="Lugares de la finca">
+    <a class="letrero" href="#matas" data-lugar="matas" data-x="468" data-y="438" data-p=".5"><span class="tabla"><b>Mis plantas</b></span><span class="estaca"></span></a>
+    <a class="letrero" href="#animales" data-lugar="animales" data-x="740" data-y="452" data-p=".5"><span class="tabla"><b>Mis animales</b></span><span class="estaca"></span></a>
+    <a class="letrero" href="#finca" data-lugar="finca" data-x="600" data-y="330" data-p=".5"><span class="tabla"><b>Mi finca</b></span><span class="estaca"></span></a>
+    <a class="letrero" href="#aprender" data-lugar="aprender" data-x="452" data-y="245" data-p=".24"><span class="tabla"><b>Aprender</b></span><span class="estaca"></span></a>
+    <a class="letrero" href="#vender" data-lugar="vender" data-x="818" data-y="366" data-p=".24"><span class="tabla"><b>Vender</b></span><span class="estaca"></span></a>
+    <a class="letrero abajo" href="#tiempo" data-lugar="tiempo" data-x="770" data-y="160" data-p="0"><span class="tabla"><b>El tiempo</b></span><span class="estaca"></span></a>
+  </nav>
+
+  <div class="arriba">
+    <a class="marca" href="#finca" data-lugar="finca" aria-label="Chagra, su finca">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V11" stroke="#2f5d1e" stroke-width="2" stroke-linecap="round"/><path d="M12 12C12 7 8 4 3 4c0 5 4 8 9 8Z" fill="#6aa843" stroke="#2f5d1e" stroke-width="1.4"/><path d="M12 14c0-4 3-7 8-7 0 4-3 7-8 7Z" fill="#a7c957" stroke="#2f5d1e" stroke-width="1.4"/></svg>
+      <span>Chagra</span>
+    </a>
+    <button class="ubicar" type="button" data-lugar="ubicar" aria-label="Ubicar mi finca: aún no ha confirmado dónde queda">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12Z" fill="#a8321f" stroke="#3a2c1f" stroke-width="1.5"/><circle cx="12" cy="10" r="2.6" fill="#fffdf4"/></svg>
+      <span>Ubicar mi finca</span>
+    </button>
+    <div class="der">
+      <button class="redondo" type="button" data-lugar="avisos" aria-label="Avisos"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#2b2118" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button>
+      <button class="redondo" type="button" data-lugar="ayuda" aria-label="Ayuda"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#2b2118" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6V14"/><circle cx="12" cy="17" r=".6" fill="#2b2118"/></svg></button>
+      <button class="redondo" type="button" data-lugar="perfil" aria-label="Mi perfil"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#2b2118" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg></button>
+    </div>
+  </div>
+
+</header>
+
+<main class="cuaderno" id="cuaderno">
+  <section class="hoja hoja-hoy" aria-labelledby="t-hoy">
+    <span class="ante">El almanaque</span>
+    <div class="almanaque">
+      <div class="dia" aria-hidden="true"><span class="mes" id="a-mes">sep</span><span class="num" id="a-num">24</span><span class="sem" id="a-sem">jueves</span></div>
+      <h2 id="t-hoy">Hoy en su finca</h2>
+      <div>
+        <p class="luna-hoy"><svg viewBox="-12 -12 24 24" aria-hidden="true" id="luna-ico"></svg><span id="luna-txt">Luna</span></p>
+        <p class="clima suave" id="clima">El clima de hoy carga cuando haya señal.</p>
+      </div>
+    </div>
+    <details class="pronostico">
+      <summary>Pronóstico de 7 días</summary>
+      <div class="siete" id="siete"></div>
+      <p class="suave" style="font-size:.84rem;margin-top:8px">Sin señal no hay pronóstico. Chagra no lo inventa.</p>
+    </details>
+    <div class="recado" id="recado">
+      <div class="quien">El recado de su compai</div>
+      <p id="recado-txt"></p>
+    </div>
+    <div class="fila">
+      <button class="boton" type="button" id="escuchar" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10Z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>Escuchar</button>
+      <button class="boton" type="button" id="noche" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>Noche</button>
+      <div class="dos" role="group" aria-label="Cómo le hablo">
+        <button type="button" id="corto" aria-pressed="true">Claro y corto</button><button type="button" id="largo" aria-pressed="false">Con detalle</button>
+      </div>
+    </div>
+    <button class="enlace" type="button" data-lugar="hoy">Ver el día completo: avisos, tareas y agenda →</button>
+    <button class="enlace" type="button" data-lugar="agente" data-pregunta="recado" style="display:block">Pregúntele a Angelita sobre este recado →</button>
+  </section>
+
+  <section class="hoja hoja-anote" aria-labelledby="t-anote">
+    <span class="ante">El cuaderno de campo</span>
+    <h2 id="t-anote">Anote lo de hoy</h2>
+    <p class="suave">Un toque y queda escrito, aunque no haya señal.</p>
+    <div class="sellos">
+      <button class="sello" type="button" data-lugar="semilleros">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 30h38l-3 10H8Z" fill="#8a5f36" stroke="#3a2c1f" stroke-width="1.6"/><path d="M5 30h38" stroke="#3a2c1f" stroke-width="1.6"/><path d="M16 36v-2M24 36v-2M32 36v-2" stroke="#3a2c1f" stroke-width="1.4"/><g stroke="#2f5d1e" stroke-width="1.6" fill="#8fc25a"><path d="M14 30v-8" fill="none"/><path d="M14 23c-4 0-6-3-6-5 3 0 6 2 6 5Zm0 0c3-1 6-4 5-7-3 1-5 4-5 7Z"/><path d="M24 30V18" fill="none"/><path d="M24 20c-5-1-7-5-6-8 4 1 6 4 6 8Zm0-1c3-2 7-4 7-8-4 0-7 3-7 8Z"/><path d="M34 30v-6" fill="none"/><path d="M34 25c-3 0-5-2-5-4 3 0 5 1 5 4Z"/></g></svg>
+        <b>Semilleros</b><small>Pruebe sus semillas y vea cuáles nacen</small></button>
+      <button class="sello" type="button" data-lugar="cosechar">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 20c0-10 24-10 24 0" fill="none" stroke="#8a5f36" stroke-width="2.4"/><circle cx="17" cy="21" r="5" fill="#c1272d" stroke="#3a2c1f" stroke-width="1.3"/><circle cx="26" cy="19" r="5.5" fill="#f2c318" stroke="#3a2c1f" stroke-width="1.3"/><circle cx="33" cy="22" r="4.5" fill="#6aa843" stroke="#3a2c1f" stroke-width="1.3"/><path d="M8 24h32l-4 16H12Z" fill="#c9a36a" stroke="#3a2c1f" stroke-width="1.6"/><path d="M10 30h28M11 35h26M18 24v16M24 24v16M30 24v16" stroke="#8a5f36" stroke-width="1.3"/></svg>
+        <b>Cosechar</b><small>Anote lo que recogió</small></button>
+      <button class="sello" type="button" data-lugar="abonos">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 14c4-3 10-3 14 0l2 26H8Z" fill="#e8dcc0" stroke="#3a2c1f" stroke-width="1.6"/><path d="M11 22h14M10 30h16" stroke="#8a5f36" stroke-width="1.3"/><path d="M28 26h10l2 14H26Z" fill="#2f6f8f" stroke="#3a2c1f" stroke-width="1.5"/><path d="M38 28l7-5" stroke="#3a2c1f" stroke-width="2.2" stroke-linecap="round"/><path d="M30 26c0-5 6-5 6 0" fill="none" stroke="#3a2c1f" stroke-width="1.6"/><g fill="#4ea8de"><circle cx="44" cy="28" r="1.3"/><circle cx="46" cy="32" r="1.3"/></g></svg>
+        <b>Abonos e insumos</b><small>Anote un abono o aplicación y vea lo que tiene</small></button>
+      <button class="sello" type="button" data-lugar="labores">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 40 34 10" stroke="#8a5f36" stroke-width="3.4" stroke-linecap="round"/><path d="M28 8c4-3 10-2 12 2l-4 6c-2-3-6-5-10-4Z" fill="#9aa0a4" stroke="#3a2c1f" stroke-width="1.6"/><path d="M8 42c6-2 14-2 22 0" stroke="#7a5433" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <b>Labores de la finca</b><small>Arreglos, limpias y mantenimiento</small></button>
+    </div>
+    <button class="bitacora" type="button" data-lugar="bitacora">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 5h22a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8Z" fill="#e2b04a" stroke="#0e140a" stroke-width="1.6"/><path d="M8 5v32" stroke="#0e140a" stroke-width="3"/><path d="M14 13h12M14 18h12M14 23h8" stroke="#5a3d22" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span><b>Cuaderno de labores</b><small>Todo lo que ha hecho en su finca</small></span><span class="flecha" aria-hidden="true">→</span>
+    </button>
+  </section>
+
+
+
+  <footer class="pie">
+    <button type="button" data-lugar="faq">Preguntas frecuentes</button>
+    <button type="button" data-lugar="ayuda">Ayuda</button>
+    <button type="button" data-lugar="jugar">Jugar</button>
+    <span>Software libre AGPL-3.0 · Catálogo CC-BY-SA 4.0</span>
+  </footer>
+</main>
+
+<div class="tablero" role="region" aria-label="Hablar con Chagra">
+  <button class="hableme" type="button" data-lugar="agente">
+    <span class="mic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></span>
+    <span><b>Hábleme</b><small>Toque y pregunte. Angelita le contesta.</small></span>
+  </button>
+  <button class="pendientes" type="button" data-lugar="cola" aria-label="Consultar sincronización"><i aria-hidden="true"></i><span class="txt">Consultando</span></button>
+</div>
+
+<section id="sala" aria-hidden="true" aria-labelledby="sala-t">
+  <div class="barra">
+    <button id="salir" type="button"><span aria-hidden="true">←</span> Volver a la finca</button>
+    <span class="titulo-barra" id="sala-barra"></span>
+  </div>
+  <div class="cuerpo">
+    <span class="ante" style="font-family:var(--mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:#5b4a38" id="sala-lugar"></span>
+    <h2 id="sala-t"></h2>
+    <p id="sala-d"></p>
+    <p>En Chagra, este lugar abre la pantalla <span class="pantalla" id="sala-p"></span>.</p>
+    <p class="nota">Cada lugar le lleva a una parte de su finca.</p>
+  </div>
+</section>
+
+
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Home de Chagra. intento A («mira no más»).
+   La finca andina en seis planos SVG apilados; cada lugar de la
+   ladera es una puerta a su parte de la app. Angelita es la
+   lámina de siempre (la misma que usa edu.chagra.bio): se mueve,
+   no se redibuja.
+   ============================================================ */
+const TAU = Math.PI * 2;
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+const quieto = () => mqRM.matches;
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sEase = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+/* ---------- a dónde lleva cada lugar (lo que abre hoy el home) ---------- */
+const DESTINOS = {
+  matas:      { t: 'Mis plantas', lugar: 'La huerta', d: 'Sus plantas y siembras.', p: 'Cultivos y semillas', dice: 'La huerta: aquí están sus plantas.' },
+  animales:   { t: 'Mis animales', lugar: 'El corral', d: 'Sus gallinas, cerdos y demás animales.', p: 'Mis animales', dice: 'El corral: sus animales.' },
+  tiempo:     { t: 'El tiempo', lugar: 'El cielo', d: 'El clima de hoy y los próximos días.', p: 'El tiempo', dice: 'Miremos cómo viene el tiempo.' },
+  vender:     { t: 'Vender', lugar: 'El cruce del camino', d: 'Precios, mercado y su despensa.', p: 'Mercado de la finca', dice: 'Por aquí pasa la chiva al pueblo.' },
+  aprender:   { t: 'Aprender', lugar: 'La escuelita', d: 'Las lecciones y guías del campo.', p: 'Aprender', dice: 'A la escuelita: lecciones del campo.' },
+  finca:      { t: 'Mi finca', lugar: 'La casa', d: 'Todos los mundos: suelo, agua, sanidad, mercado y más.', p: 'Los mundos de su finca', dice: 'Desde la casa se ve toda la finca.' },
+  semilleros: { t: 'Semilleros', lugar: 'El cuaderno', d: 'Pruebe sus semillas y vea cuáles nacen.', p: 'Germinación' },
+  cosechar:   { t: 'Cosechar', lugar: 'El cuaderno', d: 'Anote lo que recogió.', p: 'Cosechar' },
+  abonos:     { t: 'Abonos e insumos', lugar: 'El cuaderno', d: 'Anote un abono o aplicación y vea lo que tiene.', p: 'Abonos e insumos' },
+  labores:    { t: 'Labores de la finca', lugar: 'El cuaderno', d: 'Arreglos, limpias y mantenimiento.', p: 'Labores de la finca' },
+  bitacora:   { t: 'Cuaderno de labores', lugar: 'El cuaderno', d: 'Siembras, cosechas, aplicaciones y observaciones, en orden.', p: 'Cuaderno de labores' },
+  ciclo:      { t: 'Ciclo del cultivo', lugar: 'La rueda', d: 'Recorra el ciclo de su cultivo, fase por fase.', p: 'El ciclo de su maíz' },
+  hoy:        { t: 'Hoy en finca', lugar: 'El almanaque', d: 'El día completo: avisos, tareas y agenda.', p: 'Hoy en finca' },
+  agente:     { t: 'Hablar con Chagra', lugar: 'Angelita', d: 'Toque y hable. Chagra le contesta con datos verificados.', p: 'Chagra IA' },
+  ubicar:     { t: 'Ubicar mi finca', lugar: 'Arriba', d: 'Confirme dónde queda su finca para que el clima y el piso térmico sean los suyos.', p: 'Ubicación de la finca' },
+  avisos:     { t: 'Avisos', lugar: 'Arriba', d: 'Lo que Chagra le tiene pendiente de contar.', p: 'Panel de notificaciones' },
+  ayuda:      { t: 'Ayuda', lugar: 'Arriba', d: 'Cómo se usa Chagra, paso a paso.', p: 'Manual de uso' },
+  perfil:     { t: 'Mi perfil', lugar: 'Arriba', d: 'Sus datos, su finca y sus preferencias.', p: 'Perfil de usuario' },
+  faq:        { t: 'Preguntas frecuentes', lugar: 'Al pie', d: 'Lo que más preguntan.', p: 'Preguntas frecuentes' },
+  jugar:      { t: 'Jugar', lugar: 'Al pie', d: 'Los juegos de Chagra.', p: 'Jugar' },
+  cola:       { t: 'Tareas pendientes', lugar: 'Abajo', d: 'Lo que anotó sin señal y falta por subir. Consulte su cola de sincronización.', p: 'Cola de sincronización' },
+};
+
+/* ---------- la hora del día pinta el cielo ---------- */
+const ahora = new Date();
+const H = ahora.getHours() + ahora.getMinutes() / 60;
+const horaNatural = H >= 5 && H < 8 ? 'amanecer' : H >= 8 && H < 17 ? 'dia' : H >= 17 && H < 18.6 ? 'tarde' : 'noche';
+const qs = new URLSearchParams(location.search);
+let hora = qs.get('hora') || horaNatural;
+document.body.dataset.hora = hora;
+const saludo = qs.get('hora') ? { amanecer: 'Buenos días', dia: 'Buenos días', tarde: 'Buenas tardes', noche: 'Buenas noches' }[hora] || 'Buenas' : H < 12 && H >= 4 ? 'Buenos días' : H < 18.6 && H >= 12 ? 'Buenas tardes' : 'Buenas noches';
+
+/* ---------- escena procedural (una sola vez, semilla fija) ---------- */
+let sem = 20260924;
+const rnd = () => ((sem = (sem * 1664525 + 1013904223) >>> 0) / 4294967296);
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, at, padre) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (padre) padre.appendChild(e); return e; };
+// estrellas
+const est = $('#estrellas');
+for (let i = 0; i < 46; i++) el('circle', { cx: (rnd() * 1200).toFixed(0), cy: (rnd() * 230).toFixed(0), r: (.6 + rnd() * 1.3).toFixed(1) }, est);
+// la colcha de retazos: parcelas cuadradas torcidas con cercas vivas
+{
+  const g = $('#retazos');
+  const COL = ['#8fb35e', '#a9c46a', '#739f4e', '#c8b56a', '#b48c58', '#62904a', '#9cbc62', '#d0bf7a'];
+  const filas = [276, 300, 326, 356, 390, 430];
+  const cols = []; for (let x = -40; x <= 1260; x += 72 + rnd() * 40) cols.push(x);
+  const pto = (i, j) => [cols[i] + (j * 14) + (rnd() - .5) * 10, filas[j] + (rnd() - .5) * 6];
+  const P = cols.map((_, i) => filas.map((_, j) => pto(i, j)));
+  const cercas = [];
+  for (let i = 0; i < cols.length - 1; i++) for (let j = 0; j < filas.length - 1; j++) {
+    const a = P[i][j], b = P[i + 1][j], c = P[i + 1][j + 1], d = P[i][j + 1];
+    el('path', { d: `M${a}L${b} ${c} ${d}Z`, fill: COL[Math.floor(rnd() * COL.length)] }, g);
+    if (rnd() < .3){ // surcos en algunas parcelas
+      const k = 3 + Math.floor(rnd() * 3); let s = '';
+      for (let q = 1; q < k; q++){ const t = q / k; s += `M${lerp(a[0], d[0], t)} ${lerp(a[1], d[1], t)}L${lerp(b[0], c[0], t)} ${lerp(b[1], c[1], t)}`; }
+      el('path', { d: s, stroke: 'rgba(60,45,20,.22)', 'stroke-width': 1.2, fill: 'none' }, g);
+    }
+    cercas.push(`M${a}L${b}`, `M${a}L${d}`);
+  }
+  el('path', { d: cercas.join(''), fill: 'none', stroke: '#3f6a33', 'stroke-width': 3.2, 'stroke-linecap': 'round', 'stroke-dasharray': '.1 6' }, g);
+  // arbolitos sueltos en las cercas
+  for (let n = 0; n < 26; n++){ const i = Math.floor(rnd() * (cols.length - 1)), j = Math.floor(rnd() * (filas.length - 1)), p = P[i][j];
+    el('circle', { cx: p[0].toFixed(0), cy: (p[1] - 4).toFixed(0), r: (4 + rnd() * 4).toFixed(1), fill: '#3f6f35', stroke: '#2c4d25', 'stroke-width': 1 }, g); }
+}
+// cafetal: hileras de matas que se funden en una sola masa por hilera (a la izquierda)
+{
+  const g = $('#cafetal');
+  for (let f = 0; f < 4; f++){
+    const fila = el('g', {}, g), bolas = [];
+    for (let x = 10 + f * 16; x < 370 - f * 24; x += (9 + f * 2) * 1.25 + rnd() * 4){
+      const r = 9 + f * 2.4 + rnd() * 2.5; bolas.push([x, 450 + f * 23 - r * .35 + (rnd() - .5) * 3, r]);
+    }
+    for (const [x, y, r] of bolas) el('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: (r + 1.4).toFixed(1), fill: '#2c4d25', stroke: 'none' }, fila);
+    for (const [x, y, r] of bolas) el('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: r.toFixed(1), fill: f % 2 ? '#3f7336' : '#467d3a', stroke: 'none' }, fila);
+    // luz de arriba por manchas sueltas, no una por mata: si se cuentan las matas, está mal
+    for (let q = 0; q < bolas.length / 3; q++){ const [x, y, r] = bolas[Math.floor(rnd() * bolas.length)];
+      el('ellipse', { cx: (x + (rnd() - .5) * r).toFixed(1), cy: (y - r * .55).toFixed(1), rx: (r * (.8 + rnd() * .9)).toFixed(1), ry: (r * .32).toFixed(1), fill: '#5f9a48', stroke: 'none', opacity: .7 }, fila); }
+    for (const [x, y, r] of bolas) if (rnd() < .6) el('circle', { cx: (x + r * .3).toFixed(1), cy: (y + r * .25).toFixed(1), r: 1.7, fill: '#c1272d', stroke: 'none' }, fila);
+  }
+}
+// milpa: maíz con fríjol enredado
+{
+  const g = $('#maices');
+  for (let i = 0; i < 7; i++){
+    const x = -54 + i * 21, y = -12 - i * 1.4, h = 40 + rnd() * 10;
+    el('path', { d: `M${x} ${y}V${y - h}`, stroke: '#5f8f34', 'stroke-width': 2.4 }, g);
+    for (let k = 0; k < 3; k++){ const yy = y - 10 - k * 11, s = k % 2 ? 1 : -1;
+      el('path', { d: `M${x} ${yy}q${s * 10} -2 ${s * 16} 6q${-s * 8} -6 ${-s * 16} -2z`, fill: '#7fb34c' }, g); }
+    el('path', { d: `M${x} ${y - h}l-3 -7m3 7l3 -7`, stroke: '#c9a36a', 'stroke-width': 1.4 }, g);
+    el('path', { d: `M${x + 2} ${y - 16}c4 -2 4 -6 1 -9c-3 -3 -1 -7 2 -9`, fill: 'none', stroke: '#3f6a2a', 'stroke-width': 1.1 }, g);
+    if (i % 2 === 0) el('ellipse', { cx: x + 4, cy: y - 24, rx: 2.6, ry: 6, fill: '#e2c55a', stroke: '#8a6a1a', 'stroke-width': .8 }, g);
+  }
+}
+// pastos del primer plano
+{
+  const g = $('#pastos'); let d = '';
+  for (let x = 0; x < 1200; x += 9 + rnd() * 10){ const y = 576 + rnd() * 18, h = 8 + rnd() * 14, l = (rnd() - .5) * 8; d += `M${x.toFixed(0)} ${y.toFixed(0)}q${(l / 2).toFixed(1)} ${(-h / 2).toFixed(1)} ${l.toFixed(1)} ${(-h).toFixed(1)}`; }
+  el('path', { d }, g);
+}
+
+/* ---------- planos: dónde está cada cosa en pantalla ---------- */
+const finca = $('#finca');
+const capas = $$('.finca .capa');
+const letreros = $$('.letrero');
+const camino = $('#camino');
+const SCROLL_CSS = CSS.supports('animation-timeline: scroll()');
+for (const e of [...capas, ...letreros]) e.style.setProperty('--p', e.dataset.p);
+let VW = 0, VH = 0, ESC = 1, OX = 0, OY = 0; // escala y desfase del viewBox 1200×600 con slice abajo-centro
+function medir(){
+  VW = finca.clientWidth; VH = finca.clientHeight;
+  ESC = Math.max(VW / 1200, VH / 600);
+  OX = (VW - 1200 * ESC) / 2; OY = VH - 600 * ESC;
+}
+const aPantalla = (x, y) => [OX + x * ESC, OY + y * ESC];
+const par = { x: 0, y: 0, tx: 0, ty: 0, sc: 0 };
+function desplazamiento(p){ return [-par.x * p * 26, -par.y * p * 10 - par.sc * p * 60]; }
+let ultimo = '';
+const tamLetrero = new Map();
+let cajasLetreros = [];
+function medirLetreros(){ for (const l of letreros) tamLetrero.set(l, [l.offsetWidth, l.offsetHeight]); ultimo = ''; }
+function ponerPlanos(){
+  // solo se reubica si algo cambió; y sin leer layout dentro del cuadro
+  const clave = `${par.x.toFixed(4)}|${par.y.toFixed(4)}|${par.sc.toFixed(4)}|${VW}|${VH}`;
+  if (clave === ultimo) return; ultimo = clave;
+  for (const c of capas){ const p = +c.dataset.p; const [dx, dy] = desplazamiento(p); c.style.transform = p ? `translate3d(${dx.toFixed(1)}px,${dy.toFixed(1)}px,0)` : ''; }
+  const cajas = [];
+  for (const l of letreros){
+    const [x, y] = aPantalla(+l.dataset.x, +l.dataset.y); const [dx, dy] = desplazamiento(+l.dataset.p);
+    const [w, h] = tamLetrero.get(l) || [0, 0], abajo = l.classList.contains('abajo');
+    let lx = clamp(x + dx - w / 2, 12, VW - w - 12), ly = abajo ? y + dy : y + dy - h;
+    if (VW < 700 || VH < 460){
+      const places = {tiempo:[.5,.22],aprender:[.24,.43],finca:[.74,.46],matas:[.24,.70],animales:[.75,.745],vender:[.26,.85]};
+      const widePlaces = {tiempo:[.2,.28],aprender:[.5,.28],finca:[.8,.28],matas:[.2,.68],animales:[.5,.68],vender:[.8,.68]};
+      const point = (VW < 700 ? places : widePlaces)[l.dataset.lugar];
+      if(point){lx=clamp(VW*point[0]-w/2,12,VW-w-12);ly=VH*point[1]-h/2;}
+    }
+    l.style.setProperty('--x', lx.toFixed(1) + 'px'); l.style.setProperty('--y', ly.toFixed(1) + 'px');
+    cajas.push({ left:lx, top:ly, right:lx + w, bottom:ly + h });
+  }
+  // La caja sale de la posición y el tamaño de reposo, no del rectángulo
+  // pintado: durante la entrada los letreros están a escala .6, y medirlos
+  // ahí dejaba al compai encima de un letrero ya crecido (C30, «MI FIN A»).
+  // Los botones de arriba (marca, ubicación, avisos, ayuda, perfil) y el
+  // tablero «Hábleme» de abajo también son obstáculos: el compai no se posa
+  // encima de un control ni de su texto.
+  for (const c of $$('.arriba > a, .arriba > button, .arriba .der > button, .tablero')){
+    const r = c.getBoundingClientRect();
+    if (r.width && r.height) cajas.push({ left:r.left, top:r.top, right:r.right, bottom:r.bottom });
+  }
+  cajasLetreros = cajas;
+}
+
+/* ---------- la chiva baja y sube por el camino ---------- */
+const chiva = $('#chiva'); const LCAM = camino.getTotalLength();
+function ponerChiva(t){
+  if (VW < 700) {
+    if (!VW || !VH || !ESC) return;
+    const x = VW - 22, y = VH * .66;
+    const px = (x - OX) / ESC, py = (y - OY) / ESC;
+    chiva.setAttribute('transform', `translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(.8)`);
+    return;
+  }
+  // ida y vuelta entre el borde y el cruce; se detiene un rato en la parada
+  const ciclo = 38, u = (t % ciclo) / ciclo;
+  let k, volver = false;
+  if (u < .42) k = sEase(u / .42);
+  else if (u < .5) k = 1;
+  else if (u < .92){ k = 1 - sEase((u - .5) / .42); volver = true; }
+  else k = 0;
+  const L = lerp(0, LCAM * .62, k), p = camino.getPointAtLength(L), q = camino.getPointAtLength(Math.min(LCAM, L + 3));
+  let dx = q.x - p.x, dy = q.y - p.y; if (volver){ dx = -dx; dy = -dy; }
+  const esc = lerp(.72, 1.05, k);
+  const a = dx >= 0 ? Math.atan2(dy, dx) : Math.atan2(-dy, -dx);
+  chiva.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${(a * 180 / Math.PI).toFixed(1)}) scale(${(dx >= 0 ? 1 : -1) * esc} ${esc})`);
+}
+
+/* ---------- movimiento y posición del compai vivo en React ---------- */
+const PIE = 11.9;
+let BS = 112;
+function medirAbeja(){ BS = innerWidth >= 1000 ? 132 : 104; }
+const escala = () => BS / 26.2 * .82;
+const A = { x: -200, y: -200, voltear: false, visible: false, vuelo: null, donde: 'tranquera' };
+let firmaPresencia = '';
+const PERCHAS = {
+  tranquera: [664, 520, .85], cielo: [712, 156, 0], fuera: [1320, 40, 0], matas: [520, 432, .5], animales: [700, 440, .5], finca: [560, 330, .5],
+  aprender: [500, 262, .24], vender: [760, 330, .24], tiempo: [700, 150, 0], agente: [664, 520, .85],
+};
+function percha(n){ if(VW < 700 && (n === 'tranquera' || n === 'agente')) return [VW*.64,VH-18-12-BS/2]; const [ux, uy, p] = PERCHAS[n] || PERCHAS.tranquera; const [x, y] = aPantalla(ux, uy); const [dx, dy] = desplazamiento(p); const sy = SCROLL_CSS && !quieto() ? -p * 60 * clamp(scrollY / innerHeight) : 0; return [x + dx, y + dy + sy - PIE * escala() + 6]; }
+let compaiSel = 'angelita';
+function seguirCompai(now){
+  if (!A.visible){ if (firmaPresencia !== 'hidden'){ firmaPresencia = 'hidden'; parent.postMessage({channel:'home-a',action:'presence',value:{visible:false}}, '*'); } return; }
+  const bob = quieto() ? 0 : Math.sin(now / 1000 * 3.2) * 4;
+  const size = compaiSel === 'angelita' ? BS : BS * .8;
+  const centerY = compaiSel === 'angelita' ? A.y + bob : A.y + PIE * escala() - 6 - size * .48 + size / 2 + (VUELA.has(compaiSel) ? bob * .5 : 0);
+  const signs = cajasLetreros;
+  const firma = `${signs.map(r => `${r.left},${r.top},${r.right},${r.bottom}`).join(';')}|${A.voltear}`;
+  if (firma === firmaPresencia) return;
+  firmaPresencia = firma;
+  parent.postMessage({channel:'home-a',action:'presence',value:{x:A.x,y:centerY,size,signs,visible:true,flip:A.voltear}}, '*');
+}
+function volarA(n, dur){
+  return new Promise(res => {
+    A.donde = n;
+    const [tx, ty] = percha(n);
+    if (quieto() || !A.visible){ A.x = tx; A.y = ty; A.visible = true; res(); pedir(); return; }
+    const x0 = A.x, y0 = A.y, d = Math.hypot(tx - x0, ty - y0);
+    const cx = (x0 + tx) / 2 + (ty - y0) * .25, cy = Math.min(y0, ty) - 40 - d * .15;
+    A.voltear = tx < x0;
+    A.vuelo = { x0, y0, cx, cy, n, t0: performance.now(), dur: dur || clamp(350 + d * 1.6, 500, 1500), res };
+    pedir();
+  });
+}
+function avanzarVuelo(now){
+  const V = A.vuelo; if (!V) return;
+  const k = clamp((now - V.t0) / V.dur), e = sEase(k);
+  const [tx, ty] = percha(V.n);
+  A.x = (1 - e) * (1 - e) * V.x0 + 2 * (1 - e) * e * V.cx + e * e * tx;
+  A.y = (1 - e) * (1 - e) * V.y0 + 2 * (1 - e) * e * V.cy + e * e * ty;
+  if (k >= 1){ A.vuelo = null; A.voltear = false; V.res(); }
+}
+
+/* ---------- un solo bucle, y solo cuando hace falta ---------- */
+let raf = 0, visibleFinca = true;
+function pedir(){ if (!raf) raf = requestAnimationFrame(cuadro); }
+function cuadro(now){
+  raf = 0;
+  par.x += (par.tx - par.x) * .08; par.y += (par.ty - par.y) * .08;
+  avanzarVuelo(now);
+  if (!A.vuelo && A.visible){ const [x, y] = percha(A.donde); A.x = x; A.y = y; }
+  ponerPlanos();
+  if (!quieto()) ponerChiva(now / 1000);
+  seguirCompai(now);
+  // con reduced-motion o la finca fuera de la vista, no se sigue pidiendo cuadros
+  const falta = Math.abs(par.tx - par.x) > .002 || Math.abs(par.ty - par.y) > .002 || A.vuelo;
+  if (!document.hidden && visibleFinca && (!quieto() || falta)) pedir();
+}
+new IntersectionObserver(es => { visibleFinca = es[0].isIntersecting; if (visibleFinca) pedir(); }).observe(finca);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pedir(); });
+
+// paralaje: el puntero en escritorio, el scroll en el teléfono
+finca.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || quieto()) return;
+  const r = finca.getBoundingClientRect();
+  par.tx = ((e.clientX - r.left) / r.width - .5) * 2; par.ty = ((e.clientY - r.top) / r.height - .5) * 2; pedir();
+});
+finca.addEventListener('pointerleave', () => { par.tx = par.ty = 0; pedir(); });
+// si el navegador no hace la paralaje de scroll en CSS, la hace JS
+if (!SCROLL_CSS) addEventListener('scroll', () => { if (quieto()) return; par.sc = clamp(scrollY / Math.max(1, VH)); pedir(); }, { passive: true });
+addEventListener('resize', () => { medir(); medirAbeja(); medirLetreros(); if (VW < 700) ponerChiva(17.5); pedir(); });
+if (document.fonts) document.fonts.ready.then(() => { medirLetreros(); pedir(); });
+// A newly mounted document can receive its viewport after its first script pass.
+new ResizeObserver(() => { medir(); medirAbeja(); medirLetreros(); if (VW < 700) ponerChiva(17.5); ponerPlanos(); pedir(); }).observe(finca);
+
+/* ---------- la sala: a dónde lleva cada lugar ---------- */
+const sala = $('#sala');
+let abierta = null;
+function abrir(id){ window.parent.postMessage({channel:'home-a', action:'place', value:id}, '*'); }
+function cerrar(){
+  if (!abierta) return;
+  const id = abierta; abierta = null;
+  sala.classList.add('anim'); sala.style.clipPath = `circle(0px at ${sala.dataset.cx}px ${sala.dataset.cy}px)`;
+  const fin = () => { sala.classList.remove('abierta'); sala.setAttribute('aria-hidden', 'true'); document.body.classList.remove('en-sala'); };
+  if (quieto()) fin(); else setTimeout(fin, 600);
+  const vuelta = document.querySelector(`[data-lugar="${id}"]`); if (vuelta && vuelta.focus) vuelta.focus({ preventScroll: true });
+}
+$('#salir').addEventListener('click', () => { if (history.state?.sala) history.back(); else cerrar(); });
+addEventListener('popstate', () => { if (!history.state?.sala) cerrar(); else abrir(history.state.sala); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && abierta) $('#salir').click(); });
+
+// todo lo que lleva data-lugar es una puerta
+let yendo = false;
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-lugar]'); if (!t || t.closest('#sala')) return;
+  const id = t.dataset.lugar; if (!DESTINOS[id]) return;
+  if (id === 'agente') { e.preventDefault(); parent.postMessage({channel:'home-a',action:'listen'}, '*'); return; }
+  e.preventDefault(); if (yendo) return;
+    // si el lugar está en la ladera y la finca se ve, Angelita va primero
+  if (PERCHAS[id] && visibleFinca && !quieto() && id !== 'agente'){
+    yendo = true; await volarA(id);
+    setTimeout(() => { yendo = false; abrir(id, t.classList.contains('lugar') ? t : (document.querySelector(`.letrero[data-lugar="${id}"]`) || t)); }, 220);
+  } else abrir(id, t);
+});
+
+/* ---------- almanaque: fecha, luna, pronóstico ---------- */
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+$('#a-mes').textContent = MESES[ahora.getMonth()]; $('#a-num').textContent = ahora.getDate(); $('#a-sem').textContent = DIAS[ahora.getDay()];
+$('#t-hoy').textContent = `Hoy, ${DIAS[ahora.getDay()]} ${ahora.getDate()}`;
+{ // fase de la luna: edad desde una luna nueva conocida (6 ene 2000, 18:14 UTC)
+  const SIN = 29.530588853, edad = (((ahora - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) % SIN + SIN) % SIN;
+  const nombre = edad < 1.85 || edad > 27.68 ? 'Luna nueva' : edad < 13.77 ? 'Luna creciente' : edad < 15.76 ? 'Luna llena' : 'Luna menguante';
+  const f = edad / SIN, ilum = (1 - Math.cos(f * TAU)) / 2;
+  // parte iluminada: medio disco + elipse del terminador. La misma luna en el almanaque y en el cielo.
+  const der = f < .5, rx = Math.abs(1 - 2 * ilum) * 10, gib = ilum > .5;
+  for (const [g, borde] of [[$('#luna-ico'), '#2b2118'], [$('#luna-cielo'), 'none']]){
+    el('circle', { r: 10, fill: borde === 'none' ? '#26335a' : '#3b3f55', stroke: borde, 'stroke-width': 1.2 }, g);
+    el('path', { d: `M0 -10A10 10 0 0 ${der ? 1 : 0} 0 10A${rx.toFixed(2)} 10 0 0 ${der === gib ? 1 : 0} 0 -10Z`, fill: '#f3eecf' }, g);
+  }
+  $('#luna-txt').textContent = `${nombre} · ${Math.round(ilum * 100)} % iluminada`;
+}
+{ const s = $('#siete'); for (let i = 0; i < 7; i++){ const d = new Date(ahora); d.setDate(d.getDate() + i); const sp = document.createElement('span'); sp.innerHTML = `<b>${i ? DIAS[d.getDay()].slice(0, 3) : 'hoy'}</b>—`; sp.setAttribute('aria-label', `${DIAS[d.getDay()]}: sin dato`); s.appendChild(sp); } }
+
+/* ---------- recado, escuchar, noche, corto o con detalle ---------- */
+const RECADO = {
+  corto: `${saludo}. Consultando los registros de su finca.`,
+  largo: `${saludo}. Consultando los registros de su finca.`,
+};
+let largo = false;
+const ponerRecado = () => { $('#recado-txt').textContent = largo ? RECADO.largo : RECADO.corto; };
+ponerRecado();
+$('#corto').addEventListener('click', () => { largo = false; $('#corto').setAttribute('aria-pressed', 'true'); $('#largo').setAttribute('aria-pressed', 'false'); ponerRecado(); });
+$('#largo').addEventListener('click', () => { largo = true; $('#largo').setAttribute('aria-pressed', 'true'); $('#corto').setAttribute('aria-pressed', 'false'); ponerRecado(); });
+const bEsc = $('#escuchar');
+if (!('speechSynthesis' in window)) { bEsc.disabled = true; bEsc.title = 'Este navegador no lee en voz alta'; }
+bEsc.addEventListener('click', () => {
+  const ss = window.speechSynthesis; if (!ss) return;
+  if (ss.speaking){ ss.cancel(); bEsc.setAttribute('aria-pressed', 'false'); return; }
+  const u = new SpeechSynthesisUtterance($('#recado-txt').textContent); u.lang = 'es-CO'; u.rate = .95;
+  u.onend = u.onerror = () => bEsc.setAttribute('aria-pressed', 'false');
+  bEsc.setAttribute('aria-pressed', 'true'); ss.speak(u);
+});
+const bNoche = $('#noche');
+const ponerNoche = on => { hora = on ? 'noche' : (horaNatural === 'noche' ? 'dia' : horaNatural); document.body.dataset.hora = hora; bNoche.setAttribute('aria-pressed', String(on)); };
+bNoche.setAttribute('aria-pressed', String(hora === 'noche'));
+bNoche.addEventListener('click', () => { ponerNoche(hora !== 'noche'); });
+
+const VUELA = new Set(['angelita', 'guacamaya', 'luciernaga']);
+
+/* ---------- la entrada: la neblina se levanta y llega Angelita ---------- */
+medir(); medirAbeja(); medirLetreros();
+if (VW < 700) ponerChiva(17.5);
+const niebla = $('#niebla');
+function entrar(){
+  const vuela = VUELA.has(compaiSel), dondeSaluda = vuela ? 'cielo' : 'tranquera';
+  if (quieto()){
+    ponerChiva(17.5); // detenida en la parada
+    niebla.classList.add('ida'); $('#letreros').classList.remove('antes');
+    A.donde = dondeSaluda; [A.x, A.y] = percha(dondeSaluda); A.visible = true; pedir();
+    return;
+  }
+  requestAnimationFrame(() => niebla.classList.add('ida'));
+  letreros.forEach((l, i) => { l.style.transitionDelay = (700 + i * 110) + 'ms'; });
+  setTimeout(() => $('#letreros').classList.remove('antes'), 30);
+  setTimeout(() => letreros.forEach(l => { l.style.transitionDelay = ''; }), 1800);
+  // entra desde arriba a la derecha: volando si vuela, de un salto si camina
+  A.donde = 'fuera'; [A.x, A.y] = percha('fuera'); A.visible = true;
+  setTimeout(async () => {
+    await volarA(dondeSaluda, 1500);
+    if (A.donde === 'cielo' && !yendo) volarA('tranquera', 1300);
+  }, 700);
+  pedir();
+}
+ponerPlanos();
+if (location.hash && DESTINOS[location.hash.slice(1)]) history.replaceState(null, '', location.pathname + location.search);
+addEventListener('home-data', ({detail:d}) => {
+  compaiSel = d.companion;
+  RECADO.corto = d.summary; RECADO.largo = d.summary + ' Consulte los registros para ver el detalle.'; ponerRecado();
+  document.querySelector('.quien').lastChild.textContent = 'El recado de su compai';
+  document.querySelector('.hableme small').textContent = 'Toque y pregunte a su compai.';
+});
+entrar();
+})();
+</script>
+</body>
+</html>

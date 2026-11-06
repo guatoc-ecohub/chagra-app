@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — del estiércol al fuego y al suelo</title>
+<meta name="description" content="Del corral al biodigestor de bolsa: vida sin oxígeno, gas para cocinar y nutrientes para el suelo. Estimación transparente, cuidado del frío, seguridad y protección del agua. Funciona sin conexión.">
+<meta name="color-scheme" content="dark light">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(12,16,24,.66); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#0b0d1e;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#0b0d1e;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#17311d}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1f3d24;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1f3d24;margin-top:1em;font-weight:600}
+#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(236,244,240,.95),0 0 14px rgba(236,244,240,.8)}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+.rueda{display:inline-flex;align-items:baseline}
+.rueda{line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+#frase .leyenda{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:.5em;font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase .leyenda b{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.05em;margin-right:.35em}
+#frase .luz{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);margin-top:.5em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#frase .luz .barra{flex:0 0 6rem;height:5px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}
+#frase .luz .barra i{display:block;height:100%;background:#f2e3a0;width:100%}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;pointer-events:none;opacity:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(10,14,22,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(12,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(30,36,50,.8);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+#girar{display:none}
+#girar.ver{display:inline-block}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#12151f;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(5,7,14,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#12151f;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#fuentes code{font-family:var(--mono);font-size:.9em}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#1a1e2b;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op .letra{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:#10131c;width:100%;aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.solo-ancho{display:inline-block}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap}
+  .btn{padding:10px 14px}
+  .solo-ancho{display:none}
+  #girar.ver{position:fixed;right:var(--gut);top:var(--girar-top,150px)}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:370px){ .btn{padding:10px 10px} }
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+
+#bSonido,#girar{display:none!important}
+#titulo{color:#17311d;padding:12px 18px;background:rgba(238,246,226,.9);border-radius:16px;max-width:30rem}
+#titulo h1{font-size:clamp(2.6rem,5vw,4.6rem)}
+#titulo p{font-size:1.3rem}
+#frase{max-height:48vh;overflow:auto}
+#calculadora label{display:block;font-family:var(--sans);font-size:1rem;margin:8px 0}
+#calculadora input,#calculadora select{font:inherit;padding:8px;background:#eaf2da;color:#17311d;border:0;border-radius:6px;max-width:100%}
+#resultado{display:block;line-height:1.45;font-family:var(--sans);border-left:3px solid #a7c957;padding:8px;margin-top:10px;background:rgba(167,201,87,.1)}
+#resultado strong{display:block;color:#c9e28a}
+@media(max-width:640px){
+ #titulo{max-width:calc(100vw - 32px);padding:10px 14px}
+ #titulo h1{font-size:2.65rem} #titulo p{font-size:1.18rem}
+ #frase{bottom:126px;max-height:39vh}
+ #controles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+ #controles .btn{font-size:.93rem;padding:8px 9px}
+ #controles .solo-ancho{display:block}
+ #bBajar{grid-column:span 2}
+ #medidor .estacion{display:flex;grid-column:1/-1;margin-top:4px;padding-top:4px}
+ #medidor .regla{font-size:.9rem} #medidor .nota{font-size:.85rem}
+}
+.ctl{display:grid;gap:8px;margin:.4em 0 .2em;font-family:var(--sans);font-size:1rem}
+.ctl label{display:grid;gap:4px}
+.ctl input[type=range]{width:100%;accent-color:#a7c957;min-height:32px}
+.ctl .grupo{display:flex;gap:8px}
+.bc.chip[aria-pressed="true"]{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#resInline{display:block;line-height:1.45;border-left:3px solid #a7c957;padding:6px 8px;background:rgba(167,201,87,.1)}
+#resInline strong{display:block;color:#c9e28a;font-size:.95rem}
+#bDias[aria-pressed="true"],#bInver[aria-pressed="true"],#bAguacero[aria-pressed="true"]{border-color:#a7c957}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso ilustrado por escalas reales: la finca, la bolsa del biodigestor, una gota, una fibra, el consorcio de microbios y una molécula de metano; luego la cocina y el suelo" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>La energía<br>del corral</h1>
+  <p>Del estiércol al fuego.<br>Del biol al suelo vivo.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor del recorrido">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">42,0 m</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 42 000 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/8 · La finca</span><span id="vLuz">Sin altitud</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 6</div>
+  <h2 id="fTit">El corral</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="girar" aria-label="Control accesorio oculto">Girar 90°</button>
+  <button type="button" class="btn" data-repaso>Repaso</button>
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón">Sonido: no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn solo-ancho" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" data-cuenta>Cuenta</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false">Bajar ↓</button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Estas fuentes y las cuentas viajan dentro de la lección: puede leerlas sin señal. Abrir los documentos enlazados requiere conexión. El dibujo es conceptual: colores, microbios y tuberías no son un plano de instalación. El medidor da el ancho real de lo que se ve; las moléculas que viajan entre células se dibujan agrandadas.</p>
+    <ol id="listaFuentes"><li id="f1"><b>Martí Herrero · Biodigestores tubulares</b>. <a href="https://www.guiagronicaragua.com/wp-content/uploads/2020/02/Manual-de-Dise%C3%B1o-e-Instalaci%C3%B3n-de-Biodigestores-Latinoamericanos-26sep-color_compressed.pdf" target="_blank" rel="noopener">Documento</a> — Tablas 5, 6, 8 y 10; pp. 35–44. Mezcla, temperatura del líquido, retención, rendimiento y consumo. Cap. 10: geometría; §25.7: manejo del efluente. Los valores son referencias de diseño, no garantías.</li><li id="f2"><b>EPA AgSTAR · Cómo funciona la digestión</b>. <a href="https://www.epa.gov/agstar/how-does-anaerobic-digestion-work" target="_blank" rel="noopener">Documento</a> — Recipiente sin oxígeno; biogás con metano «del 50 al 75 por ciento», CO₂, H₂S y vapor de agua; digestato con parte líquida y sólida.</li><li id="f3"><b>EPA AgSTAR · Seguridad</b>. <a href="https://www.epa.gov/sites/default/files/2014-12/documents/safety_practices.pdf" target="_blank" rel="noopener">Documento</a> — §2.1.8, §2.2 y §2.3: fuego, explosión, asfixia, espacios confinados y H₂S. §2.1.5: contención de derrames. Guía de seguridad, no norma colombiana.</li><li id="f4"><b>GTZ / ISAT · Biogas Digest, volumen I</b>. <a href="https://energypedia.info/images/3/3a/Biogas_gate_volume_1.pdf" target="_blank" rel="noopener">Documento</a> — Microbiology, pp. 8–9 impresas: hidrólisis por enzimas, bacterias que producen ácido acético, H₂ y CO₂, metanógenas obligatoriamente anaerobias y sensibles; figura 3: formas de Methanosarcina (esferas) y Methanothrix (tubos). Temperature e Inhibiting factors: frío, detergentes y antibióticos. Usa «bacterias» para las metanógenas; hoy se clasifican como arqueas [7].</li><li id="f5"><b>NRCS · Manejo de nutrientes</b>. <a href="https://www.nrcs.usda.gov/getting-assistance/other-topics/nutrient-management" target="_blank" rel="noopener">Documento</a> — Analizar suelo y abonos; ajustar cantidad, momento y aplicación para reducir pérdidas y contaminación. Orientación técnica, no norma colombiana.</li><li id="f6"><b>IGAC · Zonificación climática</b>. <a href="https://www.igac.gov.co/sites/default/files/listadomaestro/in-gag-pc05-13_zonificacion_climatica_para_levantamiento_de_suelos.pdf" target="_blank" rel="noopener">Documento</a> — Tabla 3, p. 5: pisos térmicos por altitud. Orientan el aviso del sitio; no predicen la temperatura del líquido ni delimitan el páramo.</li><li id="f7"><b>Estudio experimental · Metabolic Adaptation of Methanogens</b>. <a href="https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2018.00405/full" target="_blank" rel="noopener">Documento</a> — Resumen: consorcios con bacterias hidrolíticas, acidogénicas y acetogénicas, y arqueas metanógenas. Fases: hidrólisis, acidogénesis, acetogénesis y metanogénesis; metanógenas acetoclásticas (acetato) e hidrogenotróficas (H₂ y CO₂). La última etapa la hacen arqueas.</li><li id="f11"><b>OpenStax · Biology 2e, §4.2 Prokaryotic Cells</b>. <a href="https://openstax.org/books/biology-2e/pages/4-2-prokaryotic-cells" target="_blank" rel="noopener">Documento</a> — Cell Size: las células procariotas miden de 0,1 a 5,0 µm de diámetro. Base del tamaño del dibujo del consorcio; no es medición de estas especies.</li><li id="f12"><b>NIST · CCCBDB, geometrías experimentales</b>. <a href="https://cccbdb.nist.gov/expgeom2x.asp?casno=74828&amp;charge=0" target="_blank" rel="noopener">CH₄</a> · <a href="https://cccbdb.nist.gov/expgeom2x.asp?casno=124389&amp;charge=0" target="_blank" rel="noopener">CO₂</a> · <a href="https://cccbdb.nist.gov/expgeom2x.asp?casno=7783064&amp;charge=0" target="_blank" rel="noopener">H₂S</a> — C–H 1,087 Å y H–C–H 109,47°; C=O 1,162 Å, lineal; S–H 1,336 Å y H–S–H 92,11°. Distancias entre núcleos; las esferas del dibujo no son radios atómicos.</li><li id="f8"><b>EPA · Preguntas sobre digestión anaerobia</b>. <a href="https://www.epa.gov/anaerobic-digestion/frequent-questions-about-anaerobic-digestion" target="_blank" rel="noopener">Documento</a> — La digestión reduce patógenos; eso no certifica que el efluente sea inocuo. Complementa el manejo prudente del biol.</li><li id="f9"><b>NRCS Ohio · Nutrient Management 590</b>. <a href="https://www.nrcs.usda.gov/sites/default/files/2022-09/NRCS_590_Standard.pdf" target="_blank" rel="noopener">Documento</a> — pp. 5–6: evitar escorrentía y encharcamiento; ajustar la aplicación de abonos líquidos. Referencia de manejo estadounidense, no obligación legal colombiana.</li><li id="f10"><b>CDC / NIOSH · Hydrogen sulfide</b>. <a href="https://www.cdc.gov/niosh/npg/npgd0337.html" target="_blank" rel="noopener">Documento</a> — Physical Description: el olfato se fatiga rápidamente y no advierte de forma fiable la presencia continua de H₂S.</li></ol>
+    <p class="aviso">Cuentas: carga Q = kg recogidos × (1 + agua/kg); volumen líquido = Q × días / 1000; volumen total ilustrativo = líquido / 0,80 (20 % de espacio de gas, ejemplo de la figura 3, p. 44 [1]). Gas = kg × L/kg de la tabla 8; horas = gas / 300 L/h, cocina doméstica de referencia [1]. Biogás de la tabla 8 expresado a 25 °C y una atmósfera, suponiendo 65 % de metano [1]. Efluente diario aproximado = Q al régimen estable, sin recirculación. El rendimiento depende de la alimentación, humedad y operación; la variación ±10 % del manual no cubre todas las fallas.</p>
+    <p class="aviso">Seguridad y biol: esta lección no certifica una instalación ni una dosis de fertilización. La asistencia técnica debe revisar bolsa, zanja, alivio de presión, filtro, tubería, cocina, almacenamiento y plan de nutrientes. No se propone una distancia legal ni un plazo sanitario sin evaluación local.</p>
+  </div>
+</dialog>
+
+<dialog id="cuenta" class="dlg" aria-labelledby="cuentaT"><div class="cab"><h2 id="cuentaT">La cuenta de su estiércol</h2><button type="button" class="bc" data-cierra>Cerrar</button></div><div class="cuerpo"><p>Escenario de diseño [1]. Indique lo recogido, no el total producido. Mida el líquido: el clima del aire no selecciona la tabla.</p><form id="calculadora">
+  <label>Estiércol <select id="animal"><option value="vaca">Vacuno</option><option value="cerdo">Porcino</option></select></label>
+  <label>Kg frescos recogidos al día <input id="kg" type="number" min="0" max="200" step="0.1" value="20" required></label>
+  <label>Temperatura del líquido (escenario) <select id="temp"><option value="15">13–17 °C · ejemplo frío</option><option value="10">8–12 °C</option><option value="20">18–22 °C</option><option value="25">23–27 °C</option><option value="30">28–32 °C</option><option value="35">33–37 °C</option></select></label>
+  <button class="bc prim" type="submit">Calcular estimación</button>
+  <output id="resultado" aria-live="polite"></output></form><p>Las cifras son referencias, no garantías. Tablas 5, 8 y 10 de la fuente 1. El resultado no determina una dosis de biol.</p></div></dialog>
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso — del corral a la cocina y al suelo.
+   Cada escala vive dentro de la anterior (portal). La cámara
+   baja por un parámetro p que solo mueve el usuario (scroll,
+   dedo, teclado o «Bajar»). Nada se mueve sin ese dato.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'); const texB = document.createElement('canvas');
+let texOK = false;
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+/* ============================================================
+   Cámara por escalas reales. Cada nivel se dibuja en su propio
+   marco (unidad = ancho de su estación, en metros) con origen
+   dentro del nivel anterior: así un nanómetro no pierde precisión
+   al lado de una finca de cuarenta metros.
+   ============================================================ */
+let p = 0, pObj = 0, pPrev = 0, vel = 0, sucio = true;
+let giro = 0, giroObj = 0, giroArr = 0, luzCelD = 1;
+let reloj = 0;
+const semilla = Number(qs.get('semilla')) || 20261001;
+const numero = (v,a,b) => v!==null && v.trim()!=='' && Number.isFinite(Number(v)) && Number(v)>=a && Number(v)<=b ? Number(v) : null;
+const alt = numero(qs.get('alt'),0,6000);
+const lat = numero(qs.get('lat'),-90,90), lon = numero(qs.get('lon'),-180,180);
+// La ubicación solo orienta. No se envía, guarda ni imprime una finca.
+const municipioPresente = !!qs.get('municipio')?.trim();
+const piso = alt===null ? 'Sin altitud' : alt<=1000 ? 'Cálido' : alt<=2000 ? 'Templado' : alt<=3000 ? 'Frío' : 'Alta montaña';
+const avisoSitio = alt===null ? (lat!==null&&lon!==null ? 'Coordenadas sin altitud: indique temperatura del líquido.' : 'Sin datos: ejemplo, no clima medido.') : piso==='Alta montaña' ? 'Alta montaña: revisión humana del sitio; no instalar sin evaluar protección del ecosistema.' : piso==='Frío' ? 'Piso frío: medir el líquido y evaluar cubierta solar y aislamiento.' : 'Medir el líquido: la altitud no fija su temperatura.';
+
+/* ---------- niveles: origen global (m), unidad (m), giro ---------- */
+const TH = -0.45, cT = Math.cos(TH), sT = Math.sin(TH);
+const rotT = (u, v) => [u*cT - v*sT, u*sT + v*cT];
+const F2 = 0.006, F3 = 9e-5, F4 = 9e-6, F5 = 9e-10;
+const O2 = [-1.2, 0.55];                                   // una gota en el líquido de la bolsa
+const O3 = O2.slice();                                     // la fibra pasa por el centro de la gota
+const d4 = rotT(0, 33e-6); const O4 = [O3[0] + d4[0], O3[1] + d4[1]];   // 3 µm fuera del borde de la fibra (media fibra: 30 µm)
+const B5 = [0.55, 0.12];                                   // burbuja en el consorcio (unidades de F4, marco girado)
+const d5 = rotT(B5[0]*F4, B5[1]*F4); const O5 = [O4[0] + d5[0], O4[1] + d5[1]];
+const off = (O, u, v, F, gira) => { const d = gira ? rotT(u*F, v*F) : [u*F, v*F]; return [O[0] + d[0], O[1] + d[1]]; };
+
+/* ---------- estaciones: centro (m) y ancho visible (m), apaisado y vertical ---------- */
+const K = [
+ { c:[2.5,-5.6], f:42,  cp:[-1.4,-4.6], fp:21 },                     // la finca
+ { c:[0.25,-0.5], f:10.5, cp:[0.2,-0.2], fp:8.6 },                     // la bolsa
+ { c:off(O2,-0.25,0.12,F2), f:F2, cp:off(O2,-0.1,0.1,F2), fp:F2*0.72 },     // una gota
+ { c:off(O3,0.1,0.42,F3,1), f:F3, cp:off(O3,0.05,0.3,F3,1), fp:F3*0.75 },   // la fibra
+ { c:off(O4,0.25,0.3,F4,1), f:2.4e-5, cp:off(O4,0.35,0.3,F4,1), fp:1.5e-5 },   // el consorcio
+ { c:O5.slice(), f:F5, cp:O5.slice(), fp:F5*0.8 },                   // la molécula
+ { c:[-14.5,-4.75], f:6.4, cp:[-14.5,-4.5], fp:4.2 },                // la cocina
+ { c:[13.0,-1.6], f:19, cp:[15.4,0.6], fp:10.5 }                      // suelo y agua
+];
+// Viajes: la subida del metano a la cocina pasa por la finca entera.
+const VIA = { 5: [{ c:[-5.5,-4.6], f:34, cp:[-5.5,-3.8], fp:20 }] };
+const NEST = K.length;
+const SEGS = [];
+for (let i = 0; i < NEST; i++){
+ SEGS.push({ k:'hold', L:i, st:i, w:1 });
+ if (i < NEST - 1) SEGS.push({ k:'viaje', L:i, w: VIA[i] ? 3 : 1.6 });
+}
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc, EST = SEGS.filter(s => s.k === 'hold').map(s => ({ a:s.a, b:s.b, st:s.st }));
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const F = K.map(k => k.f);
+const kc = k => PORT ? k.cp : k.c, kf = k => PORT ? k.fp : k.f;
+function interp(A, B, t){
+ const fA = kf(A), fB = kf(B), cA = kc(A), cB = kc(B);
+ const f = Math.exp(lerp(Math.log(fA), Math.log(fB), t));
+ if (Math.abs(Math.log(fA / fB)) < 0.4) return { cx:lerp(cA[0], cB[0], t), cy:lerp(cA[1], cB[1], t), f };
+ // Punto fijo: el destino entra al centro a la par con el aumento.
+ const k = (f - fB) / (fA - fB);
+ return { cx: cB[0] + (cA[0] - cB[0]) * k, cy: cB[1] + (cA[1] - cB[1]) * k, f };
+}
+function camAt(pp){
+ pp = clamp(pp, 0, T);
+ const s = SEGS.find(q => pp <= q.b) || SEGS.at(-1), u = clamp((pp - s.a) / s.w, 0, 1);
+ if (s.k === 'hold'){ const k = K[s.L]; return { k:'lvl', L:s.L, cx:kc(k)[0], cy:kc(k)[1], f:kf(k), seg:s, u, etapa:s.L }; }
+ const ruta = [K[s.L], ...(VIA[s.L] || []), K[s.L + 1]], n = ruta.length - 1;
+ const x = u * n, j = Math.min(n - 1, Math.floor(x)), t = x - j, e = t*t*(3 - 2*t);
+ return { k:'lvl', L:s.L, ...interp(ruta[j], ruta[j + 1], e), seg:s, u, etapa:s.L + u };
+}
+function anchoVista(cam){ return cam.f; }
+function luzGlobal(){ return 1; }
+function prepFondoMata(){}
+function prepTeselas(){}
+
+/* ---------- dibujo: primitivas ---------- */
+function trazo(c,pts,col,w){c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.lineJoin='round';c.beginPath();pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.stroke();}
+function elipse(c,x,y,rx,ry,col,a=0){c.fillStyle=col;c.beginPath();c.ellipse(x,y,Math.abs(rx),Math.abs(ry),a,0,Math.PI*2);c.fill();}
+function caja(c,x,y,w,h,col,r=.03){c.fillStyle=col;c.beginPath();c.roundRect(x,y,w,h,r);c.fill();}
+function bola(c,x,y,r,claro,oscuro){const g=c.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r);g.addColorStop(0,claro);g.addColorStop(1,oscuro);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+const AZ = rng(semilla);
+const az = (a, b) => a + (b - a) * AZ();
+// Follaje en masa: racimos de copas superpuestas con luz arriba a la izquierda.
+const PAL = [['#2f5a35','#4f7f45','#7aa65a','#a9c97a'],['#2b5040','#3f7356','#64996d','#97c08a'],['#3a5c2c','#5a8040','#86aa58','#b7cf84']];
+function hazMasa(x, y, r, pal, n){ const b = []; for (let i = 0; i < n; i++){ const a = AZ()*Math.PI*2, d = Math.sqrt(AZ())*r*.62; b.push([x + Math.cos(a)*d*1.15, y + Math.sin(a)*d*.8, r*az(.32,.55)]); } b.sort((u, v) => u[1] - v[1]); return { x, y, r, pal:PAL[pal % PAL.length], b }; }
+function masa(c, m){
+ const P = m.pal;
+ elipse(c, m.x, m.y + m.r*.55, m.r*1.05, m.r*.32, 'rgba(20,40,20,.22)');
+ for (const [x, y, r] of m.b) elipse(c, x, y + r*.12, r, r*.92, P[0]);
+ for (const [x, y, r] of m.b) elipse(c, x - r*.12, y - r*.08, r*.86, r*.8, P[1]);
+ for (const [x, y, r] of m.b) elipse(c, x - r*.28, y - r*.3, r*.5, r*.42, P[2]);
+ for (const [x, y, r] of m.b) if (y < m.y) elipse(c, x - r*.38, y - r*.42, r*.22, r*.18, P[3]);
+}
+
+/* ---------- la finca (metros) ---------- */
+const PERFIL = [[-60,-2.9],[-17.5,-2.66],[-11.6,-2.5],[-6.3,-2.4],[-4.3,-0.4],[-3.9,-0.06],[4.1,0.06],[6.6,0.3],[9,0.8],[13,1.7],[16.4,2.35],[18.4,2.6],[19,3.35],[21.8,3.4],[22.5,2.75],[27,2.5],[60,2.3]];
+function suelo(x){
+ for (let i = 1; i < PERFIL.length; i++){ const [x1, y1] = PERFIL[i]; if (x <= x1){ const [x0, y0] = PERFIL[i - 1]; const t = (x - x0) / (x1 - x0), e = (1 - Math.cos(Math.PI * t)) / 2; return lerp(y0, y1, e); } }
+ return PERFIL.at(-1)[1];
+}
+const LIQ = '#5f5934', LIQ2 = '#433f24', FIB = '#8c7a3d', FIB2 = '#6a5a2a', GAS = '#e2ebe4';
+const ARBOLES = [], CULTIVO = [], FRANJA = [], LEJANOS = [], PIEDRAS = [], BURB = [], NUBES = [];
+for (let x = -58; x < 58; x += az(1.6, 2.6)) LEJANOS.push(hazMasa(x, -4.6 + Math.sin(x*.21)*.7 + az(-.3,.3), az(1.0,1.9), (x*7|0)&3, 9));
+for (const [x, s] of [[-19.5,2.1],[-18.2,1.6],[-4.2,1.5],[-2.6,1.1],[7.2,1.3],[23.8,2.2],[25.6,2.6],[27.8,2.1],[29.9,2.4],[-22,2.4],[-24.5,2.0],[32,2.2]]) ARBOLES.push({ x, s, m: hazMasa(x, suelo(x) - s*2.1, s*1.25, (x*3|0)&1 ? 0 : 2, 14) });
+for (let x = 7.6; x < 15.9; x += .46){ const h = az(.42,.78); CULTIVO.push({ x, h, m: hazMasa(x, suelo(x) - h*.62, h*.48, 1 + ((x*5|0)%2), 8) }); }
+for (let x = 16.2; x < 18.6; x += .18) FRANJA.push({ x, h: az(.7, 1.25), a: az(-.25,.25) });
+FRANJA.push({ x:17.2, h:0, m: hazMasa(17.2, suelo(17.2) - 1.3, 1.0, 0, 12) });
+const MEDIOS = [];
+for (const [a, b] of [[5.5, 36], [-34, -19.5]]) for (let x = a; x < b; x += az(1.3, 2.2)){ const h = az(1.6, 3.4); MEDIOS.push(hazMasa(x, suelo(x) - h, az(.9, 1.6), (x*5|0)&3, 11)); }
+for (let i = 0; i < 110; i++){ const x = az(-30, 30); PIEDRAS.push([x, suelo(x) + az(.5, 6), az(.03, .14)]); }
+for (let i = 0; i < 70; i++) BURB.push({ x: az(-3.2, 3.2), ph: AZ(), v: az(.03, .07), r: az(.01, .032) });
+for (let i = 0; i < 9; i++) NUBES.push([az(-60, 60), az(-22, -12), az(4, 9)]);
+
+const estado = { inver:false, aguacero:false, dias:-1, diasT0:0 };
+const cuentaElegida = { animal:'vaca', kg:'20', temp:'15' };
+
+function bolsaPath(c){ c.beginPath(); c.moveTo(-3.3,-0.42); c.quadraticCurveTo(0,-0.6,3.3,-0.42); c.quadraticCurveTo(3.85,0.35,3.3,1.15); c.lineTo(-3.3,1.15); c.quadraticCurveTo(-3.85,0.35,-3.3,-0.42); c.closePath(); }
+function vaca(c,x,y,s){
+ c.save();c.translate(x,y);c.scale(s,s);
+ for(const dx of [-.62,-.38,.42,.62]){caja(c,dx-.06,-.62,.12,.62,dx<0?'#cfc6a6':'#ddd5b8',.04);caja(c,dx-.07,-.06,.14,.07,'#3a3a2c',.02);}
+ const g=c.createLinearGradient(0,-1.35,0,-.55);g.addColorStop(0,'#f4efdd');g.addColorStop(1,'#cfc4a4');
+ c.fillStyle=g;c.beginPath();c.moveTo(-.85,-1.25);c.quadraticCurveTo(0,-1.42,.72,-1.28);c.quadraticCurveTo(.92,-.95,.72,-.62);c.quadraticCurveTo(0,-.5,-.82,-.62);c.quadraticCurveTo(-1.02,-.95,-.85,-1.25);c.fill();
+ elipse(c,-.4,-1.0,.26,.2,'#4b3f2e',.3);elipse(c,.25,-1.08,.2,.16,'#4b3f2e',-.2);elipse(c,-.05,-.72,.3,.07,'#e9c9b9');
+ c.fillStyle='#e8dfc6';c.beginPath();c.moveTo(.7,-1.25);c.quadraticCurveTo(.95,-1.42,1.12,-1.18);c.lineTo(1.18,-.98);c.quadraticCurveTo(1.05,-.86,.92,-.95);c.closePath();c.fill();
+ elipse(c,1.16,-1.0,.08,.06,'#c49c87');elipse(c,1.0,-1.2,.022,.022,'#20251c');
+ trazo(c,[[.86,-1.33],[.8,-1.45],[.72,-1.4]],'#b7ab8a',.035);elipse(c,.8,-1.3,.09,.04,'#d9cfb2',-.6);
+ trazo(c,[[-.86,-1.15],[-.98,-.85],[-.97,-.62]],'#6b604a',.03);elipse(c,-.97,-.6,.04,.07,'#4b3f2e');
+ c.restore();
+}
+function cerdo(c,x,y,s){
+ c.save();c.translate(x,y);c.scale(s,s);
+ for(const dx of [-.36,-.2,.26,.4]){caja(c,dx-.05,-.25,.1,.25,'#b97a6c',.03);caja(c,dx-.055,-.04,.11,.04,'#4d362b',.02);}
+ const g=c.createLinearGradient(0,-.72,0,-.22);g.addColorStop(0,'#f2c8b0');g.addColorStop(1,'#c58373');
+ elipse(c,0,-.46,.56,.27,g);elipse(c,.5,-.52,.2,.18,g);elipse(c,.66,-.47,.08,.07,'#dc9a88');elipse(c,.69,-.47,.012,.02,'#6e4639');elipse(c,.64,-.47,.012,.02,'#6e4639');
+ c.fillStyle='#d99b86';c.beginPath();c.moveTo(.42,-.66);c.quadraticCurveTo(.44,-.86,.56,-.66);c.fill();elipse(c,.55,-.57,.018,.02,'#262c22');
+ trazo(c,[[-.55,-.5],[-.64,-.56],[-.66,-.48],[-.6,-.46]],'#b98274',.025);elipse(c,0,-.3,.4,.05,'rgba(120,60,50,.18)');c.restore();
+}
+function cielo(c, cam){
+ const g = c.createLinearGradient(0,-40,0,-2); g.addColorStop(0,'#8fc0cf'); g.addColorStop(.6,'#cfe3d6'); g.addColorStop(1,'#eef0d2');
+ c.fillStyle = g; c.fillRect(cam.x0 - 5, -60, cam.x1 - cam.x0 + 10, 70);
+ const sol = c.createRadialGradient(-9,-26,0,-9,-26,16); sol.addColorStop(0,'rgba(255,250,220,.75)'); sol.addColorStop(1,'rgba(255,250,220,0)'); c.fillStyle = sol; c.fillRect(-25,-42,32,32);
+ for (const [x, y, s] of NUBES){ const dx = ((x + reloj*.15 + 70) % 140) - 70; for (let k = 0; k < 4; k++) elipse(c, dx + k*s*.28, y + Math.sin(k*1.7)*s*.06, s*.38, s*.12, 'rgba(255,255,255,.38)'); }
+ const capas = [['#a9c7c3',-10.5,.9,.11],['#8ab4a5',-8,1.2,.17],['#6d9c80',-6,1.0,.26]];
+ for (const [col, base, amp, fr] of capas){ c.fillStyle = col; c.beginPath(); c.moveTo(cam.x0 - 5, 10); for (let x = cam.x0 - 5; x <= cam.x1 + 5; x += Math.max(.15, (cam.x1 - cam.x0)/160)) c.lineTo(x, base + Math.sin(x*fr)*amp*2 + Math.sin(x*fr*2.7 + 1)*amp*.7 + Math.sin(x*fr*7.3)*amp*.18); c.lineTo(cam.x1 + 5, 10); c.fill(); }
+ // Bruma sobre los cerros: profundidad atmosférica.
+ const b = c.createLinearGradient(0,-8,0,-3); b.addColorStop(0,'rgba(230,240,225,0)'); b.addColorStop(1,'rgba(230,240,225,.45)'); c.fillStyle = b; c.fillRect(cam.x0 - 5, -8, cam.x1 - cam.x0 + 10, 6);
+ for (const m of LEJANOS) if (m.x > cam.x0 - 3 && m.x < cam.x1 + 3) masa(c, m);
+ const nb = c.createLinearGradient(0,-4,0,3); nb.addColorStop(0,'rgba(230,240,225,.0)'); nb.addColorStop(1,'rgba(214,230,214,.35)'); c.fillStyle = nb; c.fillRect(cam.x0 - 5, -4, cam.x1 - cam.x0 + 10, 8);
+ for (const m of MEDIOS) if (m.x > cam.x0 - 3 && m.x < cam.x1 + 3) masa(c, m);
+}
+function terreno(c, cam){
+ const paso = Math.max(.05, (cam.x1 - cam.x0)/220), x0 = cam.x0 - 2, x1 = cam.x1 + 2;
+ const sg = c.createLinearGradient(0,-3,0,9); sg.addColorStop(0,'#6a4f30'); sg.addColorStop(.35,'#7b5d38'); sg.addColorStop(1,'#5a4128');
+ c.fillStyle = sg; c.beginPath(); c.moveTo(x0, 40); for (let x = x0; x <= x1; x += paso) c.lineTo(x, suelo(x)); c.lineTo(x1, 40); c.fill();
+ // horizonte orgánico oscuro bajo el pasto
+ c.fillStyle = '#4a3622'; c.beginPath(); for (let x = x0; x <= x1; x += paso) c.lineTo(x, suelo(x) + .1); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, suelo(x) + .42 + Math.sin(x*3.1)*.04); c.fill();
+ c.setLineDash([.25,.18]); trazo(c, Array.from({length: Math.ceil((x1-x0)/paso)}, (_, i) => [x0 + i*paso, suelo(x0 + i*paso) + 1.6 + Math.sin((x0+i*paso)*.7)*.15]), 'rgba(40,28,16,.16)', .04); c.setLineDash([]);
+ const hz = c.createLinearGradient(0,0,0,12); hz.addColorStop(0,'rgba(0,0,0,0)'); hz.addColorStop(1,'rgba(25,15,8,.45)'); c.fillStyle = hz; c.fillRect(x0, -1, x1 - x0, 40);
+ if (cam.f < 25) for (const [x, y, r] of PIEDRAS) if (x > x0 && x < x1) elipse(c, x, y, r, r*.7, 'rgba(160,140,110,.55)');
+ // raíces bajo el cultivo y la franja
+ if (cam.f < 30) for (const q of CULTIVO.concat(FRANJA)) { const y = suelo(q.x); trazo(c, [[q.x, y], [q.x - .05, y + .25], [q.x + .04, y + .45]], 'rgba(220,200,150,.35)', .02); trazo(c, [[q.x, y + .12], [q.x + .14, y + .3]], 'rgba(220,200,150,.3)', .014); }
+ // pasto: banda viva con borde de briznas
+ c.fillStyle = '#6f9a48'; c.beginPath(); for (let x = x0; x <= x1; x += paso) c.lineTo(x, suelo(x) - .06); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, suelo(x) + .14); c.fill();
+ c.fillStyle = '#8fb85c'; c.beginPath(); for (let x = x0; x <= x1; x += paso) c.lineTo(x, suelo(x) - .08 - (cam.f < 14 ? Math.abs(Math.sin(x*23))*.07 : 0)); for (let x = x1; x >= x0; x -= paso) c.lineTo(x, suelo(x) - .01); c.fill();
+}
+function quebrada(c, cam){
+ if (cam.x1 < 18 || cam.x0 > 23) return;
+ const g = c.createLinearGradient(0,2.9,0,3.5); g.addColorStop(0,'#7fb3b5'); g.addColorStop(1,'#3f6f74');
+ c.fillStyle = g; c.beginPath(); c.moveTo(18.75, 3.02); for (let x = 18.75; x <= 22.25; x += .05) c.lineTo(x, Math.max(3.02, suelo(x) - .02)); c.lineTo(22.25, 3.02); c.fill();
+ for (let i = 0; i < 9; i++){ const x = 18.9 + ((i*.41 + reloj*.35) % 3.2); trazo(c, [[x, 3.07 + (i%3)*.07], [x + .3, 3.07 + (i%3)*.07]], 'rgba(235,250,245,.6)', .025); }
+ trazo(c, [[18.75,3.02],[22.25,3.02]], 'rgba(235,250,245,.75)', .03);
+ if (estado.aguacero){ const m = c.createRadialGradient(19.2,3.1,0,19.2,3.1,2.2); m.addColorStop(0,'rgba(120,85,40,.85)'); m.addColorStop(1,'rgba(120,85,40,0)'); c.fillStyle = m; c.fillRect(18.7,2.98,3.6,.45); }
+}
+function casa(c, cam){
+ if (cam.x1 < -19 || cam.x0 > -10.5) return;
+ const piso0 = -2.66, techo = -5.0;
+ // pared del fondo, con su luz
+ const pf = c.createLinearGradient(-17,0,-12,0); pf.addColorStop(0,'#d9cba8'); pf.addColorStop(1,'#efe5c9'); c.fillStyle = pf; c.fillRect(-17.0, techo, 5.0, piso0 - techo);
+ c.fillStyle = 'rgba(120,90,50,.12)'; for (let y = techo + .25; y < piso0; y += .32) for (let x = -17 + ((y*10|0)%2)*.2; x < -12; x += .42) c.fillRect(x, y, .38, .28);
+ // ventana: el aire entra y sale
+ c.fillStyle = '#bfdcd2'; c.fillRect(-16.4, -4.55, 1.1, .85); elipse(c, -15.85, -3.75, .55, .18, '#7fae7e');
+ trazo(c, [[-16.4,-4.12],[-15.3,-4.12]], '#8a6a3c', .05); trazo(c, [[-15.85,-4.55],[-15.85,-3.7]], '#8a6a3c', .05);
+ c.strokeStyle = '#7a5a30'; c.lineWidth = .08; c.strokeRect(-16.4, -4.55, 1.1, .85);
+ if (!RM) for (let i = 0; i < 3; i++){ const t = (reloj*.25 + i/3) % 1; trazo(c, [[-15.9 + t*.2, -4.3 - t*.05], [-15.6 + t*.3, -4.35 - t*.05]], `rgba(255,255,255,${.5*(1-t)})`, .02); }
+ // repisa con ollas de barro
+ trazo(c, [[-13.9,-4.35],[-12.5,-4.35]], '#7a5a30', .06);
+ for (const [x, r, col] of [[-13.6,.13,'#a5643e'],[-13.2,.1,'#8e5634'],[-12.85,.12,'#b07448']]){ elipse(c, x, -4.35 - r, r, r*.95, col); elipse(c, x - r*.3, -4.35 - r*1.25, r*.3, r*.18, 'rgba(255,220,180,.35)'); }
+ // piso
+ c.fillStyle = '#a77f55'; c.fillRect(-17.0, piso0 - .05, 5.0, .12);
+ // fogón de mampostería
+ const fg = c.createLinearGradient(0,-3.5,0,-2.66); fg.addColorStop(0,'#c7b08a'); fg.addColorStop(1,'#9c845f'); c.fillStyle = fg; c.fillRect(-15.9, -3.5, 2.5, .84);
+ c.fillStyle = 'rgba(90,60,30,.25)'; for (let y = -3.4; y < -2.7; y += .2) for (let x = -15.85 + ((y*10|0)%2)*.15; x < -13.45; x += .32) c.fillRect(x, y, .29, .17);
+ caja(c, -16.0, -3.58, 2.7, .1, '#8b6d48', .02);
+ // quemador y llama
+ caja(c, -14.95, -3.66, .7, .08, '#3c3f3a', .02); elipse(c, -14.6, -3.66, .28, .04, '#2a2d2a');
+ const lz = c.createRadialGradient(-14.6,-3.75,0,-14.6,-3.75,.7); lz.addColorStop(0,'rgba(130,190,255,.35)'); lz.addColorStop(1,'rgba(130,190,255,0)'); c.fillStyle = lz; c.fillRect(-15.4,-4.5,1.6,1.4);
+ for (let i = 0; i < 11; i++){ const x = -14.86 + i*.052, h = .11 + (RM ? .02 : Math.sin(reloj*9 + i*1.7)*.025 + Math.sin(reloj*13 + i)*.015);
+  const g = c.createLinearGradient(0,-3.68 - h,0,-3.68); g.addColorStop(0,'rgba(190,235,255,.9)'); g.addColorStop(.55,'#5aa8e6'); g.addColorStop(1,'#2a5fd0');
+  c.fillStyle = g; c.beginPath(); c.moveTo(x - .022, -3.68); c.quadraticCurveTo(x - .03, -3.68 - h*.6, x, -3.68 - h); c.quadraticCurveTo(x + .03, -3.68 - h*.6, x + .022, -3.68); c.fill(); }
+ // olla
+ const ol = c.createLinearGradient(-15.0,0,-14.2,0); ol.addColorStop(0,'#4d5550'); ol.addColorStop(.45,'#c6ccbe'); ol.addColorStop(1,'#59625c');
+ caja(c, -15.0, -4.06, .8, .32, ol, .05); elipse(c, -14.6, -4.06, .41, .05, '#d9dccd'); caja(c, -14.66, -4.16, .12, .08, '#454b45', .02);
+ trazo(c, [[-15.0,-3.98],[-15.12,-3.98],[-15.12,-3.86],[-15.0,-3.86]], '#555c56', .03);
+ if (!RM) for (let i = 0; i < 4; i++){ const t = (reloj*.3 + i/4) % 1; trazo(c, [[-14.7 + i*.08, -4.15 - t*.6], [-14.62 + i*.08 + Math.sin(t*6)*.05, -4.3 - t*.6]], `rgba(255,255,255,${.35*(1-t)})`, .03); }
+ // tubería de gas dentro: llega por la pared, baja a la llave y al quemador
+ trazo(c, [[-12.0,-4.62],[-13.15,-4.62],[-13.15,-3.82],[-14.2,-3.82],[-14.3,-3.66]], '#d8c08c', .045);
+ caja(c, -13.24, -4.02, .18, .12, '#b8503c', .03); trazo(c, [[-13.15,-4.02],[-13.0,-4.12]], '#7a2e22', .03);
+ // paredes cortadas y techo de teja
+ caja(c, -17.3, techo, .32, piso0 - techo + .05, '#b99a6c', .02); caja(c, -12.02, techo, .32, piso0 - techo + .05, '#b99a6c', .02);
+ for (const x of [-17.14,-11.86]) for (let y = techo + .2; y < piso0; y += .3) trazo(c, [[x - .14, y], [x + .14, y]], 'rgba(90,60,30,.25)', .015);
+ c.fillStyle = '#6b4a2c'; c.beginPath(); c.moveTo(-17.9, techo + .02); c.lineTo(-14.65, -6.35); c.lineTo(-11.4, techo + .02); c.lineTo(-11.4, techo + .14); c.lineTo(-14.65, -6.2); c.lineTo(-17.9, techo + .14); c.fill();
+ c.fillStyle = '#a5583a'; c.beginPath(); c.moveTo(-18.0, techo - .02); c.lineTo(-14.65, -6.47); c.lineTo(-11.3, techo - .02); c.lineTo(-11.3, techo + .08); c.lineTo(-14.65, -6.33); c.lineTo(-18.0, techo + .08); c.fill();
+ c.strokeStyle = 'rgba(70,30,20,.35)'; c.lineWidth = .025; for (let k = 0; k < 14; k++){ const t = k/13; c.beginPath(); c.moveTo(lerp(-18.0,-14.65,t), lerp(techo - .02,-6.47,t)); c.lineTo(lerp(-18.0,-14.65,t), lerp(techo + .08,-6.33,t)); c.stroke(); c.beginPath(); c.moveTo(lerp(-11.3,-14.65,t), lerp(techo - .02,-6.47,t)); c.lineTo(lerp(-11.3,-14.65,t), lerp(techo + .08,-6.33,t)); c.stroke(); }
+ // filtro afuera, en la pared, antes de entrar
+ caja(c, -11.62, -4.95, .34, .5, '#5a8790', .05); caja(c, -11.58, -4.9, .1, .4, 'rgba(255,255,255,.25)', .03);
+ trazo(c, [[-11.45,-4.45],[-11.45,-4.62],[-11.98,-4.62]], '#d8c08c', .045);
+}
+function corral(c, cam){
+ if (cam.x1 < -12 || cam.x0 > -4) return;
+ const y0 = -2.4;
+ caja(c, -11.2, y0 - .08, 5.1, .16, '#a29a85', .02);
+ const tg = c.createLinearGradient(0,-5.2,0,-4.6); tg.addColorStop(0,'#9aa29a'); tg.addColorStop(1,'#6f7770');
+ for (const x of [-11,-9.4,-7.8,-6.3]) caja(c, x - .07, -4.95, .14, 2.55, '#6b5537', .03);
+ vaca(c, -9.2, y0 - .08, 1.0); cerdo(c, -7.05, y0 - .08, 1.0);
+ for (const y of [-2.95,-3.55]) trazo(c, [[-11.05, y], [-6.25, y]], '#8a7048', .07);
+ c.fillStyle = tg; c.beginPath(); c.moveTo(-11.5,-5.1); c.lineTo(-6.0,-4.72); c.lineTo(-6.0,-4.6); c.lineTo(-11.5,-4.98); c.fill();
+ c.strokeStyle = 'rgba(40,50,45,.35)'; c.lineWidth = .02; for (let x = -11.4; x < -6; x += .18){ c.beginPath(); c.moveTo(x, -5.08 + (x + 11.5)*.069); c.lineTo(x, -4.96 + (x + 11.5)*.069); c.stroke(); }
+ // estiércol barrido al canal, que baja a la caja de carga
+ elipse(c, -6.6, y0 - .1, .3, .08, '#5b4129'); elipse(c, -6.45, y0 - .14, .14, .05, '#6e5032');
+ c.fillStyle = '#4d3a26'; c.beginPath(); c.moveTo(-6.3, y0 - .02); c.lineTo(-5.15, -1.12); c.lineTo(-5.05, -1.0); c.lineTo(-6.25, y0 + .1); c.fill();
+ trazo(c, [[-6.3, y0 - .04], [-5.12, -1.14]], '#9a9282', .04);
+}
+function sistema(c, cam){
+ if (cam.x1 < -6 || cam.x0 > 7.5) return;
+ // caja de carga
+ caja(c, -5.35, -1.25, .95, .7, '#8f8a78', .03); caja(c, -5.27, -1.2, .79, .2, LIQ, .02); trazo(c, [[-5.35,-1.25],[-4.4,-1.25]], '#c9c2aa', .05);
+ // tubería de entrada hasta el fondo de la bolsa
+ trazo(c, [[-4.62,-0.6],[-3.45,0.72]], '#cfc3a0', .12); trazo(c, [[-4.62,-0.6],[-3.45,0.72]], '#a99c78', .06);
+ // zanja en corte
+ const zj = c.createLinearGradient(0,0,0,1.3); zj.addColorStop(0,'#3e3120'); zj.addColorStop(1,'#2c2216'); c.fillStyle = zj;
+ c.beginPath(); c.moveTo(-3.98, suelo(-3.98)); c.lineTo(-3.78, 1.26); c.lineTo(3.78, 1.26); c.lineTo(3.98, suelo(3.98)); c.fill();
+ if (estado.inver) invernaderoFondo(c);
+ // la bolsa: membrana y corte
+ c.save(); bolsaPath(c); c.clip();
+ const gz = c.createLinearGradient(0,-0.6,0,0.18); gz.addColorStop(0,'#eef3e6'); gz.addColorStop(1,'#c9d6bf'); c.fillStyle = gz; c.fillRect(-4,-0.7,8,0.9);
+ for (let i = 0; i < 7; i++) trazo(c, [[-3 + i, -0.5], [-2.8 + i, 0.12]], 'rgba(255,255,255,.18)', .03);
+ const lq = c.createLinearGradient(0,0.15,0,1.15); lq.addColorStop(0,'#77703f'); lq.addColorStop(.5,LIQ); lq.addColorStop(1,LIQ2); c.fillStyle = lq; c.fillRect(-4,0.15,8,1.1);
+ c.fillStyle = '#2f2a19'; c.beginPath(); c.moveTo(-4,1.18); for (let x = -4; x <= 4; x += .2) c.lineTo(x, 1.0 + Math.sin(x*2.3)*.03 + (x < -1 ? .04 : 0)); c.lineTo(4,1.3); c.fill();
+ const ra = rng(semilla + 5); for (let i = 0; i < 120; i++) elipse(c, ra()*7.4 - 3.7, .2 + ra()*.8, .012 + ra()*.02, .006 + ra()*.008, ra() < .5 ? '#9a8a52' : '#4c4628', ra()*3);
+ for (const b of BURB){ const y = 1.0 - ((reloj*b.v + b.ph) % 1) * .86; if (y > .17){ c.strokeStyle = 'rgba(232,240,205,.75)'; c.lineWidth = b.r*.25; c.beginPath(); c.arc(b.x, y, b.r, 0, 7); c.stroke(); elipse(c, b.x - b.r*.3, y - b.r*.3, b.r*.25, b.r*.2, 'rgba(255,255,255,.7)'); } }
+ trazo(c, [[-4,0.15],[4,0.15]], 'rgba(235,240,200,.55)', .025);
+ if (estado.dias >= 0) parcela(c);
+ c.restore();
+ c.save(); bolsaPath(c); c.strokeStyle = '#47553d'; c.lineWidth = .07; c.stroke(); c.restore();
+ trazo(c, [[-2.6,-0.5],[2.6,-0.5]], 'rgba(255,255,255,.55)', .03);
+ // salida al tanque de biol
+ trazo(c, [[3.42,0.75],[4.35,0.3],[5.08,0.3]], '#cfc3a0', .12); trazo(c, [[3.42,0.75],[4.35,0.3],[5.08,0.3]], '#a99c78', .06);
+ // tanque de biol en corte, tapado y con respiro
+ const tk = c.createLinearGradient(5,0,6.5,0); tk.addColorStop(0,'#8e8b78'); tk.addColorStop(.5,'#b5b29c'); tk.addColorStop(1,'#7f7c6a');
+ caja(c, 5.0, 0.12, 1.45, 1.35, tk, .05); caja(c, 5.1, 0.55, 1.25, .84, '#4f4a2a', .03); trazo(c, [[5.1,.55],[6.35,.55]], 'rgba(220,210,150,.5)', .02);
+ caja(c, 4.92, -0.02, 1.61, .09, '#6c6a5a', .02); for (const x of [5.05,6.3]) caja(c, x, .05, .1, .07, '#55524a', .01);
+ // gas: de la cúpula a la trampa de agua y a la casa; ramal al alivio
+ trazo(c, [[1.0,-0.52],[1.0,-1.06],[-2.55,-0.96],[-2.55,-1.55],[-6.3,-3.2],[-11.3,-4.62]], '#d8c08c', .05);
+ trazo(c, [[1.0,-1.06],[4.3,-1.06],[4.3,-0.58]], '#d8c08c', .05);
+ caja(c, 4.15, -0.6, .3, .66, 'rgba(170,205,215,.85)', .05); caja(c, 4.18, -0.2, .24, .24, 'rgba(90,140,170,.8)', .03);
+ caja(c, -2.7, -0.95, .3, .42, 'rgba(170,205,215,.85)', .05); caja(c, -2.67, -0.68, .24, .13, 'rgba(90,140,170,.8)', .03);
+ caja(c, .9, -1.16, .2, .14, '#b8503c', .03);
+ for (const [x, y] of [[-3.6,-1.4],[-6.0,-3.25],[-8.5,-3.95]]) trazo(c, [[x, y], [x, suelo(x)]], '#6b5537', .07);
+ if (estado.inver) invernaderoFrente(c);
+ if (estAct === ESTACIONES[1] && ESTACIONES[1].pags[pagAct]?.k === 'tam') fantasma(c);
+}
+function invernaderoFondo(c){
+ c.fillStyle = '#b38b5e'; c.fillRect(-4.3,-1.05,.35,1.1); c.fillRect(3.95,-1.05,.35,1.1);
+ c.fillStyle = 'rgba(90,60,30,.25)'; for (let y = -1.0; y < 0; y += .2){ c.fillRect(-4.28, y, .31, .16); c.fillRect(3.97, y, .31, .16); }
+}
+function invernaderoFrente(c){
+ c.fillStyle = 'rgba(225,240,245,.28)'; c.beginPath(); c.moveTo(-4.35,-1.02); c.quadraticCurveTo(0,-2.0,4.35,-1.02); c.lineTo(4.35,-0.92); c.quadraticCurveTo(0,-1.86,-4.35,-0.92); c.fill();
+ c.fillStyle = 'rgba(225,240,245,.12)'; c.beginPath(); c.moveTo(-4.35,-1.0); c.quadraticCurveTo(0,-1.95,4.35,-1.0); c.lineTo(4.35,0.05); c.lineTo(-4.35,0.05); c.fill();
+ for (let i = 1; i < 8; i++){ const x = -4.35 + i*1.0875, y = -1.02 - (1 - Math.pow(x/4.35, 2))*.49; trazo(c, [[x, y], [x, .02]], 'rgba(120,95,60,.6)', .04); }
+ trazo(c, [[-3.4,-1.5],[-1.2,-1.86]], 'rgba(255,255,255,.6)', .04);
+}
+function fantasma(c){
+ const r = calcular(cuentaElegida.animal, Number(cuentaElegida.kg), Number(cuentaElegida.temp)); if (!r) return;
+ const L = r.liquido / 1, x0 = -L/2;
+ c.setLineDash([.18,.12]); c.strokeStyle = 'rgba(250,240,170,.95)'; c.lineWidth = .05; c.strokeRect(x0, -0.42, L, 1.57); c.setLineDash([]);
+ trazo(c, [[x0,1.62],[x0 + L,1.62]], '#f6efc0', .04); for (const x of [x0, x0 + L]) trazo(c, [[x,1.45],[x,1.8]], '#f6efc0', .04);
+}
+function parcela(c){
+ const r = calcular(cuentaElegida.animal, Number(cuentaElegida.kg), Number(cuentaElegida.temp)); if (!r) return;
+ const u = clamp(estado.dias, 0, 1), x = lerp(-3.2, 3.2, u), w = .25 + u*1.6;
+ const g = c.createRadialGradient(x, .62, 0, x, .62, w); g.addColorStop(0,'rgba(240,200,90,.75)'); g.addColorStop(1,'rgba(240,200,90,0)');
+ c.fillStyle = g; c.fillRect(x - w, .15, w*2, 1.0);
+}
+function cultivo(c, cam){
+ if (cam.x1 < 6.5 || cam.x0 > 31) return;
+ // balde de biol junto a los surcos
+ caja(c, 7.0, suelo(7.0) - .42, .34, .42, '#6f8f8a', .04); elipse(c, 7.17, suelo(7.0) - .42, .17, .04, '#4f4a2a');
+ for (const q of CULTIVO){ const y = suelo(q.x); trazo(c, [[q.x, y], [q.x, y - q.h*.55]], '#5d7a3a', .035); masa(c, q.m); }
+ if (estado.aguacero) for (let i = 0; i < 6; i++){ const x = 8 + i*1.4; elipse(c, x, suelo(x) - .02, .4, .05, 'rgba(110,80,40,.7)'); }
+ for (const q of FRANJA){ if (q.m){ masa(c, q.m); continue; } const y = suelo(q.x); c.fillStyle = '#4f7d3c'; c.beginPath(); c.moveTo(q.x - .12, y); c.quadraticCurveTo(q.x + q.a*.5, y - q.h*.7, q.x + q.a, y - q.h); c.quadraticCurveTo(q.x + q.a*.3, y - q.h*.5, q.x + .12, y); c.fill();
+  c.fillStyle = '#86ad5a'; c.beginPath(); c.moveTo(q.x - .03, y - q.h*.3); c.quadraticCurveTo(q.x + q.a*.6, y - q.h*.8, q.x + q.a*.95, y - q.h*.97); c.quadraticCurveTo(q.x + q.a*.4, y - q.h*.6, q.x + .04, y - q.h*.3); c.fill(); }
+}
+function lluvia(c, cam){
+ if (!estado.aguacero || cam.x1 < 5 || cam.x0 > 30) return;
+ c.fillStyle = 'rgba(60,70,80,.18)'; c.fillRect(cam.x0, cam.y0, cam.x1 - cam.x0, cam.y1 - cam.y0);
+ const r = rng(9), t = RM ? 0 : reloj;
+ c.strokeStyle = 'rgba(220,235,245,.55)'; c.lineWidth = .02; c.beginPath();
+ for (let i = 0; i < 260; i++){ const x = 5 + r()*26, y = -9 + ((r()*14 + t*9) % 14); c.moveTo(x, y); c.lineTo(x - .12, y + .5); } c.stroke();
+ // escorrentía café que baja por la ladera hasta la quebrada
+ c.fillStyle = 'rgba(120,85,40,.8)'; c.beginPath(); for (let x = 9; x <= 19.2; x += .2) c.lineTo(x, suelo(x) - .05); for (let x = 19.2; x >= 9; x -= .2) c.lineTo(x, suelo(x) + .03 - (x - 9)*.004); c.fill();
+ for (let i = 0; i < 6; i++){ const x = 9.5 + ((i*1.8 + t*1.4) % 9.5); const y = suelo(x) - .1; c.fillStyle = 'rgba(250,235,200,.9)'; c.beginPath(); c.moveTo(x + .3, y); c.lineTo(x, y - .12); c.lineTo(x, y + .12); c.fill(); }
+}
+function dibujaMundo(c, cam){
+ cielo(c, cam);
+ for (const a of ARBOLES) if (a.x > cam.x0 - 4 && a.x < cam.x1 + 4){ trazo(c, [[a.x, suelo(a.x)], [a.x, suelo(a.x) - a.s*1.9]], '#5b4a30', a.s*.16); masa(c, a.m); }
+ terreno(c, cam); casa(c, cam); corral(c, cam); sistema(c, cam); cultivo(c, cam); quebrada(c, cam); lluvia(c, cam);
+}
+
+/* ---------- una gota (unidad: 6 mm) ---------- */
+const GPART = [], GMOTA = [], GBUR = [];
+for (let i = 0; i < 520; i++){ const r = 5.5*Math.pow(AZ(), 1.3), a = AZ()*6.283; GPART.push({ x: Math.cos(a)*r, y: Math.sin(a)*r*.8, z: AZ(), l: az(.05, .34), w: az(.004, .014), a: az(0, Math.PI), k: az(-.25, .25), col: ['#7d6a3a','#8f7d45','#5d6a3a','#6f5530','#a08a52'][i % 5] }); }
+for (let i = 0; i < 2200; i++){ const r = 5.5*Math.pow(AZ(), 1.4), a = AZ()*6.283; GMOTA.push([Math.cos(a)*r, Math.sin(a)*r*.8, az(.002, .007)]); }
+for (let i = 0; i < 140; i++) GBUR.push({ x: 4*Math.sign(AZ()-.5)*Math.pow(AZ(), 1.6), ph: AZ(), v: az(.01, .03), r: az(.008, .05) });
+function fibraG(c, x, y, l, w, a, k, col){ c.save(); c.translate(x, y); c.rotate(a); c.strokeStyle = col; c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); c.moveTo(-l/2, 0); c.quadraticCurveTo(0, k*l, l/2, 0); c.stroke(); c.strokeStyle = 'rgba(255,240,190,.22)'; c.lineWidth = w*.3; c.beginPath(); c.moveTo(-l/2, -w*.2); c.quadraticCurveTo(0, k*l - w*.2, l/2, -w*.2); c.stroke(); c.restore(); }
+function dibujaGota(c){
+ const g = c.createRadialGradient(0, -1, 0, 0, 0, 9); g.addColorStop(0, '#6b6539'); g.addColorStop(.5, LIQ); g.addColorStop(1, LIQ2);
+ c.fillStyle = g; c.fillRect(-60, -60, 120, 120);
+ for (const [x, y, r] of GMOTA) elipse(c, x, y, r, r*.8, 'rgba(200,180,120,.35)');
+ for (const q of GPART) if (q.z < .3){ c.globalAlpha = aNivel*.35; fibraG(c, q.x, q.y, q.l*1.4, q.w*3.2, q.a, q.k, q.col); }
+ c.globalAlpha = aNivel;
+ for (const q of GPART) if (q.z >= .3) fibraG(c, q.x, q.y, q.l, q.w, q.a, q.k, q.col);
+ fibraG(c, 0.02, 0, 0.62, 0.01, TH, 0.04, FIB);
+ for (const b of GBUR){ const y = 4 - ((reloj*b.v + b.ph) % 1) * 8; if (Math.abs(y) > 4) continue; c.strokeStyle = 'rgba(232,240,205,.8)'; c.lineWidth = b.r*.18; c.beginPath(); c.arc(b.x, y, b.r, 0, 7); c.stroke(); elipse(c, b.x - b.r*.3, y - b.r*.35, b.r*.28, b.r*.2, 'rgba(255,255,255,.7)'); }
+}
+
+/* ---------- la fibra (unidad: 90 µm, marco girado) ---------- */
+const FCEL = [], FBAC = [], FLIB = [];
+for (let row = -1; row <= 1; row++) for (let x = -40; x < 40; x += az(.45, .8)) FCEL.push([x, row*.21, az(.42, .75)]);
+for (let i = 0; i < 3200; i++){ const lado = AZ() < .5 ? -1 : 1, x = 6*Math.sign(AZ()-.5)*Math.pow(AZ(), 1.3); FBAC.push([x, lado*(.338 + Math.pow(AZ(), 2)*.04), az(0, Math.PI), AZ() < .4]); }
+for (let i = 0; i < 1400; i++) FLIB.push([5*Math.sign(AZ()-.5)*Math.pow(AZ(), 1.4), (AZ() < .5 ? -1 : 1)*(.39 + 3*Math.pow(AZ(), 1.6)), az(0, Math.PI), AZ() < .3]);
+function bacteria(c, x, y, a, l, w, col, borde){ c.save(); c.translate(x, y); c.rotate(a); c.fillStyle = col; c.beginPath(); c.roundRect(-l/2, -w/2, l, w, w/2); c.fill(); if (borde){ c.strokeStyle = borde; c.lineWidth = w*.16; c.stroke(); } c.restore(); }
+function dibujaFibra(c){
+ const g = c.createRadialGradient(0, 0, 0, 0, 0, 6); g.addColorStop(0, '#68623a'); g.addColorStop(1, LIQ2); c.fillStyle = g; c.fillRect(-60, -60, 120, 120);
+ for (const [x, y, a, esf] of FLIB) esf ? elipse(c, x, y, .006, .006, '#9fb69a') : bacteria(c, x, y, a, .02, .0067, '#b8b07a');
+ // cuerpo de la fibra con sus células alargadas
+ const fb = c.createLinearGradient(0, -.34, 0, .34); fb.addColorStop(0, '#a08c4c'); fb.addColorStop(.5, FIB); fb.addColorStop(1, FIB2);
+ c.fillStyle = fb; c.beginPath(); c.moveTo(-60, -.333); for (let x = -12; x <= 12; x += .1) c.lineTo(x, -.333 + Math.sin(x*7)*.006); c.lineTo(60, -.333); c.lineTo(60, .333); for (let x = 12; x >= -12; x -= .1) c.lineTo(x, .333 + Math.sin(x*5 + 1)*.006); c.lineTo(-60, .333); c.fill();
+ c.strokeStyle = 'rgba(70,58,25,.55)'; c.lineWidth = .012;
+ for (const [x, y, l] of FCEL){ c.beginPath(); c.roundRect(x, y - .09, l, .18, .06); c.stroke(); }
+ c.fillStyle = 'rgba(255,240,190,.12)'; c.fillRect(-60, -.3, 120, .07);
+ for (const [x, y, a, alt] of FBAC) bacteria(c, x, y, a, .02, .0067, alt ? '#c9b77a' : '#b9c48c', 'rgba(60,50,20,.5)');
+}
+
+/* ---------- el consorcio (unidad: 9 µm, marco girado) ---------- */
+const CHID = [], CACI = [], CACE = [], CSAR = [], CTHR = [], CFLU = [];
+for (let x = -6; x < 6; x += az(.2, .34)) CHID.push([x, -.29 + az(-.02, .03), az(-.5, .5) + (AZ() < .5 ? 0 : Math.PI/2)*.3]);
+for (let i = 0; i < 46; i++) CACI.push([az(-3.6, 3.6), az(-.05, 2.6), az(0, Math.PI)]);
+for (let i = 0; i < 34; i++) CACE.push([az(-3.4, 3.4), az(.25, 2.8), az(0, Math.PI)]);
+for (const [cx, cy, n] of [[0.42,0.26,9],[-1.25,0.95,7],[1.55,1.25,11],[-2.3,1.7,6],[2.6,0.5,8],[-0.3,2.2,10],[1.0,2.9,6],[-2.9,0.4,5],[3.3,2.1,9],[-1.6,2.9,7]]){ const cl = []; for (let i = 0; i < n; i++){ const a = i*2.4, r = .075*Math.sqrt(i)*1.6; cl.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]); } CSAR.push(cl); }
+for (const [x0, y0, a] of [[-3.2,0.6,.18],[0.8,2.0,-.12],[-2.6,2.4,.35],[1.9,0.15,-.4]]){ const ch = []; for (let i = 0; i < 11; i++) ch.push([x0 + Math.cos(a)*i*.3, y0 + Math.sin(a)*i*.3, a]); CTHR.push(ch); }
+// cadenas de productos: polímero → azúcar → ácido → acetato e H2 → metano → burbuja
+const RUTAS = [];
+for (let i = 0; i < 30; i++){ const h = CHID[(i*3) % CHID.length], a = CACI[i % CACI.length]; RUTAS.push({ t:'azucar', p:[[h[0], h[1] + .05], [lerp(h[0], a[0], .5) + .2, lerp(h[1], a[1], .5)], a], v: az(.1, .18), ph: AZ() }); }
+for (let i = 0; i < 26; i++){ const a = CACI[i % CACI.length], e = CACE[i % CACE.length]; RUTAS.push({ t:'acido', p:[a, [lerp(a[0], e[0], .5), lerp(a[1], e[1], .5) - .25], e], v: az(.08, .15), ph: AZ() }); }
+for (let i = 0; i < 30; i++){ const e = CACE[i % CACE.length], s = CSAR[i % CSAR.length][0]; RUTAS.push({ t: i % 2 ? 'h2' : 'acetato', p:[e, [lerp(e[0], s[0], .5), lerp(e[1], s[1], .5) + .2], s], v: az(.08, .16), ph: AZ() }); }
+for (let i = 0; i < 16; i++){ const s = CSAR[i % 3][i % 3]; RUTAS.push({ t:'metano', p:[s, [lerp(s[0], B5[0], .5), lerp(s[1], B5[1], .5) - .3], B5], v: az(.07, .12), ph: AZ() }); }
+function glifo(c, t, x, y, r){
+ if (t === 'azucar'){ c.fillStyle = '#f3e7a8'; c.beginPath(); for (let k = 0; k < 6; k++) c.lineTo(x + Math.cos(k*Math.PI/3)*r, y + Math.sin(k*Math.PI/3)*r); c.fill(); }
+ else if (t === 'acido'){ trazo(c, [[x - r, y + r*.4], [x - r*.3, y - r*.4], [x + r*.3, y + r*.4], [x + r, y - r*.4]], '#f2b46a', r*.45); }
+ else if (t === 'acetato'){ elipse(c, x - r*.45, y, r*.55, r*.55, '#f6cf8c'); elipse(c, x + r*.5, y, r*.45, r*.45, '#e9a95c'); }
+ else if (t === 'h2'){ elipse(c, x - r*.3, y, r*.35, r*.35, '#ffffff'); elipse(c, x + r*.3, y, r*.35, r*.35, '#ffffff'); }
+ else { elipse(c, x, y, r*.5, r*.5, '#4b4f55'); for (let k = 0; k < 4; k++) elipse(c, x + Math.cos(k*1.57 + .4)*r*.75, y + Math.sin(k*1.57 + .4)*r*.75, r*.3, r*.3, '#f4f7fb'); }
+}
+function dibujaConsorcio(c){
+ const g = c.createRadialGradient(.3, .5, 0, .3, .5, 5); g.addColorStop(0, '#6f6a42'); g.addColorStop(1, LIQ2); c.fillStyle = g; c.fillRect(-60, -60, 120, 120);
+ // la fibra, arriba: pared vegetal en corte
+ const fb = c.createLinearGradient(0, -1.4, 0, -.33); fb.addColorStop(0, FIB2); fb.addColorStop(1, '#9b874a');
+ c.fillStyle = fb; c.beginPath(); c.moveTo(-60, -60); c.lineTo(-60, -.333); for (let x = -6; x <= 6; x += .05) c.lineTo(x, -.333 + Math.sin(x*3.3)*.03 + Math.sin(x*11)*.012); c.lineTo(60, -.333); c.lineTo(60, -60); c.fill();
+ c.strokeStyle = 'rgba(70,58,25,.4)'; c.lineWidth = .02; for (let k = 1; k < 6; k++){ c.beginPath(); for (let x = -6; x <= 6; x += .1) c.lineTo(x, -.333 - k*.16 + Math.sin(x*2 + k)*.03); c.stroke(); }
+ // fibrillas sueltas que la hidrólisis va desprendiendo
+ for (let i = 0; i < 18; i++){ const x = -3.6 + i*.42; trazo(c, [[x, -.33], [x + .08, -.2], [x + .02, -.1]], 'rgba(200,180,110,.5)', .015); }
+ const mov = RM ? 0 : reloj;
+ for (const [x, y, a] of CHID) bacteria(c, x, y + Math.sin(mov*1.3 + x*4)*.004, a, .2, .067, '#c8b376', 'rgba(60,45,20,.6)');
+ for (const [x, y, a] of CACI) bacteria(c, x + Math.sin(mov*.7 + y*3)*.02, y + Math.cos(mov*.6 + x)*.02, a + Math.sin(mov*.3 + x)*.1, .22, .075, '#d9a85e', 'rgba(70,40,15,.6)');
+ for (const [x, y, a] of CACE){ c.save(); c.translate(x + Math.sin(mov*.8 + y*2)*.02, y); c.rotate(a + Math.sin(mov*.4 + y)*.1); c.strokeStyle = 'rgba(60,70,30,.7)'; c.lineWidth = .075; c.lineCap = 'round'; c.beginPath(); c.moveTo(-.1, .02); c.quadraticCurveTo(0, -.06, .1, .02); c.stroke(); c.strokeStyle = '#a9c47a'; c.lineWidth = .058; c.stroke(); c.restore(); }
+ for (const ch of CTHR){ const [x0, y0, a] = ch[0]; c.save(); c.translate(x0, y0); c.rotate(a); c.fillStyle = 'rgba(140,190,210,.25)'; c.strokeStyle = 'rgba(160,210,225,.8)'; c.lineWidth = .012; c.beginPath(); c.roundRect(-.16, -.058, ch.length*.3 + .02, .116, .05); c.fill(); c.stroke();
+  for (let i = 0; i < ch.length; i++){ c.fillStyle = '#6fa3b3'; c.beginPath(); c.roundRect(-.15 + i*.3, -.045, .28, .09, .03); c.fill(); }
+  c.restore(); }
+ for (const cl of CSAR) for (const [x, y] of cl){ bola(c, x, y, .068, '#b8e0d4', '#4f8c86'); c.strokeStyle = 'rgba(30,70,70,.5)'; c.lineWidth = .008; c.beginPath(); c.arc(x, y, .068, 0, 7); c.stroke(); }
+ // la burbuja: el gas se junta
+ const bb = c.createRadialGradient(B5[0] - .02, B5[1] - .03, .01, B5[0], B5[1], .076); bb.addColorStop(0, GAS); bb.addColorStop(.85, GAS); bb.addColorStop(1, 'rgba(250,255,250,.95)');
+ c.fillStyle = bb; c.beginPath(); c.arc(B5[0], B5[1], .076, 0, 7); c.fill(); c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = .006; c.stroke();
+ elipse(c, B5[0] - .03, B5[1] - .035, .02, .012, 'rgba(255,255,255,.9)', -.5);
+ const aGl = 1 - fade(CAM.f, 6e-6, 2.5e-6); if (aGl > .01){ c.globalAlpha = aNivel*aGl;
+ if (!RM) for (const r of RUTAS){ const t = (mov*r.v + r.ph) % 1, [a, m, b] = r.p, u = 1 - t;
+  const x = u*u*a[0] + 2*u*t*m[0] + t*t*b[0], y = u*u*a[1] + 2*u*t*m[1] + t*t*b[1];
+  c.globalAlpha = aNivel*aGl*sstep(0, .12, t) * (1 - sstep(.88, 1, t)); glifo(c, r.t, x, y, .04); }
+ else for (const r of RUTAS){ const [a, m, b] = r.p; glifo(c, r.t, .25*a[0] + .5*m[0] + .25*b[0], .25*a[1] + .5*m[1] + .25*b[1], .04); }
+ c.globalAlpha = aNivel; }
+}
+let aNivel = 1;
+
+/* ---------- la molécula (unidad: 0,9 nm). Geometría: NIST CCCBDB ---------- */
+const ANG = 1e-10 / F5;
+const CH4 = [['C',0,0,0],['H',.6276,.6276,.6276],['H',.6276,-.6276,-.6276],['H',-.6276,.6276,-.6276],['H',-.6276,-.6276,.6276]];
+const CO2 = [['C',0,0,0],['O',0,0,1.1621],['O',0,0,-1.1621]];
+const H2S = [['S',0,0,.103],['H',0,.9616,-.8239],['H',0,-.9616,-.8239]];
+const ATOMO = { C:[.36,'#8a9096','#2c3036'], H:[.24,'#ffffff','#b9c2cc'], O:[.33,'#ff9b8a','#b8382a'], S:[.46,'#fff0a0','#c9a21c'] };
+const MCAMPO = []; for (let i = 0; i < 70; i++){ const x = az(-7, 7), y = az(-5, 5); if (Math.hypot(x, y) > .7) MCAMPO.push([x, y, AZ() < .62 ? CH4 : AZ() < .9 ? CO2 : H2S, AZ()*6]); }
+function molecula(c, M, x, y, a, b, esc){
+ const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
+ const P = M.map(([e, X, Y, Z]) => { const x1 = X*ca + Z*sa, z1 = -X*sa + Z*ca, y1 = Y*cb - z1*sb, z2 = Y*sb + z1*cb; return [e, x + x1*ANG*esc, y + y1*ANG*esc, z2]; });
+ for (let i = 1; i < P.length; i++){ const [, xa, ya] = P[0], [, xb, yb] = P[i]; trazo(c, [[xa, ya], [xb, yb]], '#7d838b', .03*esc); trazo(c, [[xa, ya], [xb, yb]], '#d5d9de', .014*esc); }
+ for (const [e, px, py] of P.slice().sort((u, v) => u[3] - v[3])){ const [r, cl, os] = ATOMO[e]; elipse(c, px + .012*esc, py + .016*esc, r*ANG*esc*.7, r*ANG*esc*.7, 'rgba(40,60,60,.12)'); bola(c, px, py, r*ANG*esc*.7, cl, os); }
+ return P;
+}
+let MOLP = null;
+function dibujaMolecula(c){
+ const g = c.createRadialGradient(0, 0, 0, 0, 0, 3); g.addColorStop(0, '#eef4ef'); g.addColorStop(1, '#cfdcd6'); c.fillStyle = g; c.fillRect(-60, -60, 120, 120);
+ const t = RM ? 0 : reloj;
+ for (const [x, y, M, f] of MCAMPO) molecula(c, M, x + Math.sin(t*.4 + f)*.04, y + Math.cos(t*.35 + f)*.04, f + t*.3, f*.7, 1);
+ MOLP = {
+  ch4: molecula(c, CH4, 0, 0, .5 + t*.35, .55, 1),
+  co2: molecula(c, CO2, -.33, -.06, 1.2 + t*.22, .3, 1),
+  h2s: molecula(c, H2S, .33, .14, -.7 + t*.27, .2, 1)
+ };
+}
+
+/* ---------- composición por escalas ---------- */
+const fade = (f, a, b) => sstep(0, 1, (Math.log(a) - Math.log(f)) / (Math.log(a) - Math.log(b)));
+let AY = .42, CAM = null;
+function nivel(c, O, Fu, gira, cam, fn, a){
+ if (a <= .001) return;
+ const z = W / cam.f, s = z * Fu, tx = W/2 + (O[0] - cam.cx)*z, ty = H*AY + (O[1] - cam.cy)*z;
+ const co = gira ? cT : 1, si = gira ? sT : 0;
+ c.setTransform(DPR*s*co, DPR*s*si, -DPR*s*si, DPR*s*co, DPR*tx, DPR*ty);
+ c.globalAlpha = a; aNivel = a; fn(c); c.globalAlpha = 1; aNivel = 1;
+}
+function render(){
+ const cam = camAt(p); CAM = cam;
+ const z = W / cam.f;
+ cam.x0 = cam.cx - (W/2)/z; cam.x1 = cam.cx + (W/2)/z; cam.y0 = cam.cy - (H*AY)/z; cam.y1 = cam.cy + (H*(1 - AY))/z;
+ const f = cam.f;
+ const aG = fade(f, .22, .03), aF = fade(f, 1.6e-3, 3.5e-4), aC = fade(f, 7.5e-5, 3.4e-5), aM = fade(f, 6e-7, 2.2e-7);
+ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.fillStyle = LIQ; ctx.fillRect(0,0,W,H);
+ if (aG < 1) nivel(ctx, [0,0], 1, false, cam, c => dibujaMundo(c, cam), 1);
+ if (aF < 1) nivel(ctx, O2, F2, false, cam, dibujaGota, aG);
+ if (aC < 1) nivel(ctx, O3, F3, true, cam, dibujaFibra, aF);
+ if (aM < 1) nivel(ctx, O4, F4, true, cam, dibujaConsorcio, aC);
+ nivel(ctx, O5, F5, false, cam, dibujaMolecula, aM);
+ ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalAlpha = 1;
+ if (estado.dias >= 0 && aG < .5) contadorDias(cam);
+ if (aG < .5 && estAct === ESTACIONES[1] && ESTACIONES[1].pags[pagAct]?.k === 'tam') cotaFantasma(cam);
+ ctx.save(); ctx.globalAlpha = .16; ctx.fillStyle = ctx.createPattern(papel,'repeat'); ctx.fillRect(0,0,W,H); ctx.restore();
+ return cam;
+}
+function contadorDias(cam){
+ const r = calcular(cuentaElegida.animal, Number(cuentaElegida.kg), Number(cuentaElegida.temp)); if (!r) return;
+ const [x, y] = aPantalla(0, -0.95, cam), d = Math.round(clamp(estado.dias, 0, 1) * r.dias);
+ ctx.font = `600 ${Math.round(clamp(W/cam.f*.3, 15, 30))}px Georgia`; ctx.textAlign = 'center';
+ const t = d >= r.dias ? `día ${d}: sale por la salida` : `día ${d} de ${r.dias}`;
+ const w = ctx.measureText(t).width + 24; ctx.fillStyle = 'rgba(10,14,22,.82)'; ctx.beginPath(); ctx.roundRect(x - w/2, y - 30, w, 42, 10); ctx.fill();
+ ctx.fillStyle = '#f6efc0'; ctx.fillText(t, x, y);
+}
+function cotaFantasma(cam){
+ const r = calcular(cuentaElegida.animal, Number(cuentaElegida.kg), Number(cuentaElegida.temp)); if (!r) return;
+ const t = `${nf(Math.round(r.liquido*10)/10)} m útiles con sección de 1 m²`;
+ ctx.font = `600 ${W < 600 ? 14 : 18}px Georgia`; ctx.textAlign = 'center';
+ const w = ctx.measureText(t).width + 22, fz = document.getElementById('frase').getBoundingClientRect();
+ let [x, y] = aPantalla(0, 1.62, cam); y += W < 600 ? 22 : 30;
+ const izq = W < 600 ? 8 : fz.right + 12; x = clamp(x, izq + w/2, W - 8 - w/2);
+ if (W < 600) y = Math.min(y, fz.top - 30);
+ ctx.fillStyle = 'rgba(10,14,22,.85)'; ctx.beginPath(); ctx.roundRect(x - w/2, y - 21, w, 30, 8); ctx.fill();
+ ctx.fillStyle = '#f6efc0'; ctx.fillText(t, x, y);
+}
+const aPantalla = (gx, gy, cam) => { const z = W / cam.f; return [W/2 + (gx - cam.cx)*z, H*AY + (gy - cam.cy)*z]; };
+const papel=document.createElement('canvas');papel.width=papel.height=128;
+{ const pc=papel.getContext('2d'), grano=pc.createImageData(128,128), azar=rng(semilla+17);
+  for(let i=0;i<grano.data.length;i+=4){const v=Math.round(azar()*255);grano.data.set([v,v,v,30],i);}pc.putImageData(grano,0,0); }
+
+/* ---------- rótulos sobre la escena: anclas en metros globales ---------- */
+const g2 = (u, v) => off(O2, u, v, F2), g3 = (u, v) => off(O3, u, v, F3, 1), g4 = (u, v) => off(O4, u, v, F4, 1), g5 = (u, v) => off(O5, u, v, F5);
+const ROT = [
+ [['Corral',[-8.6,-5.0],0,-34],['Bolsa en zanja',[0,-0.62],0,-46],['Cocina',[-14.6,-6.3],0,-30],['Tanque de biol',[5.7,0.1],40,-40],['Cultivo',[11.5,0.4],10,-56],['Franja de vegetación',[17.2,1.0],-10,-60],['Quebrada',[20.5,3.1],0,34]],
+ [['Biogás',[-0.8,-0.2],-20,-60],['Mezcla en digestión',[-1.6,0.6],-40,40],['Entrada',[-4.2,-0.4],-30,-40],['Salida al biol',[4.6,0.3],20,40],['Alivio de presión',[4.3,-0.4],30,-56],['Trampa de agua',[-2.55,-0.7],-10,50],['Gas a la cocina',[-1.5,-1.0],-20,-46]],
+ [['Partícula de fibra',g2(0.25,-0.12),40,-46],['Burbuja de gas',g2(-0.5,-0.35),-30,-40]],
+ [['Fibra',g3(0.6,-0.1),30,-50],['Bacterias pegadas',g3(-0.3,0.35),-40,50]],
+ [['Hidrólisis',g4(-0.9,-0.29),-30,-46],['Bacterias de los ácidos',g4(CACI[1][0],CACI[1][1]),-40,46],['Arqueas en racimo',g4(0.42,0.26),40,50],['Arqueas en tubo',g4(-2.6,0.7),-20,-40],['Burbuja de gas',g4(B5[0],B5[1]-.08),30,-50]],
+ [['Metano · CH₄',g5(0,-0.15),0,-50],['Dióxido de carbono · CO₂',g5(-0.33,-0.2),-10,-44],['Sulfuro de hidrógeno · H₂S',g5(0.33,0.28),10,44]],
+ [['Llama azul',[-14.6,-3.85],-40,-50],['Filtro',[-11.45,-4.95],30,-40],['Llave de paso',[-13.15,-3.95],40,30],['Ventana abierta',[-15.85,-4.55],-30,-40]],
+ [['Tanque de biol',[5.7,0.1],-20,-46],['Cultivo',[11.5,0.4],10,-60],['Franja de vegetación',[17.2,1.0],-10,-70],['Quebrada',[20.5,3.1],0,40]]
+];
+const etq = document.getElementById('etiquetas'), etqSvg = document.getElementById('etqLineas'); let etqSt = -1, etqEls = [];
+function rect(id){ const e = document.getElementById(id); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? r : null; }
+const choca = (a, b) => b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+function rotulos(cam, st){
+ if (st !== etqSt){ etqSt = st; etqEls.forEach(e => e.remove()); etqEls = ROT[st].map(([t]) => { const d = document.createElement('div'); d.className = 'etq'; d.textContent = t; etq.appendChild(d); return d; }); }
+ const k = K[st], cerca = 1 - sstep(.1, .3, Math.abs(Math.log(cam.f / kf(k)))), lejos = Math.hypot(cam.cx - kc(k)[0], cam.cy - kc(k)[1]) / cam.f;
+ const ver = document.documentElement.dataset.leccion === 'anfitrion' ? 0 : cerca * (1 - sstep(.08, .2, lejos));
+ const evita = ['medidor','frase','controles','titulo','riel'].map(rect).filter(Boolean);
+ let svg = '';
+ ROT[st].forEach(([, g, dx, dy], i) => {
+  const el = etqEls[i], [ax, ay] = aPantalla(g[0], g[1], cam);
+  if (ver < .02){ el.style.opacity = 0; return; }
+  const w = el.offsetWidth, h = el.offsetHeight; let best = null;
+  for (const [sx, sy] of [[1,1],[-1,1],[1,-1],[-1,-1]]){ const lx = ax + dx*sx - w/2, ly = ay + dy*sy - h/2, r = { left:lx, top:ly, right:lx + w, bottom:ly + h };
+   if (r.left < 6 || r.right > W - 6 || r.top < 6 || r.bottom > H - 6 || evita.some(e => choca(r, e))) continue; best = [lx, ly]; break; }
+  const dentro = ax > 0 && ax < W && ay > 0 && ay < H && !evita.some(e => ax > e.left && ax < e.right && ay > e.top && ay < e.bottom);
+  if (!best || !dentro){ el.style.opacity = 0; return; }
+  el.style.opacity = ver; el.style.transform = `translate(${Math.round(best[0])}px,${Math.round(best[1])}px)`;
+  svg += `<line x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${(best[0] + w/2).toFixed(1)}" y2="${(best[1] + (best[1] > ay ? 0 : h)).toFixed(1)}" stroke="rgba(251,250,244,${(ver*.85).toFixed(2)})" stroke-width="1.2"/><circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="3" fill="rgba(251,250,244,${ver.toFixed(2)})"/>`;
+ });
+ etqSvg.innerHTML = svg;
+}
+
+/* ---------- contenido ---------- */
+const ESTACIONES = [
+ {t:'La finca: del corral al fuego y al suelo',c:'La finca',pags:[
+  {s:['Del corral sale estiércol. En una bolsa sin oxígeno se vuelve [[biogas|biogás]] para cocinar y [[biol|biol]] para el suelo{1,2}.','Vamos a bajar hasta las células que hacen el metano, y a volver a subir por el tubo del gas.'],nota:'Lámina ilustrada, no plano de obra. El medidor da el ancho de lo que se ve en el dibujo.'},
+  {k:'hacer',s:['Pese lo que de verdad recoge; no cuente todo lo que produce el animal{1}.','Deje la lluvia y el agua de lavar con jabón fuera de la carga{4}.']},
+  {k:'hacer',s:[avisoSitio+'{6}','Conserve otra forma de cocinar: la cuenta no garantiza gas todos los días.'],nota:municipioPresente?'La dirección trae municipio, pero sin la temperatura del líquido no se puede calcular la producción local.':'No se consultan servicios de ubicación.'}
+ ]},
+ {t:'La bolsa: una panza sin aire',c:'La bolsa',pags:[
+  {s:['Dentro de la bolsa sellada ocurre la [[anaerobia|digestión sin oxígeno]]{2}.','El gas sube y se junta arriba; la mezcla avanza despacio hacia la salida{1}.'],nota:'La ventana en la bolsa es un corte del dibujo: una bolsa real no se abre.'},
+  {k:'hacer',s:['Mezcla de referencia: por cada kilo fresco de vaca, 3 litros de agua; por cada kilo de cerdo, 4{1}.','Alimente todos los días parecido; no suba la carga de golpe{1}.']},
+  {k:'tam',s:['Mueva la cantidad y la temperatura del líquido. El contorno punteado da el largo útil si la sección líquida midiera 1 m²{1}.'],extra:'<div class="ctl"><div class="grupo" role="group" aria-label="Estiércol"><button type="button" class="bc chip" data-animal="vaca" aria-pressed="true">Vaca</button><button type="button" class="bc chip" data-animal="cerdo" aria-pressed="false">Cerdo</button></div><label>Kilos recogidos al día: <b id="kgV">20</b><input type="range" id="kgR" min="2" max="60" step="1" value="20"></label><label>Líquido de la bolsa: <b id="tV">13–17 °C</b><input type="range" id="tR" min="0" max="5" step="1" value="1"></label><output id="resInline" aria-live="polite"></output></div>',nota:'Escenario de diseño, no lectura de un sensor. Ancho, profundidad y anclajes requieren dimensionamiento.'},
+  {k:'cuando',s:['Con el líquido a 13–17 °C, la mezcla de vaca pasa en promedio 90 días dentro; la de cerdo, 65{1}.','[[retencion|Retención]] = volumen líquido ÷ carga diaria. Con más agua en la misma bolsa, ese tiempo baja{1}.'],extra:'<p><button type="button" class="bc prim" id="bDias" aria-pressed="false">Ver pasar los días</button></p>',nota:'Promedio hidráulico: cada gota no sale exactamente el mismo día.'},
+  {k:'hacer',s:['En frío, el manual propone un invernadero compacto con paredes de adobe sobre la zanja; el alivio queda afuera{1}.','La paja aísla poco si se moja; el manual propone 5 cm de icopor en paredes y fondo de la zanja, con revisión del diseño{1}.','Nunca caliente la bolsa con fuego{3}.'],extra:'<p><button type="button" class="bc" id="bInver" aria-pressed="false">Mostrar el invernadero</button></p>'}
+ ]},
+ {t:'Una gota de la mezcla',c:'Una gota',pags:[
+  {s:['En pocos milímetros de mezcla flotan partículas de materia orgánica y burbujas de gas{2}.','Todavía no se ve quién trabaja: son demasiado pequeños para el ojo.'],nota:'Formas y cantidades de partículas son ilustrativas.'},
+  {k:'pensar',s:['Si a la carga le llega agua con jabón o restos de antibióticos, los microbios pueden frenarse{4}.','No hay una cantidad de jabón que sirva de regla: depende de la sustancia y de cuánto entra{4}.']}
+ ]},
+ {t:'La fibra: empieza el desarme',c:'La fibra',pags:[
+  {s:['Sobre la fibra trabajan bacterias. Con enzimas cortan las cadenas largas de la materia en piezas cortas: la [[hidrolisis|hidrólisis]]{4}.','Otras bacterias convierten esas piezas en ácido acético, hidrógeno y CO₂{4}.'],nota:'Dibujo: el lugar y el número de bacterias sobre la fibra son ilustrativos.'},
+  {k:'pensar',s:['El frío hace más lento todo este trabajo{1,4}.','Por eso, en tierra fría la mezcla necesita más días dentro de la bolsa{1}.']},
+  {k:'hacer',s:['Si el gas baja, revise con asistencia técnica: frío, cambios de carga, lavados, fugas y agua en la manguera{1,4}.','No eche cal ni químicos a ciegas. Que no prenda no demuestra que la bolsa esté vacía.']}
+ ]},
+ {t:'El consorcio: un trabajo en cadena',c:'El consorcio',pags:[
+  {k:'tam',s:['Cada célula de esta comunidad mide entre una décima de micra y unas cinco micras{11}.','Puestas en fila, en un milímetro cabrían entre doscientas y diez mil, según su tamaño.'],nota:'Las moléculas que viajan entre células se dibujan más de mil veces más grandes de lo que son, para poder verlas.'},
+  {s:['Las [[arqueas|arqueas metanógenas]] hacen el último paso: forman metano con el acetato, o con hidrógeno y CO₂{7}.','Dependen de las bacterias que les pasan esos productos{4,7}.'],nota:'Esferas en racimo y tubos largos: formas descritas para Methanosarcina y Methanothrix{4}. Los colores son inventados.'},
+  {k:'pensar',s:['Las metanógenas son estrictamente anaerobias y muy sensibles a los cambios del ambiente{4}.','Por eso la bolsa va sellada y la carga se cambia despacio{1}.']}
+ ]},
+ {t:'La molécula: metano',c:'El metano',pags:[
+  {k:'tam',s:['Esto es metano, CH₄: un carbono y cuatro hidrógenos. Del centro del carbono al de cada hidrógeno hay 0,109 nanómetros{12}.','Todo el cuadro mide menos de un nanómetro: en un milímetro cabría más de un millón de veces.'],nota:'Distancias entre núcleos medidas; esferas y colores son convencionales, no el tamaño del átomo.'},
+  {s:['El biogás no es metano puro: trae CO₂, vapor de agua y [[h2s|H₂S]]. El metano suele ser del 50 al 75 %{2}.','La tabla del manual supone 65 % de metano{1}.'],nota:'Aquí las moléculas se dibujan juntas; en un gas real están mucho más separadas.'},
+  {k:'pensar',s:['El H₂S es tóxico, y el olfato se cansa rápido: no avisa con certeza{10}.','El metano arde; acumulado en un espacio cerrado puede explotar{3}.']}
+ ]},
+ {t:'La cocina: aprovechar sin exponerse',c:'La cocina',pags:[
+  {s:['Subimos por el tubo hasta la cocina: el gas pasa por un filtro y una llave antes del quemador{1,3}.','Ejemplo: 20 kg de vaca al día con el líquido a 13–17 °C dan unos 620 litros de biogás; a 300 litros por hora, unas 2,1 horas de fogón{1}.'],nota:'Pronóstico con las tablas 8 y 10 del manual, no medición: mida su consumo.'},
+  {k:'hacer',s:['Cocina ventilada, quemador para biogás, filtro, manejo del agua que se condensa y alivio de presión, revisados por un técnico{1,3}.','Nunca busque fugas con fuego; no tape el alivio ni guarde gas en recipientes improvisados{3}.']},
+  {k:'hacer',s:['Si sospecha una fuga: no prenda fuego ni toque interruptores. Salga y pida ayuda{3}.','Nunca entre a un tanque ni a una fosa a rescatar a alguien: el gas desplaza el aire y puede morir también{3}.'],nota:'Saque personas y animales. La reparación es para personal preparado.'}
+ ]},
+ {t:'El biol: de vuelta al suelo, lejos del agua',c:'Suelo y agua',pags:[
+  {s:['Lo que sale de la bolsa es el [[biol|biol]]: conserva nutrientes útiles para el suelo{2,5}.','La digestión reduce patógenos, pero no los elimina: no es agua limpia ni abono certificado{8}.']},
+  {k:'hacer',s:['Guárdelo en un tanque contenido, fuera del camino del agua de escorrentía{3,9}.','Aplique según el análisis del biol y del suelo, y lo que pide el cultivo{5}.','No aplique con lluvia anunciada ni en suelo encharcado; deje vegetación protectora junto al agua{9}.'],extra:'<p><button type="button" class="bc" id="bAguacero" aria-pressed="false">Ver un aguacero sobre biol recién puesto</button></p>'},
+  {k:'hacer',s:['Sin evaluación sanitaria, no lo rocíe sobre partes que se comen ni lo use para lavar alimentos{8}.','El ejemplo de 80 litros al día deja unos 560 litros de efluente por semana, en régimen estable; esos litros no dicen la dosis por hectárea{1,5}.'],nota:'No se da plazo de cosecha ni distancia legal sin evaluar el sitio.',extra:'<p><button class="bc prim" data-repaso type="button">Hacer el repaso</button></p>'}
+ ]}
+];
+const PASO_CROM = ESTACIONES[1];
+const GLOS = [
+ ['anaerobia','Digestión anaerobia','Descomposición de materia orgánica sin oxígeno; produce biogás y digestato{2}.'],
+ ['hidrolisis','Hidrólisis','Primer paso: enzimas de los microbios cortan cadenas largas (azúcares, proteínas, grasas) en piezas cortas{4,7}.'],
+ ['arqueas','Arqueas metanógenas','Microorganismos distintos de las bacterias. Producen metano en la última etapa: con acetato, o con hidrógeno y CO₂{7}.'],
+ ['retencion','Tiempo de retención','Volumen líquido dividido por la carga diaria. Es un promedio hidráulico, no una fecha exacta para cada partícula{1}.'],
+ ['biogas','Biogás','Mezcla combustible: metano (del 50 al 75 %), CO₂, vapor de agua y trazas de otros gases, incluido H₂S{2}.'],
+ ['h2s','Sulfuro de hidrógeno (H₂S)','Gas tóxico presente en el biogás. El olor puede dejar de advertir el peligro; no sustituye medición ni equipos de seguridad{3,10}.'],
+ ['biol','Biol o digestato','Lo que sale de la digestión. Puede aportar nutrientes; requiere manejo de patógenos y del riesgo de pérdidas al agua{2,5,8}.']
+];
+// Tabla 8 del manual: [días vaca, L/kg vaca, días cerdo, L/kg cerdo].
+const REND = {10:[125,29,90,50],15:[90,31,65,54],20:[65,33,50,59],25:[50,35,35,61],30:[40,38,30,67],35:[30,39,25,71]};
+const TEMPS = [10,15,20,25,30,35], TROT = ['8–12 °C','13–17 °C','18–22 °C','23–27 °C','28–32 °C','33–37 °C'];
+function calcular(animal,kg,temp){
+ if(!['vaca','cerdo'].includes(animal)||!Number.isFinite(kg)||kg<0||kg>200||!REND[temp])return null;
+ const cer=animal==='cerdo', r=REND[temp], agua=kg*(cer?4:3), carga=kg+agua, dias=r[cer?2:0], gas=kg*r[cer?3:1];
+ return {agua,carga,dias,gas,horas:gas/300,liquido:carga*dias/1000,total:carga*dias/800,efluente:carga};
+}
+const nf=v=>v.toLocaleString('es-CO',{maximumFractionDigits:2});
+function actualizarCuenta(){
+ const res = document.getElementById('resInline');
+ if (res){ const r = calcular(cuentaElegida.animal, Number(cuentaElegida.kg), Number(cuentaElegida.temp));
+  res.innerHTML = r ? `<strong>Estimación, no medición</strong>${nf(Math.round(r.gas))} L de biogás al día · ${nf(Math.round(r.horas*10)/10)} h de fogón<br>${r.dias} días dentro · ${nf(Math.round(r.liquido*10)/10)} m³ de líquido · ${nf(Math.round(r.total*10)/10)} m³ en total` : 'No puedo calcular con esos datos.'; }
+ const form=document.getElementById('calculadora');if(!form)return;
+ const kg=form.querySelector('#kg'), result=form.querySelector('#resultado');
+ const n=kg.value.trim()===''?NaN:Number(kg.value), r=calcular(form.querySelector('#animal').value,n,Number(form.querySelector('#temp').value));
+ if(!r){result.textContent='No puedo calcular: indique una cantidad válida y un escenario de temperatura.';return;}
+ result.innerHTML=`<strong>ESTIMACIÓN · régimen estable, no medición</strong>${nf(r.gas)} L de biogás/día · ${nf(r.horas)} h de cocina de referencia.<br>Agua: ${nf(r.agua)} L/día; mezcla: ${nf(r.carga)} L/día.<br>Retención: ${r.dias} días; líquido: ${nf(r.liquido)} m³; total ilustrativo: ${nf(r.total)} m³.<br>Efluente aproximado: ${nf(r.efluente)} L/día.<br>Tablas 5, 8 y 10 [1]. Sin fugas ni recirculación; temperatura sostenida. No garantiza servicio ni dosis de abono.`;
+}
+function leeDialogo(){ const form = document.getElementById('calculadora'); if (!form) return; cuentaElegida.animal = form.querySelector('#animal').value; cuentaElegida.kg = form.querySelector('#kg').value; cuentaElegida.temp = form.querySelector('#temp').value; }
+function sincroniza(){
+ if (!document.getElementById('bDias')) estado.dias = -1;
+ if (!document.getElementById('bInver')) estado.inver = false;
+ if (!document.getElementById('bAguacero')) estado.aguacero = false;
+ const form=document.getElementById('calculadora');if(form){form.querySelector('#animal').value=cuentaElegida.animal;form.querySelector('#kg').value=cuentaElegida.kg;form.querySelector('#temp').value=cuentaElegida.temp;}
+ const kgR = document.getElementById('kgR'); if (kgR){ kgR.value = clamp(Number(cuentaElegida.kg) || 0, 2, 60); document.getElementById('kgV').textContent = cuentaElegida.kg; const i = TEMPS.indexOf(Number(cuentaElegida.temp)); document.getElementById('tR').value = i; document.getElementById('tV').textContent = TROT[i]; }
+ for (const b of document.querySelectorAll('[data-animal]')) b.setAttribute('aria-pressed', String(b.dataset.animal === cuentaElegida.animal));
+ const bi = document.getElementById('bInver'); if (bi){ bi.setAttribute('aria-pressed', String(estado.inver)); bi.textContent = estado.inver ? 'Quitar el invernadero' : 'Mostrar el invernadero'; }
+ const ba = document.getElementById('bAguacero'); if (ba){ ba.setAttribute('aria-pressed', String(estado.aguacero)); ba.textContent = estado.aguacero ? 'Volver al día seco' : 'Ver un aguacero sobre biol recién puesto'; }
+ const bd = document.getElementById('bDias'); if (bd){ bd.setAttribute('aria-pressed', String(estado.dias >= 0 && estado.dias < 1)); }
+ actualizarCuenta();
+}
+document.addEventListener('submit',e=>{if(e.target.id==='calculadora'){e.preventDefault();leeDialogo();sincroniza();sucio=true;}});
+document.addEventListener('input',e=>{
+ if(e.target.closest('#calculadora')){leeDialogo();sincroniza();sucio=true;return;}
+ if(e.target.id==='kgR'){cuentaElegida.kg=String(e.target.value);sincroniza();sucio=true;}
+ if(e.target.id==='tR'){cuentaElegida.temp=String(TEMPS[+e.target.value]);sincroniza();sucio=true;}
+});
+document.addEventListener('change',e=>{if(e.target.closest('#calculadora')){leeDialogo();sincroniza();sucio=true;}});
+document.addEventListener('click',e=>{
+ const a=e.target.closest&&e.target.closest('[data-animal]'); if(a){cuentaElegida.animal=a.dataset.animal;sincroniza();sucio=true;return;}
+ if(e.target.closest&&e.target.closest('#bInver')){estado.inver=!estado.inver;sincroniza();sucio=true;return;}
+ if(e.target.closest&&e.target.closest('#bAguacero')){estado.aguacero=!estado.aguacero;sincroniza();sucio=true;return;}
+ if(e.target.closest&&e.target.closest('#bDias')){ if(RM){estado.dias=1;} else {estado.dias=0;estado.diasT0=reloj;} sincroniza();sucio=true; }
+});
+function avanzaDias(){ if (estado.dias >= 0 && estado.dias < 1 && !RM){ estado.dias = clamp((reloj - estado.diasT0) / 7, 0, 1); if (estado.dias >= 1) sincroniza(); } }
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, ''); }
+
+const riel = $('riel');
+ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); });
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuánto tiempo?' };
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${P.k === 'hacer' || P.k === 'pensar' ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  sincroniza(); fr.scrollTop = 0;
+  sucio = true;
+}
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = 'Sin voz local'; return; } // todavía cargan
+  const es = vs.filter(v => v.localService && /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz local en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = 'Escuchar'; bEsc.title = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('title'); bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(texto);
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  // si en 5 s la voz no arranca, el navegador no tiene con qué leer: se dice, no se cuelga
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz local en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    // en Android un cancel() anterior puede llegar tarde y cortar la frase nueva: se reintenta una vez
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz local en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ // cancela solo si algo suena, y espera a que Android lo asiente
+  let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {}
+  setTimeout(f, habla ? 250 : 0);
+}
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  if (conTitulo){ const P = estAct.pags[pagAct]; di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] + '.' : ''), turno, sigue); }
+  else { const P = estAct.pags[pagAct]; if (P.k) di(CAB[P.k] + '.', turno, sigue); else sigue(); }
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras (glosario) y fuentes ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR, $('cuenta')]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const cuenta = e.target.closest && e.target.closest('[data-cuenta]');if(cuenta){sincroniza();abre($('cuenta'));return;}
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); }
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; const prev = el._s; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = '';
+    el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? ' ' : ch; el.appendChild(s); } }
+    el.setAttribute('aria-label', str);
+  }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ // tres cifras significativas con coma decimal
+  const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); let s = v.toFixed(d); return s.replace('.', ',');
+}
+const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){
+  const U = [['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6],['nm',1e-9]];
+  for (const [u, k] of U){ if (m >= k*0.9999 || u === 'nm'){ let v = m/k; if (v >= 999.5 && u !== 'm'){ continue; } return fmt3(v) + ' ' + u; } }
+}
+function fmtAumento(x){
+  if (x < 10) return '×' + fmt3(x);
+  const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2);
+  return '×' + Math.round(r).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+/* la regla: cuántos anchos de la vista caben en un milímetro (aritmética sobre el ancho aproximado) */
+function fmtRegla(m){
+  const mm = m * 1000;
+  if (mm >= 100) return 'mide ' + miles(Math.round(mm)) + ' mm';
+  if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm';
+  if (mm >= 0.75) return 'mide cerca de 1 mm';
+  const n = 1 / mm; let r;
+  if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / q) * q; }
+  return `caben ${miles(r)} en 1 mm`;
+}
+let anchoInicial = 0;
+let ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+ const ancho = anchoVista(cam);
+ rueda($('vEscala'), fmtEscala(ancho));
+ rueda($('vAumento'), fmtAumento(anchoInicial / ancho));
+ const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; }
+ let st = 0; for (let i = 0; i < EST.length; i++) if (p >= EST[i].a - .25) st = i;
+ const e = ESTACIONES[st], cap = 'e' + st;
+ const te = `${st + 1}/${NEST} · ${e.c}`; if ($('vEstacion').textContent !== te) $('vEstacion').textContent = te;
+ if ($('vLuz').textContent !== piso) $('vLuz').textContent = piso;
+ const nota = st >= 2 && st <= 5 ? 'Tamaños aproximados. Colores de dibujo.' : avisoSitio;
+ if ($('vNota').textContent !== nota) $('vNota').textContent = nota;
+ if (cap !== ultCap){ ultCap = cap; detenVoz(); estAct = e; pagAct = 0; $('fNum').textContent = `Estación ${st + 1} de ${NEST}`; $('fTit').textContent = e.t; pintaPagina(); fr.classList.add('ver'); $('anuncio').textContent = e.t; }
+ if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { if (i === st) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); }); }
+ $('titulo').style.opacity = 1 - sstep(.02, .8, p); $('titulo').style.visibility = p > .8 ? 'hidden' : 'visible';
+ rotulos(cam, st);
+ if (!auto) rotuloBajar();
+}
+const PREG = [
+ {q:'¿Qué cantidad sirve para calcular el gas?',ops:[{t:'El estiércol fresco que recoge'},{t:'Todo lo que producen los animales'},{t:'Los litros de jabón'}],ok:0,si:'Pese lo realmente recogido: la cantidad que entra a la bolsa manda.',no:'Lo que queda en el potrero no entra a la bolsa.'},
+ {q:'¿Quién hace el metano en el último paso?',ops:[{t:'Las bacterias de la fibra'},{t:'Las arqueas metanógenas'},{t:'El oxígeno'}],ok:1,si:'Las arqueas lo forman con acetato, o con hidrógeno y CO₂, que les pasan las bacterias.',no:'Repase el consorcio: el último paso no lo hacen bacterias.'},
+ {q:'¿Cuánto mide una de esas células?',ops:[{t:'Unas pocas micras'},{t:'Un milímetro'},{t:'Un centímetro'}],ok:0,si:'Entre una décima de micra y unas cinco micras: en un milímetro caben cientos.',no:'Mucho más pequeñas: no se ven a simple vista.'},
+ {q:'En la misma bolsa, ¿qué pasa al echar más agua cada día?',ops:[{t:'Siempre sube el gas'},{t:'Desaparece el frío'},{t:'Baja el tiempo de retención'}],ok:2,si:'Más caudal en el mismo volumen líquido deja menos días a la mezcla.',no:'Piense en volumen líquido dividido por carga diaria.'},
+ {q:'¿Cómo se busca una fuga?',ops:[{t:'Con una llama'},{t:'Con un técnico y un procedimiento seguro'},{t:'Entrando al tanque'}],ok:1,si:'Nunca con fuego ni entrando a un espacio cerrado.',no:'El gas puede incendiarse y asfixiar.'},
+ {q:'¿Dónde debe ir el biol?',ops:[{t:'A la quebrada'},{t:'Sobre comida lista para comer'},{t:'Contenido, y luego al suelo con un plan'}],ok:2,si:'Así se devuelven nutrientes sin ensuciar el agua ni exponer a las personas.',no:'Que se vea líquido no significa que sea agua limpia.'}
+];
+
+let mini = {};
+function mini_limpia(){ mini = {}; }
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya recorrió del corral al fuego y al suelo.</p><p>Pese lo que recoge, mida el líquido y planifique dónde aprovechar el biol.</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Volver al corral</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  const lado = Math.round(Math.min(260, (Math.min(innerWidth, 736) - 80) / 3) * Math.min(2, devicePixelRatio || 1));
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op';
+    if (o.m !== undefined){  const s = document.createElement('span'); s.textContent = o.n; b.appendChild(s); }
+    else if (o.l){ const s = document.createElement('span'); s.className = 'letra'; s.style.background = COLB[o.l]; s.textContent = o.l; b.appendChild(s); b.setAttribute('aria-label', 'La ' + o.l); }
+    else { b.textContent = o.t; }
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.n || (o.l ? 'La ' + o.l : o.t)));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) { window.scrollTo(0, y); } else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0; // auto: +1 baja, -1 sube
+const bBajar = $('bBajar');
+/* «Bajar» va de parada en parada y se detiene: quien lee despacio decide cuándo seguir */
+function paradas(){return ESTACIONES.map((_,i)=>estP(i));}
+function rotuloBajar(){ const t = pObj >= T - 0.01 ? 'Subir ↑' : pObj > 0.05 ? 'Seguir ↓' : 'Bajar ↓'; if (bBajar.textContent !== t) bBajar.textContent = t; }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.textContent = 'Pausa ❚❚';
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) { bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[55, 'sawtooth', 0.32], [82.41, 'sawtooth', 0.2], [110.3, 'triangle', 0.35], [164.6, 'sine', 0.12]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.11 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? 'Sonido: sí' : 'Sonido: no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(){
+  if (!audio || !audio.on) return; const lz = luzGlobal(p); const t = audio.ac.currentTime;
+  audio.filtro.frequency.setTargetAtTime(160 + 2600*lz*lz, t, 0.2);
+  const base = 55 * (0.84 + 0.16*lz); [1, 1.4983, 2.006, 2.993].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4));
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false;
+  AY = PORT ? .33 : .42; anchoInicial = kf(K[0]);
+  prepFondoMata();
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? (mb + 14) + 'px' : '';
+  document.documentElement.style.setProperty('--girar-top', (mb + 10) + 'px');
+  mini_limpia();
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+const perf = { on: false, dts: [] };
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dt = Math.min(0.1, (now - tAnt) / 1000); tAnt = now;
+  if (!RM){ reloj += dt; sucio = true; } avanzaDias();
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 90) * dt; const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ // por estaciones, con transición suave y sin desenfoque en movimiento
+    let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i);
+    if (rmHacia === null){ rmHacia = meta; p = meta; }
+    if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; }
+  }
+  const antes = p;
+  if (RM){
+    if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; }
+    p = rmHacia;
+  } else {
+    const k = 1 - Math.exp(-dt * 7);
+    p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta;
+  }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  // la luz de la célula mueve los cloroplastos, con su propia lentitud
+  const lc = 1; if (Math.abs(lc - luzCelD) > 1e-3){ luzCelD += (lc - luzCelD) * (1 - Math.exp(-dt * 1.6)); sucio = true; if (camAt(p).L === 4 || camAt(p).L === 3) texOK = texOK; }
+  // giro de la hélice: por el scroll de la última estación, el gesto o el botón
+  giroArr = 0;
+  const gObj = giroObj + giroArr; if (Math.abs(gObj - giro) > 1e-4){ giro += (gObj - giro) * (1 - Math.exp(-dt * (RM ? 5 : 8))); sucio = true; }
+  if (p !== antes) sucio = true;
+  if (sucio){
+    const t0 = performance.now();
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){ // fundido entre dos estaciones, nunca a negro
+      p = rmDesde; cam = render(); ctx.setTransform(1,0,0,1,0,0);
+      bctx.setTransform(1,0,0,1,0,0); bctx.drawImage(cv, 0, 0);
+      p = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render();
+    actualizaUI(cam); sonido();
+    if (perf.on) perf.dts.push(now);
+    sucio = (RM && rmT < 1);
+  }
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+addEventListener('keydown', e => {
+  if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A')) return;
+  if (e.key === 'g' || e.key === 'G'){ giroObj += Math.PI/2; sucio = true; }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+prepTeselas();
+redim();
+if (qs.has('p')){ const v = parseFloat(qs.get('p')); const pp = qs.get('p').startsWith('e') ? estP(+qs.get('p').slice(1)) : v; if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+if (qs.has('giro')){ giroObj = parseFloat(qs.get('giro')) * Math.PI / 180; giro = giroObj; }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas y el FPS del Pixel; no altera nada) */
+window.__descenso = {
+  T, SEGS, estP, camAt, calcular, piso, avisoSitio, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, PASO_CROM, GLOS }; },
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); const med = dts[Math.floor(dts.length/2)], p95 = dts[Math.floor(dts.length*0.95)]; res({ cuadros: marcas.length, ms: marcas[marcas.length-1] - marcas[0], fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: med, p95Ms: p95, dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>

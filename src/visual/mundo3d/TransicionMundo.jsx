@@ -1,0 +1,87 @@
+/*
+ * TransicionMundo — el VIAJE entre el valle y un mundo, guiado por Angelita.
+ *
+ * Overlay DOM puro (CERO three): un velo con la luz del mundo destino que se
+ * cierra con profundidad mientras la abeja vuela hacia adentro (entrar) o de
+ * regreso hacia usted (volver). Por ser DOM funciona IGUAL sobre el valle 3D,
+ * el valle 2D o cualquier arquetipo — y no toca el chunk `vendor-three`.
+ *
+ * El tiempo lo maneja un timer (no `animationend`): determinista, testeable y
+ * a prueba de pestañas en segundo plano. Al cumplirse llama `onFin` UNA vez —
+ * ahí el host (via `useNavegacionMundos.completarViaje`) hace el intercambio
+ * de escena DEBAJO del velo.
+ *
+ * `prefers-reduced-motion`: no dibuja nada y llama `onFin` de inmediato
+ * (corte simple). Normalmente ni se monta: el hook ya salta las fases.
+ */
+import { useEffect, useRef } from 'react';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
+import './mundo.css';
+
+/** Duración del viaje (ms) — igual a las keyframes de `mundo.css`. */
+export const VIAJE_MS = 1050;
+
+export default function TransicionMundo({
+  mundoId,
+  sentido = 'entrar', // 'entrar' (valle → mundo) | 'volver' (mundo → valle)
+  animo = 'sereno',
+  energia = 1,
+  reducedMotion = false,
+  onFin,
+}) {
+  const [avatarType] = useAgentAvatarType();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const finRef = useRef(onFin);
+  // Ref "ultima version": se actualiza en un effect (no en render) para que el
+  // timer llame siempre al `onFin` mas fresco sin re-armar el temporizador.
+  useEffect(() => {
+    finRef.current = onFin;
+  });
+
+  useEffect(() => {
+    let hecho = false;
+    const t = setTimeout(
+      () => {
+        if (!hecho) {
+          hecho = true;
+          finRef.current?.();
+        }
+      },
+      reducedMotion ? 0 : VIAJE_MS,
+    );
+    return () => {
+      hecho = true;
+      clearTimeout(t);
+    };
+  }, [mundoId, sentido, reducedMotion]);
+
+  if (reducedMotion) return null;
+
+  const tinte = tinteDeMundo(mundoId);
+  const entra = sentido === 'entrar';
+  return (
+    <div
+      className={`mundo-viaje mundo-viaje--${entra ? 'entrar' : 'volver'}`}
+      style={{ '--mv-a': tinte[0], '--mv-b': tinte[1] }}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="mundo-viaje__velo" aria-hidden="true" />
+      <div className="mundo-viaje__abeja" aria-hidden="true">
+        <ChagraAgentAvatar
+          estado={animo}
+          size={72}
+          animo={animo}
+          energia={energia}
+          animated
+          ariaLabel={`${nombreCompai}, compañero de Chagra`}
+        />
+      </div>
+      <p className="mundo-viaje__txt">
+        {entra ? `${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…` : 'De vuelta al valle…'}
+      </p>
+    </div>
+  );
+}

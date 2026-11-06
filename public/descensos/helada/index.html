@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Descenso — la helada, de la noche despejada al cristal de hielo</title>
+<meta name="description" content="Una sola toma, sin cortes, desde una noche despejada en el altiplano hasta el cristal de hielo: el aire frío que baja por la ladera, las horas de la madrugada medidas en Tibaitatá, la helada blanca y la negra, la escarcha sobre la hoja, el hielo entre las células y el agua que se vuelve hielo. Qué puede hacer el campesino con lo que tiene en la finca, con cifras de la FAO, Agrosavia y Corpoica. Funciona sin señal.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --tinta:#f3f1e8; --tinta-2:rgba(243,241,232,.86); --tinta-3:rgba(243,241,232,.82);
+  --vidrio:rgba(12,16,24,.68); --vidrio-borde:rgba(255,255,255,.16);
+  --acento:#a7c957; --acento-tinta:#c9e28a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L","Noto Serif",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono","DejaVu Sans Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;
+  --gut:16px;
+}
+*{box-sizing:border-box}
+html{background:#0b0d1e;scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{margin:0;background:#0b0d1e;color:var(--tinta);font-family:var(--sans);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+#lienzo{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;touch-action:pan-y;z-index:0}
+#pista{position:relative;z-index:-1;width:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acento);outline-offset:3px;border-radius:6px}
+
+/* Título del primer cuadro */
+#titulo{position:fixed;left:max(var(--gut),4vw);top:max(18px,6vh);z-index:2;pointer-events:none;max-width:min(34rem,calc(100vw - 2*var(--gut)));color:#1d2f24;background:rgba(232,238,234,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:16px;padding:14px 20px 16px}
+#titulo h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.6rem,7.4vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em}
+#titulo p{font-family:var(--serif);font-style:italic;font-size:clamp(1.05rem,1.9vw,1.35rem);line-height:1.35;margin:.6em 0 0;color:#1f3326;max-width:26rem}
+#titulo .pista{font-family:var(--sans);font-style:normal;font-size:1rem;letter-spacing:.02em;color:#1f3326;margin-top:1em;font-weight:600}
+#titulo h1,#titulo p,#titulo .pista{text-shadow:0 0 6px rgba(236,242,240,.95),0 0 14px rgba(236,242,240,.85)}
+
+/* Medidor */
+#medidor{position:fixed;top:var(--gut);right:var(--gut);z-index:3;background:var(--vidrio);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);border:1px solid var(--vidrio-borde);border-radius:14px;padding:12px 16px 10px;min-width:19rem;max-width:calc(100vw - 2*var(--gut));font-variant-numeric:tabular-nums;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#medidor .fila{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#medidor .rot{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);white-space:nowrap}
+#medidor .val{font-family:var(--mono);font-size:1.5rem;line-height:1.2;letter-spacing:.01em;white-space:nowrap}
+#medidor .val.pq{font-size:1.1rem}
+#medidor .regla{margin-top:4px;font-family:var(--sans);font-size:1rem;color:var(--tinta);display:flex;justify-content:space-between;gap:12px}
+#medidor .regla b{font-weight:600;color:var(--acento-tinta)}
+#medidor .estacion{margin-top:8px;padding-top:8px;border-top:1px solid var(--vidrio-borde);font-size:1rem;color:var(--tinta-2);display:flex;justify-content:space-between;gap:10px}
+#medidor .nota{margin-top:6px;font-size:1rem;line-height:1.35;color:var(--tinta-3);font-family:var(--sans);max-width:19rem}
+#medidor .finca{margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:1rem;color:var(--tinta)}
+#medidor .finca button{appearance:none;background:none;border:0;padding:6px 0;min-height:36px;color:var(--acento-tinta);text-decoration:underline dotted;text-underline-offset:.2em;cursor:pointer;font-size:1rem;text-align:left}
+.rueda{display:inline-flex;align-items:baseline}
+.rueda{line-height:1.15em}
+.dg{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top;position:relative;width:1ch;contain:paint}
+.dg>span{display:block;transition:transform .32s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.dg>span>i{display:block;height:1.15em;line-height:1.15em;font-style:normal;text-align:center}
+.ch{display:inline-block;vertical-align:top;height:1.15em;line-height:1.15em}
+
+/* Leyenda de estación: una página a la vez */
+#frase{position:fixed;left:max(var(--gut),3vw);bottom:max(var(--gut),4vh);z-index:3;width:min(34rem,calc(100vw - 2*var(--gut)));background:var(--vidrio);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--vidrio-borde);border-radius:16px;padding:14px 18px 10px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+#frase.ver{opacity:1;transform:none;pointer-events:auto}
+#frase .num{font-family:var(--sans);font-size:1rem;color:var(--tinta-2)}
+#frase h2{font-family:var(--serif);font-weight:400;font-size:1.6rem;margin:.1em 0 .35em;line-height:1.15}
+#fCuerpo{min-height:6.5em}
+#frase p{font-family:var(--serif);font-size:1.18rem;line-height:1.5;margin:0 0 .35em;color:var(--tinta);overflow-wrap:break-word}
+#frase .fr{border-radius:4px;transition:background .25s ease;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+#frase .fr.leyendo{background:rgba(167,201,87,.28)}
+#frase .nota{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--tinta-2);font-style:italic;margin:.5em 0 .2em}
+#frase .nota::before{content:"≈ ";font-style:normal;color:var(--acento-tinta)}
+#frase .cab-pag{font-family:var(--sans);font-size:1rem;font-weight:700;color:var(--acento-tinta);margin:0 0 .3em}
+#frase .finca{border-left:3px solid var(--acento);padding-left:.8em}
+#frase sup a{color:var(--acento-tinta);text-decoration:none;font-family:var(--sans);font-size:.72em;padding:0 .12em}
+.t{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;text-decoration:underline dotted var(--acento-tinta);text-decoration-thickness:2px;text-underline-offset:.2em}
+.t:hover{color:var(--acento-tinta)}
+#frase .pie{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--vidrio-borde)}
+#frase .pie .esp{flex:1}
+#frase .pag{font-family:var(--sans);font-size:1rem;color:var(--tinta-2);min-width:3.6em;text-align:center}
+.bc{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(255,255,255,.06);color:var(--tinta);border-radius:999px;min-height:44px;min-width:44px;padding:8px 14px;font-family:var(--sans);font-size:1rem;cursor:pointer;white-space:nowrap}
+.bc:hover{background:rgba(255,255,255,.14)}
+.bc[disabled]{opacity:.4;cursor:default}
+.bc[aria-disabled="true"]{opacity:.7;cursor:default}
+.bc.ic{padding:8px 0;width:44px;font-size:1.15rem;line-height:1}
+.bc.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+#frase.min #fCuerpo,#frase.min .pag,#frase.min #bAntes,#frase.min #bDespues,#frase.min #bEscuchar{display:none}
+#frase.min h2{margin-bottom:0}
+#frase.min .pie{border-top:0;margin-top:4px;padding-top:0}
+
+/* Rótulos sobre la escena */
+#etiquetas{position:fixed;inset:0;z-index:2;pointer-events:none}
+#etiquetas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.etq{position:absolute;left:0;top:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.2;color:#fbfaf4;background:rgba(10,14,22,.88);border:1px solid rgba(255,255,255,.22);padding:4px 9px;border-radius:9px;white-space:nowrap;transition:opacity .3s ease}
+
+/* Controles */
+#controles{position:fixed;right:var(--gut);bottom:max(var(--gut),4vh);z-index:4;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 2*var(--gut))}
+.btn{appearance:none;border:1px solid var(--vidrio-borde);background:rgba(12,16,24,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--tinta);border-radius:999px;padding:10px 16px;font-family:var(--sans);font-size:1rem;cursor:pointer;min-height:44px;white-space:nowrap;transition:background .2s ease,border-color .2s ease,transform .12s ease}
+.btn:hover{background:rgba(30,36,50,.8);border-color:rgba(255,255,255,.3)}
+.btn:active{transform:scale(.97)}
+.btn.prim{background:#a7c957;color:#10210f;border-color:transparent;font-weight:600}
+.btn.prim:hover{background:#b7d86a}
+.btn[aria-pressed="true"]{border-color:var(--acento)}
+#frase .herr{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5em}
+#frase .herr .bc{min-height:40px;padding:6px 12px}
+#frase .herr .bc[aria-pressed="true"]{border-color:var(--acento);background:rgba(167,201,87,.18)}
+#frase .estado{font-family:var(--sans);font-size:1rem;line-height:1.4;color:var(--acento-tinta);margin:.45em 0 .1em;min-height:1.4em}
+
+/* Riel de estaciones */
+#riel{position:fixed;left:max(10px,1.2vw);top:50%;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;gap:4px}
+#riel button{appearance:none;background:none;border:0;display:flex;align-items:center;gap:8px;padding:6px 4px;min-height:32px;cursor:pointer;color:var(--tinta-3);font-family:var(--sans);font-size:1rem}
+#riel button i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .2s,transform .2s;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+#riel button[aria-current="step"]{color:var(--tinta)}
+#riel button[aria-current="step"] i{background:currentColor;transform:scale(1.25)}
+#riel button span{opacity:0;transition:opacity .2s;background:var(--vidrio);padding:3px 8px;border-radius:8px}
+#riel:hover button span,#riel button:focus-visible span,#riel button[aria-current="step"] span{opacity:1}
+
+/* Diálogos: fuentes, palabras, repaso, finca */
+dialog.dlg{max-width:min(46rem,calc(100vw - 2*var(--gut)));width:100%;max-height:min(86vh,48rem);border:1px solid var(--vidrio-borde);border-radius:16px;background:#12151f;color:var(--tinta);padding:0;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+dialog.dlg::backdrop{background:rgba(5,7,14,.66)}
+.dlg .cab{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--vidrio-borde);position:sticky;top:0;background:#12151f;z-index:1}
+.dlg h2{font-family:var(--serif);font-weight:400;margin:0;font-size:1.4rem}
+.dlg .cuerpo{padding:6px 18px 18px;overflow:auto;max-height:calc(min(86vh,48rem) - 76px)}
+#fuentes ol{padding-left:1.8em;margin:.6em 0}
+#fuentes li{font-size:1rem;line-height:1.5;margin:.6em 0;color:var(--tinta-2);overflow-wrap:anywhere}
+#fuentes li b{color:var(--tinta);font-weight:600}
+#fuentes li em{color:var(--tinta)}
+.dlg .aviso{font-size:1rem;line-height:1.5;color:var(--tinta-2);border-left:2px solid var(--acento);padding:.2em 0 .2em .8em;margin:.9em 0}
+#glosario dl{margin:.4em 0}
+#glosario dt{font-family:var(--serif);font-size:1.25rem;margin:1em 0 .2em;color:var(--tinta);scroll-margin-top:84px}
+#glosario dt.aqui{color:var(--acento-tinta)}
+#glosario dd{margin:0;font-size:1.08rem;line-height:1.5;color:var(--tinta-2)}
+#glosario dd sup a{color:var(--acento-tinta);text-decoration:none;font-size:.75em}
+#glosario .al-pie{margin-top:1.2em}
+#dlgFinca label{display:block;margin:.8em 0 .3em;font-size:1rem;color:var(--tinta)}
+#dlgFinca select,#dlgFinca input{font:inherit;font-size:1rem;min-height:44px;border:1px solid var(--vidrio-borde);border-radius:10px;padding:6px 10px;background:#1a1e2b;color:var(--tinta);max-width:100%}
+#dlgFinca form{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+#dlgFinca p{font-size:1rem;line-height:1.5;color:var(--tinta-2)}
+#estadoUbicacion{color:var(--acento-tinta);min-height:1.5em}
+
+#repaso .cuerpo{padding:14px 18px 18px}
+#repaso .puntos{display:flex;gap:8px;justify-content:center;margin:0 0 12px}
+#repaso .puntos i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+#repaso .puntos i.hecho{background:var(--acento)}
+#repaso .puntos i.ahora{background:var(--tinta)}
+#repaso .preg{font-family:var(--serif);font-size:1.45rem;line-height:1.3;margin:0 0 14px;text-align:center}
+#repaso .ops{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#repaso .op{appearance:none;border:2px solid var(--vidrio-borde);background:#1a1e2b;color:var(--tinta);border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:var(--sans);font-size:1.05rem;min-height:64px;justify-content:center;transition:border-color .25s ease,opacity .25s ease,box-shadow .25s ease}
+#repaso .op canvas{width:100%;aspect-ratio:1;border-radius:9px;display:block}
+#repaso .op.si{border-color:var(--acento);box-shadow:0 0 0 4px rgba(167,201,87,.25)}
+#repaso .op.no{opacity:.45}
+#repaso .op[aria-disabled="true"]{cursor:default}
+#repaso .resp{min-height:3.2em;font-size:1.12rem;line-height:1.45;text-align:center;margin:14px 0 6px;color:var(--tinta)}
+#repaso .acc{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+#repaso .fin{text-align:center}
+#repaso .fin p{font-family:var(--serif);font-size:1.3rem;line-height:1.45;margin:.4em 0}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:640px){
+  #medidor{left:var(--gut);right:var(--gut);min-width:0;padding:8px 12px 8px;display:grid;grid-template-columns:1fr 1fr;column-gap:12px}
+  #medidor .fila{flex-direction:column;align-items:flex-start;gap:0}
+  #medidor .val,#medidor .val.pq{font-size:1.25rem}
+  #medidor .regla{grid-column:1 / -1;justify-content:flex-start;gap:8px}
+  #medidor .estacion{display:none}
+  #medidor .nota{grid-column:1 / -1;max-width:none;margin-top:2px}
+  #medidor .finca{grid-column:1 / -1;margin-top:0}
+  #titulo h1{font-size:2.9rem}
+  #titulo .pista{margin-top:.6em}
+  #frase{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--gut) + 56px);padding:10px 14px 8px}
+  #frase h2{font-size:1.35rem}
+  #fCuerpo{min-height:5.5em}
+  #frase p{font-size:1.08rem;line-height:1.45}
+  #frase .pie{gap:6px}
+  #controles{left:var(--gut);right:var(--gut);bottom:var(--gut);justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .btn{padding:10px 9px}
+  #bSonido{font-size:0;min-width:44px;padding:0 12px} #bSonido::before{content:"♪";font-size:1.15rem}
+  #riel{left:auto;right:4px;top:46%}
+  #riel button span{display:none}
+  #repaso .preg{font-size:1.25rem}
+  #repaso .ops{gap:8px}
+  #repaso .op{padding:6px;font-size:1rem}
+}
+@media (max-width:440px){ #bBajar{min-width:48px} }
+@media (max-width:380px){ #controles{gap:4px} .btn{padding:10px 6px} #bSonido{padding:0 10px} #bBajar{min-width:44px} }
+@media (min-width:641px) and (max-width:1150px){ #frase{bottom:calc(max(var(--gut),4vh) + 60px)} }
+#frase{overflow:auto;overscroll-behavior:contain}
+@media (prefers-reduced-motion:reduce){
+  .dg>span{transition:none}
+  #frase{transition:opacity .5s ease;transform:none}
+}
+#frase .herr .bc.hr{min-width:44px;padding:6px 9px}
+#medidor #vLuz{color:var(--acento-tinta)}
+</style>
+</head>
+<body>
+<canvas id="lienzo" aria-label="Descenso continuo desde una noche despejada en el altiplano hasta el cristal de hielo que se forma en la hoja" role="img"></canvas>
+<div id="pista" aria-hidden="true"></div>
+
+<header id="titulo">
+  <h1>Descenso</h1>
+  <p>De la noche despejada al cristal de hielo en la hoja, en una sola toma.</p>
+  <p class="pista">Deslice hacia abajo o toque «Bajar»</p>
+</header>
+
+<aside id="medidor" aria-label="Medidor de tamaño">
+  <div class="fila"><span class="rot">Ancho de lo que ve</span><span class="val rueda" id="vEscala">2,40 km</span></div>
+  <div class="fila"><span class="rot">Aumento</span><span class="val pq rueda" id="vAumento">×1,00</span></div>
+  <div class="regla"><span>En su regla:</span><b id="vRegla">mide 2 400 000 mm</b></div>
+  <div class="estacion"><span id="vEstacion">1/8 · La noche</span><span id="vLuz">6:12 a. m.</span></div>
+  <div class="nota" id="vNota">Tamaños aproximados.</div>
+  <div class="finca"><button type="button" id="bFinca" aria-haspopup="dialog">Piso de ejemplo · frío</button></div>
+</aside>
+
+<nav id="riel" aria-label="Estaciones del descenso"></nav>
+
+<div id="etiquetas" aria-hidden="true"><svg id="etqLineas"></svg></div>
+
+<section id="frase" aria-live="polite" aria-labelledby="fTit">
+  <div class="num" id="fNum">Estación 1 de 8</div>
+  <h2 id="fTit">La noche despejada</h2>
+  <div id="fCuerpo"></div>
+  <div class="pie">
+    <button type="button" class="bc ic" id="bAntes" aria-label="Página anterior">‹</button>
+    <span class="pag" id="fPag" aria-live="off">1 de 3</span>
+    <button type="button" class="bc ic" id="bDespues" aria-label="Página siguiente">›</button>
+    <span class="esp"></span>
+    <button type="button" class="bc" id="bEscuchar" aria-pressed="false">Escuchar</button>
+    <button type="button" class="bc ic" id="bOcultar" aria-expanded="true" aria-label="Ocultar el texto para ver la imagen">▾</button>
+  </div>
+</section>
+
+<div id="controles">
+  <button type="button" class="btn" id="bSonido" aria-pressed="false" aria-label="Sonido apagado; activar el bordón">Sonido: no</button>
+  <button type="button" class="btn" id="bPalabras" aria-haspopup="dialog">Palabras</button>
+  <button type="button" class="btn" id="bFuentes" aria-haspopup="dialog">Fuentes</button>
+  <button type="button" class="btn" id="bRepaso" aria-haspopup="dialog">Repaso</button>
+  <button type="button" class="btn prim" id="bBajar" aria-pressed="false" aria-label="Bajar"><span class="lb">Bajar </span><span class="fl">↓</span></button>
+</div>
+
+<dialog id="glosario" class="dlg" aria-labelledby="glosarioT">
+  <div class="cab"><h2 id="glosarioT">Palabras</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Aquí se explica cada palabra difícil del recorrido. Las palabras subrayadas con puntos, en el texto, abren esta lista.</p>
+    <dl id="listaPalabras"></dl>
+    <p class="al-pie"><button type="button" class="bc" id="bVerFuentes">Ver las fuentes</button></p>
+  </div>
+</dialog>
+
+<dialog id="repaso" class="dlg" aria-labelledby="repasoT">
+  <div class="cab"><h2 id="repasoT">Repaso</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo" id="repasoCuerpo"></div>
+</dialog>
+
+<dialog id="dlgFinca" class="dlg" aria-labelledby="fincaT">
+  <div class="cab"><h2 id="fincaT">Su finca</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p id="origenFinca" aria-live="polite"></p>
+    <label for="selectorPiso">Piso de ejemplo</label>
+    <select id="selectorPiso">
+      <option value="templado">Templado (1.000 a 2.000 m)</option>
+      <option value="frio">Frío (2.000 a 3.000 m)</option>
+      <option value="muyfrio">Muy frío, páramo bajo (3.000 a 3.700 m)</option>
+      <option value="paramoalto">Páramo alto (3.700 a 4.200 m)</option>
+      <option value="calido">Cálido (menos de 1.000 m)</option>
+    </select>
+    <form id="alturaManual"><label style="width:100%" for="alturaFinca">O escriba la altitud de su finca, en metros</label><input id="alturaFinca" type="number" min="0" max="6000" step="any" inputmode="numeric" required><button type="submit" class="bc prim">Usar esta altitud</button></form>
+    <p><button type="button" class="bc" id="usarUbicacion">Usar la altitud del teléfono</button></p>
+    <p id="estadoUbicacion"></p>
+    <p class="aviso">La altitud cambia lo que se enseña en la primera estación: el piso de su finca y qué tanto le toca la helada. Aquí no se guarda su ubicación ni se manda a ninguna parte. La altitud sola no dice si una finca hiela ni si está en un páramo delimitado.</p>
+  </div>
+</dialog>
+
+<dialog id="fuentes" class="dlg" aria-labelledby="fuentesT">
+  <div class="cab"><h2 id="fuentesT">Fuentes</h2><button type="button" class="bc" data-cierra>Cerrar</button></div>
+  <div class="cuerpo">
+    <p class="aviso">Los tamaños del medidor son <b>aproximados</b>: dan el orden de tamaño de lo que se ve, no una medición. Son <b>de dibujo</b>: los colores; la forma del valle, de la ladera y de los cristales de escarcha; el espesor del charco de aire frío y sus corrientes; el tamaño de las células y de los estomas; las moléculas, que no se ven así, y su red en anillos de seis. Las temperaturas de la noche de Tibaitatá salen de la gráfica de Agrosavia: las de las 6:12 a. m. son las de su tabla; las de las otras horas se leyeron de la curva y pueden variar medio grado. «Charco de aire frío» es una <b>comparación</b>.</p>
+    <p class="aviso"><b>Esto no reemplaza al técnico ni el aviso del tiempo.</b> Para saber si viene helada en su zona, consulte el pronóstico del IDEAM y a su asistente técnico. Esta pieza no da dosis de ningún producto.</p>
+    <ol id="listaFuentes">
+      <li id="f1"><b>Snyder RL, de Melo-Abreu JP (2005).</b> <em>Frost protection: fundamentals, practice and economics.</em> Volumen 1. FAO, Roma. Serie de Medio Ambiente y Recursos Naturales n.º 10 — helada: aire a 0 °C o menos, medido entre 1,25 y 2 m de altura en una caseta; helada por radiación: cielo despejado, calma, inversión, punto de rocío bajo; la inversión llega por lo general de 9 a 60 m; helada blanca (escarcha) y negra, y la negra suele hacer más daño porque al depositarse el hielo se suelta calor; la mayor parte del enfriamiento ocurre en pocas horas alrededor de la puesta del sol, y luego menos de 1 °C por hora hasta el amanecer (pp. 2–6). El daño viene sobre todo del hielo que se forma afuera de las células, que les saca el agua y las deshidrata (p. 17). El aire frío es más denso, baja por la ladera y se acumula en lo bajo como el agua de una inundación; los fondos de valle son más fríos; los sitios fríos se reconocen por la neblina a ras del suelo y se pueden medir en cualquier época; setos, cercas, pacas o vegetación densa al pie del lote represan el frío y conviene quitarlos; bien puestos, los obstáculos desvían el aire frío; con rastrojo o pasto, el aire es de 0 a 0,5 °C más frío que con suelo desnudo (pp. 19–20). Árboles sobre el cultivo: aumentan la radiación que baja; la sombra protege el café de la helada en Brasil (p. 21). Coberturas de polipropileno: de 1 a 5 °C según el grosor; no arar en temporada de heladas, y si se aró, compactar y regar; suelo húmedo, cerca de capacidad de campo, de 1 a 3 días después de regar, en los primeros 30 cm (p. 22). Hasta 2 °C de diferencia en la superficie entre suelo desnudo y pasto de 5 cm (p. 23). Nitrógeno y fósforo antes de una helada aumentan la sensibilidad (p. 21). El hielo empieza sobre todo por bacterias nucleadoras de hielo y entra por las aberturas de la superficie (p. 24). Calentadores: con unos cien por hectárea, cerca de 1 °C; el humo no ayuda y contamina (pp. 25–26). La temperatura se mide en una caseta o abrigo que no deja al termómetro expuesto al cielo despejado (p. 27). Aspersión sobre la planta: si el agua no alcanza o el equipo falla, el daño puede ser mayor que sin proteger (p. 30). Agua sobreenfriada: por debajo de 0 °C sin congelarse; un golpe o algo extraño la congela (p. 29). Hielo dentro de la célula: rompe su estructura; se vio enfriando centeno 8 °C por minuto; en la naturaleza el daño viene del hielo de afuera, sin pruebas de hielo adentro; el vapor tiene menos presión sobre el hielo, el agua sale de la célula por la membrana y la célula se seca; las plantas resistentes a la sequía suelen resistir la helada (pp. 68–69). Endurecimiento: con días fríos la planta aguanta más, y lo pierde con días calientes; los azúcares bajan la temperatura de congelación (pp. 67, 70). Tabla 4.5, temperaturas críticas de daño (según Ventskevich, 1958): papa, al nacer −2 a −3 °C, en floración −1 a −2, con fruto −1 a −2; maíz −2 a −3, −1 a −2, −2 a −3; arveja −7 a −8, −2 a −3, −3 a −4; avena −8 a −9, −1 a −2, −2 a −4; cebada −7 a −8, −1 a −2, −2 a −4 (p. 81). Las temperaturas críticas son una guía: salen de cámaras, y en el campo el daño puede empezar antes (pp. 18, 84).</li>
+      <li id="f2"><b>AGROSAVIA (2020).</b> <em>Condiciones climáticas en Cundinamarca y Boyacá durante el mes de febrero.</em> Centro de Investigación Tibaitatá, Mosquera, 10 de febrero de 2020 — helada: menos de 0 °C a nivel de caseta; para el cultivo, cuando el frío afecta los tejidos. En la primera temporada de menos lluvias, sin nubes, mediodías calientes y madrugadas frías. Estación Tibaitatá, mínima a 2 m: de 7,2 °C el 1 de febrero a −2,6 °C el 6 de febrero; a 10 cm del suelo, del 3 al 6 de febrero, de −6,7 a −2,9 °C, con fuertes daños en hortalizas de hoja, en el kikuyo con 10 días de rotación y en etapas de la papa y el maíz (figura 3). Registro hora a hora desde las 5:00 p. m. del 5 de febrero hasta las 9:00 a. m. del 6: la inversión empieza a las 5:00 p. m. y se sostiene hasta la mañana (figura 4). Las medidas contra la helada se ponen una o dos horas antes de que la temperatura llegue al umbral de daño. Riego al suelo para guardar calor; aspersión sobre el follaje: el calor latente del agua que se congela evita que la hoja se enfríe; continua durante todo el evento; prenderla cuando la temperatura llegue a 2 a 4 °C. No voltear el suelo en época de heladas; si se labra, compactar y regar. En sequía, no dejar el suelo despejado.</li>
+      <li id="f3"><b>Porras Rodríguez PD, Herrera Heredia CA (2015).</b> <em>Modelo productivo de la papa variedad Corpoica-Mary para los departamentos de Cundinamarca y Boyacá.</em> Corpoica, Mosquera. ISBN 978-958-740-211-7 — en el altiplano cundiboyacense, alta probabilidad de heladas de diciembre a marzo, con menor incidencia hacia julio, más severas en suelos planos a ligeramente inclinados; helada, temperatura igual o menor a 0 °C; en la papa, pérdidas de rendimiento significativas cuando ocurre entre la floración y el llenado del tubérculo (p. 11).</li>
+      <li id="f4"><b>FENALCE (2017).</b> <em>Boletín de heladas dentro del altiplano cundiboyacense</em>, semana del 18 al 26 de diciembre de 2017, con el pronóstico del IDEAM — helada: 0 °C o menos a 2 m del suelo; para la agrometeorología, la temperatura a la que los tejidos empiezan a dañarse; de diciembre a febrero, con poca nubosidad, mínimas en la madrugada; no usar fertilizantes nitrogenados durante las heladas.</li>
+      <li id="f5"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §2.2 «Water». OpenStax (CC BY 4.0) — en el hielo las moléculas de agua forman un cristal sostenido por puentes de hidrógeno; eso hace al hielo menos denso que el agua líquida, y por eso flota; los cristales de hielo pueden romper las membranas de las células.</li>
+      <li id="f6"><b>Instituto Geográfico Agustín Codazzi (IGAC).</b> Instructivo IN-AGR-PC05-01, actualización de áreas homogéneas de tierras, tabla 1 (p. 4): pisos térmicos — cálido, 0 a 1.000 m, más de 24 °C; templado, 1.000 a 2.000 m, 18 a 24 °C; frío, 2.000 a 3.000 m, 12 a 18 °C; muy frío (páramo bajo), 3.000 a 3.700 m, 8 a 12 °C; extremadamente frío (páramo alto), 3.700 a 4.200 m, 4 a 8 °C.</li>
+      <li id="f7"><b>Congreso de Colombia.</b> <em>Ley 1930 de 2018</em>, gestión integral de los páramos — artículo 5: en los páramos se prohíben las quemas (numeral 9) y, salvo casos excepcionales, las sustancias inflamables (numeral 8).</li>
+      <li id="f8"><b>Clark MA, Douglas M, Choi J (2018).</b> <em>Biology 2e</em>, §30.4 «Leaves». OpenStax (CC BY 4.0) — los estomas son aberturas por donde la hoja cambia gases, con dos células oclusivas; la epidermis está cubierta por la cutícula, una capa cerosa; parénquima en empalizada: células en columna, apretadas; parénquima esponjoso: células sueltas, de forma irregular, con espacios de aire entre ellas.</li>
+    </ol>
+    <p class="aviso"><b>Lo que no se pudo leer.</b> La nota técnica de heladas del IDEAM (actualización de 2012) no abrió: el sitio no respondió y la copia de archivo está cortada. Lo del IDEAM que aparece aquí llega por el boletín de FENALCE y por Agrosavia.</p>
+  </div>
+</dialog>
+
+<p class="sr" id="anuncio" aria-live="polite"></p>
+
+<script>
+(() => {
+'use strict';
+/* ============================================================
+   Descenso de la helada — una sola toma de la noche despejada
+   al cristal de hielo. Cada escala vive dentro de la anterior
+   (portal). La cámara baja por un parámetro p que solo mueve el
+   usuario (scroll, dedo, teclado o «Bajar»). Nada se mueve sin
+   ese dato. El motor (cámara, medidor, páginas, voz, palabras,
+   fuentes, repaso, giro) es el del Descenso del café y de la papa.
+   ============================================================ */
+const qs = new URLSearchParams(location.search);
+const numero = (v, min, max) => v !== null && v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= max ? Number(v) : null;
+const cv = document.getElementById('lienzo');
+const ctx = cv.getContext('2d', { alpha: false });
+const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mqRM.matches || qs.has('rm');
+mqRM.addEventListener && mqRM.addEventListener('change', e => { RM = e.matches || qs.has('rm'); rmHacia = null; sucio = true; });
+
+let W = 0, H = 0, S = 0, DPR = 1, PORT = false;
+const buf = document.createElement('canvas'); const bctx = buf.getContext('2d');
+const texA = document.createElement('canvas'); const texB = document.createElement('canvas');
+let texOK = false;
+
+/* semilla del azar decorativo (estrellas, cristales, células). La geometría que une los niveles no depende de ella */
+const SEM = ((numero(qs.get('semilla'), 0, 4294967295) ?? 20260930) >>> 0);
+const sr = k => ((SEM ^ Math.imul(k + 1, 2654435761)) >>> 0);
+
+/* ---------- utilidades ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+function hex(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+function mix(a, b, t){ const A = hex(a), B = hex(b); return `rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`; }
+function mixH(a, b, t){ const A = hex(a), B = hex(b); return '#' + [0,1,2].map(i => Math.round(lerp(A[i], B[i], t)).toString(16).padStart(2, '0')).join(''); }
+function rgba(h, a){ const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function voronoi(sites, box, cell){
+  const grid = new Map(); const key = (i,j) => i + ',' + j;
+  sites.forEach((s, n) => { const i = Math.floor(s[0]/cell), j = Math.floor(s[1]/cell); const k = key(i,j); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(n); });
+  const polys = [];
+  for (let n = 0; n < sites.length; n++){
+    const s = sites[n];
+    let poly = [[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]];
+    const i0 = Math.floor(s[0]/cell), j0 = Math.floor(s[1]/cell);
+    for (let di = -2; di <= 2; di++) for (let dj = -2; dj <= 2; dj++){
+      const L = grid.get(key(i0+di, j0+dj)); if (!L) continue;
+      for (const m of L){ if (m === n) continue; const o = sites[m];
+        const mx = (s[0]+o[0])/2, my = (s[1]+o[1])/2, nx = o[0]-s[0], ny = o[1]-s[1];
+        const out = [];
+        for (let q = 0; q < poly.length; q++){
+          const A = poly[q], B = poly[(q+1)%poly.length];
+          const da = (A[0]-mx)*nx + (A[1]-my)*ny, db = (B[0]-mx)*nx + (B[1]-my)*ny;
+          if (da <= 0) out.push(A);
+          if ((da <= 0) !== (db <= 0)){ const t = da/(da-db); out.push([A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t]); }
+        }
+        poly = out; if (poly.length < 3) break;
+      }
+    }
+    if (poly.length >= 3){ let cx=0, cy=0, x0=1e9, y0=1e9, x1=-1e9, y1=-1e9; for (const p of poly){ cx+=p[0]; cy+=p[1]; x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); }
+      polys.push({ p: poly, c: [cx/poly.length, cy/poly.length], bb: [x0,y0,x1,y1], s }); }
+  }
+  return polys;
+}
+function jitterSites(r, box, step, jit){
+  const out = [];
+  for (let y = box[1]; y <= box[3]; y += step*0.866) { const row = Math.round((y-box[1])/(step*0.866));
+    for (let x = box[0] + (row%2 ? step/2 : 0); x <= box[2]; x += step) out.push([x + (r()-.5)*step*jit, y + (r()-.5)*step*jit]); }
+  return out;
+}
+function roundPoly(c, pts){
+  const n = pts.length; const m = (a,b) => [(a[0]+b[0])/2,(a[1]+b[1])/2];
+  let s = m(pts[n-1], pts[0]); c.moveTo(s[0], s[1]);
+  for (let i = 0; i < n; i++){ const p = pts[i], q = m(pts[i], pts[(i+1)%n]); c.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+  c.closePath();
+}
+function shrink(poly, c, k){ return poly.map(p => [c[0] + (p[0]-c[0])*k, c[1] + (p[1]-c[1])*k]); }
+function inView(bb, v, m){ return !(bb[2] < v[0]-m || bb[0] > v[2]+m || bb[3] < v[1]-m || bb[1] > v[3]+m); }
+function trazo(c, pts){ c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); }
+function bez2(a, b, cc, t){ const u = 1 - t; return [u*u*a[0] + 2*u*t*cc[0] + t*t*b[0], u*u*a[1] + 2*u*t*cc[1] + t*t*b[1]]; }
+const muestra = (f, n) => { const o = []; for (let i = 0; i <= n; i++) o.push(f(i/n)); return o; };
+function dentroPoly(poly, x, y){ let d = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++){ const a = poly[i], b = poly[j]; if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0])*(y - a[1])/(b[1] - a[1]) + a[0]) d = !d; } return d; }
+
+/* ============================================================
+   LA NOCHE MEDIDA: Tibaitatá (Mosquera), 5 y 6 de febrero de 2020
+   [Agrosavia 2020, figuras 3 y 4]. Las 6:12 son de la tabla;
+   las otras horas, leídas de la curva (± medio grado).
+   ============================================================ */
+const HORAS = [
+  { h:'5 p. m.', c:'5:00 p. m.', t2: 19.7, t10: 20.9, exacta: false },
+  { h:'8 p. m.', c:'8:00 p. m.', t2: 10.4, t10: 6.5, exacta: false },
+  { h:'11 p. m.', c:'11:00 p. m.', t2: 8.4, t10: 4.1, exacta: false },
+  { h:'2 a. m.', c:'2:00 a. m.', t2: 2.3, t10: -2.4, exacta: false },
+  { h:'4 a. m.', c:'4:00 a. m.', t2: 0.1, t10: -4.5, exacta: false },
+  { h:'6 a. m.', c:'6:12 a. m.', t2: -2.6, t10: -6.7, exacta: true },
+  { h:'8 a. m.', c:'8:00 a. m.', t2: 8.8, t10: 8.8, exacta: false },
+];
+const HMIN = 5;
+const ESTADO = { hora: HMIN, tipo: 'blanca', cerca: 'cerrada', enfria: 'lento' };
+const horaAct = () => HORAS[ESTADO.hora];
+const frio = () => clamp((12 - horaAct().t10)/18, 0, 1);          // cuánto aire frío hay abajo
+const bajoCero = () => clamp(-horaAct().t10/5, 0, 1);              // cuánto hiela a ras del suelo
+const escarcha = () => ESTADO.tipo === 'blanca' ? bajoCero() : 0;  // hielo blanco encima
+const dano = () => ESTADO.tipo === 'negra' ? (ESTADO.hora === 6 ? 1 : bajoCero()*0.55) : 0; // de dibujo
+const deshielo = () => ESTADO.tipo === 'blanca' && ESTADO.hora === 6 ? 1 : 0;   // gotas de la escarcha derretida
+const CIELOS = [
+  { top:'#38598c', hor:'#f0b47a', est:0, luz:0.75 },
+  { top:'#0b1431', hor:'#2a3d6c', est:0.8, luz:0.1 },
+  { top:'#060b22', hor:'#16224c', est:1, luz:0.05 },
+  { top:'#060b22', hor:'#16224c', est:1, luz:0.05 },
+  { top:'#070d26', hor:'#1d2a55', est:1, luz:0.06 },
+  { top:'#0a1438', hor:'#4c66a0', est:0.65, luz:0.14 },
+  { top:'#6a9bd2', hor:'#dbe8ef', est:0, luz:1 },
+];
+const cielo = () => CIELOS[ESTADO.hora];
+const luz = () => cielo().luz;
+function fmtT(t, exacta){ const v = exacta ? Math.abs(t).toFixed(1).replace('.', ',') : String(Math.round(Math.abs(t))); return (t < 0 && (exacta || Math.round(Math.abs(t)) > 0) ? '−' : '') + v + ' °C'; }
+function fmtTH(H, k){ const t = H[k]; return (H.exacta ? '' : 'unos ') + fmtT(t, H.exacta); }
+let versionEstado = 0; // sube cuando cambia la hora o el tipo de helada: vuelve a pintar lo pre-dibujado
+function tocaEstado(){ versionEstado++; texOK = false; sucio = true; }
+
+/* ============================================================
+   ESCALAS  (F = ancho del cuadro de cada nivel, en metros)
+   0 el valle de noche · 1 la ladera · 2 la mata y los termómetros ·
+   3 la hoja · 4 la escarcha de cerca · 5 la hoja por dentro (corte) ·
+   6 el hielo y la célula · 7 el agua hecha hielo
+   ============================================================ */
+const HF4 = 0.85;
+const F = [2400, 40, 4, 0.05, 0.0012, 0, 2.5e-4, 4e-9]; F[5] = F[4]*HF4*0.97;
+const PORTAL = [null, null, null, null, null, null, null, null];
+function cieloVista(c, v){ // el cielo se pinta en coordenadas de pantalla: así no hay costura entre niveles
+  const C = cielo(), h = v[3] - v[1]; const g = c.createLinearGradient(0, v[1], 0, v[3]);
+  g.addColorStop(0, C.top); g.addColorStop(0.45, mixH(C.top, C.hor, 0.55)); g.addColorStop(0.8, C.hor); g.addColorStop(1, C.hor); c.fillStyle = g; c.fillRect(v[0] - h, v[1] - h, v[2] - v[0] + 2*h, 3*h);
+}
+
+/* ============================================================
+   NIVEL 0 · LA NOCHE EN EL VALLE  (1 unidad = 2,4 km)
+   De perfil: la ladera baja a la izquierda hasta el fondo plano.
+   ============================================================ */
+const kn = t => (Math.sqrt(t*t + 0.0004) + t)/2; // rodilla suave: plano, y luego pendiente
+function g0(x){ return 0.10 + 0.005*Math.exp(-(((x - 0.15)/0.09)**2)) - 0.5*kn(-0.125 - x) + 0.3*kn(-0.625 - x) - 0.18*sstep(0.45, 0.9, x) + 0.0035*Math.sin(x*41 + 1) + 0.0018*Math.sin(x*113); }
+PORTAL[0] = { x: -0.125, y: g0(-0.125) - 0.002, s: F[1]/F[0] };
+const s0 = PORTAL[0].s;
+const NIV0 = 0.105; // nivel del fondo del valle
+const ESTRELLAS = (() => { const r = rng(sr(3)), a = []; for (let i = 0; i < 520; i++){ const x = -1.2 + r()*2.4, y = -1.0 + Math.pow(r(), 1.3)*1.05; const b = Math.pow(r(), 3); a.push({ x, y, r: 0.0007 + b*0.0024, b: 0.35 + b*0.65, tinte: r() }); } return a; })();
+const CORDS = [ // cordilleras del fondo, de lejos a cerca
+  { base: 0.03, amp: 0.20, sd: 5, col: '#2c3c66', f: [2.1, 5.3, 13] },
+  { base: 0.06, amp: 0.14, sd: 9, col: '#22314f', f: [3.3, 7.9, 17] },
+  { base: 0.085, amp: 0.08, sd: 13, col: '#1b2a3e', f: [4.1, 11, 23] },
+];
+const cordY = (C, x) => C.base - C.amp*(0.55 + 0.45*Math.sin(x*C.f[0] + C.sd))*(0.62 + 0.38*Math.sin(x*C.f[1] + C.sd*2)) - 0.012*Math.sin(x*C.f[2] + C.sd);
+const CASAS0 = [[-0.52, 0.004], [-0.36, 0.006], [-0.23, 0.005], [0.62, 0.004], [0.3, 0.003]];
+const ARB0 = (() => { const r = rng(sr(11)), a = []; for (let i = 0; i < 70; i++){ const x = -0.9 + r()*1.75; a.push({ x, R: 0.004 + r()*0.006, t: r() }); } return a; })();
+let fondo0 = null, fondo0V = -1;
+function pintaCieloLejano(c){ // pre-dibujado: cielo, estrellas, cordilleras
+  const C = cielo();
+  if (C.est > 0){ // la Vía Láctea, de dibujo, y las estrellas
+    c.save(); c.globalAlpha = 0.18*C.est; const gv = c.createLinearGradient(-0.9, -0.9, 0.7, 0.0); gv.addColorStop(0, 'rgba(200,210,255,0)'); gv.addColorStop(0.5, 'rgba(210,220,255,.9)'); gv.addColorStop(1, 'rgba(200,210,255,0)');
+    c.fillStyle = gv; c.translate(-0.1, -0.5); c.rotate(-0.45); c.beginPath(); c.ellipse(0, 0, 1.1, 0.09, 0, 0, 7); c.fill(); c.restore();
+    for (const s of ESTRELLAS){ c.fillStyle = `rgba(${Math.round(lerp(200, 255, s.tinte))},${Math.round(lerp(215, 240, s.tinte))},255,${s.b*C.est})`; c.beginPath(); c.arc(s.x, s.y, s.r, 0, 7); c.fill(); } }
+  CORDS.forEach((Cd, k) => { c.fillStyle = mixH(Cd.col, '#7f98b8', C.luz*0.7); c.beginPath(); c.moveTo(-1.25, 0.3); for (let x = -1.25; x <= 1.26; x += 0.005) c.lineTo(x, cordY(Cd, x)); c.lineTo(1.25, 0.3); c.closePath(); c.fill();
+    const gn = c.createLinearGradient(0, Cd.base - 0.06, 0, Cd.base + 0.03); gn.addColorStop(0, rgba(C.hor, 0)); gn.addColorStop(1, rgba(C.hor, 0.18 + 0.1*k)); c.fillStyle = gn; c.fillRect(-1.25, Cd.base - 0.06, 2.5, 0.09); });
+}
+function prepFondo0(){
+  const res = Math.max(512, Math.round(S/1.2)); const cvf = fondo0 || document.createElement('canvas'); cvf.width = res*2; cvf.height = Math.round(res*1.1);
+  const x = cvf.getContext('2d'); x.setTransform(res*2/2.5, 0, 0, cvf.height/1.15, cvf.width/2, cvf.height*(1.05/1.15)); pintaCieloLejano(x);
+  fondo0 = cvf; fondo0V = versionEstado;
+}
+function sueloCol0(){ return mixH('#1c3433', '#4f6d3c', luz()); }
+function dibujaValle(c, env){
+  const v = env.view, px = env.px, C = cielo(), fr = frio();
+  if (fondo0V !== versionEstado || !fondo0) prepFondo0();
+  // el cielo y las cordilleras se dibujan pre-hechos; al acercarse, la ladera tapa casi todo
+  cieloVista(c, v);
+  c.drawImage(fondo0, -1.25, -1.05, 2.5, 1.15);
+  // el perfil del valle: ladera, fondo y lomas
+  const paso = clamp(px*3, 1e-5, 0.004), x0 = v[0] - 0.01, x1 = v[2] + 0.01;
+  const perfil = []; for (let x = x0; x <= x1 + paso; x += paso) perfil.push([x, g0(x)]);
+  const fondoY = Math.max(v[3] + 0.1, 0.4);
+  c.fillStyle = sueloCol0(); c.beginPath(); c.moveTo(x0, fondoY); for (const q of perfil) c.lineTo(q[0], q[1]); c.lineTo(x1, fondoY); c.closePath(); c.fill();
+  // textura del terreno: franjas de potreros y cultivos en la ladera (de dibujo)
+  c.save(); c.beginPath(); c.moveTo(x0, fondoY); for (const q of perfil) c.lineTo(q[0], q[1]); c.lineTo(x1, fondoY); c.closePath(); c.clip();
+  const rr = rng(sr(17)); const tonos = ['#22423a', '#2b4a35', '#1f3a37', '#33503a', '#26443e'];
+  for (let i = 0; i < 90; i++){ const x = -0.95 + i*0.021 + (rr() - .5)*0.008; const w = 0.012 + rr()*0.014; if (x + w < x0 || x > x1) continue; const t = tonos[Math.floor(rr()*tonos.length)];
+    c.fillStyle = mixH(t, '#7a9a54', luz()*0.8); const y = g0(x); c.beginPath(); c.moveTo(x, y); c.lineTo(x + w, g0(x + w)); c.lineTo(x + w, g0(x + w) + 0.006); c.lineTo(x, y + 0.006); c.closePath(); c.fill(); }
+  const gs = c.createLinearGradient(0, 0.0, 0, 0.2); gs.addColorStop(0, 'rgba(6,10,20,0)'); gs.addColorStop(1, 'rgba(6,10,20,.45)'); c.fillStyle = gs; c.fillRect(x0, -0.6, x1 - x0, 1.2);
+  c.restore();
+  // árboles de las cercas y casas con luz (de dibujo)
+  for (const a of ARB0){ if (a.x < x0 || a.x > x1) continue; const y = g0(a.x); c.fillStyle = mix('#0f2224', '#2f4a2c', luz()*0.8 + a.t*0.15); c.beginPath(); c.ellipse(a.x, y - a.R*0.8, a.R*0.8, a.R, 0, 0, 7); c.fill(); }
+  for (const [x, h] of CASAS0){ if (x < x0 || x > x1) continue; const y = g0(x); c.fillStyle = mix('#3a3d4a', '#d8cfbf', luz()); c.fillRect(x - h*0.6, y - h, h*1.2, h); c.fillStyle = mix('#2a2026', '#8a3d2a', 0.4 + luz()*0.5); c.beginPath(); c.moveTo(x - h*0.8, y - h); c.lineTo(x, y - h*1.55); c.lineTo(x + h*0.8, y - h); c.closePath(); c.fill();
+    if (luz() < 0.5){ c.fillStyle = 'rgba(255,206,120,.95)'; c.fillRect(x - h*0.25, y - h*0.7, h*0.25, h*0.28); const gl = c.createRadialGradient(x - h*0.12, y - h*0.55, 0, x - h*0.12, y - h*0.55, h*2.2); gl.addColorStop(0, 'rgba(255,200,110,.28)'); gl.addColorStop(1, 'rgba(255,200,110,0)'); c.fillStyle = gl; c.beginPath(); c.arc(x - h*0.12, y - h*0.55, h*2.2, 0, 7); c.fill(); } }
+  aireFrio0(c, v, perfil, x0, x1, fr);
+  // el lote de papa al pie de la ladera, donde baja la cámara
+  const P = PORTAL[0]; c.save(); c.translate(P.x, P.y); c.scale(s0, s0);
+  const v1 = [(v[0] - P.x)/s0, (v[1] - P.y)/s0, (v[2] - P.x)/s0, (v[3] - P.y)/s0];
+  if (v1[2] - v1[0] < 30) lote1(c, v1, env.px/s0, true);
+  c.restore();
+}
+function aireFrio0(c, v, perfil, x0, x1, fr){
+  fr *= sstep(0.05, 0.3, v[2] - v[0]);
+  if (fr <= 0.01) return;
+  // una capa fría pegada al suelo, y el charco de aire frío en el fondo del valle [FAO 2005, pp. 3–4 y 19]
+  const prof = 0.006 + 0.016*fr, tope = NIV0 - prof;
+  c.save();
+  c.beginPath(); c.moveTo(x0, tope); for (const q of perfil) c.lineTo(q[0], Math.max(tope, q[1])); c.lineTo(x1, tope); c.closePath();
+  const g = c.createLinearGradient(0, tope, 0, NIV0 + 0.004); g.addColorStop(0, `rgba(150,196,255,${0.06*fr})`); g.addColorStop(0.55, `rgba(170,208,255,${0.26*fr})`); g.addColorStop(1, `rgba(205,228,255,${0.62*fr})`); c.fillStyle = g; c.fill();
+  c.strokeStyle = `rgba(200,230,255,${0.35*fr})`; c.lineWidth = Math.max(0.0006, (v[2] - v[0])*0.0012); c.beginPath(); let dentro = false;
+  for (const q of perfil){ if (q[1] > tope){ if (!dentro){ c.moveTo(q[0], tope); dentro = true; } else c.lineTo(q[0], tope); } else dentro = false; } c.stroke();
+  // la película fría que baja por la ladera
+  const gros = 0.0016 + 0.0026*fr;
+  c.beginPath(); perfil.forEach((q, i) => i ? c.lineTo(q[0], q[1] - gros) : c.moveTo(q[0], q[1] - gros)); for (let i = perfil.length - 1; i >= 0; i--) c.lineTo(perfil[i][0], perfil[i][1] + 0.001); c.closePath();
+  c.fillStyle = `rgba(170,210,255,${0.32*fr})`; c.fill();
+  // neblina a ras del suelo en lo más bajo, con aire húmedo [FAO 2005, p. 19]
+  if (ESTADO.tipo === 'blanca' && fr > 0.5){ const k = (fr - 0.5)*2; const r = rng(sr(19)); for (let i = 0; i < 40; i++){ const x = -0.05 + r()*0.6, y = g0(x) - 0.003 - r()*0.008, R = 0.03 + r()*0.05;
+      const gg = c.createRadialGradient(x, y, 0, x, y, R); gg.addColorStop(0, `rgba(226,236,248,${0.3*k})`); gg.addColorStop(1, 'rgba(226,236,248,0)'); c.fillStyle = gg; c.beginPath(); c.ellipse(x, y, R, R*0.22, 0, 0, 7); c.fill(); } }
+  c.restore();
+  // el fondo del valle, blanco de escarcha a la madrugada
+  const e = escarcha(); if (e > 0){ c.strokeStyle = `rgba(232,240,250,${0.7*e})`; c.lineWidth = Math.max(0.0008, (v[2] - v[0])*0.0016); c.beginPath(); let on = false; for (const q of perfil){ if (q[1] > tope - 0.002){ on ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); on = true; } else on = false; } c.stroke(); }
+}
+
+/* ============================================================
+   NIVEL 1 · LA LADERA Y EL LOTE  (1 unidad = 80 m)
+   El suelo es el mismo perfil del valle, visto de cerca.
+   ============================================================ */
+function g1(X){ return (g0(PORTAL[0].x + X*s0) - PORTAL[0].y)/s0 + 0.0025*Math.sin(X*31 + 2) + 0.0012*Math.sin(X*83); }
+const PASO_MATA = 0.03;                 // 1,2 m entre matas en el surco
+const X_LOTE = 0.12;                    // la mata donde baja la cámara
+const CERCA = { a: 0.31, b: 0.40, puerta: [0.343, 0.367] };
+const MATAS1 = (() => { const r = rng(sr(31)), a = []; for (let k = -24; k <= 12; k++){ const X = X_LOTE + k*PASO_MATA; if (X > CERCA.a - 0.015) break; a.push({ X, k, sd: Math.floor(r()*1e6), h: 0.0125 + r()*0.003, t: r() }); }
+  for (let k = 0; k < 8; k++){ const X = CERCA.b + 0.04 + k*PASO_MATA; a.push({ X, k: 99, sd: Math.floor(r()*1e6), h: 0.012 + r()*0.003, t: r() }); } return a; })();
+const SETO = (() => { const r = rng(sr(33)), a = []; for (let i = 0; i < 90; i++){ const X = lerp(CERCA.a, CERCA.b, r()); const hmax = 0.06 + 0.035*Math.sin((X - CERCA.a)/(CERCA.b - CERCA.a)*Math.PI); const y = r()*hmax; a.push({ X, y, R: 0.012 + r()*0.016, t: r(), alto: y > 0.05 }); } a.sort((p, q) => q.y - p.y); return a; })();
+const ARB1 = [[-0.44, 0.19], [-0.3, 0.16], [-0.17, 0.14]].map(([X, h], i) => ({ X, h, sd: 40 + i }));
+function poolTope1(){ const gf = g1(CERCA.a); return { gf, cerrada: gf - 0.05*frio(), abierta: gf - 0.015*frio() }; }
+const enCharco1 = X => { const T = poolTope1(), tope = ESTADO.cerca === 'abierta' ? T.abierta : T.cerrada; return frio() > 0.05 && X < CERCA.a && g1(X) > tope; };
+function mata1(c, m, px, conHielo){ // una mata de papa vista desde lejos: masa de follaje (de dibujo)
+  const y = g1(m.X), r = rng(m.sd), h = m.h, L = luz();
+  const base = mixH('#16302a', '#3f6a33', L*0.85), alto = mixH('#24453a', '#6f9a48', L*0.9);
+  for (let i = 0; i < 6; i++){ const dx = (r() - .5)*h*0.9, dy = -h*(0.35 + r()*0.45), R = h*(0.28 + r()*0.18);
+    c.fillStyle = i < 3 ? base : alto; c.beginPath(); c.ellipse(m.X + dx, y + dy, R*1.15, R*0.85, 0, 0, 7); c.fill(); }
+  if (conHielo > 0){ c.fillStyle = `rgba(236,244,252,${0.75*conHielo})`; for (let i = 0; i < 4; i++){ const dx = (r() - .5)*h*0.8, dy = -h*(0.65 + r()*0.3); c.beginPath(); c.ellipse(m.X + dx, y + dy, h*0.22, h*0.07, 0, 0, 7); c.fill(); } }
+  if (dano() > 0.3){ c.fillStyle = `rgba(30,24,20,${0.35*dano()})`; c.beginPath(); c.ellipse(m.X, y - h*0.6, h*0.6, h*0.4, 0, 0, 7); c.fill(); }
+}
+function lote1(c, v, px, desdeLejos){
+  const fr = frio(), L = luz();
+  // suelo
+  const paso = clamp(px*2.5, 1e-4, 0.01), X0 = v[0] - 0.02, X1 = v[2] + 0.02, abajo = Math.max(v[3] + 0.2, 0.6);
+  const perf = []; for (let X = X0; X <= X1 + paso; X += paso) perf.push([X, g1(X)]);
+  if (!desdeLejos){
+    c.fillStyle = mixH('#1c2c2a', '#5c4a34', L*0.8); c.beginPath(); c.moveTo(X0, abajo); for (const q of perf) c.lineTo(q[0], q[1]); c.lineTo(X1, abajo); c.closePath(); c.fill();
+    c.strokeStyle = mixH('#20402f', '#5a7d3c', L); c.lineWidth = Math.max(px*2, 0.003); c.beginPath(); perf.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.stroke();
+    const gt = c.createLinearGradient(0, 0.1, 0, 0.5); gt.addColorStop(0, 'rgba(0,0,0,0)'); gt.addColorStop(1, 'rgba(4,6,12,.55)'); c.fillStyle = gt; c.beginPath(); c.moveTo(X0, abajo); for (const q of perf) c.lineTo(q[0], q[1] + 0.01); c.lineTo(X1, abajo); c.closePath(); c.fill();
+  }
+  if (desdeLejos && px > 0.02) return;
+  // árboles en la ladera (alisos, de dibujo) y la cerca viva al pie del lote
+  for (const a of ARB1){ if (a.X < v[0] - 0.08 || a.X > v[2] + 0.08) continue; const y = g1(a.X), r = rng(sr(a.sd));
+    c.strokeStyle = mixH('#1b1a1c', '#4a3a2c', L); c.lineWidth = a.h*0.07; c.beginPath(); c.moveTo(a.X, y); c.lineTo(a.X + 0.002, y - a.h*0.55); c.stroke();
+    for (let i = 0; i < 9; i++){ const dx = (r() - .5)*a.h*0.55, dy = -a.h*(0.5 + r()*0.45); c.fillStyle = mixH(i < 5 ? '#102422' : '#1d3a30', '#4d7a3c', L*0.85); c.beginPath(); c.ellipse(a.X + dx, y + dy, a.h*0.2, a.h*0.17, 0, 0, 7); c.fill(); } }
+  for (const m of MATAS1){ if (m.X < v[0] - 0.02 || m.X > v[2] + 0.02) continue;     mata1(c, m, px, escarcha()*(enCharco1(m.X) ? 1 : 0.35)); }
+  const ab = ESTADO.cerca === 'abierta';
+  for (const s of SETO){ if (s.X < v[0] - 0.03 || s.X > v[2] + 0.03) continue; if (ab && s.X > CERCA.puerta[0] && s.X < CERCA.puerta[1] && s.y < 0.06) continue;
+    const y = g1(s.X) - s.y; c.fillStyle = mixH(s.t < 0.5 ? '#0d201d' : '#173229', '#43703a', L*0.8); c.beginPath(); c.ellipse(s.X, y, s.R, s.R*0.8, 0, 0, 7); c.fill(); }
+  if (desdeLejos) return;
+  aireFrio1(c, v, perf, px);
+}
+function aireFrio1(c, v, perf, px){
+  const fr = frio()*sstep(0.12, 0.45, v[2] - v[0]); if (fr < 0.02) return;
+  const T = poolTope1(), ab = ESTADO.cerca === 'abierta', tope = ab ? T.abierta : T.cerrada, fin = ab ? v[2] + 0.1 : CERCA.a + 0.012;
+  c.save();
+  // el charco de aire frío represado [FAO 2005, pp. 19–20]
+  c.beginPath(); let empezado = false; const pts = perf.filter(q => q[0] <= fin && q[1] > tope);
+  if (pts.length){ c.moveTo(pts[0][0], tope); for (const q of pts) c.lineTo(q[0], q[1]); c.lineTo(pts[pts.length - 1][0], tope); c.closePath(); empezado = true; }
+  if (empezado){ const g = c.createLinearGradient(0, tope, 0, T.gf); g.addColorStop(0, `rgba(160,204,255,${0.22*fr})`); g.addColorStop(1, `rgba(206,232,255,${0.7*fr})`); c.fillStyle = g; c.fill();
+    c.setLineDash([px*10, px*7]); c.strokeStyle = `rgba(210,234,255,${0.6*fr})`; c.lineWidth = px*1.6; c.beginPath(); c.moveTo(pts[0][0], tope); c.lineTo(pts[pts.length - 1][0], tope); c.stroke(); c.setLineDash([]); }
+  // más allá de la cerca, si está cerrada, solo una capa delgada
+  if (!ab){ const resto = perf.filter(q => q[0] > CERCA.b); if (resto.length){ c.beginPath(); resto.forEach((q, i) => i ? c.lineTo(q[0], q[1] - 0.008*fr) : c.moveTo(q[0], q[1] - 0.008*fr)); for (let i = resto.length - 1; i >= 0; i--) c.lineTo(resto[i][0], resto[i][1]); c.closePath(); c.fillStyle = `rgba(170,210,255,${0.3*fr})`; c.fill(); } }
+  // la corriente fría que baja por la ladera: flechas que avanzan con el recorrido (de dibujo)
+  const fase = (p*1.7) % 1;
+  c.strokeStyle = `rgba(214,236,255,${0.75*fr})`; c.fillStyle = `rgba(214,236,255,${0.75*fr})`; c.lineWidth = Math.max(px*1.6, 0.0012);
+  for (let j = 0; j < 3; j++){ const alto = 0.01 + j*0.012;
+    for (let i = -1; i < 9; i++){ const X = -0.55 + (i + fase + j*0.33)*0.075; const X2 = X + 0.045; if (X2 < v[0] || X > Math.min(v[2], ab ? v[2] : CERCA.a - 0.01)) continue;
+      const a = [X, g1(X) - alto], b = [X2, g1(X2) - alto]; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), s = 0.009; c.beginPath(); c.moveTo(b[0], b[1]); c.lineTo(b[0] - Math.cos(ang - 0.45)*s, b[1] - Math.sin(ang - 0.45)*s); c.lineTo(b[0] - Math.cos(ang + 0.45)*s, b[1] - Math.sin(ang + 0.45)*s); c.closePath(); c.fill(); } }
+  c.restore();
+}
+function dibujaLadera(c, env){
+  const v = env.view;
+  cieloVista(c, v);
+  const C = cielo();
+  if (C.est > 0){ for (let i = 0; i < 260; i++){ const s = ESTRELLAS[i]; const x = s.x*0.7, y = -0.62 + (s.y + 1)*0.5; c.fillStyle = `rgba(230,236,255,${s.b*C.est*0.9})`; c.beginPath(); c.arc(x, y, Math.max(env.px*0.6, s.r*0.45), 0, 7); c.fill(); } }
+  // lomas lejanas al otro lado del valle (de dibujo)
+  c.fillStyle = mixH('#16233a', '#7d93ad', C.luz*0.7); c.beginPath(); c.moveTo(v[0] - 0.1, 0.4); for (let X = v[0] - 0.1; X <= v[2] + 0.1; X += 0.01) c.lineTo(X, -0.02 - 0.05*(0.5 + 0.5*Math.sin(X*4.3 + 1))*(0.7 + 0.3*Math.sin(X*11))); c.lineTo(v[2] + 0.1, 0.4); c.closePath(); c.fill();
+  lote1(c, v, env.px, false);
+}
+const s1 = F[2]/F[1];
+PORTAL[1] = { x: X_LOTE, y: g1(X_LOTE) - 0.25*s1, s: s1 };
+
+/* ============================================================
+   NIVEL 2 · LA MATA Y LOS TERMÓMETROS  (1 unidad = 4 m)
+   El suelo del lote está en y = 0,25. La caseta, a 2 m;
+   el otro termómetro, a 10 cm del suelo [Agrosavia 2020].
+   ============================================================ */
+const SUELO2 = 0.25;
+const CASETA = { x: -0.2, y: SUELO2 - 0.5, w: 0.11, h: 0.085 };
+const SENSOR = { x: -0.13, y: SUELO2 - 0.025 };
+function armaPlanta(bases, seed, esc){
+  const r = rng(seed), hojuelas = [], tallos = [], flores = [], masa = [];
+  const hoja = (P, ang, Ll, t, zb, frente) => {
+    const dir = [Math.cos(ang), Math.sin(ang)];
+    const caida = lerp(0.42, 0.12, t);
+    const fin = [P[0] + dir[0]*Ll, P[1] + dir[1]*Ll + Ll*caida], ctlH = [P[0] + dir[0]*Ll*0.55, P[1] + dir[1]*Ll*0.55 - Ll*0.1];
+    const rach = muestra(u => bez2(P, fin, ctlH, u), 12);
+    const tang = u => { const a = bez2(P, fin, ctlH, Math.max(0, u - 0.02)), c = bez2(P, fin, ctlH, Math.min(1, u + 0.02)); return Math.atan2(c[1] - a[1], c[0] - a[0]); };
+    const esc2 = frente ? 0.7 : 1;
+    const pon = (u, lado2, largo, peq) => { const Q = bez2(P, fin, ctlH, u), ta = tang(u); const a = ta + lado2*(peq ? 1.25 : 0.85) + (r() - .5)*0.35;
+      hojuelas.push({ x: Q[0], y: Q[1], a, l: largo*esc2, w: peq ? 0.64 : 0.6, z: zb + (r() - .5)*0.35, luz: r(), t, seed: Math.floor(r()*1e6), arriba: Q[1] }); };
+    for (const u of [0.3, 0.5, 0.7, 0.86]) for (const l2 of [-1, 1]) pon(u, l2, Ll*(0.28 + r()*0.05)*(1 - (0.86 - u)*0.35), false);
+    for (const u of [0.4, 0.6, 0.78]) for (const l2 of [-1, 1]) if (r() < 0.7) pon(u, l2, Ll*0.09, true);
+    hojuelas.push({ x: fin[0], y: fin[1], a: tang(1) + (r() - .5)*0.2, l: Ll*0.34*esc2, w: 0.6, z: zb, luz: r(), t, seed: Math.floor(r()*1e6) });
+    tallos.push({ pts: rach, w: 0.0024*esc, hoja: true, z: zb });
+    masa.push({ x: (P[0] + fin[0])/2, y: (P[1] + fin[1])/2, rx: Ll*0.55, ry: Ll*0.3, a: Math.atan2(fin[1] - P[1], fin[0] - P[0]), z: zb });
+  };
+  bases.forEach((b, i) => {
+    const h = (0.2 + r()*0.04)*esc, lean = (i - (bases.length - 1)/2)*0.06*esc + (r() - .5)*0.02*esc;
+    const top = [b[0] + lean, b[1] - h], ctl = [b[0] + lean*0.15, b[1] - h*0.55];
+    tallos.push({ pts: muestra(u => bez2(b, top, ctl, u), 18), w: 0.0068*esc });
+    for (let n = 0; n < 11; n++){
+      const t = 0.03 + n/10*0.9; const P = bez2(b, top, ctl, t);
+      const lado = (n + i) % 2 ? 1 : -1, frente = (n + i*2) % 4 === 1;
+      const Ll = lerp(0.15, 0.075, t)*esc*(0.88 + r()*0.24);
+      hoja(P, -Math.PI/2 + lado*(lerp(1.35, 0.5, t) + (r() - .5)*0.3), Ll, t, (frente ? 1.0 : 0) + (r() - .5)*1.2 + (i === 1 ? 0.25 : 0), frente);
+    }
+    const lado = i % 2 ? 1 : -1; const b2 = bez2(b, top, ctl, 0.18); const top2 = [b2[0] + lado*0.07*esc, b2[1] - 0.12*esc]; const ctl2 = [b2[0] + lado*0.05*esc, b2[1] - 0.04*esc];
+    tallos.push({ pts: muestra(u => bez2(b2, top2, ctl2, u), 12), w: 0.0048*esc });
+    for (let n = 0; n < 5; n++){ const t = 0.2 + n*0.18; const P = bez2(b2, top2, ctl2, t); const l2 = n % 2 ? lado : -lado; hoja(P, -Math.PI/2 + l2*(0.9 + (r() - .5)*0.3) + lado*0.3, lerp(0.12, 0.07, t)*esc, 0.3 + t*0.4, (r() - .5)*1.4 - 0.2, false); }
+    if (i !== 0){ const pe = [top[0] + 0.004*esc, top[1] - 0.04*esc]; tallos.push({ pts: muestra(u => bez2(top, pe, [top[0] - 0.01*esc, top[1] - 0.025*esc], u), 8), w: 0.0024*esc });
+      for (let k = 0; k < 6; k++){ const a = -Math.PI/2 + (k - 2.5)*0.52 + (r() - .5)*0.2; const d = 0.02*esc*(0.7 + r()*0.4); flores.push({ x: pe[0] + Math.cos(a)*d, y: pe[1] + Math.sin(a)*d*0.8, bx: pe[0], by: pe[1], r: 0.0088*esc*(0.85 + r()*0.25), a: r()*6.28, k: r(), abierta: r() < 0.8 }); } }
+  });
+  hojuelas.sort((a, b) => a.z - b.z); masa.sort((a, b) => a.z - b.z);
+  return { hojuelas, tallos, flores, masa };
+}
+const ESC2 = 0.45; // la mata de la papa del descenso de la papa, en metros de este nivel
+const PLANTA = armaPlanta([[-0.012, SUELO2], [0, SUELO2], [0.012, SUELO2]], sr(101), ESC2);
+const VECINAS = [-1, 1].map((k, i) => armaPlanta([[k*0.3 - 0.01, SUELO2], [k*0.3 + 0.004, SUELO2], [k*0.3 + 0.016, SUELO2]], sr(120 + i), ESC2*0.96));
+function hojuelaPath(c, len, wid){ // hojuela ovada, de borde entero y punta corta; eje x de 0 a len
+  c.beginPath(); c.moveTo(0, 0); const n = 18;
+  for (let i = 1; i <= n; i++){ const u = i/n; const w = wid*1.12*len*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.64)), 0.72); c.lineTo(u*len, -w*0.5); }
+  for (let i = n - 1; i >= 1; i--){ const u = i/n; const w = wid*1.12*len*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.64)), 0.72)*0.94; c.lineTo(u*len, w*0.5); }
+  c.closePath();
+}
+const anchoHojuela = (len, wid, u, lado) => wid*1.12*len*Math.pow(Math.sin(Math.PI*Math.pow(clamp(u, 0, 1), 0.64)), 0.72)*0.5*(lado > 0 ? 0.94 : 1);
+/* la hojuela donde baja la cámara: de las de adelante, grande y en la parte alta de la mata */
+const HOJA = (() => { const cand = PLANTA.hojuelas.filter(h => h.l > 0.012 && h.z > 0.4 && h.y < SUELO2 - 0.05 && Math.abs(Math.cos(h.a)) > 0.45); cand.sort((a, b) => (b.l - a.l) || (b.z - a.z)); const h = cand[0] || PLANTA.hojuelas[PLANTA.hojuelas.length - 1]; h.elegida = true; return h; })();
+const U_PORT = 0.55;
+PORTAL[2] = { x: HOJA.x + Math.cos(HOJA.a)*HOJA.l*U_PORT, y: HOJA.y + Math.sin(HOJA.a)*HOJA.l*U_PORT, s: F[3]/F[2] };
+const s2 = PORTAL[2].s;
+const camino = h => h.cam || (h.cam = (() => { const q = new Path2D(); const n = 18, len = h.l, wid = h.w; q.moveTo(0, 0);
+  for (let i = 1; i <= n; i++){ const u = i/n; q.lineTo(u*len, -wid*1.12*len*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.64)), 0.72)*0.5); }
+  for (let i = n - 1; i >= 1; i--){ const u = i/n; q.lineTo(u*len, wid*1.12*len*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.64)), 0.72)*0.94*0.5); } q.closePath(); return q; })());
+const sombraH = h => h.som || (h.som = (() => { const q = new Path2D(); q.moveTo(0, 0); for (let i = 1; i <= 10; i++){ const u = i/10; q.lineTo(u*h.l, h.w*h.l*Math.pow(Math.sin(Math.PI*Math.pow(u, 0.72)), 0.9)*0.47); } q.lineTo(h.l, 0); q.closePath(); return q; })());
+function dibujaPlantaVector(c, PL, v, px, tono){
+  const k = tono === undefined ? 1 : tono, L = luz(), e = escarcha(), d = dano();
+  const noche = (col, dia) => mixH(col, dia, L);
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const m of PL.masa){ if (m.x + m.rx < v[0] || m.x - m.rx > v[2] || m.y + m.rx < v[1] || m.y - m.rx > v[3]) continue;
+    c.fillStyle = mix(noche('#0b1a1c', '#142b16'), noche('#13292a', '#23421f'), clamp((m.z + 1.2)/2.4, 0, 1)*0.8*k); c.beginPath(); c.ellipse(m.x, m.y, m.rx, m.ry, m.a, 0, 7); c.fill(); }
+  for (const t of PL.tallos){ if (t.hoja) continue; c.strokeStyle = mix(noche('#1f3a34', '#3a5528'), noche('#2f5040', '#627536'), 0.4*k); c.lineWidth = t.w; trazo(c, t.pts); }
+  let zPrev = -9;
+  for (const h of PL.hojuelas){
+    if (h.x + 0.05 < v[0] || h.x - 0.05 > v[2] || h.y + 0.05 < v[1] || h.y - 0.05 > v[3]) continue;
+    if (h.z > zPrev + 0.5){ for (const t of PL.tallos){ if (!t.hoja || t.z > h.z || t.z <= zPrev) continue; c.strokeStyle = mix(noche('#1a3430', '#2f4a24'), noche('#2c4c3c', '#5a7336'), 0.5*k); c.lineWidth = t.w; trazo(c, t.pts); } zPrev = h.z; }
+    const lit = clamp(0.3 + h.luz*0.35 + (SUELO2 - 0.1 - h.y)*1.2, 0, 1);
+    const prof = clamp((h.z + 1.2) / 2.6, 0, 1);
+    c.save(); c.translate(h.x, h.y); c.rotate(h.a);
+    let col = mix(mixH(noche('#122a2a', '#1b381c'), noche('#1f4440', '#335f2a'), prof), mixH(noche('#2f5a52', '#5f8f3c'), noche('#4a7a66', '#9cbf5c'), prof), lit*0.85*k);
+    const hp = camino(h); c.fillStyle = col; c.fill(hp);
+    if (d > 0){ c.fillStyle = `rgba(28,24,16,${0.55*d*(0.6 + 0.4*h.luz)})`; c.fill(hp); } // helada negra: tejido quemado (de dibujo)
+    c.fillStyle = 'rgba(6,16,14,.26)'; c.fill(sombraH(h));
+    if (h.l/px > 14){ c.strokeStyle = 'rgba(190,220,190,.26)'; c.lineWidth = Math.max(px*0.8, h.l*0.022); c.beginPath(); c.moveTo(0, 0); c.lineTo(h.l*0.95, 0); c.stroke(); }
+    if (e > 0){ // la escarcha: un velo blanco, más en el borde, y granitos de hielo (de dibujo)
+      c.fillStyle = `rgba(226,238,250,${0.3*e*(0.6 + 0.4*lit)})`; c.fill(hp);
+      c.strokeStyle = `rgba(240,248,255,${0.45*e})`; c.lineWidth = Math.max(px*0.7, h.l*0.025); c.stroke(hp);
+      const r = rng(h.seed); c.fillStyle = `rgba(248,252,255,${0.8*e})`; const n = Math.min(14, Math.round(h.l/px*0.3)); for (let i = 0; i < n; i++){ const u = 0.06 + r()*0.9, lado = r() < 0.5 ? -1 : 1, w = anchoHojuela(h.l, h.w, u, lado)*Math.sqrt(r()); const s = Math.max(px*0.7, h.l*0.008); c.fillRect(u*h.l - s/2, lado*w - s/2, s, s); } }
+    if (deshielo()){ const r = rng(h.seed + 7); c.fillStyle = 'rgba(220,236,250,.75)'; for (let i = 0; i < 3; i++){ const u = 0.2 + r()*0.7; c.beginPath(); c.arc(u*h.l, (r() - .5)*h.l*h.w*0.4, Math.max(px*0.8, h.l*0.025), 0, 7); c.fill(); } }
+    c.restore();
+  }
+  for (const t of PL.tallos){ if (!t.hoja || t.z <= zPrev) continue; c.strokeStyle = mix(noche('#1a3430', '#2f4a24'), noche('#2c4c3c', '#5a7336'), 0.5*k); c.lineWidth = t.w; trazo(c, t.pts); }
+  for (const f of PL.flores){ if (f.x < v[0] - 0.02 || f.x > v[2] + 0.02 || f.y < v[1] - 0.02 || f.y > v[3] + 0.02) continue;
+    c.strokeStyle = noche('#2c4a3c', '#4f6b32'); c.lineWidth = f.r*0.14; c.beginPath(); c.moveTo(f.bx, f.by); c.lineTo(f.x, f.y); c.stroke();
+    c.save(); c.translate(f.x, f.y); c.rotate(f.a);
+    c.fillStyle = mix(noche('#8a8aa8', '#f4f1f6'), noche('#7a6f9a', '#d9c9ea'), f.k*0.7); c.beginPath();
+    for (let i = 0; i < 10; i++){ const a = i/10*6.283, dd = i % 2 ? f.r*0.62 : f.r; i ? c.lineTo(Math.cos(a)*dd, Math.sin(a)*dd*0.85) : c.moveTo(Math.cos(a)*dd, Math.sin(a)*dd*0.85); } c.closePath(); c.fill();
+    if (d > 0.5){ c.fillStyle = `rgba(40,30,30,${0.6*d})`; c.fill(); }
+    c.fillStyle = noche('#8a7a3a', '#e8b82a'); c.beginPath(); c.moveTo(0, -f.r*0.3); c.lineTo(f.r*0.22, f.r*0.2); c.lineTo(-f.r*0.22, f.r*0.2); c.closePath(); c.fill();
+    c.restore(); }
+}
+function cajaPlanta(PL){ if (PL.caja) return PL.caja; let x0 = 9, y0 = 9, x1 = -9, y1 = -9; const ext = (x, y, r) => { x0 = Math.min(x0, x - r); y0 = Math.min(y0, y - r); x1 = Math.max(x1, x + r); y1 = Math.max(y1, y + r); };
+  for (const h of PL.hojuelas) ext(h.x, h.y, h.l*1.1); for (const m of PL.masa) ext(m.x, m.y, m.rx); for (const t of PL.tallos) for (const q of t.pts) ext(q[0], q[1], 0.01); for (const fl of PL.flores) ext(fl.x, fl.y, fl.r*1.2);
+  return (PL.caja = [x0, y0, x1, y1]); }
+let plantasV = -1;
+function prepPlantas(){ for (const [PL, tono] of [[PLANTA, 1], ...VECINAS.map(P => [P, 0.8])]){ const b = cajaPlanta(PL); const K = Math.min(DPR*S/(PL === PLANTA ? 0.5 : 0.9), 2600/Math.max(b[2] - b[0], b[3] - b[1]));
+  const cv2 = (PL.spr && PL.spr.cv) || document.createElement('canvas'); cv2.width = Math.ceil((b[2] - b[0])*K); cv2.height = Math.ceil((b[3] - b[1])*K); const x = cv2.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, cv2.width, cv2.height); x.setTransform(K, 0, 0, K, -b[0]*K, -b[1]*K);
+  dibujaPlantaVector(x, PL, [b[0] - 1, b[1] - 1, b[2] + 1, b[3] + 1], 1/K, tono); PL.spr = { cv: cv2, K }; } plantasV = versionEstado; }
+function dibujaPlanta(c, PL, v, px, tono){
+  const b = cajaPlanta(PL); if (b[2] < v[0] || b[0] > v[2] || b[3] < v[1] || b[1] > v[3]) return;
+  if (plantasV !== versionEstado) prepPlantas();
+  if (PL.spr && DPR/px <= PL.spr.K*1.6){ c.drawImage(PL.spr.cv, b[0], b[1], b[2] - b[0], b[3] - b[1]); return; }
+  dibujaPlantaVector(c, PL, v, px, tono);
+}
+function caseta(c, px){
+  const L = luz(), K = CASETA, blanco = mixH('#aeb8c8', '#f2f2ee', L);
+  c.strokeStyle = mixH('#5d6470', '#8a8a86', L); c.lineWidth = 0.006;
+  for (const dx of [-0.04, 0.04]){ c.beginPath(); c.moveTo(K.x + dx, SUELO2); c.lineTo(K.x + dx*0.9, K.y + K.h/2); c.stroke(); }
+  c.lineWidth = 0.003; c.beginPath(); c.moveTo(K.x - 0.04, SUELO2 - 0.12); c.lineTo(K.x + 0.04, SUELO2 - 0.2); c.stroke();
+  c.fillStyle = blanco; c.fillRect(K.x - K.w/2, K.y - K.h/2, K.w, K.h);
+  c.fillStyle = mixH('#c8d0dc', '#ffffff', L); c.beginPath(); c.moveTo(K.x - K.w*0.62, K.y - K.h/2); c.lineTo(K.x + K.w*0.62, K.y - K.h/2); c.lineTo(K.x + K.w*0.5, K.y - K.h/2 - 0.018); c.lineTo(K.x - K.w*0.5, K.y - K.h/2 - 0.018); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(60,70,90,.45)'; c.lineWidth = Math.max(px, 0.0015); for (let i = 1; i < 8; i++){ const y = K.y - K.h/2 + i*K.h/8; c.beginPath(); c.moveTo(K.x - K.w/2 + 0.006, y); c.lineTo(K.x + K.w/2 - 0.006, y + 0.004); c.stroke(); }
+  // el otro termómetro, en una estaca, a 10 cm del suelo
+  c.strokeStyle = mixH('#4a4036', '#7a6248', L); c.lineWidth = 0.006; c.beginPath(); c.moveTo(SENSOR.x, SUELO2 + 0.01); c.lineTo(SENSOR.x, SENSOR.y - 0.012); c.stroke();
+  c.fillStyle = blanco; for (let i = 0; i < 3; i++){ c.beginPath(); c.ellipse(SENSOR.x, SENSOR.y - 0.004*i, 0.014 - i*0.002, 0.004, 0, 0, 7); c.fill(); }
+}
+let fondo2 = null, fondo2V = -1;
+function prepFondo2(){ // la ladera y la cerca, lejos y desenfocadas (de dibujo)
+  const res = Math.max(256, Math.round(S/2)); const c1 = document.createElement('canvas'); c1.width = res*2; c1.height = res; const x = c1.getContext('2d');
+  x.setTransform(res/1.2, 0, 0, res/1.2, res, res*0.62);
+  const L = luz(); x.fillStyle = mixH('#14223a', '#9fb5c8', L*0.8); x.beginPath(); x.moveTo(-1.3, 0.5); for (let X = -1.3; X <= 1.3; X += 0.01) x.lineTo(X, -0.18 - Math.max(0, -X - 0.2)*0.9 + 0.02*Math.sin(X*9)); x.lineTo(1.3, 0.5); x.closePath(); x.fill();
+  x.fillStyle = mixH('#0f2020', '#3d6236', L*0.8); x.beginPath(); x.moveTo(-1.3, 0.5); for (let X = -1.3; X <= 1.3; X += 0.01) x.lineTo(X, -0.06 - Math.max(0, -X - 0.3)*0.7 - (X > 0.55 ? 0.11*Math.sin((X - 0.55)*7)**2 + 0.05 : 0)); x.lineTo(1.3, 0.5); x.closePath(); x.fill();
+  const r = rng(sr(61)); for (let i = 0; i < 60; i++){ const X = -1.3 + r()*2.6, y = 0.02 + r()*0.03; x.fillStyle = mixH('#163029', '#557d3e', L*0.8); x.beginPath(); x.ellipse(X, y, 0.025, 0.014, 0, 0, 7); x.fill(); }
+  const c2 = document.createElement('canvas'); c2.width = c1.width; c2.height = c1.height; const x2 = c2.getContext('2d');
+  if ('filter' in x2){ x2.filter = `blur(${Math.max(2, res/90)}px)`; x2.drawImage(c1, 0, 0); x2.filter = 'none'; } else x2.drawImage(c1, 0, 0);
+  fondo2 = c2; fondo2V = versionEstado;
+}
+function dibujaMata(c, env){
+  const v = env.view, px = env.px, L = luz(), fr = frio();
+  cieloVista(c, v);
+  const C = cielo(); if (C.est > 0){ for (let i = 0; i < 140; i++){ const s = ESTRELLAS[i]; const x = s.x*0.9, y = -0.95 + (s.y + 1)*0.7; if (y > SUELO2 - 0.3) continue; c.fillStyle = `rgba(230,236,255,${s.b*C.est})`; c.beginPath(); c.arc(x, y, s.r*1.4, 0, 7); c.fill(); } }
+  if (fondo2V !== versionEstado || !fondo2) prepFondo2();
+  c.drawImage(fondo2, -1.2*1.2, SUELO2 - 0.62*1.2 + 0.02, 2.4*1.2, 1.2);
+  // el suelo del lote y los camellones
+  c.fillStyle = mixH('#1e2a28', '#5d4a35', L*0.85); c.fillRect(v[0] - 0.1, SUELO2 - 0.01, v[2] - v[0] + 0.2, v[3] - SUELO2 + 0.2);
+  for (let x = Math.floor((v[0] - 0.3)/0.3)*0.3; x < v[2] + 0.3; x += 0.3){ c.fillStyle = mixH('#253430', '#6b563d', L*0.85); c.beginPath(); c.ellipse(x, SUELO2 + 0.005, 0.12, 0.022, 0, Math.PI, 0); c.fill(); }
+  const e = escarcha(); if (e > 0){ const r = rng(sr(71)); const gE = c.createLinearGradient(0, SUELO2 - 0.02, 0, SUELO2 + 0.04); gE.addColorStop(0, `rgba(226,238,250,${0.4*e})`); gE.addColorStop(1, 'rgba(226,238,250,0)'); c.fillStyle = gE; c.fillRect(v[0] - 0.1, SUELO2 - 0.02, v[2] - v[0] + 0.2, 0.06);
+    c.fillStyle = `rgba(246,251,255,${0.8*e})`; for (let i = 0; i < 1400; i++){ const x = -1.5 + r()*3, y = SUELO2 - 0.01 + r()*r()*0.05; if (x < v[0] || x > v[2]) continue; const s = Math.max(px*0.9, 0.0012); c.fillRect(x, y, s, s); } }
+  caseta(c, px);
+  for (const PL of VECINAS) dibujaPlanta(c, PL, v, px, 0.8);
+  dibujaPlanta(c, PLANTA, v, px, 1);
+  // el aire frío pegado al suelo: la inversión [Agrosavia 2020; FAO 2005, p. 4]
+  const inv = clamp((horaAct().t2 - horaAct().t10)/4.5, 0, 1)*fr;
+  if (inv > 0.02){ const g = c.createLinearGradient(0, SUELO2, 0, SUELO2 - 0.45); g.addColorStop(0, `rgba(160,205,255,${0.34*inv})`); g.addColorStop(1, 'rgba(160,205,255,0)'); c.fillStyle = g; c.fillRect(v[0] - 0.1, SUELO2 - 0.45, v[2] - v[0] + 0.2, 0.45); }
+  if (L > 0.6){ const gs = c.createLinearGradient(v[0], 0, v[2], 0); gs.addColorStop(0, 'rgba(255,226,170,.16)'); gs.addColorStop(1, 'rgba(255,226,170,0)'); c.fillStyle = gs; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]); }
+}
+
+/* ============================================================
+   NIVEL 3 · LA HOJA  (1 unidad = 5 cm)
+   La hojuela elegida, con el mismo ángulo y forma del nivel 2.
+   El origen es el punto donde baja la cámara.
+   ============================================================ */
+const LH = HOJA.l*F[2]/F[3], WH = HOJA.w, AH = HOJA.a;      // largo en unidades del nivel 3
+const BASE3 = [-Math.cos(AH)*LH*U_PORT, -Math.sin(AH)*LH*U_PORT];
+const loc3 = (u, v) => [BASE3[0] + Math.cos(AH)*u - Math.sin(AH)*v, BASE3[1] + Math.sin(AH)*u + Math.cos(AH)*v];
+const P3L = { u: LH*(U_PORT + 0.035), v: -anchoHojuela(LH, WH, U_PORT, -1)*0.42 }; // en la lámina, entre dos nervios
+PORTAL[3] = (() => { const q = loc3(P3L.u, P3L.v); return { x: q[0], y: q[1], s: F[4]/F[3] }; })();
+const NERV = (() => { const a = []; for (const u of [0.12, 0.24, 0.36, 0.5, 0.64, 0.78]) for (const l of [-1, 1]){ const w = anchoHojuela(LH, WH, u + 0.12, l); a.push({ u: u*LH, l, w, uf: (u + 0.16)*LH }); } return a; })();
+const AREOLAS = (() => { const r = rng(sr(81)); const hw = anchoHojuela(LH, WH, 0.5, -1); const sites = jitterSites(r, [0, -hw*1.05, LH, hw*1.05], 0.045, 0.85); return voronoi(sites, [-0.05, -hw*1.1, LH + 0.05, hw*1.1], 0.045).map(q => ({ ...q, sh: shrink(q.p, q.c, 0.93) })); })();
+const BORDE3 = (() => { const r = rng(sr(83)), a = []; for (let i = 0; i < 260; i++){ const u = r(), lado = r() < 0.5 ? -1 : 1, w = anchoHojuela(LH, WH, u, lado); a.push({ u: u*LH, v: lado*w*(0.9 + r()*0.12), s: 0.006 + r()*r()*0.016, a: r()*6.28, k: r() }); } return a; })();
+const BOKEH3 = (() => { const r = rng(sr(85)), a = []; for (let i = 0; i < 40; i++){ const q = r(); a.push({ x: -1 + r()*2, y: -0.8 + r()*1.6, r: 0.05 + r()*0.16, hielo: q < 0.4, a: 0.25 + r()*0.4 }); } return a; })();
+/* textura de escarcha: granos y agujitas blancas, pre-dibujadas en un azulejo que se repite (de dibujo) */
+let teselaEscarcha = null;
+function prepTeselas(){
+  const n = 160, t = document.createElement('canvas'); t.width = t.height = n; const x = t.getContext('2d'); const r = rng(sr(87));
+  for (let i = 0; i < 900; i++){ const px0 = r()*n, py0 = r()*n, L = 0.8 + r()*r()*5, a = r()*6.283, al = 0.25 + r()*0.7;
+    x.strokeStyle = `rgba(246,251,255,${al})`; x.lineWidth = 0.6 + r()*0.9; x.lineCap = 'round';
+    for (const ox of [0, -n, n]) for (const oy of [0, -n, n]){ x.beginPath(); x.moveTo(px0 + ox, py0 + oy); x.lineTo(px0 + ox + Math.cos(a)*L, py0 + oy + Math.sin(a)*L); x.stroke(); } }
+  for (let i = 0; i < 90; i++){ const px0 = r()*n, py0 = r()*n, R = 0.6 + r()*1.4; x.fillStyle = `rgba(255,255,255,${0.5 + r()*0.5})`; x.beginPath(); x.arc(px0, py0, R, 0, 7); x.fill(); }
+  teselaEscarcha = t;
+}
+function patron(c, tex, tam){ const pat = c.createPattern(tex, 'repeat'); if (pat.setTransform) pat.setTransform(new DOMMatrix([tam/tex.width, 0, 0, tam/tex.height, 0, 0])); return pat; }
+function cristalChico(c, x, y, s, a, alfa, px){ // agujitas de escarcha en el borde de la hoja (de dibujo)
+  c.strokeStyle = `rgba(214,236,252,${0.6*alfa})`; c.lineWidth = Math.max(px, s*0.16); c.beginPath();
+  for (let i = 0; i < 3; i++){ const t = a + (i - 1)*0.5, L = s*(1 - Math.abs(i - 1)*0.3); c.moveTo(x, y); c.lineTo(x + Math.cos(t)*L, y + Math.sin(t)*L); } c.stroke();
+  c.strokeStyle = `rgba(255,255,255,${alfa})`; c.lineWidth = Math.max(px*0.6, s*0.06); c.stroke();
+}
+function dibujaHoja(c, env){
+  const v = env.view, px = env.px, L = luz(), e = escarcha(), d = dano();
+  // fondo: la noche entre las matas, desenfocada
+  const gb = c.createLinearGradient(0, v[1], 0, v[3]); gb.addColorStop(0, mixH('#0a1426', '#7d9cb8', L)); gb.addColorStop(1, mixH('#081210', '#2c4626', L)); c.fillStyle = gb; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  for (const b of BOKEH3){ const g = c.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r); const col = b.hielo && e > 0 ? `rgba(220,236,255,${b.a*0.5*e})` : `rgba(${Math.round(lerp(30, 90, L))},${Math.round(lerp(60, 130, L))},${Math.round(lerp(60, 70, L))},${b.a*0.5})`; g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(b.x, b.y, b.r, 0, 7); c.fill(); }
+  c.save(); c.translate(BASE3[0], BASE3[1]); c.rotate(AH);
+  // la lámina, con luz de lado y un poco abombada entre los nervios
+  const gl = c.createLinearGradient(0, -0.3, 0, 0.3); gl.addColorStop(0, mixH('#2c5c4a', '#6e9e45', L)); gl.addColorStop(0.5, mixH('#214c3e', '#4f8034', L)); gl.addColorStop(1, mixH('#183a32', '#3d6a2a', L));
+  c.fillStyle = gl; hojuelaPath(c, LH, WH); c.fill();
+  c.save(); hojuelaPath(c, LH, WH); c.clip();
+  { const g = c.createRadialGradient(LH*0.45, 0, 0.05, LH*0.45, 0, LH*0.6); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,10,8,.28)'); c.fillStyle = g; c.fillRect(-0.1, -1, LH + 0.2, 2); }
+  for (const n of NERV){ const cx = n.u + LH*0.07, cy = n.l*n.w*0.5; const g = c.createRadialGradient(cx, cy - 0.02, 0, cx, cy, 0.16); g.addColorStop(0, 'rgba(160,210,170,.10)'); g.addColorStop(1, 'rgba(160,210,170,0)'); c.fillStyle = g; c.fillRect(cx - 0.2, cy - 0.2, 0.4, 0.4); }
+  // las areolas: la red fina entre los nervios, apenas marcada
+  if (px < 0.008 && px > 0.0002){ c.strokeStyle = 'rgba(150,200,160,.09)'; c.lineWidth = Math.max(px*0.8, 0.0018); c.beginPath(); for (const q of AREOLAS){ if (q.bb[2] < -0.02) continue; roundPoly(c, q.sh); } c.stroke(); }
+  // nervios: un surco oscuro y un filo claro
+  c.lineCap = 'round';
+  const nervio = (dib, ancho) => { c.strokeStyle = 'rgba(6,22,16,.45)'; c.lineWidth = ancho*1.6; dib(); c.stroke(); c.strokeStyle = mixH('#4f7c62', '#a8cc8a', L*0.9); c.lineWidth = ancho; dib(); c.stroke(); c.strokeStyle = 'rgba(220,240,210,.25)'; c.lineWidth = ancho*0.35; dib(); c.stroke(); };
+  nervio(() => { c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(LH*0.5, -0.012, LH*0.97, 0); }, 0.02);
+  for (const n of NERV) nervio(() => { c.beginPath(); c.moveTo(n.u, 0); c.bezierCurveTo(n.u + LH*0.03, n.l*n.w*0.3, n.uf - LH*0.02, n.l*n.w*0.62, n.uf + LH*0.02, n.l*n.w*0.88); }, 0.008);
+  // la helada negra: el tejido se ve oscuro y como mojado (de dibujo)
+  if (d > 0){ const r = rng(sr(88)); for (let i = 0; i < 9; i++){ const u = r()*LH, l = r() < 0.5 ? -1 : 1, w = anchoHojuela(LH, WH, u/LH, l); const x = u, y = l*w*(0.4 + r()*0.6), R = 0.06 + r()*0.12;
+      const g = c.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, `rgba(26,30,22,${0.75*d})`); g.addColorStop(1, 'rgba(26,30,22,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, R, 0, 7); c.fill(); }
+    c.fillStyle = `rgba(12,18,14,${0.25*d})`; c.fillRect(-0.1, -1, LH + 0.2, 2); }
+  // la escarcha: un velo de granos, más espeso hacia el borde [FAO 2005, p. 6]
+  if (e > 0){ if (!teselaEscarcha) prepTeselas(); const pat = patron(c, teselaEscarcha, 0.05);
+    c.globalAlpha = 0.95*e; c.fillStyle = pat; c.fillRect(-0.1, -1, LH + 0.2, 2);
+    c.globalAlpha = 0.9*e; c.strokeStyle = pat; c.lineWidth = 0.11; hojuelaPath(c, LH, WH); c.stroke();
+    c.globalAlpha = 1; const gw = c.createLinearGradient(0, -0.35, 0, 0.35); gw.addColorStop(0, `rgba(220,234,248,${0.3*e})`); gw.addColorStop(0.5, `rgba(220,234,248,${0.12*e})`); gw.addColorStop(1, `rgba(220,234,248,${0.24*e})`); c.fillStyle = gw; c.fillRect(-0.1, -1, LH + 0.2, 2); }
+  c.restore();
+  c.strokeStyle = 'rgba(8,18,14,.5)'; c.lineWidth = Math.max(px, 0.004); hojuelaPath(c, LH, WH); c.stroke();
+  if (e > 0) for (const q of BORDE3){ if (q.k > e*1.05) continue; const g = loc3(q.u, q.v); if (g[0] < v[0] - 0.05 || g[0] > v[2] + 0.05 || g[1] < v[1] - 0.05 || g[1] > v[3] + 0.05) continue; cristalChico(c, q.u, q.v, q.s*(0.6 + 0.4*e)*1.4, (q.v < 0 ? -Math.PI/2 : Math.PI/2) + (q.a - 3.14)*0.35, 0.8, px); }
+  if (deshielo()){ const r = rng(sr(89)); for (let i = 0; i < 70; i++){ const u = r(), l = r() < 0.5 ? -1 : 1, w = anchoHojuela(LH, WH, u, l), x = u*LH, y = l*w*r()*0.9, R = 0.008 + r()*0.016;
+      const g = c.createRadialGradient(x - R*0.3, y - R*0.3, 0, x, y, R); g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(0.5, 'rgba(200,226,240,.45)'); g.addColorStop(1, 'rgba(120,170,190,.25)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, R, 0, 7); c.fill(); } }
+  c.restore();
+}
+
+/* ============================================================
+   NIVEL 4 · LA ESCARCHA DE CERCA  (1 unidad = 1,2 mm)
+   La epidermis vista desde arriba, con estomas y cristales.
+   ============================================================ */
+const CEL4 = (() => { const r = rng(sr(91)); const sites = jitterSites(r, [-0.9, -0.9, 0.9, 0.9], 0.055, 0.8); return voronoi(sites, [-0.95, -0.95, 0.95, 0.95], 0.055).map(q => ({ ...q, t: r(), sh: shrink(q.p, q.c, 0.97) })); })();
+const ESTOMAS4 = (() => { const r = rng(sr(93)), a = []; let n = 0; while (a.length < 40 && n < 4000){ n++; const x = -0.88 + r()*1.76, y = -0.88 + r()*1.76; if (a.some(o => Math.hypot(o.x - x, o.y - y) < 0.13)) continue; a.push({ x, y, a: r()*3.14, s: 0.9 + r()*0.25, ab: r() }); } return a; })();
+const PELOS4 = [{ x: -0.62, y: 0.32, a: -0.5, L: 0.55 }, { x: 0.55, y: -0.5, a: 2.4, L: 0.48 }];
+const HIELO4 = (() => { const r = rng(sr(95)), a = []; let n = 0; const fijos = [[0.12, -0.12], [-0.18, 0.1], [0.3, 0.16], [-0.02, 0.24]]; while (a.length < 38 && n < 4000){ n++; const fx = fijos[a.length]; const x = fx ? fx[0] : -0.9 + r()*1.8, y = fx ? fx[1] : -0.9 + r()*1.8; if (a.some(o => Math.hypot(o.x - x, o.y - y) < 0.17)) continue;
+  const L = 0.07 + r()*0.13, ag = []; const nA = 3 + Math.floor(r()*4), a0 = r()*6.283; for (let i = 0; i < nA; i++) ag.push({ a: a0 + (r() - .5)*2.2, L: L*(0.45 + r()*0.55), w: L*(0.09 + r()*0.05) }); ag.sort((p, q) => p.L - q.L);
+  const pl = []; const nP = fx ? 1 : Math.floor(r()*3); for (let i = 0; i < nP; i++) pl.push({ dx: (r() - .5)*L*0.6, dy: (r() - .5)*L*0.6, R: L*(0.18 + r()*0.2), a: r()*1.05 });
+  a.push({ x, y, L, ag, pl, k: fx ? 0 : r() }); } return a; })();
+function paredOndulada(c, q){ // pared de la célula de la epidermis, en rompecabezas: una sola curva por pared compartida (de dibujo)
+  const pts = q.p, n = pts.length; c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 0; i < n; i++){ const A = pts[i], B = pts[(i + 1) % n]; const inv = A[0] > B[0] || (A[0] === B[0] && A[1] > B[1]); const P0 = inv ? B : A, P1 = inv ? A : B;
+    const dx = P1[0] - P0[0], dy = P1[1] - P0[1], Lg = Math.hypot(dx, dy); if (Lg < 1e-6) continue; const nx = -dy/Lg, ny = dx/Lg; const k = Math.max(1, Math.round(Lg/0.03)); const m = k*8;
+    for (let j = 1; j <= m; j++){ const t = j/m, tc = inv ? 1 - t : t; const o = Math.sin(tc*Math.PI*k)*0.006*(k === 1 ? 1 : Math.sin(tc*Math.PI)); c.lineTo(P0[0] + dx*tc + nx*o, P0[1] + dy*tc + ny*o); } }
+  c.closePath();
+}
+function estoma(c, e){
+  c.save(); c.translate(e.x, e.y); c.rotate(e.a); const s = 0.024*e.s;
+  c.fillStyle = 'rgba(10,30,20,.35)'; c.beginPath(); c.ellipse(s*0.12, s*0.16, s*1.3, s*1.0, 0, 0, 7); c.fill();
+  for (const l of [-1, 1]){ const g = c.createRadialGradient(-s*0.3, l*s*0.5 - s*0.15, s*0.05, 0, l*s*0.45, s*1.2); g.addColorStop(0, '#9dcc80'); g.addColorStop(1, '#4f7e44'); c.fillStyle = g; c.beginPath(); c.ellipse(0, l*s*0.44, s*1.18, s*0.52, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(40,110,40,.85)'; for (let i = 0; i < 5; i++){ c.beginPath(); c.ellipse(-s*0.76 + i*s*0.38, l*s*0.48, s*0.13, s*0.09, 0, 0, 7); c.fill(); } }
+  c.fillStyle = '#0b1a14'; c.beginPath(); c.ellipse(0, 0, s*0.78, s*0.1*(0.6 + e.ab), 0, 0, 7); c.fill();
+  c.restore();
+}
+function aguja(c, x, y, a, L, w, px, sombra){ // aguja de hielo: prisma alargado y transparente (de dibujo)
+  const ca = Math.cos(a), sa = Math.sin(a), nx = -sa, ny = ca;
+  const P = [[x + nx*w/2, y + ny*w/2], [x + ca*L*0.88 + nx*w/2, y + sa*L*0.88 + ny*w/2], [x + ca*L, y + sa*L], [x + ca*L*0.88 - nx*w/2, y + sa*L*0.88 - ny*w/2], [x - nx*w/2, y - ny*w/2]];
+  if (sombra){ c.fillStyle = 'rgba(4,22,12,.28)'; c.beginPath(); P.forEach((q, i) => i ? c.lineTo(q[0] + w*0.7, q[1] + w*0.9) : c.moveTo(q[0] + w*0.7, q[1] + w*0.9)); c.closePath(); c.fill(); return; }
+  const g = c.createLinearGradient(x + nx*w/2, y + ny*w/2, x - nx*w/2, y - ny*w/2); g.addColorStop(0, 'rgba(255,255,255,.62)'); g.addColorStop(0.45, 'rgba(206,232,252,.2)'); g.addColorStop(0.55, 'rgba(236,246,255,.42)'); g.addColorStop(1, 'rgba(150,196,236,.34)');
+  c.fillStyle = g; c.beginPath(); P.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.8)'; c.lineWidth = Math.max(px*0.9, w*0.06); c.stroke();
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = Math.max(px*0.7, w*0.05); c.beginPath(); c.moveTo(x, y); c.lineTo(x + ca*L*0.97, y + sa*L*0.97); c.stroke();
+}
+function placa(c, x, y, R, a, px, sombra){ // placa de hielo de seis lados (de dibujo)
+  const hexa = (rr, ox, oy) => { c.beginPath(); for (let i = 0; i < 6; i++){ const t = a + i*Math.PI/3; i ? c.lineTo(x + ox + Math.cos(t)*rr, y + oy + Math.sin(t)*rr) : c.moveTo(x + ox + Math.cos(t)*rr, y + oy + Math.sin(t)*rr); } c.closePath(); };
+  if (sombra){ hexa(R, R*0.15, R*0.2); c.fillStyle = 'rgba(4,22,12,.22)'; c.fill(); return; }
+  hexa(R, 0, 0); const g = c.createLinearGradient(x - R, y - R, x + R, y + R); g.addColorStop(0, 'rgba(250,253,255,.5)'); g.addColorStop(0.6, 'rgba(196,226,250,.2)'); g.addColorStop(1, 'rgba(160,204,240,.32)'); c.fillStyle = g; c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = Math.max(px*0.9, R*0.05); c.stroke();
+  hexa(R*0.58, 0, 0); c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = Math.max(px*0.6, R*0.03); c.stroke();
+}
+function racimoHielo(c, h, px, k){
+  if (h.L*k/px < 3) return;
+  for (const p of h.pl) placa(c, h.x + p.dx, h.y + p.dy, p.R*k, p.a, px, true);
+  for (const q of h.ag) aguja(c, h.x, h.y, q.a, q.L*k, q.w*k, px, true);
+  for (const p of h.pl) placa(c, h.x + p.dx, h.y + p.dy, p.R*k, p.a, px, false);
+  for (const q of h.ag) aguja(c, h.x, h.y, q.a, q.L*k, q.w*k, px, false);
+}
+let piel4 = null, piel4V = -1;
+function pintaPiel4(c, v, px){
+  const d = dano(), L = luz();
+  c.fillStyle = mixH('#1c3a2c', '#4c7a3a', L*0.6 + 0.2); c.fillRect(v[0] - 0.1, v[1] - 0.1, v[2] - v[0] + 0.2, v[3] - v[1] + 0.2);
+  for (const q of CEL4){ if (!inView(q.bb, v, 0.02)) continue; c.beginPath(); paredOndulada(c, q);
+    const g = c.createRadialGradient(q.c[0] - 0.012, q.c[1] - 0.014, 0.004, q.c[0], q.c[1], 0.055); g.addColorStop(0, mix(mixH('#5a8e5c', '#a6cf86', L*0.7), '#3a3a28', d*0.6)); g.addColorStop(0.7, mix(mixH('#3a6a46', '#6e9e58', L*0.7), '#26281c', d*0.6)); g.addColorStop(1, mix(mixH('#2a5236', '#4e7e42', L*0.7), '#1e2016', d*0.6)); c.fillStyle = g; c.fill(); }
+  c.strokeStyle = 'rgba(16,40,26,.55)'; c.lineWidth = Math.max(px*1.8, 0.005); c.beginPath(); for (const q of CEL4){ if (!inView(q.bb, v, 0.02)) continue; paredOndulada(c, q); } c.stroke();
+  c.strokeStyle = mixH('#86b48c', '#cce6b0', L*0.6); c.lineWidth = Math.max(px*0.9, 0.0022); c.stroke();
+}
+function prepPiel4(){ const n = Math.min(3072, Math.max(1536, Math.round(S*DPR*2))); const t = piel4 || document.createElement('canvas'); t.width = t.height = n; const x = t.getContext('2d'); const K = n/1.9;
+  x.setTransform(K, 0, 0, K, n/2, n/2); pintaPiel4(x, [-0.95, -0.95, 0.95, 0.95], 1/K); piel4 = t; piel4V = versionEstado; }
+function superficie4(c, env){
+  const v = env.view, px = env.px, e = escarcha(), L = luz();
+  if (piel4V !== versionEstado || !piel4) prepPiel4();
+  if (DPR/px <= piel4.width/1.9*1.5) c.drawImage(piel4, -0.95, -0.95, 1.9, 1.9); else pintaPiel4(c, v, px);
+  for (const s of ESTOMAS4){ if (s.x < v[0] - 0.05 || s.x > v[2] + 0.05 || s.y < v[1] - 0.05 || s.y > v[3] + 0.05) continue; estoma(c, s); }
+  for (const h of PELOS4){ c.save(); c.translate(h.x, h.y); c.rotate(h.a); const n = 4; for (let i = 0; i < n; i++){ const x0 = i*h.L/n, w = 0.026*(1 - i/n*0.7); const g = c.createLinearGradient(0, -w, 0, w); g.addColorStop(0, mixH('#b9d6bc', '#eef6e2', L*0.6)); g.addColorStop(1, mixH('#6f9478', '#b6cba4', L*0.6)); c.fillStyle = g; c.beginPath(); c.ellipse(x0 + h.L/n/2, 0, h.L/n/2, w, 0, 0, 7); c.fill(); c.strokeStyle = 'rgba(40,70,50,.5)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); } c.restore(); }
+  // brillo de la cutícula
+  const gc = c.createLinearGradient(v[0], v[1], v[2], v[3]); gc.addColorStop(0, 'rgba(255,255,255,.08)'); gc.addColorStop(0.5, 'rgba(255,255,255,0)'); gc.addColorStop(1, 'rgba(255,255,255,.05)'); c.fillStyle = gc; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  if (e > 0){ c.fillStyle = `rgba(214,232,246,${0.1*e})`; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+    for (const h of HIELO4){ if (h.k > e*1.1) continue; if (h.x + h.L < v[0] || h.x - h.L > v[2] || h.y + h.L < v[1] || h.y - h.L > v[3]) continue; racimoHielo(c, h, px, 0.55 + 0.45*e); } }
+}
+function dibujaEscarcha(c, env){ superficie4(c, env); }
+
+/* ============================================================
+   NIVEL 5 · LA HOJA POR DENTRO  (corte, 1 unidad ≈ 1 mm)
+   Arriba la superficie de la hoja (la del nivel 4, de canto).
+   ============================================================ */
+const SEC = (() => {
+  const r = rng(sr(101));
+  const Y = { sup: -0.2 }; Y.epiB = Y.sup + 0.022; Y.pal1 = Y.epiB + 0.075; Y.pal2 = Y.pal1 + 0.065; Y.espB = Y.pal2 + 0.13; Y.infB = Y.espB + 0.02;
+  const epi = []; { let x = -1.4 + r()*0.02; while (x < 1.4){ const w = 0.03 + r()*0.03; epi.push([x, x + w]); x += w; } }
+  const epiI = []; { let x = -1.4 + r()*0.02; while (x < 1.4){ const w = 0.025 + r()*0.03; epiI.push([x, x + w]); x += w; } }
+  const pal = []; for (const [y0, y1] of [[Y.epiB, Y.pal1], [Y.pal1, Y.pal2]]){ let x = -1.4 + r()*0.01; while (x < 1.4){ const w = 0.017 + r()*0.01; const t0 = r()*0.012, t1 = r()*0.01; pal.push({ x0: x, x1: x + w, y0: y0 + t0*0.4, y1: y1 - t1*0.4, cl: Array.from({ length: 10 }, () => [r(), r()]), t: r() }); x += w; } }
+  const BOLSA = { x: 0.07, y: Y.pal2 + 0.06, r: 0.034 };   // el espacio de aire donde baja la cámara
+  const sites = jitterSites(r, [-1.4, Y.pal2 + 0.012, 1.4, Y.espB - 0.012], 0.048, 0.9).filter(s => Math.hypot(s[0] - BOLSA.x, s[1] - BOLSA.y) > BOLSA.r + 0.012);
+  const esp = voronoi(sites, [-1.45, Y.pal2, 1.45, Y.espB], 0.048).map((q, i) => { const rr = rng(sr(700 + i)); const k = 0.68 + rr()*0.12; return { ...q, i, k, sh: shrink(q.p, q.c, k), cl: Array.from({ length: 8 }, () => [rr(), rr()]), hielo: rr() }; });
+  const ESTI = { x: 0.32 };
+  const huecos = []; const rh = rng(sr(105)); for (let n = 0; n < 400 && huecos.length < 30; n++){ const q = esp[Math.floor(rh()*esp.length)]; const vx = q.p[Math.floor(rh()*q.p.length)]; if (vx[1] < Y.pal2 + 0.012 || vx[1] > Y.espB - 0.012) continue; if (Math.hypot(vx[0] - BOLSA.x, vx[1] - BOLSA.y) < 0.06) continue; if (huecos.some(h => Math.hypot(h.x - vx[0], h.y - vx[1]) < 0.03)) continue; huecos.push({ x: vx[0], y: vx[1], R: 0.008 + rh()*0.009, a: rh()*6.28, k: rh(), sd: Math.floor(rh()*1e6) }); }
+  const escar = []; const re = rng(sr(107)); for (let i = 0; i < 46; i++){ const h = 0.03 + re()*re()*0.12; const ag = []; const n = 1 + Math.floor(re()*3); for (let j = 0; j < n; j++) ag.push({ a: -Math.PI/2 + (re() - .5)*1.3, L: h*(0.5 + re()*0.5), w: h*(0.1 + re()*0.05) }); escar.push({ x: -1.35 + re()*2.7, ag, k: re() }); }
+  return { Y, epi, epiI, pal, esp, BOLSA, ESTI, huecos, escar };
+})();
+const hieloDentro = () => bajoCero();   // hiela adentro con las dos heladas: la negra también congela
+/* ============================================================
+   NIVEL 6 · EL HIELO Y LA CÉLULA  (1 unidad = 250 µm)
+   Las células esponjosas del corte que rodean la bolsa de aire;
+   el hielo llena el espacio entre sus paredes.
+   ============================================================ */
+PORTAL[5] = { x: SEC.BOLSA.x, y: SEC.BOLSA.y, s: F[6]/F[5] };
+const s5 = PORTAL[5].s;
+const aL6 = (x, y) => [(x - PORTAL[5].x)/s5, (y - PORTAL[5].y)/s5];
+const deL6 = (x, y) => [PORTAL[5].x + x*s5, PORTAL[5].y + y*s5];
+const CEL6 = (() => { const B = SEC.BOLSA; const out = [];
+  for (const q of SEC.esp){ const d = Math.hypot(q.c[0] - B.x, q.c[1] - B.y); if (d > 0.2) continue; const pts = q.p.map(t => aL6(t[0], t[1])), c0 = aL6(q.c[0], q.c[1]);
+    const rr = rng(sr(1300 + q.i)); const clo = []; for (let k = 0; k < 16; k++){ const a = k/16*6.283 + rr()*0.2; clo.push({ a, R: 0.82 + rr()*0.08, s: 0.85 + rr()*0.3, g: rr()*3 }); }
+    out.push({ pts, c: c0, k: q.k, d, clo, nuc: [rr() - 0.5, rr() - 0.5], i: q.i, hielo: q.hielo, pared: shrink(pts, c0, q.k) }); }
+  out.sort((a, b) => a.d - b.d); return out; })();
+/* el hielo: desde el centro de la bolsa, hasta donde topa con una pared (rayos) */
+const ICE6 = (() => { const n = 64, R = [], RMAX = 0.24, GAP = 0.004;
+  for (let i = 0; i < n; i++){ const t = i/n*6.283, ca = Math.cos(t), sa = Math.sin(t); let r = 0;
+    for (r = 0.002; r < RMAX; r += 0.002){ const x = ca*r, y = sa*r; if (CEL6.some(q => dentroPoly(q.pared, x, y))) break; }
+    R.push(Math.max(0.02, r - GAP)); }
+  let sR = R.slice(); for (let pase = 0; pase < 3; pase++) sR = sR.map((r, i) => Math.min(r, (sR[(i + n - 2) % n] + sR[(i + n - 1) % n] + r + sR[(i + 1) % n] + sR[(i + 2) % n])/5 + 0.01)); // liso, sin pasar las paredes
+  let im = 0; for (let i = 1; i < n; i++) if (sR[i] > sR[im]) im = i;
+  return { n, R: sR, im }; })();
+const icePts = k => ICE6.R.map((r, i) => { const t = i/ICE6.n*6.283; return [Math.cos(t)*r*k, Math.sin(t)*r*k]; });
+function cristalCorte(c, x, y, R, a, alfa, px){ // trocito de hielo en un espacio de aire (de dibujo)
+  c.save(); c.translate(x, y); c.rotate(a); c.beginPath(); for (let i = 0; i < 6; i++){ const t = i/6*6.283, rr = R*(i % 2 ? 0.8 : 1); i ? c.lineTo(Math.cos(t)*rr, Math.sin(t)*rr) : c.moveTo(Math.cos(t)*rr, Math.sin(t)*rr); } c.closePath();
+  const g = c.createLinearGradient(-R, -R, R, R); g.addColorStop(0, `rgba(236,248,255,${0.9*alfa})`); g.addColorStop(0.5, `rgba(168,214,240,${0.65*alfa})`); g.addColorStop(1, `rgba(120,180,220,${0.75*alfa})`);
+  c.fillStyle = g; c.fill(); c.strokeStyle = `rgba(250,253,255,${alfa})`; c.lineWidth = Math.max(px, R*0.07); c.stroke(); c.restore();
+}
+function masaHielo(c, k, px, alfa){ // el hielo que llena la bolsa: facetas de vidrio (de dibujo)
+  const P = icePts(k); const n = P.length;
+  c.beginPath(); P.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath();
+  const Rm = Math.max(...ICE6.R)*k; const g = c.createRadialGradient(-Rm*0.3, -Rm*0.35, Rm*0.05, 0, 0, Rm*1.1); g.addColorStop(0, `rgba(252,254,255,${0.95*alfa})`); g.addColorStop(0.55, `rgba(206,236,252,${0.88*alfa})`); g.addColorStop(1, `rgba(150,206,240,${0.9*alfa})`); c.fillStyle = g; c.fill();
+  c.save(); c.clip();
+  const r = rng(sr(1601)); const centros = [[0, 0], [Rm*0.35, -Rm*0.2], [-Rm*0.3, Rm*0.25]];
+  for (let i = 0; i < n; i += 4){ const A = P[i], B = P[(i + 4) % n], C = centros[(i/4) % 3]; c.fillStyle = r() < 0.5 ? `rgba(255,255,255,${(0.1 + r()*0.25)*alfa})` : `rgba(110,170,215,${(0.06 + r()*0.12)*alfa})`; c.beginPath(); c.moveTo(C[0], C[1]); c.lineTo(A[0], A[1]); c.lineTo(B[0], B[1]); c.closePath(); c.fill(); }
+  c.strokeStyle = `rgba(120,180,220,${0.35*alfa})`; c.lineWidth = Math.max(px*0.8, Rm*0.01); c.beginPath(); for (let i = 0; i < n; i += 8){ const C = centros[(i/8) % 3]; c.moveTo(C[0], C[1]); c.lineTo(P[i][0], P[i][1]); } c.stroke();
+  c.restore();
+  c.beginPath(); P.forEach((q, i) => i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1])); c.closePath(); c.strokeStyle = `rgba(250,253,255,${0.95*alfa})`; c.lineWidth = Math.max(px*1.2, Rm*0.02); c.stroke();
+}
+function dibujaCorteEn(c, v, px){
+  const Y = SEC.Y, e = escarcha(), hd = hieloDentro(), rap = ESTADO.enfria === 'rapido', d = dano(), L = luz();
+  // el aire de la noche, arriba y abajo de la hoja
+  const ga = c.createLinearGradient(0, v[1], 0, Y.sup); ga.addColorStop(0, mixH('#0b1630', '#7d9cb8', L)); ga.addColorStop(1, mixH('#132542', '#a8c2d4', L)); c.fillStyle = ga; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, Y.sup - v[1] + 1);
+  c.fillStyle = mixH('#081224', '#56708a', L); c.fillRect(v[0] - 1, Y.infB, v[2] - v[0] + 2, v[3] - Y.infB + 1);
+  c.fillStyle = mixH('#0d1c1e', '#2a3c34', L*0.6); c.fillRect(v[0] - 1, Y.pal2, v[2] - v[0] + 2, Y.espB - Y.pal2);
+  const verde = (a, b, t) => mix(mixH(a, b, t), '#2c2a1c', d*0.55);
+  for (const q of SEC.esp){ if (!inView(q.bb, v, 0.03)) continue;
+    const seca = hd*(0.3 + 0.25*q.hielo); const sh = shrink(q.p, q.c, q.k*(1 - seca*0.14));
+    c.beginPath(); roundPoly(c, sh); c.fillStyle = verde('#6eaa5e', '#86be6c', q.hielo*0.4); c.fill();
+    if (px < 0.006){ c.fillStyle = 'rgba(214,244,190,.22)'; c.beginPath(); c.ellipse(q.c[0] - 0.006, q.c[1] - 0.008, (q.bb[2] - q.bb[0])*0.18, (q.bb[3] - q.bb[1])*0.12, -0.5, 0, 7); c.fill(); }
+    c.strokeStyle = 'rgba(214,240,196,.6)'; c.lineWidth = Math.max(px, 0.0026); c.stroke();
+    if (px < 0.004){ c.fillStyle = '#2f6a2c'; for (const [a, b] of q.cl){ const x = lerp(q.bb[0], q.bb[2], 0.25 + a*0.5), y = lerp(q.bb[1], q.bb[3], 0.25 + b*0.5); if (!dentroPoly(sh, x, y)) continue; c.beginPath(); c.ellipse(x, y, 0.0045, 0.003, a*3, 0, 7); c.fill(); } }
+    if (rap && hd > 0 && q.hielo < 0.35){ c.strokeStyle = 'rgba(240,250,255,.9)'; c.lineWidth = Math.max(px, 0.0018); const rr = rng(q.i + 5); c.beginPath(); for (let k = 0; k < 5; k++){ const a = rr()*6.28, Lr = 0.012 + rr()*0.012; c.moveTo(q.c[0], q.c[1]); c.lineTo(q.c[0] + Math.cos(a)*Lr, q.c[1] + Math.sin(a)*Lr); } c.stroke(); } }
+  // hielo en los espacios de aire [FAO 2005, pp. 17 y 68–69]
+  if (hd > 0){ for (const h of SEC.huecos){ if (h.k > hd*1.1) continue; if (h.x < v[0] - 0.05 || h.x > v[2] + 0.05) continue; cristalCorte(c, h.x, h.y, h.R*(0.6 + 0.4*hd), h.a, 0.9, px); }
+    c.save(); c.beginPath(); c.rect(v[0] - 1, Y.pal2, v[2] - v[0] + 2, Y.espB - Y.pal2); c.clip(); c.translate(PORTAL[5].x, PORTAL[5].y); c.scale(s5, s5); masaHielo(c, rap ? 0.55 : 1, px/s5, 0.95); c.restore(); }
+  // empalizada: columnas apretadas, llenas de cloroplastos [OpenStax 30.4]
+  for (const q of SEC.pal){ if (q.x1 < v[0] || q.x0 > v[2]) continue; c.beginPath(); c.roundRect ? c.roundRect(q.x0 + 0.0012, q.y0 + 0.0015, q.x1 - q.x0 - 0.0024, q.y1 - q.y0 - 0.003, 0.008) : c.rect(q.x0, q.y0, q.x1 - q.x0, q.y1 - q.y0);
+    c.fillStyle = verde('#6aaa5a', '#82bc68', q.t); c.fill(); if (px < 0.006){ c.fillStyle = 'rgba(214,244,190,.18)'; c.fillRect(q.x0 + 0.003, q.y0 + 0.004, (q.x1 - q.x0)*0.3, q.y1 - q.y0 - 0.008); } c.strokeStyle = 'rgba(214,240,196,.6)'; c.lineWidth = Math.max(px, 0.0022); c.stroke();
+    if (px < 0.004){ c.fillStyle = 'rgba(30,96,34,.9)'; for (const [a, b] of q.cl){ const x = a < 0.5 ? q.x0 + 0.004 : q.x1 - 0.004, y = lerp(q.y0 + 0.006, q.y1 - 0.006, b); c.beginPath(); c.ellipse(x, y, 0.0026, 0.0038, 0, 0, 7); c.fill(); } } }
+  // epidermis de arriba y de abajo, con la cutícula
+  const caja = (a, b, y0, y1, fill) => { c.beginPath(); c.roundRect ? c.roundRect(a + 0.001, y0 + 0.001, b - a - 0.002, y1 - y0 - 0.002, 0.005) : c.rect(a, y0, b - a, y1 - y0); c.fillStyle = fill; c.fill(); c.strokeStyle = 'rgba(200,226,200,.6)'; c.lineWidth = Math.max(px, 0.002); c.stroke(); };
+  for (const [a, b] of SEC.epi){ if (b < v[0] || a > v[2]) continue; caja(a, b, Y.sup, Y.epiB, mix('#c4ddb8', '#2c2c20', d*0.5)); }
+  for (const [a, b] of SEC.epiI){ if (b < v[0] || a > v[2]) continue; if (Math.abs((a + b)/2 - SEC.ESTI.x) < 0.03) continue; caja(a, b, Y.espB, Y.infB, mix('#b0d0a8', '#2c2c20', d*0.5)); }
+  for (const l of [-1, 1]){ c.fillStyle = '#6fa060'; c.beginPath(); c.ellipse(SEC.ESTI.x + l*0.014, (Y.espB + Y.infB)/2, 0.011, 0.012, 0, 0, 7); c.fill(); c.fillStyle = 'rgba(30,90,30,.8)'; c.beginPath(); c.arc(SEC.ESTI.x + l*0.014, (Y.espB + Y.infB)/2, 0.003, 0, 7); c.fill(); }
+  c.strokeStyle = 'rgba(236,240,200,.8)'; c.lineWidth = Math.max(px*1.4, 0.0035); c.beginPath(); c.moveTo(v[0] - 1, Y.sup); c.lineTo(v[2] + 1, Y.sup); c.moveTo(v[0] - 1, Y.infB); c.lineTo(v[2] + 1, Y.infB); c.stroke();
+  // escarcha de canto, sobre la superficie: agujas que se levantan
+  if (e > 0) for (const s of SEC.escar){ if (s.k > e*1.1 || s.x < v[0] - 0.15 || s.x > v[2] + 0.15) continue; for (const q of s.ag) aguja(c, s.x, Y.sup, q.a, q.L*(0.6 + 0.4*e), q.w*(0.6 + 0.4*e), px, false); }
+}
+function dibujaCorte(c, env){ dibujaCorteEn(c, env.view, env.px); }
+
+function progCel(){ const h = EST[ECEL]; return sstep(h.a + 0.15, h.b - 0.3, p); }
+function crecHielo(){ const cam = camAt(p); if (cam.L === 6 && cam.seg.k === 'hold') return 0.55 + 0.45*progCel(); return 1; }
+function cloroplasto(c, x, y, a, s, px){
+  c.save(); c.translate(x, y); c.rotate(a);
+  c.fillStyle = '#2a7430'; c.beginPath(); c.ellipse(0, 0, s, s*0.55, 0, 0, 7); c.fill(); c.fillStyle = 'rgba(140,210,110,.45)'; c.beginPath(); c.ellipse(-s*0.25, -s*0.16, s*0.5, s*0.2, 0, 0, 7); c.fill();
+  if (s/px > 6){ c.strokeStyle = 'rgba(170,230,140,.55)'; c.lineWidth = Math.max(px*0.6, s*0.06); for (let i = -2; i <= 2; i++){ c.beginPath(); c.moveTo(-s*0.6, i*s*0.16); c.lineTo(s*0.6, i*s*0.16); c.stroke(); } }
+  c.restore();
+}
+function dibujaCelula(c, env){
+  const v = env.view, px = env.px, k = crecHielo(), rap = ESTADO.enfria === 'rapido', hd = hieloDentro(), d = dano();
+  c.fillStyle = '#0a1820'; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  const gA = c.createRadialGradient(0, 0, 0, 0, 0, 0.8); gA.addColorStop(0, 'rgba(60,100,120,.22)'); gA.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gA; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  const seca = hd*k*(rap ? 0.25 : 1);
+  CEL6.forEach((q, n) => {
+    const toca = q.d < 0.09 ? 1 : 0.4;
+    const pared = q.pared, memb = shrink(q.pts, q.c, q.k*(0.94 - 0.15*seca*toca));
+    c.beginPath(); roundPoly(c, pared); c.fillStyle = 'rgba(196,222,168,.16)'; c.fill(); c.strokeStyle = 'rgba(214,236,190,.92)'; c.lineWidth = Math.max(px*1.5, 0.012); c.stroke();
+    c.save(); c.beginPath(); roundPoly(c, memb); c.clip();
+    const gc = c.createRadialGradient(q.c[0], q.c[1], 0, q.c[0], q.c[1], 0.28); gc.addColorStop(0, mix('#bfe4ae', '#6a6a4c', d*0.5)); gc.addColorStop(1, mix('#6eae62', '#3c3a2c', d*0.5)); c.fillStyle = gc; c.fillRect(q.c[0] - 1, q.c[1] - 1, 2, 2);
+    c.fillStyle = 'rgba(226,246,236,.32)'; c.beginPath(); roundPoly(c, shrink(memb, q.c, 0.7)); c.fill();
+    for (const o of q.clo){ const m = memb[Math.floor(o.a/6.283*memb.length) % memb.length]; const x = lerp(q.c[0], m[0], o.R), y = lerp(q.c[1], m[1], o.R); cloroplasto(c, x, y, Math.atan2(m[1] - q.c[1], m[0] - q.c[0]) + Math.PI/2, 0.017*o.s, px); }
+    const nx = q.c[0] + q.nuc[0]*0.08, ny = q.c[1] + q.nuc[1]*0.08; const gn = c.createRadialGradient(nx - 0.005, ny - 0.005, 0.002, nx, ny, 0.022); gn.addColorStop(0, '#c9c7b0'); gn.addColorStop(1, '#7c8070'); c.fillStyle = gn; c.beginPath(); c.arc(nx, ny, 0.02, 0, 7); c.fill();
+    // enfriado muy rápido: hielo adentro, que rompe la membrana [FAO 2005, p. 68]
+    if (rap && hd > 0 && n < 4){ const rr = rng(sr(1500 + n)); c.strokeStyle = 'rgba(244,252,255,.95)'; for (let j = 0; j < 8; j++){ const a = rr()*6.283, Lr = (0.05 + rr()*0.07)*k; const x0 = q.c[0] + (rr() - .5)*0.06, y0 = q.c[1] + (rr() - .5)*0.06; c.lineWidth = Math.max(px, 0.004); c.beginPath(); c.moveTo(x0, y0); c.lineTo(x0 + Math.cos(a)*Lr, y0 + Math.sin(a)*Lr);
+        for (let b = 1; b < 4; b++){ const t = b/4, bx = x0 + Math.cos(a)*Lr*t, by = y0 + Math.sin(a)*Lr*t; for (const l of [-1, 1]){ c.moveTo(bx, by); c.lineTo(bx + Math.cos(a + l*1.05)*Lr*0.25, by + Math.sin(a + l*1.05)*Lr*0.25); } } c.stroke(); } }
+    c.restore();
+    const rota = rap && hd > 0 && n < 4 && k > 0.6;
+    c.beginPath(); roundPoly(c, memb); c.strokeStyle = rota ? 'rgba(255,190,170,.95)' : 'rgba(236,250,226,.88)'; c.lineWidth = Math.max(px, 0.0045); if (rota) c.setLineDash([0.022, 0.014]); c.stroke(); c.setLineDash([]);
+  });
+  // el hielo que llena la bolsa de aire, y el agua que sale de las células hacia él [FAO 2005, pp. 68–69]
+  if (hd > 0){ masaHielo(c, (rap ? 0.55 : 1)*k, px, 0.95);
+    if (!rap){ const fase = (p*2.2) % 1; for (const q of CEL6.filter(q => q.d < 0.09).slice(0, 6)){ const dx = -q.c[0], dy = -q.c[1], Lg = Math.hypot(dx, dy); const ux = dx/Lg, uy = dy/Lg; const x0 = q.c[0] + ux*Lg*0.35, y0 = q.c[1] + uy*Lg*0.35, x1 = q.c[0] + ux*Lg*0.68, y1 = q.c[1] + uy*Lg*0.68;
+        for (let j = 0; j < 4; j++){ const t = (j/4 + fase) % 1; const a = 1 - Math.abs(t - 0.5)*2; c.fillStyle = `rgba(150,206,255,${0.9*a})`; c.beginPath(); c.arc(lerp(x0, x1, t), lerp(y0, y1, t), 0.006, 0, 7); c.fill(); }
+        c.strokeStyle = 'rgba(170,215,255,.7)'; c.lineWidth = Math.max(px, 0.003); c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); const ang = Math.atan2(dy, dx), s = 0.016; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x1 - Math.cos(ang - 0.5)*s, y1 - Math.sin(ang - 0.5)*s); c.moveTo(x1, y1); c.lineTo(x1 - Math.cos(ang + 0.5)*s, y1 - Math.sin(ang + 0.5)*s); c.stroke(); } } }
+}
+const P6 = (() => { const i = ICE6.im, t = i/ICE6.n*6.283, r = ICE6.R[i]*0.97; return { x: Math.cos(t)*r, y: Math.sin(t)*r }; })();
+PORTAL[6] = { x: P6.x, y: P6.y, s: F[7]/F[6] };
+
+/* ============================================================
+   NIVEL 7 · EL AGUA HECHA HIELO  (1 unidad = 4 nm)
+   Arriba a la izquierda, el cristal; abajo a la derecha, agua.
+   Las moléculas y la red en anillos de seis son de dibujo.
+   ============================================================ */
+const DOO = 0.069;  // distancia entre oxígenos vecinos, en unidades (de dibujo, cerca de 0,28 nm)
+const ANG7 = Math.atan2(P6.y, P6.x), CA7 = Math.cos(ANG7), SA7 = Math.sin(ANG7);
+const FRENTE = (x, y) => x*CA7 + y*SA7;   // > 0: agua líquida (hacia afuera del cristal); < 0: hielo
+const RED7 = (() => { const out = [], a = DOO*Math.sqrt(3); const r = rng(sr(1701));
+  for (let j = -60; j <= 60; j++) for (let i = -60; i <= 60; i++){ const x0 = i*a + (j % 2 ? a/2 : 0), y0 = j*DOO*1.5;
+    for (const [dx, dy] of [[0, -DOO/2], [0, DOO/2]]){ const x = x0 + dx, y = y0 + dy; if (Math.abs(x) > 3.2 || Math.abs(y) > 3.2) continue; out.push({ x, y, h: r(), j: r(), sd: Math.floor(r()*1e6), up: dy < 0 }); } }
+  return out; })();
+const LIQ7 = (() => { const r = rng(sr(1703)), a = [], cel = 0.07, grid = new Map(); const key = (gx, gy) => gx + ',' + gy;
+  const pon = m => { a.push(m); const k = key(Math.floor(m.x/cel), Math.floor(m.y/cel)); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(m); };
+  const libre = (x, y, d) => { const gx = Math.floor(x/cel), gy = Math.floor(y/cel); for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++){ const L = grid.get(key(gx + i, gy + j)); if (L) for (const o of L) if (Math.hypot(o.x - x, o.y - y) < d) return false; } return true; };
+  for (const q of RED7){ if (FRENTE(q.x, q.y) < -0.05) continue; const t = r()*6.283, d = r()*DOO*0.3; pon({ x: q.x + Math.cos(t)*d, y: q.y + Math.sin(t)*d, a: r()*6.283 }); }
+  const meta = Math.round(a.length*0.1); let n = 0, extra = 0;   // el agua líquida es más densa que el hielo [OpenStax 2.2]
+  while (extra < meta && n < 200000){ n++; const x = -3.2 + r()*6.4, y = -3.2 + r()*6.4; if (FRENTE(x, y) < -0.05 || !libre(x, y, DOO*0.72)) continue; pon({ x, y, a: r()*6.283 }); extra++; }
+  return a; })();
+function progMol(){ const h = EST[EMOL]; return sstep(h.a + 0.1, h.a + 0.55*(h.b - h.a), p); }
+const ESF = {}; // esfera del oxígeno, pre-dibujada por color
+function esfera(tinte){ if (ESF[tinte]) return ESF[tinte]; const n = 96, t = document.createElement('canvas'); t.width = t.height = n; const x = t.getContext('2d'); const g = x.createRadialGradient(n*0.35, n*0.35, n*0.05, n/2, n/2, n/2); g.addColorStop(0, '#ffffff'); g.addColorStop(1, tinte); x.fillStyle = g; x.beginPath(); x.arc(n/2, n/2, n/2 - 0.5, 0, 7); x.fill(); return (ESF[tinte] = t); }
+function molecula(c, x, y, ang, px, tinte, alfa){
+  const R = DOO*0.33, rH = R*0.55, dH = R*0.95;
+  c.fillStyle = `rgba(246,214,200,${alfa})`; c.beginPath(); for (const s of [-1, 1]){ const a = ang + s*0.91; c.moveTo(x + Math.cos(a)*dH + rH, y + Math.sin(a)*dH); c.arc(x + Math.cos(a)*dH, y + Math.sin(a)*dH, rH, 0, 7); } c.fill();
+  if (alfa < 1) c.globalAlpha = alfa; c.drawImage(esfera(tinte), x - R, y - R, 2*R, 2*R); c.globalAlpha = 1;
+}
+function dibujaMoleculas(c, env){
+  const v = env.view, px = env.px, k = progMol();
+  const avance = 0.05 + 0.35*k; // el frente de hielo avanza hacia el agua con el recorrido
+  // fondo: hielo más claro, agua más profunda
+  c.fillStyle = '#0a1830'; c.fillRect(v[0] - 1, v[1] - 1, v[2] - v[0] + 2, v[3] - v[1] + 2);
+  const enHielo = (x, y) => FRENTE(x, y) < avance;
+  const gI = c.createLinearGradient(-CA7, -SA7, CA7, SA7); gI.addColorStop(clamp(0.5 + (avance - 0.08)/2, 0, 1), 'rgba(120,186,230,.16)'); gI.addColorStop(clamp(0.5 + (avance + 0.08)/2, 0, 1), 'rgba(120,186,230,0)'); c.fillStyle = gI; c.fillRect(v[0], v[1], v[2] - v[0], v[3] - v[1]);
+  // puentes de hidrógeno en el cristal [OpenStax 2.2]
+  const visto = q => q.x > v[0] - 0.1 && q.x < v[2] + 0.1 && q.y > v[1] - 0.1 && q.y < v[3] + 0.1;
+  c.setLineDash([DOO*0.1, DOO*0.07]); c.strokeStyle = 'rgba(176,224,255,.85)'; c.lineWidth = Math.max(px*1.2, DOO*0.07); c.beginPath();
+  for (const q of RED7){ if (!visto(q) || !enHielo(q.x, q.y)) continue; const vec = q.up ? [[0, DOO]] : [[DOO*0.866, DOO*0.5], [-DOO*0.866, DOO*0.5]]; for (const [dx, dy] of vec){ if (!enHielo(q.x + dx, q.y + dy)) continue; c.moveTo(q.x, q.y); c.lineTo(q.x + dx, q.y + dy); } }
+  c.stroke(); c.setLineDash([]);
+  // calor que suelta el agua al volverse hielo, en el frente (de dibujo) [FAO 2005, p. 6]
+  const fase = (p*1.6) % 1;
+  for (let i = 0; i < 14; i++){ const t = (i/14 + fase*0.3) % 1; const s = -2 + t*4; const bx = -s*SA7 + avance*CA7, by = s*CA7 + avance*SA7; if (bx < v[0] - 0.2 || bx > v[2] + 0.2 || by < v[1] - 0.2 || by > v[3] + 0.2) continue;
+    const pul = 0.5 + 0.5*Math.sin(i*2.3 + p*9); const R = DOO*(0.9 + 0.8*pul); const g = c.createRadialGradient(bx, by, 0, bx, by, R); g.addColorStop(0, `rgba(255,190,120,${0.35*pul})`); g.addColorStop(1, 'rgba(255,190,120,0)'); c.fillStyle = g; c.beginPath(); c.arc(bx, by, R, 0, 7); c.fill(); }
+  // moléculas del hielo: en la red, todas en su lugar
+  for (const q of RED7){ if (!visto(q) || !enHielo(q.x, q.y)) continue; const ang = q.up ? -Math.PI/2 + (q.h < 0.5 ? 0.5 : -0.5) : Math.PI/2 + (q.h < 0.5 ? 0.6 : -0.6) + (q.j - 0.5)*0.4; molecula(c, q.x, q.y, ang, px, '#96c8f0', 1); }
+  // moléculas del agua líquida: sueltas y más juntas
+  for (const m of LIQ7){ if (m.x < v[0] - 0.1 || m.x > v[2] + 0.1 || m.y < v[1] - 0.1 || m.y > v[3] + 0.1) continue; if (enHielo(m.x, m.y)) continue; molecula(c, m.x, m.y, m.a, px, '#548cc8', 0.92); }
+}
+
+/* ============================================================
+   REGISTRO DE NIVELES
+   ============================================================ */
+const LV = [dibujaValle, dibujaLadera, dibujaMata, dibujaHoja, dibujaEscarcha, dibujaCorte, dibujaCelula, dibujaMoleculas];
+
+/* ============================================================
+   GUION DE CÁMARA
+   ============================================================ */
+const SEGS = [
+  { k:'hold', L:0, f0:1, f1:0.88, st:0, w:1.2 },
+  { k:'zoom', L:0, e:'in', w:1.35 },
+  { k:'hold', L:1, f0:1, f1:0.92, st:1, w:1.25 },
+  { k:'zoom', L:1, e:'both', w:1.3 },
+  { k:'hold', L:2, f0:1, f1:1.32, st:2, w:1.5 },
+  { k:'zoom', L:2, e:'both', w:1.45 },
+  { k:'hold', L:3, f0:1, f1:0.9, st:3, w:1.2 },
+  { k:'zoom', L:3, e:'both', w:1.3 },
+  { k:'hold', L:4, f0:1, f1:HF4, st:4, w:1.2 },
+  { k:'tilt', w:1.7 },
+  { k:'hold', L:5, f0:1, f1:0.94, st:5, w:1.2 },
+  { k:'zoom', L:5, e:'both', w:1.3 },
+  { k:'hold', L:6, f0:1, f1:0.96, st:6, w:2.4 },
+  { k:'zoom', L:6, e:'both', w:1.4 },
+  { k:'hold', L:7, f0:1, f1:2.4, st:7, w:2.4 },
+];
+let acc = 0; for (const s of SEGS){ s.a = acc; acc += s.w; s.b = acc; }
+const T = acc;
+const EST = SEGS.filter(s => s.k === 'hold').map(s => ({ a: s.a, b: s.b, st: s.st }));
+const NEST = EST.length, EHORA = 2, ECEL = 6, EMOL = 7;
+const estP = i => i === 0 ? 0 : i === NEST - 1 ? T : (EST[i].a + EST[i].b) / 2;
+const easeF = { '':u=>u, 'in':u=>2*u*u-u*u*u, 'out':u=>{const v=1-u; return 1-(2*v*v-v*v*v);}, 'both':u=>u*u*(3-2*u) };
+/* dónde mira la cámara en cada estación (se corre para que lo importante no quede bajo el texto);
+   en el teléfono, algunas estaciones se alejan un poco para que quepa lo que se enseña */
+function holdCam(s, u){
+  const e = s.st === 0 ? 1 : sstep(0.02, 0.5, u);
+  let f = s.f0 * Math.pow(s.f1/s.f0, s.st === 2 ? sstep(0, 0.45, u) : u), o = [0, 0], pf = 1;
+  switch (s.st){
+    case 0: o = PORT ? [-0.06, -0.1] : [-0.06, -0.07]; pf = PORT ? 1.55 : 1; break;
+    case 1: o = PORT ? [0.08*e, 0.4*e] : [0.02*e, 0.06*e]; pf = PORT ? lerp(1, 1.5, e) : 1; break;
+    case 2: o = PORT ? [-0.06*e, 0.46*e] : [-0.1*e, 0.05*e]; pf = PORT ? lerp(1, 2.0, e) : 1; break;
+    case 3: o = PORT ? [0.0, 0.12*e] : [-0.08*e, 0.0]; pf = PORT ? lerp(1, 1.25, e) : 1; break;
+    case 4: { const e2 = sstep(0.02, 0.4, u)*(1 - sstep(0.7, 0.98, u)); o = PORT ? [0, 0.12*e2] : [-0.06*e2, 0]; break; }
+    case 5: o = PORT ? [0, 0.12*e] : [-0.05*e, 0.02*e]; break;
+    case 6: o = PORT ? [0, 0.22*e] : [-0.16*e, -0.02*e]; pf = PORT ? lerp(1, 1.6, e) : 1; break;
+    case 7: o = PORT ? [0, 0.3*e] : [-0.12*e, -0.04*e]; break;
+  }
+  return { cx: o[0], cy: o[1], f: f*pf };
+}
+function camAt(p){
+  p = clamp(p, 0, T);
+  let s = SEGS[SEGS.length-1], si = SEGS.length - 1;
+  for (let i = 0; i < SEGS.length; i++){ if (p <= SEGS[i].b){ s = SEGS[i]; si = i; break; } }
+  const u = clamp((p - s.a) / s.w, 0, 1);
+  if (s.k === 'hold'){ const h = holdCam(s, u); return { k:'lvl', L:s.L, cx: h.cx, cy: h.cy, f: h.f, seg:s, u }; }
+  if (s.k === 'tilt') return { k:'tilt', t:u, seg:s, u };
+  const P = PORTAL[s.L]; const uu = easeF[s.e](u);
+  const h0 = holdCam(SEGS[si - 1], 1), f0 = h0.f;
+  const f = f0 * Math.pow(P.s / f0, uu);
+  const k = (f0 - f) / (f0 - P.s);
+  return { k:'lvl', L:s.L, cx: h0.cx + (P.x - h0.cx)*k, cy: h0.cy + (P.y - h0.cy)*k, f, seg:s, u };
+}
+function anchoVista(cam){
+  const r = W / S;
+  if (cam.k === 'lvl') return F[cam.L] * cam.f * r;
+  const a = F[4]*HF4, b = F[5]; return Math.exp(lerp(Math.log(a), Math.log(b), cam.t)) * r;
+}
+function luzGlobal(p){ return Math.exp(-2.0 * p / T); }
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+let p = 0, pObj = 0, vel = 0, sucio = true;
+function envPara(L, cx, cy, f, ppu){ const hw = W/2/ppu, hh = H/2/ppu; return { L, cx, cy, f, ppu, px: 1/ppu, view: [cx - hw, cy - hh, cx + hw, cy + hh] }; }
+function pintaNivel(c, L, cx, cy, f){
+  const ppu = S / f;
+  const P = PORTAL[L];
+  const pp = P ? P.s * ppu : 0;
+  const a = P ? sstep(0.28*S, 0.92*S, pp) : 0;
+  // si el nivel de adentro ya cubre toda la pantalla, el de afuera no se ve: no se dibuja
+  if (a < 0.999){ c.setTransform(DPR*ppu, 0, 0, DPR*ppu, DPR*(W/2 - cx*ppu), DPR*(H/2 - cy*ppu)); LV[L](c, envPara(L, cx, cy, f, ppu)); }
+  if (!P || a <= 0) return;
+  const ppu2 = ppu * P.s;
+  const ox = W/2 + (P.x - cx)*ppu, oy = H/2 + (P.y - cy)*ppu;
+  const cx2 = (cx - P.x) / P.s, cy2 = (cy - P.y) / P.s, f2 = f / P.s;
+  const cubre = a >= 0.999;
+  const dst = cubre ? c : bctx;
+  if (!cubre){ bctx.setTransform(1,0,0,1,0,0); bctx.clearRect(0, 0, buf.width, buf.height); }
+  dst.setTransform(DPR*ppu2, 0, 0, DPR*ppu2, DPR*ox, DPR*oy);
+  const env2 = envPara(L+1, cx2, cy2, f2, ppu2); env2.portal = !cubre;
+  LV[L+1](dst, env2);
+  if (cubre) return;
+  bctx.setTransform(1,0,0,1,0,0);
+  bctx.globalCompositeOperation = 'destination-in';
+  const r0 = pp*lerp(0.22, 0.85, a)*DPR, r1 = r0 + pp*0.16*DPR;
+  const gm = bctx.createRadialGradient(ox*DPR, oy*DPR, r0, ox*DPR, oy*DPR, r1);
+  gm.addColorStop(0, `rgba(0,0,0,${a})`); gm.addColorStop(1, 'rgba(0,0,0,0)');
+  bctx.fillStyle = gm; bctx.fillRect(0, 0, buf.width, buf.height);
+  bctx.globalCompositeOperation = 'source-over';
+  c.setTransform(1,0,0,1,0,0); c.drawImage(buf, 0, 0);
+}
+/* el giro: de la hoja vista desde arriba al corte. El corte cuelga del borde de abajo
+   y se levanta; su fila de arriba es la misma superficie de la hoja */
+const texAv = document.createElement('canvas'), texBv = document.createElement('canvas');
+function prepTexturasGiro(){
+  for (const t of [texA, texB, texAv, texBv]){ t.width = cv.width; t.height = cv.height; }
+  pintaNivel(texA.getContext('2d'), 4, 0, 0, HF4);
+  pintaNivel(texB.getContext('2d'), 5, 0, 0, 1);
+  for (const [o, d] of [[texA, texAv], [texB, texBv]]){ const x = d.getContext('2d'); x.setTransform(1, 0, 0, -1, 0, d.height); x.drawImage(o, 0, 0); x.setTransform(1, 0, 0, 1, 0, 0); }
+  texOK = true;
+}
+function pintaGiro(c, t){
+  if (!texOK) prepTexturasGiro();
+  const th = (t*t*(3 - 2*t)) * Math.PI/2;
+  const Wd = cv.width, Hd = cv.height, h = H, Dp = 1.8*Math.max(W, H);
+  const o = bctx; o.setTransform(1,0,0,1,0,0);
+  o.fillStyle = '#0b1630'; o.fillRect(0, 0, Wd, Hd);
+  const ct = Math.cos(th), st = Math.sin(th);
+  const proy = (y, zp) => { const yr = y*ct - zp*st, zr = y*st + zp*ct + h/2; const k = Dp/(Dp + zr); return [H/2 + yr*k, k]; };
+  const paso = Math.max(2, Math.round(DPR*1.5));
+  if (th < Math.PI/2 - 0.001){
+    for (let j = 0; j < Hd; j += paso){ const y0 = j/DPR - h/2, y1 = (j + paso)/DPR - h/2; const [s0, k0] = proy(y0, -h/2), [s1] = proy(y1, -h/2); if (s1 - s0 <= 0) continue; const ww = W*Math.max(1, k0); o.drawImage(texAv, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+    const [ya] = proy(-h/2, -h/2), [yb] = proy(h/2, -h/2); o.fillStyle = `rgba(6,12,20,${0.5*st})`; o.fillRect(0, ya*DPR, Wd, (yb - ya)*DPR);
+  }
+  for (let j = 0; j < Hd; j += paso){ const z0 = (Hd - j)/DPR, z1 = (Hd - j - paso)/DPR; const [s0, k0] = proy(-h/2, z0 - h/2), [s1] = proy(-h/2, z1 - h/2); if (s1 - s0 <= 0) continue; const ww = W*Math.max(1, k0); o.drawImage(texBv, 0, j, Wd, paso, (W/2 - ww/2)*DPR, s0*DPR, ww*DPR, (s1 - s0)*DPR + 0.6); }
+  const [yc] = proy(-h/2, h/2), [yd] = proy(-h/2, -h/2); o.fillStyle = `rgba(4,10,16,${0.55*ct})`; o.fillRect(0, yc*DPR, Wd, (yd - yc)*DPR);
+  o.strokeStyle = `rgba(220,240,230,${0.25 + 0.5*Math.sin(th*2)})`; o.lineWidth = 2*DPR; o.beginPath(); o.moveTo(0, yd*DPR); o.lineTo(Wd, yd*DPR); o.stroke();
+  c.setTransform(1, 0, 0, -1, 0, Hd); c.drawImage(buf, 0, 0); c.setTransform(1, 0, 0, 1, 0, 0);
+}
+function render(){
+  const cam = camAt(p);
+  if (cam.k === 'tilt') pintaGiro(ctx, cam.t);
+  else pintaNivel(ctx, cam.L, cam.cx, cam.cy, cam.f);
+  ctx.setTransform(1,0,0,1,0,0);
+  const lz = luzGlobal(p);
+  const gv = ctx.createRadialGradient(cv.width/2, cv.height/2, Math.min(cv.width, cv.height)*0.3, cv.width/2, cv.height/2, Math.hypot(cv.width, cv.height)*0.6);
+  gv.addColorStop(0, 'rgba(0,0,0,0)'); gv.addColorStop(1, `rgba(3,5,12,${0.1 + 0.3*(1 - lz)})`);
+  ctx.fillStyle = gv; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!RM && Math.abs(vel) > 0.25 && cam.k === 'lvl'){
+    const k = clamp(Math.abs(vel)*0.012, 0, 0.05), al = clamp((Math.abs(vel) - 0.25)*0.25, 0, 0.28);
+    ctx.globalAlpha = al; const sw = cv.width*(1 + k), sh = cv.height*(1 + k);
+    ctx.drawImage(cv, (cv.width - sw)/2, (cv.height - sh)/2, sw, sh); ctx.globalAlpha = 1;
+  }
+  return cam;
+}
+
+/* ============================================================
+   EL PISO DE LA FINCA: por la URL (?alt=&municipio=&lat=&lon=),
+   por la altitud que escriba la persona o por la del teléfono.
+   Cambia lo que se enseña en la estación 1.
+   ============================================================ */
+const PISOS = {
+  calido: { nombre: 'cálido', rango: 'menos de 1.000 m', temp: 'más de 24 grados' },
+  templado: { nombre: 'templado', rango: '1.000 a 2.000 m', temp: '18 a 24 grados' },
+  frio: { nombre: 'frío', rango: '2.000 a 3.000 m', temp: '12 a 18 grados' },
+  muyfrio: { nombre: 'muy frío (páramo bajo)', rango: '3.000 a 3.700 m', temp: '8 a 12 grados' },
+  paramoalto: { nombre: 'extremadamente frío (páramo alto)', rango: '3.700 a 4.200 m', temp: '4 a 8 grados' },
+};
+const pisoDe = alt => alt < 1000 ? 'calido' : alt < 2000 ? 'templado' : alt < 3000 ? 'frio' : alt < 3700 ? 'muyfrio' : 'paramoalto';
+const altURL = numero(qs.get('alt'), 0, 6000);
+const muniURL = (qs.get('municipio') || '').trim().slice(0, 60).replace(/[<>&"{}\[\]]/g, '');
+const latURL = numero(qs.get('lat'), -90, 90), lonURL = numero(qs.get('lon'), -180, 180);
+const FINCA = { piso: altURL === null ? 'frio' : pisoDe(altURL), alt: altURL, origen: altURL === null ? 'Piso de ejemplo' : 'Altitud de la app' };
+const miles = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+function paginasFinca(){
+  const P = PISOS[FINCA.piso], a = FINCA.alt, donde = a === null ? `En el piso ${P.nombre} de ejemplo` : `Su finca, a ${miles(a)} m${muniURL ? ' (' + muniURL + ')' : ''}, está en el piso ${P.nombre}`;
+  const pags = [];
+  pags.push({ k:'finca', s:[`${donde}: de ${P.rango}, con temperatura media de ${P.temp}{6}.`, 'Pero la media no es la noche: en Tibaitatá, en la sabana de Bogotá, una madrugada de febrero bajó de cero{2}.'] });
+  if (FINCA.piso === 'calido' || FINCA.piso === 'templado') pags.push({ k:'finca', s:['Las fuentes leídas para esta pieza hablan de heladas en tierra fría, no en su piso.', 'Lo que sigue se escribió para el altiplano: sirve para entender el frío, y para cuando siembre más arriba.'] });
+  if (FINCA.piso === 'frio') pags.push({ k:'finca', s:['Busque en su finca los sitios planos y bajos: ahí la helada pega más fuerte{3,1}.'] });
+  if (FINCA.piso === 'muyfrio' || FINCA.piso === 'paramoalto'){
+    pags.push({ k:'finca', s:['Más arriba, la temperatura media es más baja{6}: hay menos margen antes de que hiele.', 'La altitud sola no dice si su finca está en un páramo delimitado: eso lo dice la delimitación.'] });
+    pags.push({ k:'cuidado', s:['En los páramos la ley prohíbe las quemas{7}.', 'Prender fuego contra la helada, además, calienta poco y el humo no protege{1}.'] });
+  }
+  return pags;
+}
+
+/* ============================================================
+   INTERFAZ: medidor, estaciones por páginas, palabras
+   [[clave|texto]] = palabra del glosario · {n,m} = fuentes
+   ============================================================ */
+function armaEstaciones(){ return [
+  { t:'La noche despejada', c:'La noche', pags:[
+    { s:['Es de noche en el altiplano. El cielo está despejado y no hay viento.', 'En noches así, la tierra suelta su calor hacia el cielo y se enfría{1}.', 'Así llega la [[helada|helada]] más común, la de radiación{1}.'] },
+    { s:['Para el tiempo, hiela cuando el aire baja a 0 grados o menos, medido a unos 2 metros del suelo en una [[caseta|caseta]]{1,2,4}.', 'Para el cultivo, la helada es el frío que alcanza a dañar sus tejidos{2,4}.'] },
+    { k:'cuando', s:['En el altiplano cundiboyacense, las heladas son más probables de diciembre a marzo, y menos hacia julio{3}.', 'Es la temporada de menos lluvias: sin nubes, el mediodía es caliente y la madrugada, muy fría{2,4}.'] },
+    ...paginasFinca(),
+    { k:'tam', s:['El recuadro de arriba dice cuánto mide de ancho lo que usted ve.', 'Aquí son más de dos kilómetros. Al final serán unas millonésimas de milímetro.'] },
+    { k:'hacer', s:['Al atardecer, mire el cielo y sienta el viento.', 'Si en la temporada seca la noche viene despejada y quieta, prepárese: puede helar{1,4}.', 'Consulte el aviso de heladas del IDEAM para su zona{4}.'] } ] },
+  { t:'El aire frío baja', c:'La ladera', h:'cerca', pags:[
+    { s:['El aire frío pesa más que el caliente{1}.', 'Por eso baja por la ladera, como el agua, y se empoza en lo más bajo{1}.', 'Las hondonadas y el fondo del valle son los sitios más fríos{1}.'], nota:'Las flechas y el espesor del charco de aire frío son de dibujo.' },
+    { s:['Donde primero se forma la neblina a ras del suelo, ahí se junta el frío{1}.', 'En el altiplano, la helada pega más fuerte en los terrenos planos o poco inclinados{3}.'] },
+    { s:['Mire la [[cerca|cerca viva]] al pie del lote: ataja el aire frío y lo represa sobre la papa{1}.', 'Una tapia, unas pacas de pasto o monte espeso abajo hacen lo mismo{1}.', 'Toque «Con un paso abierto» y mire el charco.'] },
+    { k:'hacer', s:['Siembre lo más delicado en la ladera, no en la hondonada{1}.', 'Abra un paso en la cerca de abajo para que el frío siga de largo{1}.', 'Bien puesta, según por dónde baje el aire, una barrera lo desvía del cultivo{1}.'] },
+    { k:'pensar', s:['La cerca viva da leña, sombra y abrigo al ganado.', '¿Dónde la pondría para que no represe el frío sobre su cultivo?'] } ] },
+  { t:'Las horas de la madrugada', c:'La madrugada', h:'hora', pags:[
+    { s:['Una noche medida en Tibaitatá, en Mosquera, del 5 al 6 de febrero de 2020{2}.', 'Un termómetro estaba a 2 metros, en la caseta; otro, a 10 centímetros del suelo{2}.', 'Toque las horas y mire los dos termómetros.'] },
+    { k:'cuando', s:['A las 5 de la tarde los dos marcaban casi lo mismo{2}.', 'Desde ahí, abajo se enfrió más rápido que arriba: es la [[inversion|inversión]]{2,1}.', 'El frío más grande llegó a las 6:12 de la mañana: −2,6 grados en la caseta y −6,7 a ras del suelo{2}.'] },
+    { k:'cuando', s:['En las noches de helada, casi todo el enfriamiento ocurre en pocas horas, alrededor de la puesta del sol{1}.', 'Después sigue bajando despacio, hasta el amanecer{1}.'] },
+    { s:['Su papa no vive a 2 metros: vive abajo, donde el aire es más frío{2}.', 'Por eso una helada que en la caseta se ve suave puede ser fuerte en el cultivo{2}.'] },
+    { k:'hacer', s:['Lo que haga contra la helada, hágalo una o dos horas antes de que el frío llegue al daño{2}.', 'Si tiene termómetro, póngalo a la altura de las matas y mírelo en la madrugada.'] } ] },
+  { t:'Blanca o negra', c:'Blanca o negra', h:'tipo', pags:[
+    { s:['Con aire húmedo, el vapor se pega a la hoja como hielo blanco: es la [[blanca|helada blanca]], la escarcha{1}.', 'Con aire seco no se forma hielo por encima, pero la hoja se congela igual: es la [[negra|helada negra]]{1}.'] },
+    { s:['La negra suele hacer más daño{1}.', 'Cuando el vapor se vuelve escarcha suelta calor, y ese calor le quita un poco de frío a la hoja{1}.', 'Que no se vea hielo no quiere decir que no haya helado{1}.'] },
+    { k:'frio', s:['Según la FAO, la papa se daña entre −1 y −2 grados en la floración; recién nacida, entre −2 y −3{1}.', 'El maíz florecido, entre −1 y −2. La arveja florecida, entre −2 y −3{1}.', 'La avena y la cebada florecidas, entre −1 y −2; recién nacidas, se dañan apenas entre −7 y −9{1}.'], nota:'Son temperaturas de [[critica|daño]] medidas en cámaras. En el campo el daño puede empezar antes{1}.' },
+    { k:'frio', s:['En Tibaitatá, con −6,7 grados a ras del suelo, se dañaron hortalizas de hoja, el [[kikuyo|kikuyo]] con 10 días de rotación, la papa y el maíz{2}.', 'En la papa, la helada quita más cosecha si cae entre la floración y el llenado del tubérculo{3}.'] },
+    { k:'hacer', s:['Apunte en qué noches y en qué rincones de su finca heló.', 'Los sitios fríos se pueden reconocer midiendo en noches despejadas, en cualquier época del año{1}.'] } ] },
+  { t:'La escarcha de cerca', c:'La escarcha', h:'tipo', pags:[
+    { s:['Esta es la piel de la hoja, la [[epidermis|epidermis]], cubierta de [[cuticula|cutícula]], una capa como cera{8}.', 'Los ojales son [[estoma|estomas]]: por ahí la hoja cambia gases con el aire{8}.'], nota:'El tamaño de las células y de los estomas, y la forma de los cristales, son de dibujo.' },
+    { s:['Encima crecen los cristales de escarcha{1}.', 'El hielo casi siempre arranca donde hay [[bacteria|bacterias que forman hielo]]{1}.', 'Desde afuera, el hielo entra a la hoja por sus aberturas{1}.'], nota:'Las bacterias son mucho más pequeñas de lo que se alcanza a ver en este cuadro.' },
+    { s:['El agua puede seguir líquida por debajo de 0 grados: está [[sobreenfriada|sobreenfriada]]{1}.', 'Un golpe o algo extraño la congelan de una vez{1}.'] },
+    { k:'tam', s:['Este cuadro mide poco más de un milímetro de ancho.', 'Lo que ve es la piel de una sola hojita de la mata.'] } ] },
+  { t:'Dentro de la hoja', c:'Por dentro', pags:[
+    { s:['Cortamos la hoja de lado.', 'Arriba, la epidermis. Debajo, células en columna: la [[empalizada|empalizada]]{8}.', 'Más abajo, células sueltas con aire entre ellas: el [[esponjoso|parénquima esponjoso]]{8}.'] },
+    { s:['En una helada en el campo, el hielo se forma afuera de las células, en esos espacios de aire{1}.', 'Ese hielo le saca el agua a las células y las seca{1}.'], nota:'Los cristales azules son hielo. Su forma es de dibujo.' },
+    { s:['Por eso la FAO dice que no es el frío el que daña: es el hielo{1}.', 'Las plantas que aguantan la sequía suelen aguantar mejor la helada{1}.'] },
+    { k:'hacer', s:['No abone con nitrógeno justo antes de la temporada de heladas: hace crecer tejido tierno, más sensible al frío{1,4}.'] } ] },
+  { t:'El hielo y la célula', c:'La célula', h:'enfria', pags:[
+    { s:['Una célula de la hoja, con su pared y su [[membrana|membrana]], y al lado, en el espacio de aire, un cristal de hielo{1,8}.', 'Deslice despacio: el cristal crece.'], nota:'Los colores, los cloroplastos y la forma del cristal son de dibujo.' },
+    { s:['Sobre el hielo, el vapor de agua tiene menos fuerza que sobre el agua líquida{1}.', 'Por eso el agua sale de la célula, atraviesa la membrana y se pega al cristal{1}.', 'La célula se encoge y se seca; el cristal crece{1}.'] },
+    { s:['Si el hielo se forma dentro de la célula, la rompe{1,5}.', 'Eso se ha visto con un enfriamiento muy rápido, de 8 grados por minuto{1}.', 'En el campo, dice la FAO, el daño viene del hielo de afuera: no hay pruebas de hielo adentro{1}.'] },
+    { k:'pensar', s:['Después de varios días fríos la planta se [[endurece|endurece]] y aguanta más; unos días calientes le quitan esa defensa{1}.', '¿Ha visto que una helada temprana, después de días calientes, hace más daño?'] } ] },
+  { t:'El agua hecha hielo', c:'Agua y hielo', pags:[
+    { s:['Aquí cada bolita es una molécula de agua, dibujada.', 'En el hielo, las moléculas se ordenan en un cristal unido por [[puente|puentes de hidrógeno]]{5}.', 'Ese orden deja más espacio: el hielo es menos denso que el agua, y por eso flota{5}.'], nota:'Las moléculas no se ven así: forma, color y tamaño son de dibujo.' },
+    { s:['Cuando el agua se vuelve hielo, suelta calor{1,2}.', 'Por eso la escarcha protege un poco{1}.', 'Y por eso el riego por [[aspersion|aspersión]] sobre la planta la cuida, mientras la siga mojando{1,2}.'] },
+    { k:'cuidado', s:['La aspersión no se para a medias: si el agua no alcanza o el equipo falla, la planta queda peor que sin regar{1}.', 'Agrosavia recomienda prenderla cuando el aire baje a 2 a 4 grados, y no pararla durante la helada{2}.'] },
+    { k:'hacer', s:['Con lo que tiene en la finca: si el suelo está seco, riéguelo de uno a tres días antes de la helada{1}.', 'El suelo húmedo guarda y pasa más calor; basta mojar los primeros 30 centímetros{1,2}.', 'No voltee la tierra en temporada de heladas; si la aró, apriétela y riéguela{1,2}.'] },
+    { k:'hacer', s:['Tape las matas pequeñas en las noches de riesgo: con tela de polipropileno, la FAO cuenta de 1 a 5 grados más, según el grosor{1}.', 'Los árboles dentro o encima del cultivo devuelven calor de noche: en Brasil, la sombra protege el café de la helada{1}.'] },
+    { k:'hacer', s:['En temporada de heladas, mantenga corta la hierba del lote y de arriba del lote{1}.', 'El suelo limpio y firme puede estar hasta 2 grados más caliente en la superficie que uno con hierba de 5 centímetros{1}.'] },
+    { k:'pensar', s:['La hierba y el rastrojo cuidan el suelo de la erosión y le guardan humedad en la sequía{2}.', 'En la noche de helada, en cambio, enfrían el aire{1}.', '¿Cómo lo balancea en su lote de ladera?'] },
+    { k:'cuidado', s:['Calentar el lote rinde poco: con cien calentadores por hectárea, la FAO cuenta cerca de 1 grado más{1}.', 'El humo no protege y contamina{1}.', 'En el páramo la ley prohíbe las quemas{7}.'], extra:`<p style="margin-top:.6em"><button type="button" class="bc prim" data-repaso>Hacer el repaso</button></p>` } ] },
+]; }
+let ESTACIONES = armaEstaciones();
+
+const GLOS = [
+  ['helada', 'Helada', 'Para el tiempo: aire a 0 grados o menos, medido a unos 2 metros del suelo{1,2,4}. Para el cultivo: el frío que daña sus tejidos{2,4}.'],
+  ['caseta', 'Caseta meteorológica', 'El abrigo donde va el termómetro del aire, a unos 2 metros del suelo, sin que le dé el cielo despejado{1,2}.'],
+  ['inversion', 'Inversión', 'Cuando el aire de abajo está más frío que el de arriba. Pasa en las noches despejadas y quietas{1,2}.'],
+  ['cerca', 'Cerca viva', 'Fila de árboles o arbustos que separa lotes. Al pie del lote puede atajar el aire frío y represarlo{1}.'],
+  ['blanca', 'Helada blanca', 'Helada con aire húmedo: el vapor se pega a las hojas como hielo blanco, la escarcha{1}. Suele hacer menos daño que la negra{1}.'],
+  ['negra', 'Helada negra', 'Helada con aire seco: la planta se congela sin que se forme hielo por encima{1}. Suele hacer más daño{1}.'],
+  ['critica', 'Temperatura crítica', 'La temperatura a la que un cultivo empieza a dañarse. Cambia con la etapa del cultivo y se mide en cámaras; en el campo es una guía{1}.'],
+  ['kikuyo', 'Kikuyo', 'Pasto. En Tibaitatá, la helada de febrero de 2020 dañó el kikuyo con 10 días de rotación{2}.'],
+  ['epidermis', 'Epidermis', 'La piel de la hoja: por lo general, una sola capa de células{8}.'],
+  ['cuticula', 'Cutícula', 'Capa como cera que cubre la hoja y le ayuda a no perder agua{8}.'],
+  ['estoma', 'Estoma', 'Abertura de la hoja por donde entran y salen los gases; la rodean dos células que la abren y la cierran{8}.'],
+  ['bacteria', 'Bacterias que forman hielo', 'Bacterias que hacen que el agua se congele más fácil. Casi siempre el hielo arranca donde están{1}.'],
+  ['sobreenfriada', 'Agua sobreenfriada', 'Agua que sigue líquida por debajo de 0 grados. Un golpe o algo extraño la congelan{1}.'],
+  ['empalizada', 'Empalizada', 'Capa de células en columna, apretadas, debajo de la piel de arriba de la hoja{8}.'],
+  ['esponjoso', 'Parénquima esponjoso', 'Capa de células sueltas, con espacios de aire entre ellas, en la mitad de abajo de la hoja{8}.'],
+  ['membrana', 'Membrana', 'La capa que separa lo de adentro de la célula. El agua puede atravesarla{1}.'],
+  ['endurece', 'Endurecimiento', 'Lo que gana la planta después de días fríos: aguanta más la helada. Lo pierde con días calientes{1}.'],
+  ['puente', 'Puente de hidrógeno', 'La unión entre moléculas de agua que, en el hielo, las ordena en un cristal{5}.'],
+  ['aspersion', 'Aspersión', 'Riego que moja la planta desde arriba, como lluvia. Contra la helada tiene que ser continuo{1,2}.'],
+];
+
+const $ = id => document.getElementById(id);
+function marca(txt){
+  return txt.replace(/\[\[(\w+)\|([^\]]+)\]\]/g, (m, k, v) => `<button type="button" class="t" data-g="${k}">${v}</button>`)
+            .replace(/\{([\d,]+)\}/g, (m, l) => '<sup>' + l.split(',').map(n => `<a href="#f${n}" data-f>${n}</a>`).join('<span aria-hidden="true">,</span>') + '</sup>');
+}
+function plano(txt){ return txt.replace(/\[\[\w+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, ''); }
+
+const riel = $('riel');
+function pintaRiel(){ riel.textContent = ''; ESTACIONES.forEach((e, i) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${i+1} · ${e.c}</span>`; b.setAttribute('aria-label', `Ir a la estación ${i+1}: ${e.c}`); b.addEventListener('click', () => irA(estP(i))); riel.appendChild(b); }); ultEst = -1; }
+$('listaPalabras').innerHTML = GLOS.map(([k, t, d]) => `<dt id="g-${k}">${t}</dt><dd>${marca(d)}</dd>`).join('');
+
+/* ---------- el panel: una página a la vez ---------- */
+const fr = $('frase');
+let estAct = ESTACIONES[0], pagAct = 0;
+const CAB = { hacer:'Para hacer en la finca', pensar:'Para pensar', tam:'¿De qué tamaño?', cuando:'¿Cuándo?', frio:'¿Cuánto frío aguanta?', cuidado:'Con cuidado', finca:'Su finca' };
+function herrHTML(h){
+  const b = (set, txt, on, cls) => `<button type="button" class="bc tg${cls ? ' ' + cls : ''}" data-set="${set}" aria-pressed="${on}">${txt}</button>`;
+  if (h === 'hora') return `<div class="herr" role="group" aria-label="Hora de la noche">` + HORAS.map((H, i) => b('hora:' + i, H.h, ESTADO.hora === i, 'hr')).join('') + `</div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'cerca') return `<div class="herr" role="group" aria-label="La cerca de abajo">` + b('cerca:cerrada', 'Cerca cerrada', ESTADO.cerca === 'cerrada') + b('cerca:abierta', 'Con un paso abierto', ESTADO.cerca === 'abierta') + `</div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'tipo') return `<div class="herr" role="group" aria-label="Tipo de helada">` + b('tipo:blanca', 'Helada blanca', ESTADO.tipo === 'blanca') + b('tipo:negra', 'Helada negra', ESTADO.tipo === 'negra') + `</div><p class="estado" id="estadoTxt"></p>`;
+  if (h === 'enfria') return `<div class="herr" role="group" aria-label="Cómo se enfría">` + b('enfria:lento', 'Lento, como en el campo', ESTADO.enfria === 'lento') + b('enfria:rapido', 'Muy rápido, en laboratorio', ESTADO.enfria === 'rapido') + `</div><p class="estado" id="estadoTxt"></p>`;
+  return '';
+}
+function avisoHora(){ const H = horaAct(); return H.t10 < 0 ? '' : ` A las ${H.c} todavía no hiela a ras del suelo: en la estación 3 puede elegir otra hora.`; }
+function estadoTexto(h){
+  const H = horaAct();
+  if (h === 'hora') return `${H.c}: en la caseta, a 2 m, ${fmtTH(H, 't2')}; a 10 cm del suelo, ${fmtTH(H, 't10')}.` + (H.t10 < 0 ? ' A ras del suelo, bajo cero.' : H.t10 < H.t2 - 1 ? ' Abajo, más frío que arriba.' : '');
+  if (h === 'cerca') return ESTADO.cerca === 'cerrada' ? 'Cerca cerrada: el aire frío se represa sobre el lote.' + (frio() < 0.3 ? ' A esta hora casi no hay aire frío.' : '') : 'Con un paso abierto, el aire frío sigue de largo y el charco baja.';
+  if (h === 'tipo') return (ESTADO.tipo === 'blanca' ? 'Helada blanca: aire húmedo, escarcha encima.' : 'Helada negra: aire seco, sin hielo encima; la hoja se congela igual.') + avisoHora();
+  if (h === 'enfria') return (ESTADO.enfria === 'lento' ? 'Lento, como en el campo: el hielo crece afuera y la célula se seca.' : 'Muy rápido, como en el laboratorio: el hielo se forma adentro y rompe la membrana.') + avisoHora();
+  return '';
+}
+function partesDe(P){ return P.s.concat(P.nota ? [P.nota] : []); }
+function pintaPagina(){
+  const P = estAct.pags[pagAct]; let h = '';
+  if (P.k) h += `<p class="cab-pag">${CAB[P.k]}</p>`;
+  h += `<p${['hacer', 'pensar', 'finca', 'cuidado'].includes(P.k) ? ' class="finca"' : ''}>` + P.s.map((x, j) => `<span class="fr" data-i="${j}">${marca(x)}</span>`).join(' ') + '</p>';
+  if (P.extra) h += marca(P.extra);
+  if (estAct.h && !['hacer', 'finca', 'pensar', 'cuidado'].includes(P.k)) h += herrHTML(estAct.h);
+  if (P.nota) h += `<p class="nota"><span class="fr" data-i="${P.s.length}">${marca(P.nota)}</span></p>`;
+  $('fCuerpo').innerHTML = h;
+  const n = estAct.pags.length;
+  $('fPag').textContent = `${pagAct + 1} de ${n}`;
+  $('bAntes').disabled = pagAct === 0; $('bDespues').disabled = pagAct === n - 1;
+  const et = $('estadoTxt'); if (et && estAct.h){ et._s = estadoTexto(estAct.h); et.textContent = et._s; }
+  ajustaPanel(); sucio = true;
+}
+/* el panel nunca sube encima del medidor: si no cabe, se desplaza por dentro */
+function ajustaPanel(){ const mb = $('medidor').getBoundingClientRect().bottom, abajo = parseFloat(getComputedStyle(fr).bottom) || 16; const mh = Math.max(160, Math.floor(innerHeight - abajo - (innerWidth <= 640 ? mb + 8 : 16))) + 'px'; if (fr.style.maxHeight !== mh) fr.style.maxHeight = mh; }
+function vePagina(d){ const n = estAct.pags.length; const k = clamp(pagAct + d, 0, n - 1); if (k === pagAct) return; detenVoz(); pagAct = k; pintaPagina(); }
+$('bAntes').addEventListener('click', () => vePagina(-1));
+$('bDespues').addEventListener('click', () => vePagina(1));
+$('bOcultar').addEventListener('click', () => {
+  const min = fr.classList.toggle('min'); detenVoz();
+  $('bOcultar').textContent = min ? 'Ver texto' : '▾'; $('bOcultar').classList.toggle('ic', !min);
+  $('bOcultar').setAttribute('aria-expanded', String(!min)); $('bOcultar').setAttribute('aria-label', min ? 'Mostrar el texto' : 'Ocultar el texto para ver la imagen');
+  sucio = true;
+});
+
+/* ---------- Escuchar: la voz del navegador, sin archivos ni red ---------- */
+const bEsc = $('bEscuchar');
+const voz = { v: null, motivo: '', turno: 0, dichas: 0, errores: [] };
+function eligeVoz(){
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined'){ voz.motivo = 'Sin voz aquí'; return; }
+  const vs = speechSynthesis.getVoices();
+  if (!vs.length) { voz.motivo = ''; return; }
+  const es = vs.filter(v => /^es([-_]|$)/i.test(v.lang));
+  if (!es.length){ voz.v = null; voz.motivo = 'Sin voz en español'; return; }
+  const pref = ['es-CO', 'es-US', 'es-MX', 'es-419', 'es-ES'];
+  const rango = v => { const i = pref.indexOf(v.lang.replace('_', '-')); return i < 0 ? 9 : i; };
+  es.sort((a, b) => (b.localService - a.localService) || (rango(a) - rango(b)));
+  voz.v = es[0]; voz.motivo = '';
+}
+function pintaBotonVoz(){
+  if (voz.turno) return;
+  if (voz.motivo){ if (bEsc.textContent !== voz.motivo) $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; bEsc.textContent = voz.motivo; bEsc.setAttribute('aria-disabled', 'true'); }
+  else { bEsc.textContent = 'Escuchar'; bEsc.removeAttribute('aria-disabled'); }
+}
+if (window.speechSynthesis){ eligeVoz(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', () => { eligeVoz(); pintaBotonVoz(); }); }
+else voz.motivo = 'Sin voz aquí';
+pintaBotonVoz();
+function marcaLeyendo(i){ for (const s of $('fCuerpo').querySelectorAll('.fr')) s.classList.toggle('leyendo', +s.dataset.i === i); }
+function detenVoz(){
+  if (!voz.turno) return;
+  voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {}
+  marcaLeyendo(-1); bEsc.setAttribute('aria-pressed', 'false'); pintaBotonVoz();
+}
+/* la voz lee «−2,6» como «menos dos coma seis» */
+const paraVoz = t => t.replace(/−(?=\d)/g, 'menos ').replace(/(\d),(\d)/g, '$1 coma $2').replace(/°C/g, 'grados').replace(/\ba\. m\./g, 'de la mañana').replace(/\bp\. m\./g, 'de la tarde');
+function di(texto, turno, alFinal, alEmpezar, intento){
+  const u = new SpeechSynthesisUtterance(paraVoz(texto));
+  if (voz.v){ u.voice = voz.v; u.lang = voz.v.lang; } else u.lang = 'es-CO';
+  u.rate = 0.92;
+  const guardia = setTimeout(() => { if (voz.turno !== turno) return; voz.errores.push('sin-arranque'); if (!voz.v) voz.motivo = 'Sin voz en español'; detenVoz(); pintaBotonVoz(); }, 5000);
+  u.onstart = () => { clearTimeout(guardia); if (voz.turno === turno && alEmpezar) alEmpezar(); };
+  u.onend = () => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.dichas++; alFinal(); };
+  u.onerror = (e) => { clearTimeout(guardia); if (voz.turno !== turno) return; voz.errores.push(e.error || 'error');
+    if ((e.error === 'interrupted' || e.error === 'canceled') && !intento){ setTimeout(() => { if (voz.turno === turno) di(texto, turno, alFinal, alEmpezar, 1); }, 250); return; }
+    if (!voz.v){ voz.motivo = 'Sin voz en español'; }
+    detenVoz(); if (voz.motivo) pintaBotonVoz(); else avisoVoz('No se pudo leer');
+  };
+  speechSynthesis.speak(u);
+}
+function avisoVoz(t){ bEsc.textContent = t; $('anuncio').textContent = t; setTimeout(() => { if (!voz.turno) pintaBotonVoz(); }, 4000); }
+function callaYLuego(f){ let habla = false; try { habla = speechSynthesis.speaking || speechSynthesis.pending; if (habla) speechSynthesis.cancel(); } catch (e) {} setTimeout(f, habla ? 250 : 0); }
+function leePagina(turno, conTitulo){
+  const partes = partesDe(estAct.pags[pagAct]).map(plano);
+  let i = -1;
+  const sigue = () => {
+    i++;
+    if (i < partes.length){ di(partes[i], turno, sigue, () => marcaLeyendo(i)); return; }
+    if (pagAct < estAct.pags.length - 1){ pagAct++; pintaPagina(); leePagina(turno, false); return; }
+    detenVoz();
+  };
+  const P = estAct.pags[pagAct];
+  if (conTitulo) di(estAct.t + '.' + (P.k ? ' ' + CAB[P.k] : ''), turno, sigue);
+  else if (P.k) di(CAB[P.k], turno, sigue); else sigue();
+}
+bEsc.addEventListener('click', () => {
+  if (voz.turno){ detenVoz(); return; }
+  eligeVoz();
+  if (voz.motivo){ pintaBotonVoz(); $('anuncio').textContent = voz.motivo + ': este navegador no puede leer en voz alta.'; return; }
+  const t = (voz.turno = Date.now()); bEsc.setAttribute('aria-pressed', 'true'); bEsc.textContent = 'Parar';
+  callaYLuego(() => { if (voz.turno === t) leePagina(t, pagAct === 0); });
+});
+
+/* ---------- Palabras, fuentes, finca ---------- */
+const dlgF = $('fuentes'), dlgG = $('glosario'), dlgR = $('repaso'), dlgP = $('dlgFinca');
+function abre(d){ for (const o of [dlgF, dlgG, dlgR, dlgP]) if (o !== d && o.open) o.close(); detenVoz(); try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+function abreFuentes(id){ abre(dlgF); if (id){ const li = document.getElementById(id); if (li){ li.scrollIntoView({ block: 'center' }); li.style.outline = '1px solid #a7c957'; setTimeout(() => li.style.outline = '', 1600); } } }
+function abrePalabra(k){ abre(dlgG); const dt = document.getElementById('g-' + k); if (dt){ dt.scrollIntoView({ block: 'start' }); dt.classList.add('aqui'); setTimeout(() => dt.classList.remove('aqui'), 2400); } }
+$('bFuentes').addEventListener('click', () => abreFuentes());
+$('bPalabras').addEventListener('click', () => abrePalabra(''));
+$('bVerFuentes').addEventListener('click', () => abreFuentes());
+$('bRepaso').addEventListener('click', () => abreRepaso());
+$('bFinca').addEventListener('click', () => abre(dlgP));
+document.addEventListener('click', e => {
+  const t = e.target.closest && e.target.closest('.t'); if (t){ e.preventDefault(); abrePalabra(t.dataset.g); return; }
+  const a = e.target.closest && e.target.closest('a[data-f]'); if (a){ e.preventDefault(); abreFuentes(a.getAttribute('href').slice(1)); return; }
+  const c = e.target.closest && e.target.closest('[data-cierra]'); if (c){ c.closest('dialog').close(); return; }
+  const r = e.target.closest && e.target.closest('[data-repaso]'); if (r){ abreRepaso(); return; }
+  const tg = e.target.closest && e.target.closest('[data-set]');
+  if (tg){ const [k, v] = tg.dataset.set.split(':'); const nuevo = k === 'hora' ? clamp(+v, 0, HORAS.length - 1) : v; if (ESTADO[k] !== nuevo){ ESTADO[k] = nuevo; tocaEstado(); }
+    pintaPagina(); const b = $('fCuerpo').querySelector(`[data-set="${tg.dataset.set}"]`); if (b) b.focus(); }
+});
+function mostrarFinca(){
+  const P = PISOS[FINCA.piso];
+  const txt = `${FINCA.origen}${FINCA.alt !== null ? ' · ' + miles(FINCA.alt) + ' m' : ''} · ${P.nombre}`;
+  $('bFinca').textContent = txt;
+  $('origenFinca').textContent = `${txt}${muniURL ? ' · ' + muniURL : ''}${latURL !== null && lonURL !== null && FINCA.alt === null ? ' · la app mandó coordenadas sin altitud' : ''}.`;
+  $('selectorPiso').value = FINCA.piso; $('alturaFinca').value = FINCA.alt === null ? '' : FINCA.alt;
+}
+function cambiarPiso(k, alt, origen){
+  FINCA.piso = k; FINCA.alt = alt; FINCA.origen = origen;
+  ESTACIONES = armaEstaciones(); pintaRiel();
+  const st = estAct ? ESTACIONES.findIndex(e => e.t === estAct.t) : 0; estAct = ESTACIONES[Math.max(0, st)]; pagAct = Math.min(pagAct, estAct.pags.length - 1);
+  if (fr.classList.contains('ver')) pintaPagina(); mostrarFinca(); sucio = true;
+}
+$('selectorPiso').addEventListener('change', e => cambiarPiso(e.target.value, null, 'Piso de ejemplo'));
+$('alturaManual').addEventListener('submit', e => { e.preventDefault(); const a = numero($('alturaFinca').value, 0, 6000); if (a !== null){ cambiarPiso(pisoDe(a), a, 'Altitud que usted escribió'); dlgP.close(); } });
+let ubicPend = false;
+$('usarUbicacion').addEventListener('click', () => {
+  const est = $('estadoUbicacion');
+  if (!navigator.geolocation){ est.textContent = 'Este navegador no da la ubicación. Escriba la altitud o elija un piso.'; return; }
+  est.textContent = 'Esperando su permiso de ubicación…'; ubicPend = true;
+  navigator.geolocation.getCurrentPosition(pos => { if (!ubicPend) return; ubicPend = false; const a = numero(pos.coords.altitude, 0, 6000);
+    if (a === null){ est.textContent = 'El teléfono dio coordenadas sin altitud. Escriba los metros de su finca.'; return; }
+    cambiarPiso(pisoDe(a), a, 'Altitud del teléfono (aproximada)'); est.textContent = 'La ubicación del teléfono puede no ser la de la finca.'; },
+    err => { if (!ubicPend) return; ubicPend = false; est.textContent = err.code === 1 ? 'No se dio permiso. Escriba la altitud o elija un piso.' : 'No se pudo obtener. Escriba la altitud o elija un piso.'; },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+});
+
+/* ---------- medidor ---------- */
+function rueda(el, str){
+  if (el._s === str) return; el._s = str;
+  const forma = str.replace(/\d/g, '0');
+  if (el._forma !== forma){ el._forma = forma; el.textContent = ''; el._dg = [];
+    for (const ch of str){ if (/\d/.test(ch)){ const d = document.createElement('span'); d.className = 'dg'; const s = document.createElement('span'); for (let k = 0; k < 10; k++){ const i = document.createElement('i'); i.textContent = k; s.appendChild(i); } d.appendChild(s); el.appendChild(d); el._dg.push(s); }
+      else { const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch === ' ' ? '\u00a0' : ch; el.appendChild(s); } } }
+  let k = 0; for (const ch of str){ if (/\d/.test(ch)){ el._dg[k].style.transform = `translateY(${-(+ch)*1.15}em)`; k++; } }
+  el.setAttribute('aria-label', str);
+}
+function fmt3(v){ const e = Math.floor(Math.log10(v)); const d = Math.max(0, 2 - e); return v.toFixed(d).replace('.', ','); }
+const milesE = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+function fmtEscala(m){ // siempre devuelve texto: si al redondear llega a 1 000, sube a la unidad de arriba
+  const U = [['km',1e3],['m',1],['cm',1e-2],['mm',1e-3],['µm',1e-6],['nm',1e-9]];
+  for (let i = 0; i < U.length; i++){ const [u, k] = U[i], v = m/k; if (v >= 0.9995 || i === U.length - 1){ if (v >= 999.5 && i > 0) return fmt3(m/U[i-1][1]) + ' ' + U[i-1][0]; return fmt3(v) + ' ' + u; } }
+  return fmt3(m/1e-9) + ' nm';
+}
+function fmtAumento(x){ if (x < 10) return '×' + fmt3(x); const e = Math.floor(Math.log10(x)); const r = Math.round(x / Math.pow(10, e-2)) * Math.pow(10, e-2); return '×' + milesE(Math.round(r)); }
+function fmtRegla(m){ const mm = m*1000; if (mm >= 1e6) return 'mide ' + fmt3(m/1000).replace(/,0+$/, '') + ' km'; if (mm >= 100) return 'mide ' + milesE(Math.round(mm)) + ' mm'; if (mm >= 1.5) return 'mide ' + fmt3(mm) + ' mm'; if (mm >= 0.75) return 'mide cerca de 1 mm'; const n = 1/mm; let r; if (n < 10) r = Math.round(n); else { const q = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n/q)*q; } return `caben ${milesE(r)} en 1 mm`; }
+let anchoInicial = 0, ultEst = -1, ultCap = '';
+function actualizaUI(cam){
+  const ancho = anchoVista(cam);
+  rueda($('vEscala'), fmtEscala(ancho));
+  rueda($('vAumento'), fmtAumento(anchoInicial / ancho));
+  const rg = fmtRegla(ancho), vR = $('vRegla'); if (vR._s !== rg){ vR._s = rg; vR.textContent = rg; if (W <= 640) ajustaPanel(); }
+  let st = 0; for (let i = 0; i < EST.length; i++){ const pegada = i > 0 && EST[i-1].b >= EST[i].a - 1e-9; if (p >= EST[i].a - (pegada ? 0 : 0.4)) st = i; }
+  const e = ESTACIONES[st];
+  const vis = EST.some(h => p >= h.a - 0.25 && p <= h.b + 0.2);
+  const cap = vis ? 'e' + st : '';
+  $('vEstacion').textContent = `${st+1}/${NEST} · ${e.c}`;
+  const hv = 'Hora: ' + horaAct().c; if ($('vLuz')._s !== hv){ $('vLuz')._s = hv; $('vLuz').textContent = hv; }
+  const nota = p > EST[1].a - 0.3 ? 'Tamaños aproximados. Colores de dibujo.' : 'Tamaños aproximados.';
+  if ($('vNota')._s !== nota){ $('vNota')._s = nota; $('vNota').textContent = nota; }
+  if (cap !== ultCap){ ultCap = cap; detenVoz();
+    if (!cap) fr.classList.remove('ver');
+    else { estAct = e; pagAct = 0; $('fNum').textContent = `Estación ${st+1} de ${NEST}`; $('fTit').textContent = estAct.t; pintaPagina(); fr.classList.add('ver'); $('anuncio').textContent = `Estación ${st+1}: ${estAct.t}`; } }
+  if (st !== ultEst){ ultEst = st; [...riel.children].forEach((b, i) => { b.removeAttribute('aria-current'); if (i === st) b.setAttribute('aria-current', 'step'); }); }
+  const et = $('estadoTxt'); if (et && estAct.h){ const t = estadoTexto(estAct.h); if (et._s !== t){ et._s = t; et.textContent = t; } }
+  $('titulo').style.opacity = 1 - sstep(0.08, 0.6, p);
+  $('titulo').style.visibility = p > 0.65 ? 'hidden' : 'visible';
+  if (!auto) rotuloBajar();
+  etiquetas(cam, cap, st);
+}
+
+/* ---------- rótulos sobre la escena ---------- */
+const LVL_EST = [0, 1, 2, 3, 4, 5, 6, 7];
+function etqEstacion(st){
+  const e = escarcha(), hd = hieloDentro();
+  if (st === 0) return [['Ladera', -0.3, g0(-0.3) - 0.012], ['Fondo del valle', 0.3, g0(0.3) - 0.004], frio() > 0.2 ? ['Aire frío', 0.14, NIV0 - 0.006] : null, ['Lote de papa', PORTAL[0].x, PORTAL[0].y]];
+  if (st === 1) return [['Cerca viva', 0.355, g1(0.355) - 0.04], frio() > 0.2 ? ['Aire frío que baja', -0.32, g1(-0.32) - 0.014] : null, enCharco1(0.22) ? ['Charco de aire frío', 0.24, g1(0.24) - 0.01] : null, ['Papa', X_LOTE, g1(X_LOTE) - 0.008]];
+  if (st === 2){ const H = horaAct(); const h = PLANTA.hojuelas.filter(q => q.z > 0.5).sort((a, b) => a.y - b.y)[0];
+    return [[`A 2 m: ${fmtT(H.t2, H.exacta)}`, CASETA.x, CASETA.y], [`A 10 cm: ${fmtT(H.t10, H.exacta)}`, SENSOR.x, SENSOR.y], e > 0.2 && h ? ['Escarcha', h.x + Math.cos(h.a)*h.l*0.6, h.y + Math.sin(h.a)*h.l*0.6] : null]; }
+  if (st === 3){ const q = BORDE3.find(c => c.k < e && c.u > LH*0.62 && c.u < LH*0.8 && c.v < 0); return [e > 0.2 && q ? ['Escarcha', ...loc3(q.u, q.v)] : null, ['Nervio', ...loc3(LH*0.32, -0.006)], dano() > 0.5 ? ['Hoja helada', ...loc3(LH*0.75, -anchoHojuela(LH, WH, 0.75, -1)*0.5)] : null]; }
+  if (st === 4){ const cam = camAt(p); const cerca = (arr) => arr.slice().sort((a, b) => Math.hypot(a.x - cam.cx, a.y - cam.cy) - Math.hypot(b.x - cam.cx, b.y - cam.cy));
+    const s = cerca(ESTOMAS4)[1], h = cerca(HIELO4.filter(q => q.k < e*1.1))[0], cel = CEL4.slice().sort((a, b) => Math.hypot(a.c[0] - cam.cx + 0.15, a.c[1] - cam.cy) - Math.hypot(b.c[0] - cam.cx + 0.15, b.c[1] - cam.cy))[0];
+    return [s ? ['Estoma', s.x, s.y] : null, e > 0.2 && h ? ['Cristal de escarcha', h.x, h.y] : null, cel ? ['Célula de la piel', cel.c[0], cel.c[1]] : null]; }
+  if (st === 5){ const Y = SEC.Y; return [['Empalizada', -0.2, (Y.epiB + Y.pal2)/2], ['Esponjoso', -0.32, (Y.pal2 + Y.espB)/2], hd > 0 ? ['Hielo', SEC.BOLSA.x, SEC.BOLSA.y] : null, ['Epidermis', 0.25, (Y.sup + Y.epiB)/2]]; }
+  if (st === 6){ const cam = camAt(p), sx = W/S*cam.f, sy = H/S*cam.f; const cerca = (x, y) => CEL6.slice().sort((a, b) => Math.hypot(a.c[0] - x, a.c[1] - y) - Math.hypot(b.c[0] - x, b.c[1] - y))[0];
+    const q = cerca(cam.cx - 0.05*sx, cam.cy - 0.32*sy), q2 = cerca(cam.cx + 0.3*sx, cam.cy + 0.1*sy); const pw = q.pared.slice().sort((a, b) => a[1] - b[1])[0];
+    const mb = shrink(q.pts, q.c, q.k*0.86), vb = mb.slice().sort((a, b) => b[0] - a[0])[0];
+    const m = shrink(q2.pts, q2.c, q2.k*0.9), o = q2.clo[5], mm = m[Math.floor(o.a/6.283*m.length) % m.length];
+    return [hd > 0 ? ['Hielo', 0.01, 0.01] : null, ['Pared', pw[0], pw[1]], ['Membrana', vb[0], vb[1]], ['Cloroplasto', lerp(q2.c[0], mm[0], o.R), lerp(q2.c[1], mm[1], o.R)]]; }
+  if (st === 7){ const cam = camAt(p), k = progMol(), av = 0.05 + 0.35*k; const ice = RED7.filter(q => FRENTE(q.x, q.y) < av - 0.25).sort((a, b) => Math.hypot(a.x - cam.cx + 0.15, a.y - cam.cy + 0.1) - Math.hypot(b.x - cam.cx + 0.15, b.y - cam.cy + 0.1))[0];
+    const tx = cam.cx + 0.22*W/S*cam.f, ty = cam.cy + 0.12*H/S*cam.f; const liq = LIQ7.filter(m => FRENTE(m.x, m.y) > av + 0.15).sort((a, b) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(b.x - tx, b.y - ty))[0];
+    const b = RED7.filter(q => q.up && FRENTE(q.x, q.y) < av - 0.3).sort((a, c) => Math.hypot(a.x - cam.cx - 0.25, a.y - cam.cy + 0.25) - Math.hypot(c.x - cam.cx - 0.25, c.y - cam.cy + 0.25))[0];
+    return [ice ? ['Hielo', ice.x, ice.y] : null, liq ? ['Agua líquida', liq.x, liq.y] : null, b ? ['Puente de hidrógeno', b.x, b.y + DOO*0.5] : null]; }
+  return [];
+}
+const etqCapa = $('etiquetas'), etqSvg = $('etqLineas'), etqNodos = [];
+function nodoEtq(i){
+  if (etqNodos[i]) return etqNodos[i];
+  const el = document.createElement('span'); el.className = 'etq'; etqCapa.appendChild(el);
+  const ns = 'http://www.w3.org/2000/svg';
+  const ln = document.createElementNS(ns, 'line'); ln.setAttribute('stroke', 'rgba(251,250,244,.9)'); ln.setAttribute('stroke-width', '1.5');
+  const halo = document.createElementNS(ns, 'line'); halo.setAttribute('stroke', 'rgba(10,14,22,.55)'); halo.setAttribute('stroke-width', '3.5');
+  const pt = document.createElementNS(ns, 'circle'); pt.setAttribute('r', '4.5'); pt.setAttribute('fill', '#fbfaf4'); pt.setAttribute('stroke', 'rgba(10,14,22,.8)'); pt.setAttribute('stroke-width', '2');
+  etqSvg.append(halo, ln, pt);
+  return (etqNodos[i] = { el, ln, halo, pt, txt: '' });
+}
+function tapados(){ const o = []; for (const id of ['medidor', 'controles', 'riel']) o.push($(id).getBoundingClientRect()); if ($('titulo').style.visibility !== 'hidden' && p < 0.3) o.push($('titulo').getBoundingClientRect()); if (fr.classList.contains('ver')) o.push(fr.getBoundingClientRect()); return o; }
+const dentro = (x, y, r, m) => x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m;
+const choca = (a, r) => !(a.r < r.left || a.l > r.right || a.b < r.top || a.t > r.bottom);
+function etiquetas(cam, cap, st){
+  let lista = [];
+  if (cam.k === 'lvl' && cap && cap[0] === 'e' && cam.L === LVL_EST[st]) lista = etqEstacion(st);
+  lista = lista.filter(Boolean);
+  const tap = lista.length ? tapados() : [], ppu = S / (cam.f || 1), ocupado = [];
+  const n = Math.max(lista.length, etqNodos.length);
+  for (let i = 0; i < n; i++){
+    const it = lista[i]; if (!it && !etqNodos[i]) continue;
+    const E = nodoEtq(i);
+    if (!it){ E.el.style.opacity = 0; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = 0; continue; }
+    const [txt, x, y] = it;
+    const ax = W/2 + (x - cam.cx)*ppu, ay = H/2 + (y - cam.cy)*ppu;
+    if (E.txt !== txt){ E.txt = txt; E.el.textContent = txt; E.w = E.el.offsetWidth; E.h = E.el.offsetHeight; }
+    const w = E.w || 80, h = E.h || 28;
+    let ok = ax > 10 && ax < W - 10 && ay > 10 && ay < H - 10 && !tap.some(r => dentro(ax, ay, r, 6));
+    let bx = 0, by = 0;
+    if (ok){ ok = false;
+      for (const [dx, dy] of [[1, -1], [-1, -1], [1, 1], [-1, 1]]){
+        bx = dx > 0 ? ax + 16 : ax - 16 - w; by = dy < 0 ? ay - 18 - h : ay + 18;
+        const caja = { l: bx - 4, r: bx + w + 4, t: by - 4, b: by + h + 4 };
+        if (caja.l < 6 || caja.r > W - 6 || caja.t < 6 || caja.b > H - 6) continue;
+        if (tap.some(r => choca(caja, r)) || ocupado.some(r => choca(caja, r))) continue;
+        ocupado.push({ left: caja.l, right: caja.r, top: caja.t, bottom: caja.b }); ok = true; break; } }
+    const op = ok ? 1 : 0;
+    E.el.style.opacity = op; E.ln.style.opacity = E.halo.style.opacity = E.pt.style.opacity = op;
+    if (!ok) continue;
+    E.el.style.transform = `translate(${bx.toFixed(1)}px,${by.toFixed(1)}px)`;
+    const lx = bx < ax ? bx + w : bx, ly = by < ay ? by + h : by;
+    for (const L of [E.ln, E.halo]){ L.setAttribute('x1', ax.toFixed(1)); L.setAttribute('y1', ay.toFixed(1)); L.setAttribute('x2', lx.toFixed(1)); L.setAttribute('y2', ly.toFixed(1)); }
+    E.pt.setAttribute('cx', ax.toFixed(1)); E.pt.setAttribute('cy', ay.toFixed(1));
+  }
+}
+
+/* ---------- repaso: se juega tocando, sin puntaje ---------- */
+const PREG = [
+  { q:'¿Qué noche trae la helada más común?', ops:[{ t:'Nublada y con viento' }, { t:'Despejada y quieta' }, { t:'Con lluvia' }], ok:1, si:'Eso es: sin nubes ni viento, la tierra suelta su calor hacia el cielo.', no:'Esa no. Piense en una noche de estrellas, sin una brisa.' },
+  { q:'¿Dónde se junta el aire frío?', ops:[{ t:'En la cima del cerro' }, { t:'En la hondonada y el fondo del valle' }, { t:'Igual en todas partes' }], ok:1, si:'Eso es: el aire frío pesa más y baja como el agua.', no:'Esa no. El aire frío pesa más que el caliente: ¿hacia dónde corre?' },
+  { q:'Esa noche en Tibaitatá, ¿cuándo llegó el frío más fuerte?', ops:[{ t:'A las 10 de la noche' }, { t:'A medianoche' }, { t:'Hacia las 6 de la mañana' }], ok:2, si:'Eso es: a las 6:12, justo antes de que calentara el día.', no:'Esa no. Mire la estación de las horas: el frío siguió bajando toda la noche.' },
+  { q:'En una noche de helada, ¿dónde hace más frío?', ops:[{ t:'A 2 metros del suelo' }, { t:'A ras del suelo, donde está el cultivo' }, { t:'Igual arriba y abajo' }], ok:1, si:'Eso es: −6,7 grados a 10 cm, cuando la caseta marcaba −2,6.', no:'Esa no. Compare los dos termómetros de la madrugada.' },
+  { q:'¿Qué hace la cerca viva al pie del lote en una noche de helada?', ops:[{ t:'Represa el aire frío sobre el cultivo' }, { t:'Calienta el lote' }, { t:'Nada' }], ok:0, si:'Eso es: un paso abierto deja que el frío siga de largo.', no:'Esa no. Piense en el aire frío como agua que baja.' },
+  { q:'¿Qué daña la hoja en una helada del campo?', ops:[{ t:'El peso de la escarcha' }, { t:'El hielo que se forma afuera de las células y las seca' }, { t:'El viento' }], ok:1, si:'Eso es: no es el frío, es el hielo, que les saca el agua.', no:'Esa no. Mire lo que pasa entre las células.' },
+  { q:'¿Sirve el humo contra la helada?', ops:[{ t:'Sí, mucho' }, { t:'No: no protege y contamina' }, { t:'Solo el de llantas' }], ok:1, si:'Eso es. Y en el páramo, la ley prohíbe las quemas.', no:'Esa no. La FAO dice que el humo no ayuda.' },
+];
+let rq = 0;
+function pintaRepaso(){
+  const cu = $('repasoCuerpo');
+  const puntos = '<div class="puntos" aria-hidden="true">' + PREG.map((_, i) => `<i class="${i < rq ? 'hecho' : i === rq ? 'ahora' : ''}"></i>`).join('') + '</div>';
+  if (rq >= PREG.length){
+    cu.innerHTML = puntos + `<div class="fin"><p>Ya bajó de la noche despejada hasta el agua hecha hielo.</p><p>La próxima noche quieta y estrellada de la temporada seca, mire su lote: ¿dónde se junta el frío?</p><div class="acc" style="margin-top:14px"><button type="button" class="bc" id="rOtra">Jugar otra vez</button><button type="button" class="bc prim" id="rSubir">Subir a la noche</button></div></div>`;
+    $('rOtra').addEventListener('click', () => { rq = 0; pintaRepaso(); });
+    $('rSubir').addEventListener('click', () => { dlgR.close(); irA(0); });
+    return;
+  }
+  const Q = PREG[rq];
+  cu.innerHTML = puntos + `<p class="preg" id="rPreg">${Q.q}</p><div class="ops" role="group" aria-labelledby="rPreg"></div><p class="resp" id="rResp" aria-live="polite"></p><div class="acc"><button type="button" class="bc" id="rOir">Escuchar la pregunta</button><button type="button" class="bc prim" id="rSig" hidden>${rq === PREG.length - 1 ? 'Terminar' : 'Siguiente ›'}</button></div>`;
+  const ops = cu.querySelector('.ops');
+  Q.ops.forEach((o, j) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'op'; b.textContent = o.t;
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      if (j === Q.ok){ b.classList.add('si'); for (const x of ops.children) x.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.si; $('rSig').hidden = false; $('rSig').focus(); }
+      else { b.classList.add('no'); b.setAttribute('aria-disabled', 'true'); $('rResp').textContent = Q.no; }
+    });
+    ops.appendChild(b);
+  });
+  $('rSig').addEventListener('click', () => { rq++; pintaRepaso(); });
+  $('rOir').addEventListener('click', () => {
+    eligeVoz(); if (voz.motivo){ $('rOir').textContent = voz.motivo; $('rOir').setAttribute('aria-disabled', 'true'); return; }
+    const partes = [Q.q].concat(Q.ops.map(o => o.t));
+    const t = (voz.turno = Date.now()); let i = 0; const sig = () => { if (++i < partes.length) di(partes[i], t, sig); else voz.turno = 0; };
+    callaYLuego(() => { if (voz.turno === t) di(partes[0], t, sig); });
+  });
+}
+function abreRepaso(){ rq = 0; abre(dlgR); pintaRepaso(); }
+dlgR.addEventListener('close', () => { if (voz.turno){ voz.turno = 0; try { speechSynthesis.cancel(); } catch (e) {} } });
+
+/* ============================================================
+   DESPLAZAMIENTO: el scroll ES el dato que mueve la cámara
+   ============================================================ */
+const pista = $('pista');
+const PANT_POR_UNIDAD = 0.62;
+function altoPista(){ pista.style.height = Math.round(innerHeight * (1 + T*PANT_POR_UNIDAD)) + 'px'; }
+function maxScroll(){ return Math.max(1, document.documentElement.scrollHeight - innerHeight); }
+function pDeScroll(){ return clamp(scrollY / maxScroll(), 0, 1) * T; }
+function irA(pp){ const y = pp / T * maxScroll(); detenAuto(); if (RM) window.scrollTo(0, y); else window.scrollTo({ top: y, behavior: 'smooth' }); }
+addEventListener('scroll', () => { pObj = pDeScroll(); sucio = true; }, { passive: true });
+
+let auto = 0, metaAuto = 0;
+const bBajar = $('bBajar');
+function paradas(){ return EST.map((_, i) => estP(i)); }
+function rotuloBajar(){ const [lb, fl, al] = pObj >= T - 0.01 ? ['Subir ', '↑', 'Subir al comienzo'] : pObj > 0.05 ? ['Seguir ', '↓', 'Seguir bajando'] : ['Bajar ', '↓', 'Bajar']; const L = bBajar.querySelector('.lb'), Fl = bBajar.querySelector('.fl'); if (L.textContent !== lb){ L.textContent = lb; Fl.textContent = fl; bBajar.setAttribute('aria-label', al); } }
+function detenAuto(){ auto = 0; bBajar.setAttribute('aria-pressed', 'false'); rotuloBajar(); }
+bBajar.addEventListener('click', () => {
+  if (auto){ detenAuto(); return; }
+  if (pObj >= T - 0.01){ auto = -1; metaAuto = 0; }
+  else { auto = 1; metaAuto = paradas().find(x => x > pObj + 0.05); if (metaAuto === undefined) metaAuto = T; }
+  if (RM){ window.scrollTo(0, metaAuto / T * maxScroll()); pObj = metaAuto; detenAuto(); return; }
+  bBajar.setAttribute('aria-pressed', 'true'); bBajar.querySelector('.lb').textContent = 'Pausa '; bBajar.querySelector('.fl').textContent = '❚❚'; bBajar.setAttribute('aria-label', 'Pausa');
+});
+['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, (e) => { if (auto && !(e.type === 'keydown' && (e.target === bBajar))) detenAuto(); }, { passive: true }));
+
+/* ============================================================
+   SONIDO: un bordón sintetizado que se oscurece al bajar
+   ============================================================ */
+let audio = null;
+const bSon = $('bSonido');
+bSon.addEventListener('click', () => {
+  try {
+    if (!audio){
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) { bSon.textContent = 'Sin sonido'; bSon.disabled = true; return; }
+      const ac = new AC(); const master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+      const filtro = ac.createBiquadFilter(); filtro.type = 'lowpass'; filtro.Q.value = 0.7; filtro.connect(master);
+      const oscs = [[55, 'sawtooth', 0.28], [82.41, 'triangle', 0.22], [110.3, 'triangle', 0.32], [164.6, 'sine', 0.14]].map(([f, t, g]) => { const o = ac.createOscillator(); o.type = t; o.frequency.value = f; const gg = ac.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(filtro); o.start(); return o; });
+      audio = { ac, master, filtro, oscs, on: false };
+    }
+    audio.on = !audio.on;
+    if (audio.ac.state === 'suspended') audio.ac.resume();
+    const t = audio.ac.currentTime; audio.master.gain.cancelScheduledValues(t); audio.master.gain.setTargetAtTime(audio.on ? 0.1 : 0, t, 0.25);
+    bSon.setAttribute('aria-pressed', String(audio.on)); bSon.textContent = audio.on ? 'Sonido: sí' : 'Sonido: no';
+    bSon.setAttribute('aria-label', audio.on ? 'Sonido encendido; silenciar' : 'Sonido apagado; activar bordón');
+  } catch (err) { bSon.textContent = 'Sin sonido'; }
+});
+function sonido(){
+  if (!audio || !audio.on) return; const lz = luzGlobal(p); const t = audio.ac.currentTime;
+  audio.filtro.frequency.setTargetAtTime(160 + 2400*lz*lz, t, 0.2);
+  const base = 55 * (0.84 + 0.16*lz); [1, 1.4983, 2.006, 2.993].forEach((m, i) => audio.oscs[i].frequency.setTargetAtTime(base*m, t, 0.4));
+}
+
+/* ============================================================
+   TAMAÑO
+   ============================================================ */
+function redim(){
+  W = innerWidth; H = innerHeight; S = Math.max(W, H); PORT = H > W;
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  buf.width = cv.width; buf.height = cv.height;
+  texOK = false; fondo0V = -1; fondo2V = -1; plantasV = -1; piel4V = -1;
+  anchoInicial = anchoVista(camAt(0));
+  altoPista();
+  const tt = $('titulo'), mb = Math.round($('medidor').getBoundingClientRect().bottom); tt.style.top = W <= 640 ? (mb + 14) + 'px' : '';
+  ajustaPanel();
+  pObj = pDeScroll();
+  sucio = true;
+}
+addEventListener('resize', () => { const pp = pObj; redim(); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; });
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let tAnt = performance.now(), activo = true;
+let rmDesde = null, rmHacia = null, rmT = 1;
+function cuadro(now){
+  if (!activo) return;
+  const dtReal = (now - tAnt) / 1000, dt = Math.min(0.1, dtReal); tAnt = now;
+  // la bajada automática usa el tiempo real (con tope de medio segundo): en un aparato lento no se arrastra
+  if (auto && !RM){ let y = scrollY + auto * (maxScroll() / T) * (T / 90) * Math.min(0.5, dtReal); const yM = metaAuto / T * maxScroll();
+    if ((auto > 0 && y >= yM) || (auto < 0 && y <= yM)){ window.scrollTo(0, yM); pObj = metaAuto; detenAuto(); } else { window.scrollTo(0, y); pObj = pDeScroll(); } }
+  let meta = pObj;
+  if (RM){ let i = 0, best = 1e9; for (let k = 0; k < NEST; k++){ const d = Math.abs(estP(k) - pObj); if (d < best){ best = d; i = k; } }
+    meta = estP(i); if (rmHacia === null){ rmHacia = meta; p = meta; } if (meta !== rmHacia){ rmDesde = p; rmHacia = meta; rmT = 0; } }
+  const antes = p;
+  if (RM){ if (rmT < 1){ rmT = Math.min(1, rmT + dt / 0.9); sucio = true; } p = rmHacia; }
+  else { const k = 1 - Math.exp(-dt * 7); p += (meta - p) * k; if (Math.abs(meta - p) < 1e-5) p = meta; }
+  vel = dt > 0 ? (p - antes) / dt : 0;
+  if (p !== antes) sucio = true;
+  if (sucio) try {
+    let cam;
+    if (RM && rmT < 1 && rmDesde !== null){
+      p = rmDesde; cam = render(); ctx.setTransform(1,0,0,1,0,0);
+      bctx.setTransform(1,0,0,1,0,0); bctx.drawImage(cv, 0, 0);
+      p = rmHacia; cam = render();
+      ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha = 1 - (rmT*rmT*(3 - 2*rmT)); ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1;
+    } else cam = render();
+    actualizaUI(cam); sonido();
+    sucio = (RM && rmT < 1);
+  } catch (err){ console.error('cuadro:', err); sucio = false; } // un error no congela la bajada
+  requestAnimationFrame(cuadro);
+}
+document.addEventListener('visibilitychange', () => {
+  activo = !document.hidden;
+  if (activo){ tAnt = performance.now(); sucio = true; requestAnimationFrame(cuadro); }
+  if (audio){ try { document.hidden ? audio.ac.suspend() : (audio.on && audio.ac.resume()); } catch (e) {} }
+});
+
+/* ============================================================
+   ARRANQUE (sin red, sin nada que esperar)
+   ============================================================ */
+pintaRiel();
+mostrarFinca();
+if (altURL === null && qs.has('alt')) $('estadoUbicacion').textContent = 'La altitud que mandó la app no es válida. Escriba la altitud o elija un piso.';
+else if (altURL === null && latURL !== null && lonURL !== null) $('estadoUbicacion').textContent = 'La app mandó coordenadas sin altitud. Escriba los metros de la finca o elija un piso.';
+redim();
+if (qs.has('p')){ const s = qs.get('p'); const pp = s.startsWith('e') ? estP(+s.slice(1)) : parseFloat(s); if (isFinite(pp)){ requestAnimationFrame(() => { window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; rmHacia = null; sucio = true; }); } }
+requestAnimationFrame(cuadro);
+
+/* gancho de medición (lo usan las capturas; no altera nada) */
+window.__descenso = {
+  T, SEGS, estP, camAt, anchoVista: pp => anchoVista(camAt(pp)),
+  fijar(pp){ window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; },
+  costo(pp, n){ const p0 = p; p = pp; render(); const t0 = performance.now(); for (let i = 0; i < n; i++) render(); const ms = (performance.now() - t0)/n; p = p0; sucio = true; return ms; },
+  pagina(i){ pagAct = clamp(i, 0, estAct.pags.length - 1); pintaPagina(); },
+  paginas(){ return estAct.pags.length; },
+  repaso(){ abreRepaso(); },
+  voz(){ return { nombre: voz.v && voz.v.name, lang: voz.v && voz.v.lang, local: voz.v && voz.v.localService, motivo: voz.motivo, leyendo: !!voz.turno, dichas: voz.dichas, errores: voz.errores.slice(), boton: bEsc.textContent }; },
+  textos(){ return { ESTACIONES, GLOS }; },
+  estado(){ return Object.assign({}, ESTADO); },
+  poner(o){ Object.assign(ESTADO, o); tocaEstado(); pintaPagina(); },
+  finca(){ return Object.assign({}, FINCA, { municipio: muniURL }); },
+  fmt: m => fmtEscala(m),
+  medir(desde, hasta, ms){ return new Promise(res => { const t0 = performance.now(); const marcas = []; const paso = (now) => { const u = Math.min(1, (now - t0) / ms); const pp = lerp(desde, hasta, u); window.scrollTo(0, pp / T * maxScroll()); pObj = pp; p = pp; sucio = true; marcas.push(now); if (u < 1) requestAnimationFrame(paso); else { const dts = marcas.slice(1).map((m, i) => m - marcas[i]); dts.sort((a, b) => a - b); res({ cuadros: marcas.length, ms: marcas[marcas.length-1] - marcas[0], fps: (marcas.length - 1) / ((marcas[marcas.length-1] - marcas[0]) / 1000), medianaMs: dts[Math.floor(dts.length/2)], p95Ms: dts[Math.floor(dts.length*0.95)], dpr: DPR, w: W, h: H }); } }; requestAnimationFrame(paso); }); }
+};
+/* PUENTE-LECCION v1 */
+// `estacion` y `pagina` se cuentan desde 1.
+(() => {
+  if (window.parent === window) return;
+  let anfitrion = false;
+  let paginaPendiente = null;
+  let ultimaPagina = null;
+  let accionEnCurso = false;
+  const estilo = document.createElement('style');
+  estilo.textContent = 'html[data-leccion="anfitrion"] #frase{display:none}';
+  document.head.appendChild(estilo);
+  function texto(s) {
+    const nodo = document.createElement('span');
+    nodo.innerHTML = String(s || '').replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, '$1').replace(/\{[\d,]+\}/g, '');
+    return nodo.textContent;
+  }
+  const enviar = (tipo, datos) => window.parent.postMessage({ tipo, v: 1, ...datos }, location.origin);
+  function controles() {
+    return [...document.querySelectorAll('#fCuerpo button, #fCuerpo a[href]')]
+      .filter(n => !n.matches('.t, [data-g], [data-f]'));
+  }
+  function pagina(forzar = false) {
+    if (!anfitrion || accionEnCurso || paginaPendiente || !ESTACIONES.includes(estAct)) return;
+    const P = estAct.pags[pagAct];
+    const cabecera = P.k && typeof CAB !== 'undefined' ? texto(CAB[P.k] || '') : '';
+    const claves = [...(P.s || []), P.nota || ''].join(' ');
+    const glos = typeof GLOS === 'undefined' ? [] : GLOS;
+    const caja = document.getElementById('medidor')?.getBoundingClientRect();
+    const datos = {
+      estacion: ESTACIONES.indexOf(estAct) + 1, total: ESTACIONES.length,
+      titulo: estAct.t, pagina: pagAct + 1, paginas: estAct.pags.length,
+      clase: P.k || 'dice', frases: (P.s || []).map(texto), nota: texto(P.nota),
+      cabecera,
+      acciones: controles().map((n, i) => ({ i, texto: texto(n.innerHTML),
+        tipo: n.tagName === 'A' ? 'enlace' : 'boton', href: n.getAttribute('href'),
+        pulsado: n.getAttribute('aria-pressed') === 'true',
+        desactivado: n.disabled === true || n.getAttribute('aria-disabled') === 'true' })),
+      palabras: glos.filter(([k]) => claves.includes('[[' + k + '|'))
+        .map(([, palabra, definicion]) => ({ palabra: texto(palabra), definicion: texto(definicion) })),
+      anclas: { medidor: caja && caja.width > 0 && caja.height > 0 ? { x: caja.x, y: caja.y, w: caja.width, h: caja.height } : null }
+    };
+    const firma = JSON.stringify(datos);
+    if (forzar || firma !== ultimaPagina) {
+      ultimaPagina = firma;
+      enviar('chagra:leccion-pagina', datos);
+    }
+  }
+  function irEstacion(i, paginaDestino) {
+    paginaPendiente = { estacion: ESTACIONES[i], pagina: paginaDestino };
+    detenAuto();
+    // Un paso de la lección aterriza en la estación, sin tarjetas de tránsito.
+    window.__descenso.fijar(estP(i));
+    if (typeof pRender !== 'undefined') pRender = p;
+    if (typeof rmHacia !== 'undefined') { rmHacia = p; rmDesde = null; rmT = 1; }
+    actualizaUI(render(p));
+  }
+  const pintar = pintaPagina;
+  pintaPagina = function (...args) {
+    if (paginaPendiente && estAct === paginaPendiente.estacion) {
+      pagAct = paginaPendiente.pagina; paginaPendiente = null;
+    }
+    const resultado = pintar.apply(this, args);
+    pagina(); return resultado;
+  };
+  document.addEventListener('click', e => {
+    if (anfitrion && e.target.closest?.('#bEscuchar, #rOir')) { e.stopImmediatePropagation(); detenVoz(); }
+  }, true);
+  if (typeof di === 'function') {
+    const decir = di;
+    di = function (...args) { if (anfitrion) { detenVoz(); return; } return decir.apply(this, args); };
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || e.source !== window.parent || !e.data || e.data.v !== 1) return;
+    const m = e.data;
+    if (m.tipo === 'chagra:leccion-hola') {
+      anfitrion = true;
+      detenVoz();
+      document.documentElement.dataset.leccion = 'anfitrion';
+      enviar('chagra:leccion-lista', {
+        slug: location.pathname.match(/descenso-([^/]+)/)?.[1] || location.pathname.split('/').filter(Boolean).slice(-2, -1)[0] || '',
+        titulo: document.title, estaciones: ESTACIONES.map(e => ({ t: e.t, paginas: e.pags.length }))
+      });
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-ir' && (m.paso === -1 || m.paso === 1)) {
+      const ultima = estAct.pags.length - 1;
+      if (m.paso === 1 && pagAct === ultima) {
+        const siguiente = ESTACIONES.indexOf(estAct) + 1;
+        if (siguiente < ESTACIONES.length) { irEstacion(siguiente, 0); }
+      } else if (m.paso === -1 && pagAct === 0) {
+        const anterior = ESTACIONES.indexOf(estAct) - 1;
+        if (anterior >= 0) { irEstacion(anterior, ESTACIONES[anterior].pags.length - 1); }
+      } else vePagina(m.paso);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-accion' && Number.isInteger(m.i)) {
+      const control = controles()[m.i];
+      if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      accionEnCurso = true;
+      try { control.click(); } finally { accionEnCurso = false; }
+      pagina(true);
+    } else if (anfitrion && m.tipo === 'chagra:leccion-abrir') {
+      if (m.que === 'palabras') abrePalabra('');
+      else if (m.que === 'fuentes') abreFuentes();
+      else if (m.que === 'repaso') abreRepaso();
+    }
+  });
+})();
+/* fin PUENTE-LECCION */
+})();
+</script>
+</body>
+</html>
