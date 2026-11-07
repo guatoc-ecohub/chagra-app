@@ -66,12 +66,15 @@ schema estricto son el patrón legacy de `sources[]` (`_url_pendiente` /
 
 ## Archivos STALE / legacy (NO son la verdad — conservados)
 
+> 2026-11-06: se retiraron de este repo público cinco archivos que ningún script ni
+> código del repo consumía: `chagra-catalog-graph-export.json`,
+> `chagra-catalog-oss-subset-v3.1.json`, `chagra-catalog-seed-v3.0.json`,
+> `chagra-catalog-seed-v3.2.json` y `control-biologico-seed.json`. Siguen en la
+> historia de git (commit `f741941`) para quien necesite trazabilidad.
+
 | Archivo | species | Qué es | ¿Por qué no se borra? |
 |---|---:|---|---|
 | `chagra-catalog-seed-v3.1.json` | 72 | **Stale.** Base histórica formato v3.1 referenciada por scripts de validación/ETL y por el **default hardcodeado** de `scripts/validate-catalog.mjs` (línea ~50) + el gate `lefthook`/`.github/workflows/catalog-validate.yml` (corren el validador sin argumento → validan ESTE archivo, no el que shipea). El corpus full curado vive en el repo privado hermano de módulos opcionales. | Moverlo rompería el default del validador, `lefthook`, CI y ~12 scripts (`catalog-to-age.mjs`, `extract-oss-subset-v32.mjs`, etc.). |
-| `chagra-catalog-graph-export.json` | 200 | **Stale.** Export viejo del grafo→catálogo (`export-graph-to-catalog.mjs`), anterior a v3.2. | Referencia para `validate-catalog-export.mjs` / `catalog-graph-export.test.mjs`. |
-| `chagra-catalog-oss-subset-v3.1.json` | 50 | Snapshot histórico del primer subset OSS (editorial-v2, 2026-05-20). Deprecado tras revert PR #1012 (cortaba aguacate/tomate/lechuga/acelga). | Ruta de rollback / trazabilidad. |
-| `chagra-catalog-seed-v3.0.json` | 0 | **Roto** (`species[]` vacío). Solo referencia de estructura para `migrate-v30-to-v31.mjs`. | Lo usa el migrador como esqueleto histórico. |
 
 ## Snapshot del grafo `chagra_kg` (entidades que NO existen en ningún catálogo)
 
@@ -102,10 +105,8 @@ Estado por archivo (verificado con `detectMiscategorizacion` archivo por archivo
 |---|---:|---|
 | `chagra-catalog-seed-v3.1.json` | 0 | Limpio. Editar este archivo NO reduce el conteo global porque el seed está limpio desde PR #2002. |
 | `chagra-catalog-oss-subset-v3.2.json` | 0 | CANÓNICO que shipea (`DEFAULT_SEED` de `build-catalog-sqlite.mjs`). Limpio. |
-| `chagra-catalog-oss-subset-v3.1.json` | 7 | STALE. Snapshot de 2026-05-20 con texto pre-fix (`Hemileia vastatrix (roya)` en `plagas_criticas` de `coffea_arabica`; `Trozador (Agrotis ipsilon)` en `enfermedades_criticas` de 6 solanums). |
-| `chagra-catalog-graph-export.json` | 1 | STALE. Export viejo grafo→catálogo con texto pre-fix de `Tagosodes orizicolus` en `plagas_criticas` de `oryza_sativa` (usa "Virus" literal en lugar del acrónimo VHB). |
 
-Los 8 hallazgos restantes viven exclusivamente en archivos stale derivados.
+Los 8 hallazgos restantes vivían en dos archivos stale derivados que ya se retiraron del repo (ver arriba).
 Reducir el conteo requiere regenerar esos snapshots (vía `extract-oss-subset.mjs`
 + `export-graph-to-catalog.mjs`) o editarlos directamente — ambos fuera del scope
 de tasks que prohiben tocar derivados. El gate `--check` del auditor usa

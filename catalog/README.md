@@ -11,8 +11,6 @@
 | `schema-v3.1.json` | JSON Schema draft-07 con definición formal de `species`, `biopreparado`, `source` |
 | `chagra-catalog-oss-subset-v3.2.json` | **Catálogo OSS canónico (581 especies, 36 biopreparados y 132 fuentes en `sources[]`)** — el archivo que consume la PWA vía `npm run build:catalog` → `public/catalog.sqlite` (es el `DEFAULT_SEED` en `scripts/build-catalog-sqlite.mjs`). Es autocontenido y no se deriva en vivo de otro seed. Ver `CATALOG_VERSIONS.md` para el estado de cada archivo. |
 | `chagra-catalog-seed-v3.1.json` | Catálogo fuente (formato v3.1) del cual se extrae el subset OSS via `scripts/extract-oss-subset-v32.mjs`. El corpus full curado vive en el repo privado hermano; en este repo público se conserva la base referenciada por los scripts de validación/ETL. |
-| `chagra-catalog-oss-subset-v3.1.json` | Snapshot histórico del primer subset OSS (50 species, cobertura multi-piso térmico, generado por `scripts/extract-oss-subset.mjs` el 2026-05-20). Deprecado tras el revert PR #1012; preservado por trazabilidad y como ruta de rollback. |
-| `chagra-catalog-seed-v3.0.json` | Versión histórica preservada (referencia para `migrate-v30-to-v31.mjs`) |
 | `biopreparados-seed.json` | Catálogo de biopreparados agroecológicos |
 | `sources-seed.json` | Fuentes científicas referenciadas por `species[].source_ids` |
 | `AMBIGUITIES_RESOLUTION.md` | Las 11 ambigüedades del schema v3 resueltas (ADR-013) |
@@ -28,7 +26,7 @@ El subset que **realmente ships** y compila a `public/catalog.sqlite` es `chagra
 - **36 biopreparados**, conteo directo de `biopreparados[]`.
 - **132 fuentes**, conteo directo de `sources[]`.
 
-El primer subset OSS (`chagra-catalog-oss-subset-v3.1.json`, 50 species, criterio editorial-v2) cortaba species críticas (aguacate, tomate, lechuga, acelga) y fue revertido en PR #1012; se conserva solo como snapshot histórico / rollback.
+El primer subset OSS (`chagra-catalog-oss-subset-v3.1.json`, 50 species, criterio editorial-v2) cortaba species críticas (aguacate, tomate, lechuga, acelga) y fue revertido en PR #1012; se retiró del repo el 2026-11-06 y sigue disponible en la historia de git (commit `f741941`).
 
 Para reconstruir el subset desde el full Pro (idempotente):
 

@@ -200,6 +200,6 @@ Todos los validators semánticos AMB-05/10/13/14/15/16/17/18/19/20/21/22/23/25/2
 
 ## Rollback
 
-Si surge regresión: `CHAGRA_SEED=chagra-catalog-oss-subset-v3.1.json node scripts/build-catalog-sqlite.mjs` vuelve al subset 50 species deprecado pero conservado.
+Si surge regresión: el subset 50 species deprecado (`chagra-catalog-oss-subset-v3.1.json`) se retiró del árbol el 2026-11-06; se recupera de la historia de git (`git show f741941:catalog/chagra-catalog-oss-subset-v3.1.json`) y se compila con `CHAGRA_SEED=chagra-catalog-oss-subset-v3.1.json node scripts/build-catalog-sqlite.mjs`.
 
 Alternativa corpus full (Pro): `CHAGRA_SEED=chagra-catalog-seed-v3.1.json node scripts/build-catalog-sqlite.mjs`.

@@ -44,8 +44,8 @@ import './montana-mundos-campesino.css';
 // ── Escenas REALES del home vivo reusadas como nodos-mundo (regla dura:
 // reusar, no reescribir). SceneFincaOrganismo no importa su propio CSS
 // (en el home lo importa FincaVivaHero) — aquí lo importamos nosotros.
-import SceneFincaOrganismo from '../components/dashboard/SceneFincaOrganismo';
-import '../components/dashboard/scene-finca-organismo.css';
+import SceneFincaOrganismo from '../visual/scenes/SceneFincaOrganismo.jsx';
+import '../visual/scenes/scene-finca-organismo.css';
 // GuardianEspiritu (5 fauna) se retiró de aquí el 2026-08-14 (unificación
 // compAI): sistema paralelo desconectado del roster real de 7 compañeros. La
 // escena "Su guardián" ahora abre el mismo AgentAvatarSelector del resto de
