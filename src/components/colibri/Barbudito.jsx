@@ -29,17 +29,17 @@ import './barbudito.css';
  */
 
 const VENTANA_SRC = '/colibri/barbudito-ventana.mp4';
-const VENTANA_POSTER = '/colibri/barbudito-poster.png';
-const POSADO_SRC = '/colibri/barbudito-posado.png';
+const VENTANA_POSTER = '/colibri/barbudito-poster.webp';
+const POSADO_SRC = '/colibri/barbudito-posado.webp';
 const CRUZA_WEBM = '/colibri/barbudito-transition.webm';
-const CRUZA_SPRITE = '/colibri/barbudito-sprite.png';
+const CRUZA_SPRITE = '/colibri/barbudito-sprite.webp';
 // HOME A/B — lado REAL: sprite 4×4 (16 frames) del barbudito en vuelo, recortado
 // y transparente. Animado por CSS steps(16); fuera de pantalla se pausa.
-const REAL_SPRITE = '/colibri/barbudito-real-sprite.png';
-const REAL_POSTER = '/colibri/barbudito-real-poster.png';
+const REAL_SPRITE = '/colibri/barbudito-real-sprite.webp';
+const REAL_POSTER = '/colibri/barbudito-real-poster.webp';
 // TRANSICIÓN — clip de la flor del frailejón con el barbudito libando néctar.
 const FLOR_SRC = '/colibri/flower-transition.mp4';
-const FLOR_POSTER = '/colibri/barbudito-poster.png';
+const FLOR_POSTER = '/colibri/barbudito-poster.webp';
 
 function prefersReducedMotion() {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function'

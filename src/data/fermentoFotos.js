@@ -5,7 +5,7 @@
  * fermento alimentario para FermentosView.
  *
  * FUENTE ÚNICA: las fotos viven en `catalog/fotos/<tema>/*.webp` con su crédito
- * en `catalog/fotos/fotos-atribucion.json` (56 fotos CC, PR #2068). Aquí NO se
+ * en `catalog/fotos/fotos-atribucion.json` (11 fotos CC; las 45 que nadie usaba se retiraron el 2026-11-06). Aquí NO se
  * duplican al directorio público: Vite las empaqueta en build vía
  * `import.meta.glob`, así el bundle queda offline-first (lo cachea el SW) y se
  * mantiene una sola copia con su licencia al lado.
