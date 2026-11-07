@@ -526,21 +526,34 @@
     }
 
     function renderPhotos() {
-      photosGrid.innerHTML = '';
+      photosGrid.replaceChildren();
       
       state.photos.forEach(photo => {
         const card = document.createElement('div');
         card.className = 'photo-card';
-        card.innerHTML = `
-          <img src="${photo.dataUrl}" alt="${photo.name}">
-          <div class="photo-info">
-            <div class="photo-date">📅 ${photo.date.toLocaleDateString('es-ES')}</div>
-            <div class="photo-name">${photo.name}</div>
-            <button class="remove-photo" onclick="removePhoto(${photo.id})">
-              Eliminar
-            </button>
-          </div>
-        `;
+
+        const image = document.createElement('img');
+        image.src = photo.dataUrl;
+        image.alt = photo.name;
+
+        const photoInfo = document.createElement('div');
+        photoInfo.className = 'photo-info';
+
+        const photoDate = document.createElement('div');
+        photoDate.className = 'photo-date';
+        photoDate.textContent = `📅 ${photo.date.toLocaleDateString('es-ES')}`;
+
+        const photoName = document.createElement('div');
+        photoName.className = 'photo-name';
+        photoName.textContent = photo.name;
+
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-photo';
+        removeButton.textContent = 'Eliminar';
+        removeButton.addEventListener('click', () => removePhoto(photo.id));
+
+        photoInfo.append(photoDate, photoName, removeButton);
+        card.append(image, photoInfo);
         photosGrid.appendChild(card);
       });
 
@@ -632,7 +645,7 @@
       }
 
       // Render anomalies
-      anomalyGrid.innerHTML = '';
+      anomalyGrid.replaceChildren();
       result.anomalies.forEach(anomaly => {
         const severityClass = anomaly.severity === 'alta' ? 'high' : 
                              anomaly.severity === 'media' ? 'medium' : 'low';
@@ -643,70 +656,102 @@
 
         const card = document.createElement('div');
         card.className = `anomaly-card ${severityClass}`;
-        card.innerHTML = `
-          <div class="anomaly-header">
-            <div class="anomaly-name">
-              ${getAnomalyIcon(anomaly.type)} ${formatAnomalyName(anomaly.type)}
-            </div>
-            <div class="confidence-badge ${confidenceLevel}">
-              ${confidencePercent}% confianza
-            </div>
-          </div>
-          <div class="anomaly-description">
-            ${anomaly.description}
-          </div>
-          <div class="anomaly-details">
-            ${Object.entries(anomaly.details).map(([key, value]) => `
-              <div class="detail-row">
-                <span>${formatDetailKey(key)}:</span>
-                <span>${value}</span>
-              </div>
-            `).join('')}
-          </div>
-        `;
+
+        const header = document.createElement('div');
+        header.className = 'anomaly-header';
+
+        const name = document.createElement('div');
+        name.className = 'anomaly-name';
+        name.textContent = `${getAnomalyIcon(anomaly.type)} ${formatAnomalyName(anomaly.type)}`;
+
+        const confidenceBadge = document.createElement('div');
+        confidenceBadge.className = `confidence-badge ${confidenceLevel}`;
+        confidenceBadge.textContent = `${confidencePercent}% confianza`;
+        header.append(name, confidenceBadge);
+
+        const description = document.createElement('div');
+        description.className = 'anomaly-description';
+        description.textContent = anomaly.description ?? '';
+
+        const details = document.createElement('div');
+        details.className = 'anomaly-details';
+        Object.entries(anomaly.details ?? {}).forEach(([key, value]) => {
+          const row = document.createElement('div');
+          row.className = 'detail-row';
+
+          const label = document.createElement('span');
+          label.textContent = `${formatDetailKey(key)}:`;
+
+          const detailValue = document.createElement('span');
+          detailValue.textContent = value ?? '';
+          row.append(label, detailValue);
+          details.appendChild(row);
+        });
+
+        card.append(header, description, details);
         anomalyGrid.appendChild(card);
       });
 
       // Render comparison section
       if (result.summary) {
-        comparisonSection.innerHTML = `
-          <h3 class="comparison-title">📋 Resumen y Recomendaciones</h3>
-          <div class="anomaly-card" style="border-left-color: #2196f3;">
-            <div class="anomaly-details">
-              <div class="detail-row">
-                <span>Estado General:</span>
-                <span>${formatHealthStatus(result.summary.overall_health)}</span>
-              </div>
-              <div class="detail-row">
-                <span>Preocupación Principal:</span>
-                <span>${formatAnomalyName(result.summary.primary_concern)}</span>
-              </div>
-              <div class="detail-row">
-                <span>Recomendación:</span>
-                <span>${result.summary.recommendation}</span>
-              </div>
-              <div class="detail-row">
-                <span>Próximo Monitoreo:</span>
-                <span>${result.summary.next_check}</span>
-              </div>
-            </div>
-          </div>
-        `;
+        comparisonSection.replaceChildren();
+
+        const summaryTitle = document.createElement('h3');
+        summaryTitle.className = 'comparison-title';
+        summaryTitle.textContent = '📋 Resumen y Recomendaciones';
+
+        const summaryCard = document.createElement('div');
+        summaryCard.className = 'anomaly-card';
+        summaryCard.style.borderLeftColor = '#2196f3';
+
+        const summaryDetails = document.createElement('div');
+        summaryDetails.className = 'anomaly-details';
+        [
+          ['Estado General:', formatHealthStatus(result.summary.overall_health)],
+          ['Preocupación Principal:', formatAnomalyName(result.summary.primary_concern)],
+          ['Recomendación:', result.summary.recommendation ?? ''],
+          ['Próximo Monitoreo:', result.summary.next_check ?? '']
+        ].forEach(([labelText, valueText]) => {
+          const row = document.createElement('div');
+          row.className = 'detail-row';
+
+          const label = document.createElement('span');
+          label.textContent = labelText;
+
+          const value = document.createElement('span');
+          value.textContent = valueText;
+          row.append(label, value);
+          summaryDetails.appendChild(row);
+        });
+        summaryCard.appendChild(summaryDetails);
+
+        comparisonSection.append(summaryTitle, summaryCard);
 
         // Add photo comparison
-        const photosHtml = state.photos.map((photo, index) => `
-          <div class="comparison-item">
-            <img src="${photo.dataUrl}" alt="${photo.name}">
-            <div class="comparison-label">
-              Foto ${index + 1}: ${photo.date.toLocaleDateString('es-ES')}
-            </div>
-          </div>
-        `).join('');
+        const photosTitle = document.createElement('h3');
+        photosTitle.className = 'comparison-title';
+        photosTitle.style.marginTop = '20px';
+        photosTitle.textContent = '📷 Fotos Analizadas';
 
-        comparisonSection.innerHTML += `
-          <h3 class="comparison-title" style="margin-top: 20px;">📷 Fotos Analizadas</h3>
-          <div class="comparison-grid">${photosHtml}</div>
-        `;
+        const comparisonGrid = document.createElement('div');
+        comparisonGrid.className = 'comparison-grid';
+        state.photos.forEach((photo, index) => {
+          const item = document.createElement('div');
+          item.className = 'comparison-item';
+
+          const image = document.createElement('img');
+          image.src = photo.dataUrl;
+          image.alt = photo.name;
+
+          const label = document.createElement('div');
+          label.className = 'comparison-label';
+          label.textContent = `Foto ${index + 1}: ${photo.date.toLocaleDateString('es-ES')}`;
+
+          item.append(image, label);
+          comparisonGrid.appendChild(item);
+        });
+
+        comparisonSection.append(photosTitle, comparisonGrid);
       }
     }
 
@@ -714,13 +759,16 @@
       resultsSection.classList.add('active');
       apiStatus.className = 'api-status mock';
       apiStatus.textContent = `❌ Error: ${error.message}`;
-      anomalyGrid.innerHTML = `
-        <div class="anomaly-card" style="border-left-color: #f44336;">
-          <div class="anomaly-description">
-            No se pudo analizar las imágenes. Por favor intenta de nuevo.
-          </div>
-        </div>
-      `;
+      const errorCard = document.createElement('div');
+      errorCard.className = 'anomaly-card';
+      errorCard.style.borderLeftColor = '#f44336';
+
+      const errorDescription = document.createElement('div');
+      errorDescription.className = 'anomaly-description';
+      errorDescription.textContent = 'No se pudo analizar las imágenes. Por favor intenta de nuevo.';
+
+      errorCard.appendChild(errorDescription);
+      anomalyGrid.replaceChildren(errorCard);
     }
 
     function getAnomalyIcon(type) {
@@ -737,19 +785,19 @@
     }
 
     function formatAnomalyName(type) {
-      return type.split('_').map(word => 
+      return String(type ?? '').split('_').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' ');
     }
 
     function formatDetailKey(key) {
-      return key.split('_').map(word => 
+      return String(key ?? '').split('_').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' ');
     }
 
     function formatHealthStatus(status) {
-      return status.split('_').map(word => 
+      return String(status ?? '').split('_').map(word =>
         word.charAt(0).toUpperCase() + word.slice(1)
       ).join(' ');
     }
