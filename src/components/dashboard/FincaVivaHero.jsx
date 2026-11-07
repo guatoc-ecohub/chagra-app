@@ -45,7 +45,7 @@ import NotificationsBell from '../NotificationsBell';
 //   · verde-vivo  → "Huerto Exuberante" (verdes saturados, rocío que cae).
 //   · minimalista → "Un solo trazo" (line-art que se dibuja sobre papel).
 // Las escalas balcon/invernadero conservan sus escenas isométricas intactas.
-import SceneFincaOrganismo from './SceneFincaOrganismo';
+import SceneFincaOrganismo from '../../visual/scenes/SceneFincaOrganismo.jsx';
 // [ARCHIVADO 2026-08-26] PanelVitalidadEspiritu ("VITALIDAD DEL ESPÍRITU")
 // desmontado del home 2D por orden del operador (le restaba valor a lo
 // importante). Componente + CSS movidos a src/components/_archivado/.
@@ -60,7 +60,7 @@ import SceneTrazoMinimal from './SceneTrazoMinimal';
 import PortalesMano from './PortalesMano';
 // LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle + entrada New Donk.
 // Reintroduce el acceso al valle 3D desde el home 2D con una capa ligera.
-import './scene-finca-organismo.css';
+import '../../visual/scenes/scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
 import './scene-trazo-minimal.css';

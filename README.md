@@ -1,6 +1,6 @@
 # Chagra
 
-Chagra es una aplicación web progresiva (PWA) de software libre para la agroecología campesina en Colombia. Sirve para llevar el registro de una finca —plantas, siembras, cosechas, insumos y observaciones— y para consultar un catálogo agroecológico de especies, biopreparados y prácticas por piso térmico. Funciona sin conexión: guarda todo en el dispositivo y sincroniza con un servidor [farmOS](https://farmos.org) cuando vuelve la señal.
+Chagra es un agente agroecológico de código abierto para el campo colombiano: lleva el registro de la finca y responde por voz, también sin conexión. Es una aplicación web progresiva (PWA) que sirve para llevar el registro de una finca —plantas, siembras, cosechas, insumos y observaciones— y para consultar un catálogo agroecológico de especies, biopreparados y prácticas por piso térmico. Funciona sin conexión: guarda todo en el dispositivo y sincroniza con un servidor [farmOS](https://farmos.org) cuando vuelve la señal.
 
 Más información: [chagra.bio](https://chagra.bio)
 
