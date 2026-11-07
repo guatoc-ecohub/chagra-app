@@ -14,6 +14,7 @@ import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
 import useIdleDetection from './hooks/useIdleDetection';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
+import useAvisoCierreIncompleto from './hooks/useAvisoCierreIncompleto';
 const BiopunkBackground = lazy(() => import('./components/dashboard/BiopunkBackground'));
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -1865,6 +1866,9 @@ export default function App() {
     setToast({ message, isError });
     setTimeout(() => setToast(null), 4000);
   }, []);
+  // Un «Salir» cuyo borrado de tokens falló invalida la sesión igual; aquí
+  // se le dice al usuario.
+  useAvisoCierreIncompleto(showToast);
 
   // Tier Pro decidido por el servidor: se pregunta al arrancar (sin cuenta
   // activa no sale ninguna petición) y

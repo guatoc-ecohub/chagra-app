@@ -1,12 +1,21 @@
 /**
  * authService — Autenticación OAuth2 contra FarmOS.
  * Soporta Authorization Code + PKCE (recomendado) y Password Grant (legacy).
- * Persiste tokens en localforage (offline-first).
+ * Persiste tokens solo en IndexedDB (tokenStore); sin IndexedDB el login falla
+ * sin guardarlos.
  *
  * @module authService
  */
 
-import localforage from 'localforage';
+import {
+    TokenStorageError,
+    clearTokens,
+    readToken,
+    removeAux,
+    saveNewSession,
+    updateSession,
+    writeAux,
+} from './tokenStore';
 import { endUserAccess } from './userSessionService';
 import { clearActiveTenantId } from './tenantContext';
 import { clearServerTier } from './tierService';
@@ -22,6 +31,9 @@ export const SESSION_EXPIRED_EVENT = 'chagra:session-expired';
 // otros, loadProModules: los módulos Pro exigen sesión en el servidor y no se
 // pueden pedir antes de tenerla.
 export const SESSION_STARTED_EVENT = 'chagra:session-started';
+// Se emite cuando un cierre de sesión no pudo borrar los tokens del aparato.
+// La sesión queda invalidada igual; la UI avisa al usuario.
+export const LOGOUT_INCOMPLETE_EVENT = 'chagra:logout-incomplete';
 
 const announceSessionStarted = () => {
     if (typeof window === 'undefined') return;
@@ -149,8 +161,8 @@ export const initiateAuthorizationCodeFlow = async (state, loginHint = '') => {
     const codeChallenge = await generateCodeChallenge(codeVerifier);
 
     // Persistir code_verifier para usarlo en el callback
-    await localforage.setItem('oauth_code_verifier', codeVerifier);
-    await localforage.setItem('oauth_state', state);
+    await writeAux('oauth_code_verifier', codeVerifier);
+    await writeAux('oauth_state', state);
 
     const params = new URLSearchParams({
         response_type: 'code',
@@ -217,12 +229,18 @@ export const exchangeCodeForToken = async (code, state) => {
     console.info('[Auth] Intercambiando code por token (PKCE)');
 
     // Validar state
-    const savedState = await localforage.getItem('oauth_state');
+    let savedState;
+    let codeVerifier;
+    try {
+        savedState = await readToken('oauth_state');
+        codeVerifier = await readToken('oauth_code_verifier');
+    } catch (_) {
+        return { success: false, error: MSG.auth.almacenamientoNoDisponible };
+    }
     if (state !== savedState) {
         return { success: false, error: 'State inválido. Posible ataque CSRF.' };
     }
 
-    const codeVerifier = await localforage.getItem('oauth_code_verifier');
     if (!codeVerifier) {
         return { success: false, error: 'Code verifier no encontrado. Flujo inválido.' };
     }
@@ -256,22 +274,34 @@ export const exchangeCodeForToken = async (code, state) => {
 
         const data = await response.json();
 
-        // Almacenamiento Offline-First del Token JWT
-        await localforage.setItem('farmos_access_token', data.access_token);
-        await localforage.setItem('farmos_refresh_token', data.refresh_token);
-        await localforage.setItem('farmos_token_expiry', Date.now() + (data.expires_in * 1000));
+        // Solo IndexedDB; si no está, saveNewSession rechaza sin guardar nada.
+        await saveNewSession({
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiry: Date.now() + (data.expires_in * 1000),
+        });
 
         // Limpiar PKCE state
-        await localforage.removeItem('oauth_code_verifier');
-        await localforage.removeItem('oauth_state');
+        await removeAux('oauth_code_verifier');
+        await removeAux('oauth_state');
 
         announceSessionStarted();
         return { success: true };
     } catch (error) {
         console.error("Fallo en el intercambio del token:", error);
-        return { success: false, error: error.message };
+        return { success: false, error: loginErrorMessage(error) };
     }
 };
+
+/**
+ * Mensaje para un login fallido: el de almacenamiento si no hay IndexedDB,
+ * el del error en los demás casos.
+ * @param {Error} error
+ * @returns {string}
+ */
+const loginErrorMessage = (error) => (
+    error instanceof TokenStorageError ? MSG.auth.almacenamientoNoDisponible : error.message
+);
 
 /**
  * Autenticación OAuth2 Password Grant (LEGACY - DEPRECATED).
@@ -313,16 +343,18 @@ export const authenticateUser = async (username, password) => {
 
         const data = await response.json();
 
-        // Almacenamiento Offline-First del Token JWT
-        await localforage.setItem('farmos_access_token', data.access_token);
-        await localforage.setItem('farmos_refresh_token', data.refresh_token);
-        await localforage.setItem('farmos_token_expiry', Date.now() + (data.expires_in * 1000));
+        // Solo IndexedDB; si no está, saveNewSession rechaza sin guardar nada.
+        await saveNewSession({
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiry: Date.now() + (data.expires_in * 1000),
+        });
 
         announceSessionStarted();
         return { success: true };
     } catch (error) {
         console.error("Fallo en la negociación del token:", error);
-        return { success: false, error: error.message };
+        return { success: false, error: loginErrorMessage(error) };
     }
 };
 
@@ -362,7 +394,7 @@ export const refreshAccessToken = async () => {
         lastRefreshFailureReason = null;
         let refreshToken;
         try {
-            refreshToken = await localforage.getItem('farmos_refresh_token');
+            refreshToken = await readToken('farmos_refresh_token');
         } catch (err) {
             console.error('[Auth] no se pudo leer el refresh_token:', err);
             lastRefreshFailureReason = 'storage';
@@ -410,14 +442,19 @@ export const refreshAccessToken = async () => {
                 return null;
             }
 
-            await localforage.setItem('farmos_access_token', data.access_token);
             // El refresh_token suele rotar en cada uso: persistir el nuevo si
             // viene, conservar el anterior si el backend no lo rota.
-            if (data.refresh_token) {
-                await localforage.setItem('farmos_refresh_token', data.refresh_token);
-            }
             const expiresIn = Number(data.expires_in) || 3600;
-            await localforage.setItem('farmos_token_expiry', Date.now() + expiresIn * 1000);
+            const updated = await updateSession({
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token || undefined,
+                expiry: Date.now() + expiresIn * 1000,
+            });
+            if (!updated) {
+                // La sesión se cerró mientras el refresh estaba en vuelo.
+                lastRefreshFailureReason = 'missing';
+                return null;
+            }
 
             console.info('[Auth] access token renovado vía refresh_token grant.');
             return data.access_token;
@@ -457,13 +494,13 @@ export const expireSession = async (detail = {}) => {
  * refresh_token vencido/revocado hace un logout limpio (evita el estado zombi).
  *
  * @returns {Promise<string|null>} token activo (renovado si hizo falta), o null
- *   si no existe / no se pudo renovar / localforage falló (defensive: la app
+ *   si no existe / no se pudo renovar / el almacenamiento falló (defensive: la app
  *   debe tratar null como "no auth").
  */
 export const getAccessToken = async () => {
     try {
-        const token = await localforage.getItem('farmos_access_token');
-        const expiry = await localforage.getItem('farmos_token_expiry');
+        const token = await readToken('farmos_access_token');
+        const expiry = await readToken('farmos_token_expiry');
 
         if (token && expiry && Date.now() > expiry) {
             // Token vencido: intentar renovación silenciosa con el refresh_token
@@ -480,7 +517,7 @@ export const getAccessToken = async () => {
             //     usuario no pierde su sesión por estar offline un rato.
             let hadRefresh = false;
             try {
-                hadRefresh = !!(await localforage.getItem('farmos_refresh_token'));
+                hadRefresh = !!(await readToken('farmos_refresh_token'));
             } catch (_) { /* asumir que no, fail-safe */ }
 
             if (
@@ -501,17 +538,19 @@ export const getAccessToken = async () => {
 };
 
 /**
- * Limpia los tokens persistidos. No-throw: si localforage falla, se loguea
- * y se continúa (el siguiente getAccessToken devolverá null de todas formas).
+ * Limpia los tokens persistidos. No-throw. Si el borrado falla, la sesión
+ * queda revocada igual (tokenStore deja de leer los tokens que quedaron) y se
+ * emite LOGOUT_INCOMPLETE_EVENT para que la UI avise.
+ *
+ * @returns {Promise<{tokensBorrados: boolean}>}
  */
 export const logoutUser = async () => {
     endUserAccess();
-    try {
-        await localforage.removeItem('farmos_access_token');
-        await localforage.removeItem('farmos_refresh_token');
-        await localforage.removeItem('farmos_token_expiry');
-    } catch (err) {
-        console.error('[Auth] logoutUser failed (tokens may persist):', err);
+    const tokensBorrados = await clearTokens();
+    if (!tokensBorrados && typeof window !== 'undefined') {
+        try {
+            window.dispatchEvent(new CustomEvent(LOGOUT_INCOMPLETE_EVENT));
+        } catch (_) { /* CustomEvent existe en browsers soportados */ }
     }
     // ADR-036 MVP multi-finca: limpiar tenantId asegura que un re-login con
     // otro usuario no herede el scope del anterior. NO purgamos IDB aquí —
@@ -522,6 +561,7 @@ export const logoutUser = async () => {
         console.warn('[Auth] clearActiveTenantId failed:', err);
     }
     clearServerTier();
+    return { tokensBorrados };
 };
 
 /**
