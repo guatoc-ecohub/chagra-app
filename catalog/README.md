@@ -63,12 +63,12 @@ npm run build:catalog
 ## Validación humana (ADR-016)
 
 Cada `species[]` lleva campo `validation_level`:
-- `unreviewed_draft` — borrador editorial sin revisar
+- `claude_draft` — generada por LLM, sin revisar
 - `operator_reviewed` — el operador la verificó
 - `agronomist_validated` — un agrónomo con registro profesional la firmó (campo `validated_by[]`)
 - `community_attested` — saber tradicional documentado y atestiguado por custodios
 
-Las contribuciones externas vía PR DEBEN venir con `validation_level: unreviewed_draft` o superior + `source_ids[]` poblado.
+Las contribuciones externas vía PR DEBEN venir con `validation_level: claude_draft` o superior + `source_ids[]` poblado.
 
 ## Atribución requerida
 

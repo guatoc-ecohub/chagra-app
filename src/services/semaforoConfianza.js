@@ -12,11 +12,11 @@
  *   - `grounding_provenance` → array [{entity_id, confidence, source,
  *     validation_level}] por entidad resuelta contra el grafo AGE. Primer
  *     paso CLIENT-SIDE: refina la base con el nivel de curaduría del dato
- *     (expert_reviewed / verificado_openalex ≠ unreviewed_draft ≠ disputado).
+ *     (expert_reviewed / verificado_openalex ≠ claude_draft ≠ disputado).
  *
  * REGLA DE COMBINACIÓN (conservadora, honesta): el nivel final es el PEOR
  * entre el semáforo del sidecar y el nivel de curaduría de la procedencia.
- * El cliente puede DEGRADAR (un "answer" con datos unreviewed_draft baja a
+ * El cliente puede DEGRADAR (un "answer" con datos claude_draft baja a
  * ámbar: "está en el catálogo pero aún en revisión") pero JAMÁS sube un
  * rojo/ámbar del sidecar a verde — la política del agente manda.
  *
@@ -27,7 +27,7 @@
  * UI (SemaforoConfianza.jsx solo consume `computeSemaforoTurno`).
  *
  * Vocabulario `validation_level` (enum canónico del catálogo, ver
- * scripts/validate-catalog.mjs AMB-26): unreviewed_draft, powo_validated,
+ * scripts/validate-catalog.mjs AMB-26): claude_draft, powo_validated,
  * agrosavia_verified, expert_reviewed, published. Las aristas del grafo
  * además traen `disputed` y `verificado_openalex` (booleans) — se aceptan
  * como señales si el sidecar las propaga en el item de procedencia.
@@ -49,8 +49,8 @@ const NIVELES_VERIFICADOS = new Set([
   'openalex_verified',
 ]);
 
-/** Borrador sin revisión humana o institucional. */
-const NIVELES_BORRADOR = new Set(['unreviewed_draft']);
+/** Borrador generado por IA, aún sin revisión humana/institucional. */
+const NIVELES_BORRADOR = new Set(['claude_draft']);
 
 /** Fuentes en desacuerdo (aristas disputed del grafo — no se borran, se marcan). */
 const NIVELES_DISPUTA = new Set(['disputed', 'en_disputa']);
@@ -63,7 +63,7 @@ const NIVELES_DISPUTA = new Set(['disputed', 'en_disputa']);
  * Reglas (espejo del encargo del operador):
  *   VERDE  → toda la procedencia está verificada (expert_reviewed,
  *            published, agrosavia_verified, powo_validated u OpenAlex).
- *   ÁMBAR  → hay disputa entre fuentes, hay borradores unreviewed_draft, la
+ *   ÁMBAR  → hay disputa entre fuentes, hay borradores claude_draft, la
  *            verificación es parcial (mezcla), o solo hay UNA fuente
  *            trazable sin revisión.
  *   ROJO   → sin procedencia, o nada trazable ni revisado (sin verificar).
@@ -335,8 +335,8 @@ export function nivelValidacionInfo(validationLevel) {
     case 'disputed':
     case 'en_disputa':
       return { label: 'Fuentes en desacuerdo', nivel: 'ambar' };
-    case 'unreviewed_draft':
-      return { label: 'Borrador · en revisión', nivel: 'ambar' };
+    case 'claude_draft':
+      return { label: 'Borrador IA · en revisión', nivel: 'ambar' };
     default:
       return { label: 'Aún sin revisión', nivel: 'ambar' };
   }

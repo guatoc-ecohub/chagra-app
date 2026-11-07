@@ -1,5 +1,5 @@
 // Tips dinámicos rotantes para HelpManual (HelpTipCard).
-// Fuente: extracto de PlantCemeteryModal.jsx + contenido de ciclo.
+// Fuente: extracto de PlantCemeteryModal.jsx + ciclo contenido.
 // Categoría: errores (cementerio), observacion, riego, sustrato, plagas, paciencia.
 //
 // Overhaul 2026-07 (ayuda visual): cada tip ganó `title` (frase corta y

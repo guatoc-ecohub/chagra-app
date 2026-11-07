@@ -23,7 +23,7 @@ import {
  *
  *   verde → dato respaldado y revisado (expert_reviewed / OpenAlex / POWO /
  *           Agrosavia / publicado) con política answer del sidecar.
- *   ámbar → respaldo parcial: borrador unreviewed_draft, una sola fuente,
+ *   ámbar → respaldo parcial: borrador claude_draft, una sola fuente,
  *           fuentes en disputa, o política hedge.
  *   rojo  → sin verificar — el agente prefirió decirlo de frente (abstain).
  *

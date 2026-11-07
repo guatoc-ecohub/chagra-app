@@ -84,7 +84,7 @@ export const CURSO_MODULOS = [
     emoji: '🤲',
     resumen:
       'El suelo no es solo tierra: es un mundo vivo de hongos, bacterias y lombrices que trabajan para tu cultivo. Aprende a leerlo sin laboratorio (color, olor, tacto, la prueba de la mostaza) y a seguir la fenología —el calendario natural de cada cultivo— para saber cuándo abonar, podar y cosechar.',
-    fuente: 'Agrosavia.',
+ fuente: ' · Agrosavia.',
     videos: [],
     lecciones: ['suelo', 'fenologia'],
     pruebas: [
