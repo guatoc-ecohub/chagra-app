@@ -34,10 +34,9 @@
  * Campos estructurados del pasaje que, si están presentes y con valor, marcan
  * ORIGEN colombiano validado. Derivados del corpus real (cycle-content):
  * - `diferenciador_colombiano`: contexto agronómico específico de Colombia.
- * - `convergencia_dr_034`: hecho proveniente del DR-034 (corpus base colombiano).
  * Si el pasaje proviene de uno de estos `key` paths, es contexto Co.
  */
-const CO_KEY_MARKERS = ['diferenciador_colombiano', 'convergencia_dr_034', 'leccion_agroecologica'];
+const CO_KEY_MARKERS = ['diferenciador_colombiano', 'leccion_agroecologica'];
 
 /**
  * Valores del campo estructurado `origin`/`origen` (si el pasaje lo trae,
