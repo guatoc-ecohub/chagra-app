@@ -13,7 +13,7 @@
  * CERO invención de cifras: las observaciones ("señales de campo") y sus
  * umbrales gruesos (palada de 20-30 cm, agua que no baja, etc.) están
  * GROUNDED al mismo consolidado que ya usa el diagnóstico interactivo:
- * src/data/soil-diagnostics.json (DR-SUELOS-1: IGAC, AGROSAVIA, CIPAV, FAO,
+ * src/data/soil-diagnostics.json (IGAC, AGROSAVIA, CIPAV, FAO,
  * SENA, USDA-NRCS, Cenicafé, Jaramillo 2002). Aquí NO se reimplementa ese
  * motor: este pilar es la lámina didáctica photo-forward que ENLAZA a la
  * herramienta interactiva (ruta 'suelo' → SoilDiagnosticScreen).
