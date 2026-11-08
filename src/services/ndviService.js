@@ -1,10 +1,15 @@
 import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
-import { getActiveTenantId } from './tenantContext.js';
 import { loteGeoJson, parentLandIdOf } from './loteService.js';
+import {
+  NDVI_CACHE_NAME,
+  NDVI_CACHE_SCOPE_HEADER,
+  claimNdviCacheForAccount,
+  ndviAccountScope,
+  ndviCacheKey,
+} from './ndviCacheStore.js';
 
-export const NDVI_CACHE_NAME = 'chagra-ndvi-v1';
-const NDVI_CACHE_KEY_PREFIX = '/__chagra_ndvi_cache__/';
+export { NDVI_CACHE_NAME };
 
 function sidecarUrl() {
   let base = '/api/mcp/agro';
@@ -25,28 +30,14 @@ function requestData(lote) {
   return { fincaId, loteId: lote.id, geometry };
 }
 
-async function cacheScope() {
-  if (!globalThis.crypto?.subtle || typeof TextEncoder === 'undefined') return null;
-  const tenant = getActiveTenantId() || 'anonymous';
-  const digest = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(`ndvi-tenant\u0000${tenant}`));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-async function cacheKey(body, scope) {
-  if (!globalThis.crypto?.subtle || typeof TextEncoder === 'undefined') return null;
-  if (!scope) return null;
-  const input = `${scope}\u0000${JSON.stringify(body)}`;
-  const digest = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
-  const hex = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-  return `${NDVI_CACHE_KEY_PREFIX}${hex}`;
-}
-
 /** Read the last exact-request result from CacheStorage without contacting the network. */
 export async function readCachedNdviSeries(lote) {
   try {
     if (!globalThis.caches?.open || typeof location === 'undefined') return null;
     const body = requestData(lote);
-    const key = await cacheKey(body, await cacheScope());
+    const scope = await ndviAccountScope();
+    await claimNdviCacheForAccount(scope);
+    const key = await ndviCacheKey(scope, JSON.stringify(body));
     if (!key) return null;
     const cache = await caches.open(NDVI_CACHE_NAME);
     const response = await cache.match(new URL(key, location.origin).toString());
@@ -60,9 +51,12 @@ export async function readCachedNdviSeries(lote) {
 /** Request one lot's series; the Service Worker can satisfy this exact POST offline. */
 export async function requestNdviSeries(lote) {
   const body = requestData(lote);
+  const scope = await ndviAccountScope();
+  await claimNdviCacheForAccount(scope);
+  // Sin cuenta activa no va scope y el Service Worker no guarda ni sirve caché.
   const headers = {
     ...buildSidecarHeaders(),
-    'x-chagra-ndvi-cache-scope': await cacheScope() || 'anonymous',
+    ...(scope ? { [NDVI_CACHE_SCOPE_HEADER]: scope } : {}),
   };
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 90000);

@@ -19,6 +19,7 @@ import {
 import { endUserAccess } from './userSessionService';
 import { clearActiveTenantId } from './tenantContext';
 import { clearServerTier } from './tierService';
+import { purgeNdviCache } from './ndviCacheStore';
 import { MSG } from '../config/messages';
 
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
@@ -561,6 +562,9 @@ export const logoutUser = async () => {
         console.warn('[Auth] clearActiveTenantId failed:', err);
     }
     clearServerTier();
+    // Las series NDVI guardadas para offline son de esta cuenta: se borran
+    // también cuando la sesión vence, no solo con el «Salir» explícito.
+    await purgeNdviCache();
     return { tokensBorrados };
 };
 
