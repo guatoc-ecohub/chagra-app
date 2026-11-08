@@ -63,3 +63,16 @@ No se repuso ninguna foto ni se escribió ninguna atribución nueva.
   tiene; por eso el marcador se mide aparte, con el chunk real de `MapPicker`.
 - La sonda corre en Chromium sin cabeza y no mide FPS; no importa la
   herramienta de pantalla, que solo hace falta para medir rendimiento.
+
+## Escáner pre-publicación (sin PR por este motivo)
+
+- Repo completo, todas las refs: **NO PUBLICAR** (13 altos, 154 de revisión).
+  Ninguno está en un archivo que toque esta rama (0 de 26; como control,
+  `README.md`, que tiene hallazgo, sí aparece en el mismo filtro) y ninguno
+  viene del commit de la rama. Todos ya estaban en `main` o en otras refs.
+- Solo los archivos de la rama (más `LICENSE`, `package.json` y
+  `package-lock.json` para el chequeo de licencias): **PUBLICAR CON REVISIÓN**,
+  con 0 altos y 1 de revisión (`correo-externo` en `package-lock.json`, que la
+  rama no modifica).
+- El encargo exige PUBLICAR para pedir revisión. No se abrió el PR: la rama
+  está empujada y espera la decisión del operador sobre los hallazgos previos.
