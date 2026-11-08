@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): ayudaFunciones.js contiene copy user-facing en español
+ * i18n: ayudaFunciones.js contiene copy user-facing en español
  * Colombia (nombres de función, pasos de uso, "cuándo sirve") pendiente de
  * migrar a src/config/messages.js. Se desactiva la regla a nivel de archivo,
  * mismo criterio que agentCapabilities.js (de donde se DERIVA este manifiesto).

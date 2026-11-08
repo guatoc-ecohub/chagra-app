@@ -15,7 +15,7 @@
  *   - Sombra cafetera: 30-50%, buffer 2-4°C
  *   - Reducción arvenses: 24-55%
  *   - Control plagas: hasta 40%
- * Fuentes: DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DOI 10.1093/aob/mcu191;
+ * Fuentes: DOI 10.1093/aob/mcu191;
  * DOI 10.3389/fagro.2023.1115490; DOI 10.1016/j.fcr.2019.107661.
  *
  * Todo offline: cero red en runtime. Sin nombres propios de personas.

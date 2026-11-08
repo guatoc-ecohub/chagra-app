@@ -2,12 +2,12 @@
 /**
  * llmTools.js — Tool registry para function calling.
  *
- * NOTA i18n (ADR-050): los `description` de las tools y los mensajes de error
+ * NOTA i18n: los `description` de las tools y los mensajes de error
  * del corpus son texto de razonamiento que consume el LLM (no UI visible al
  * usuario), por eso viven en español aquí y no en src/config/messages.js.
  *
  * Implementa el patrón de registry paralelo a moduleRegistry.js.
- * Herramientas mínimas para DR-034 + tool use básico.
+ * Herramientas mínimas para el corpus de ciclos + tool use básico.
  *
  * Pre-requisito: un modelo que soporte function calling.
  * Algunos modelos locales NO soportan function calling.
@@ -371,7 +371,7 @@ registerTool({
 
 /**
  * Tool: query_corpus_dr034
- * Buscar información en el corpus DR-034 de ciclo de especies.
+ * Buscar información en el corpus de ciclos de especies.
  */
 registerTool({
   name: 'query_corpus_dr034',

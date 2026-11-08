@@ -38,7 +38,7 @@ import useFincaActiveStore from '../services/fincaActiveStore.js';
  * cliente de defense-in-depth mientras tanto.
  *
  * Ruta: #usuarios. Entrada desde ProfileScreen → sección "Gestión de
- * usuarios" (mismo patrón `chagra:nav` que "Acompañamiento", ADR-048).
+ * usuarios" (mismo patrón `chagra:nav` que "Acompañamiento").
  *
  * Gate: solo se monta si el actor tiene `user:manage` (ver App.jsx). Esta
  * pantalla además re-verifica internamente (defense-in-depth doble).

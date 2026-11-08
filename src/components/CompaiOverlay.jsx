@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): los strings es-CO que vivían aquí (mapa ruta→hint) se
+ * i18n: los strings es-CO que vivían aquí (mapa ruta→hint) se
  * movieron a src/config/compaiHints.js (unificación 2026-08-23). Lo que queda
  * en este archivo no dispara la regla chagra-i18n, así que ya no necesita el
  * eslint-disable a nivel de archivo.

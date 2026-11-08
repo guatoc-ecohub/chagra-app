@@ -253,7 +253,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
 
     if (result.success) {
-      // Activar Capa 1 HMAC (ADR-027.v): computa operator_id_hash determinista
+      // Activar Capa 1 HMAC (Habeas Data, Ley 1581): computa operator_id_hash determinista
       // vía HMAC-SHA256(username, PBKDF2(account_uuid_master, "chagra-salt-v1"))
       // y persiste en localStorage. Los consumidores (InventoryDashboard,
       // RecountDrawer, PlanEditor) dejan de usar 'default-hash-0...' fallback.
@@ -264,7 +264,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         // Componentes hacen fallback a default-hash. Tracking warning silenciosa.
         console.warn('[LoginScreen] setCurrentOperator failed:', err);
       }
-      // ADR-036 MVP multi-finca: persistir el username como tenantId activo.
+      // MVP multi-finca: persistir el username como tenantId activo.
       // Lo consumen apiService (filter[uid.name]) y useAssetStore (scope IDB).
       // Si el tenantId cambia respecto al previo (re-login con otro usuario),
       // setActiveTenantId emite `tenantChanged` y los stores limpian su caché.

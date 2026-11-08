@@ -563,7 +563,7 @@ function EstadoVacio({ onNavigate }) {
             onClick={() => onNavigate('sembrar')}
             className="ha-contraste-boton px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
           >
-            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy campesino pendiente de migrar a messages.js (ADR-050, deuda soft igual que mundosFinca) */}
+            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy campesino pendiente de migrar a messages.js (deuda soft igual que mundosFinca) */}
             <Sprout size={14} aria-hidden="true" /> Registrar una siembra
           </button>
           <button

@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (la planta, el manejo, el desfibrado, los usos y el aprovechamiento del fique),
  * pendiente de migrar a src/config/messages.js — mismo criterio que cafeFinca.js
  * / aguaFinca.js.

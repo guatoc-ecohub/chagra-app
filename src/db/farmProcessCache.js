@@ -14,7 +14,7 @@ import { getActiveFincaId } from '../services/tenantContext';
 import useFincaActiveStore from '../services/fincaActiveStore';
 
 /**
- * ADR-036 multi-finca: marca el ciclo con la finca activa al guardarlo, si
+ * multi-finca: marca el ciclo con la finca activa al guardarlo, si
  * todavía no trae una. Sin marca, `farm_processes` mezcla los ciclos de todas
  * las fincas del dispositivo (STEV-46).
  * @template {Record<string, any>} T

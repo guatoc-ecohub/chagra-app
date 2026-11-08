@@ -1,5 +1,5 @@
 /**
- * caseStudyTreatmentRecommender.js — sugerencias biopreparados (DR-044 F4)
+ * caseStudyTreatmentRecommender.js — sugerencias biopreparados
  * ================================================================
  * Dado un pest_name + species_id (opcional), devuelve top-3 biopreparados
  * del catálogo Chagra como sugerencias ranqueadas.
@@ -43,7 +43,7 @@ export const RAG_CONTEXT_FOOTER = '=== FIN INFORMACIÓN AGRONÓMICA DE REFERENCI
  * KISS: pattern matching simple, no embeddings. Fácil de auditar
  * por agrónomo piloto. Cada entry: { match: regex|substring, recs: [...] }.
  *
- * Post-DR-040 (pest catalog first-class), esta tabla se reemplaza por
+ * Cuando el catálogo de plagas sea de primera clase, esta tabla se reemplaza por
  * lookup directo a catalog.pests_diseases[X].biopreparados_curativos[].
  */
 const PEST_RULES = [
@@ -114,7 +114,7 @@ const PEST_RULES = [
  * Recomienda biopreparados para un problema dado.
  *
  * @param {string} pestName - free text "trozador", "antracnosis", "áfidos verdes"
- * @param {Object} [_opts] - reservado para post-DR-040 (species_id lookup contra catalog.species[].enfermedades_criticas)
+ * @param {Object} [_opts] - reservado para cuando el catálogo de plagas sea de primera clase (species_id lookup contra catalog.species[].enfermedades_criticas)
  * @returns {Array<{id, rationale, priority, match_keywords}>} top recommendations ordered
  */
 export function recommendTreatments(pestName, _opts = {}) {

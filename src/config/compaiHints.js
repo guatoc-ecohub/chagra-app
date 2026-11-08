@@ -27,7 +27,7 @@
  * `notificacionesInteligentes` en AgentFab). Aquí NO se inventan datos del
  * usuario.
  */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- hints pedagógicos es-CO, deuda i18n preexistente (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- hints pedagógicos es-CO, deuda i18n preexistente */
 
 // El mapa de mundos ya pertenece al motor; no duplicarlo en los hints.
 export { mundoDePantalla } from '../services/angelitaInteligencia.js';

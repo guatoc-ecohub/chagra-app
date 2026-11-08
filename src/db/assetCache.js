@@ -16,7 +16,7 @@ import useFincaActiveStore from '../services/fincaActiveStore';
 
 export { openDB, STORES };
 
-// ADR-036 MVP multi-finca: filtra una lista de assets ya leídos de IDB por
+// MVP multi-finca: filtra una lista de assets ya leídos de IDB por
 // persona y finca. En modo legado o con una sola finca se conservan recursos
 // sin finca etiquetada; con varias fincas se ocultan si no hay un vínculo que
 // permita asignarlos sin mostrarlos en una finca equivocada.
@@ -80,7 +80,7 @@ export const assetCache = {
    */
   async put(assetType, asset) {
     const db = await openDB();
-    // ADR-036 MVP multi-finca: stamp del tenant activo. Si el asset ya trae
+    // MVP multi-finca: stamp del tenant activo. Si el asset ya trae
     // un `_tenant_id` (rehidratación desde syncFromServer con asset remoto),
     // preservarlo — el caller sabe a qué tenant pertenece.
     const tenantId = asset._tenant_id || getActiveTenantId() || null;
@@ -164,7 +164,7 @@ export const assetCache = {
       store.put({
         ...stampAssetFinca(remote),
         asset_type: assetType,
-        // ADR-036 MVP: assets recién recibidos pertenecen al tenant que los
+        // assets recién recibidos pertenecen al tenant que los
         // descargó. Si no hay tenant activo (dev sin login), queda null y se
         // trata como legacy pre-multifinca.
         _tenant_id: getActiveTenantId() || null,
@@ -231,7 +231,7 @@ export const assetCache = {
       req.onsuccess = () => res(req.result || []);
       req.onerror = () => rej(req.error);
     });
-    // ADR-036 MVP multi-finca: el GC opera solo dentro del tenant activo.
+    // MVP multi-finca: el GC opera solo dentro del tenant activo.
     // Si un usuario A sincroniza, NO debe purgar assets que pertenezcan al
     // tenant B en el mismo device — el universo `allRemoteIds` solo cubre A.
     // Assets legacy sin _tenant_id también se purgan (mismo criterio que
@@ -334,7 +334,7 @@ export const assetCache = {
       const store = tx.objectStore(STORES.ASSETS);
       const index = store.index('asset_type');
       const request = index.getAll(IDBKeyRange.only(assetType));
-      // ADR-036 MVP multi-finca: scope por tenant activo en read-path.
+      // MVP multi-finca: scope por tenant activo en read-path.
       request.onsuccess = () => resolve(filterByActiveTenant(request.result || []));
       request.onerror = () => reject(request.error);
     });
@@ -476,7 +476,7 @@ export const assetCache = {
         const assetStore = tx.objectStore(STORES.ASSETS);
         const activeTenant = getActiveTenantId() || null;
         assetUpdates.forEach(({ assetType, asset }) => {
-          // ADR-036 MVP: stamp `_tenant_id` para que las queries scoped puedan
+          // stamp `_tenant_id` para que las queries scoped puedan
           // filtrarlo. Preserva el del asset si ya viene marcado (refill,
           // updates desde otro tenant en device compartido, etc).
           assetStore.put({

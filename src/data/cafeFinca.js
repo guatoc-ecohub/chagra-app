@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (variedades, ciclo, plagas y beneficio del café), pendiente de migrar a
  * src/config/messages.js — mismo criterio que aguaFinca.js / sanidadData.js.
  */

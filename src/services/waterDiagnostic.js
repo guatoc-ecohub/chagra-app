@@ -1,7 +1,7 @@
 /**
- * waterDiagnostic — diagnóstico y calculadora de captación de agua (DR-AGUA-1).
+ * waterDiagnostic — diagnóstico y calculadora de captación de agua.
  *
- * Fuente: DR-AGUA-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
+ * Fuente: investigación consolidada de agua (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
  * Referencias: IDEAM, AGROSAVIA, CIPAV, FAO, SENA, Cenicafe, CORPOICA, CIAT, UICN.
  *
  * Fórmula de captación: Vc = area × lluvia(mm) × Ce × η (η≈0.85).

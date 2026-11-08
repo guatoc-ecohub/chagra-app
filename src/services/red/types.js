@@ -28,7 +28,7 @@
  *                   social + la reputación + el "pregúntele al vecino". El MVP
  *                   opera en niveles 1–2.
  *   3 CANONIZADO  — un sabedor/experto lo canoniza y pasa a conocimiento
- *                   comunitario (puente con el grafo DR-SOCIAL-1:
+ *                   comunitario (puente con el grafo social:
  *                   Caso —SE_VUELVE→ ConocimientoComunitario). Se MODELA aquí
  *                   aunque el MVP todavía no lo ejecute.
  *

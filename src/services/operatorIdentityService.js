@@ -1,6 +1,6 @@
 /**
  * operatorIdentityService — pseudonimización determinista de operadores
- * conforme ADR-027.v (Compliance Ley 1581 Habeas Data Colombia).
+ * conforme a la Ley 1581 (Habeas Data Colombia).
  *
  * Capa 1 de las 4 capas de privacidad:
  *   operator_id_hash = HMAC-SHA256(operator_id, salt)
@@ -146,7 +146,7 @@ export function clearCurrentOperator() {
 // ─── Verificación / autoauditoría ────────────────────────────────────
 
 /**
- * Permite al operador owner ver su propio hash (right of access ADR-027.v).
+ * Permite al operador owner ver su propio hash (derecho de acceso, Ley 1581).
  * Útil para autoauditoría y debug.
  */
 export async function verifyOperatorIdentity(operatorId, expectedHash) {

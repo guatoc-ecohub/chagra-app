@@ -1,11 +1,11 @@
 /**
- * fincaScope — Capa de ABSTRACCIÓN de scope por finca (ADR-036 MF-1, #378).
+ * fincaScope — Capa de ABSTRACCIÓN de scope por finca (MF-1, #378).
  *
  * ════════════════════════════════════════════════════════════════════════════
  * QUÉ ES Y POR QUÉ EXISTE
  * ════════════════════════════════════════════════════════════════════════════
  * Hoy la PWA modela UNA sola finca: los stores IDB (assetCache, logCache, …) no
- * separan los datos por finca. ADR-036 (multi-finca / federación de células)
+ * separan los datos por finca. El camino multi-finca / federación de células
  * quiere que un mismo usuario —o un extensionista— gestione VARIAS fincas sin
  * mezclar sus datos. MF-1 es la FUNDACIÓN de almacenamiento de ese camino: una
  * sola puerta para "scopear" lecturas/escrituras por `finca_id`, DETRÁS DE UN
@@ -31,7 +31,7 @@
  *     stores vía `_tenant_id`. Ese eje (usuario) es ORTOGONAL al eje finca.
  *     fincaScope añade el segundo eje (finca) sin tocar el primero. Con el flag
  *     OFF ambos siguen comportándose como hoy.
- *   - `extensionistaAccess` (ADR-048) decide si un usuario PUEDE ver fincas
+ *   - `extensionistaAccess` decide si un usuario PUEDE ver fincas
  *     ajenas; fincaScope decide CÓMO se separan los datos de cada finca.
  *
  * LO QUE MF-1 NO HACE (follow-ups, ver plan en el PR):

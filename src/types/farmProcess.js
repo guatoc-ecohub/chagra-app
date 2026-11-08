@@ -27,7 +27,7 @@
  * @property {string} process_id — ULID
  * @property {'farm_process'} type
  * @property {FarmProcessAttributes} attributes
- * @property {string} [_finca_id] - finca (grupo) a la que pertenece el ciclo; ver ADR-036
+ * @property {string} [_finca_id] - finca (grupo) a la que pertenece el ciclo (multi-finca)
  */
 
 /**

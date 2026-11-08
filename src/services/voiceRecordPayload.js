@@ -2,7 +2,7 @@
  * Los nombres/labels de los registros FarmOS que arma este módulo (ej.
  * "Cosecha de …", "Aplicación de …", "Observación: …") NO son texto de UI: son
  * los `name` que se escriben en el servidor y aparecen en la bitácora. Su
- * migración a src/config/messages.js (ADR-050 i18n) es transversal y fuera del
+ * migración a src/config/messages.js (i18n) es transversal y fuera del
  * alcance de #23. Los errores reales de ESLint siguen activos. */
 /**
  * voiceRecordPayload — Construye el payload FarmOS estructurado a partir de un

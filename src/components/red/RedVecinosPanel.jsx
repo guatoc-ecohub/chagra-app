@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia — mismo criterio
+/* i18n: etiquetas user-facing en español Colombia — mismo criterio
  * de archivo que MercadosScreen. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useEffect, useMemo } from 'react';

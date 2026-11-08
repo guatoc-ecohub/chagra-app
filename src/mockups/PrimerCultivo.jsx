@@ -2,7 +2,7 @@
  * MOCKUP DEV (#/mockups/primer-cultivo): copy de muestra en español de
  * Colombia (usted) para el onboarding aspiracional del primer cultivo. No es
  * UI de producción; si se adopta, sus textos migran a src/config/messages.js
- * (ADR-050).
+ *.
  */
 /**
  * PrimerCultivo.jsx — MOCKUP DEV · "EL CAMINO DEL PRIMER CULTIVO"

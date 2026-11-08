@@ -123,7 +123,7 @@ function isNightNow(hour) {
 // + corrección orográfica por piso térmico + modulación ENSO, sesgo de
 // honestidad: solo degrada hacia más nube) y la luna dibuja su FASE REAL
 // (skyEphemeris.moonPathD — astronomía válida; mostrar la fase ≠ recomendar
-// labores por ella, eso es folclore vetado por ADR-033).
+// labores por ella, eso es folclore vetado).
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Nube puffy compartida por las variantes (parcial/nublado/niebla/lluvia).
@@ -1606,7 +1606,7 @@ export default function AgentHero({ onNavigate }) {
                 {/* — SOL/LUNA realista: nubosidad real Open-Meteo + corrección
                      orográfica andina + ENSO de día; FASE LUNAR real de noche
                      (mostrarla es astronomía; recomendar labores por ella sería
-                     folclore — ADR-033). data-sky habilita la validación E2E. — */}
+                     folclore). data-sky habilita la validación E2E. — */}
                 <div
                     className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}
                     title={sky.label}
@@ -1806,7 +1806,7 @@ export default function AgentHero({ onNavigate }) {
                                 </span>
                             </div>
                         ))}
-                        {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js (ADR-050) */}
+                        {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js */}
                         <div className="nsec">Tareas de campo</div>
                         {pendingTasks.length === 0 && (
                             <p className="nempty">No tienes tareas de campo pendientes.</p>
@@ -1993,7 +1993,7 @@ export default function AgentHero({ onNavigate }) {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
                             </span>
-                            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js (ADR-050) */}
+                            {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- TODO: migrate to messages.js */}
                             <span className="flex-1 text-base text-rose-500 font-medium tabular-nums">
                                 Grabando… {recSeconds}s
                             </span>

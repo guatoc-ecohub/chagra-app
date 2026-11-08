@@ -350,7 +350,7 @@ function isFrostPiso(piso) {
 
 /**
  * Nota de riesgo de helada SOLO para El Niño en piso frío/páramo. La paradoja
- * andina (IDEAM/Cenicafé, DR-MISSION-4): con El Niño el cielo despejado hace
+ * andina (IDEAM/Cenicafé): con El Niño el cielo despejado hace
  * perder más calor de noche y dispara MÁS heladas, no sequía. Sin ese piso la
  * nota no aplica y no se fabrica.
  */

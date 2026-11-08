@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): userProfileService.js trae strings en español Colombia
+ * i18n: userProfileService.js trae strings en español Colombia
  * (nombres de módulos, mensajes de consola) pendientes de migrar a
  * src/config/messages.js — deuda PREEXISTENTE (14 warnings en `dev` HEAD,
  * verificado antes de este cambio) que nadie había disparado porque nadie
@@ -1397,7 +1397,7 @@ export function isModuleVisible(moduleId) {
  * El usuario puede MOVER a su antojo las tarjetas de módulo del home
  * (DashboardLive), excepto la portada del agente (AgentHero), que queda fija
  * arriba. El orden elegido se persiste en el perfil bajo `modulos_orden`
- * (junto a `modulos_visibles`) — client-side, soberanía ADR-007.
+ * (junto a `modulos_visibles`) — client-side, soberanía de datos.
  *
  * El orden por DEFECTO replica el layout histórico del home. El AgentHero NO
  * aparece en esta lista a propósito: vive fijo fuera del grid draggable.

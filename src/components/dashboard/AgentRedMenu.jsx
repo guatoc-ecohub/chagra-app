@@ -59,7 +59,7 @@ const GROUP_META = Object.freeze({
   cuidar: { icon: '🐛', label: 'Cuidar y prevenir' },
   observar: { icon: '👁️', label: 'Mirar la finca' },
   restaurar: { icon: '🌳', label: 'Restaurar y conservar' },
-  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- rótulo legacy, migración i18n diferida a ADR-050 (preexistente)
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- rótulo legacy, migración i18n diferida (preexistente)
   registrar: { icon: '📝', label: 'Guardar lo que hago' },
   planear: { icon: '📅', label: 'Planear' },
   aprender: { icon: '📚', label: 'Aprender' },

@@ -53,7 +53,7 @@ export const ALERT_TYPES = {
  *
  * Helada por piso térmico: una mínima de 4°C es benigna en el cálido pero ya es
  * riesgo de helada en piso frío/páramo (cielo despejado -> pérdida radiativa
- * nocturna; paradoja documentada en El Niño seco, DR-MISSION-4). Por eso el
+ * nocturna; paradoja documentada en El Niño seco). Por eso el
  * umbral de helada sube con la altitud del piso térmico.
  */
 export const FORECAST_THRESHOLDS = {

@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: copy de UI de muestra, no producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: copy de UI de muestra, no producción */
 import React, { useCallback, useRef, useState } from 'react';
 import { ScreenShell } from '../components/common/ScreenShell';
 import { ScanEye, ShieldAlert, Sparkles, Info, Camera, Leaf, Image as ImageIcon, AlertTriangle, CheckCircle2 } from 'lucide-react';

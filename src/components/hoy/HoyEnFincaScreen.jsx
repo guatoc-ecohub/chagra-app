@@ -1,4 +1,4 @@
-/* i18n (ADR-050): deuda preexistente de textos en español Colombia hardcodeados
+/* i18n: deuda preexistente de textos en español Colombia hardcodeados
  * en esta pantalla (ninguno tocado por el planificador de paseo #25-#34) — el
  * mismo criterio que App.jsx: se desactiva a nivel de archivo para no bloquear
  * --max-warnings=0 con deuda que no es parte de este encargo. Los errores

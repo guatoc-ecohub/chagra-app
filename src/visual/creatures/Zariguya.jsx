@@ -86,7 +86,7 @@ export function Zariguya({
      lengüita, los ojos se cierran… y la cola sigue enroscándose sola porque no
      está muerta ni por asomo. Las crías se aguantan agarradas. Default false. */
   tanatosis = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + cola + crías + vibrisas) y
      deja los estados reactivos (husmea/tanatosis). */
   tier,

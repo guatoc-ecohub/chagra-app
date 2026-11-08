@@ -1,4 +1,4 @@
-/* i18n (ADR-050): este archivo es DATA (ofertas de ejemplo del marketplace) con
+/* i18n: este archivo es DATA (ofertas de ejemplo del marketplace) con
  * nombres de finca/producto/vereda en español Colombia — contenido, no UI
  * traducible. La regla chagra-i18n es soft (warn); se desactiva a nivel de
  * archivo como en otros data files. Los errores reales siguen activos. */

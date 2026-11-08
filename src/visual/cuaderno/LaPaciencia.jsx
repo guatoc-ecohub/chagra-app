@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI español intencional; ADR-050 i18n pendiente */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI español intencional; i18n pendiente */
 /*
  * LaPaciencia — lo que se mide en años y vale la espera.
  *

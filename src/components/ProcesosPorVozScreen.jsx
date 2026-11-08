@@ -15,7 +15,7 @@ import ChagraGrowLoader from './ChagraGrowLoader';
  * (siembra/proceso) y Chagra arma un CICLO PRODUCTIVO (FarmProcess) que tú
  * confirmas y queda registrado localmente.
  *
- * Cablea el subsistema FarmProcess (PR #1370, ADR-047/050) que estaba "oscuro"
+ * Cablea el subsistema FarmProcess (PR #1370) que estaba "oscuro"
  * (mergeado sin conectar). Reusa el MISMO pipeline de voz que VoiceCapture
  * (transcribe → extractEntities → enrichEntitiesWithRag) y, en vez de registrar
  * una planta, construye drafts (voiceToDraft) → tarjeta de confirmación editable

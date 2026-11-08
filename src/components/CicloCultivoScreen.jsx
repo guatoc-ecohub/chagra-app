@@ -12,8 +12,7 @@ import ChagraGrowLoader from './ChagraGrowLoader';
  * (FarmProcess) registrados, con su fenología (línea de tiempo de etapas),
  * tareas de la etapa actual y riesgos de plaga.
  *
- * Cablea el track de fenología/ciclo del subsistema FarmProcess (PR #1370,
- * ADR-047/049) que estaba "oscuro". Lee los ciclos de IndexedDB
+ * Cablea el track de fenología/ciclo del subsistema FarmProcess (PR #1370) que estaba "oscuro". Lee los ciclos de IndexedDB
  * (farmProcessCache.listFarmProcesses) — los crea "Procesos por voz" — y arma
  * la vista con piezas que estaban huérfanas: FarmProcessSummary +
  * PhenologyTimeline + cycleTaskService + climateCycleService. Todo client-side.

@@ -1,4 +1,4 @@
-/* i18n (ADR-050): este servicio incluye copy user-facing (notas y puntos
+/* i18n: este servicio incluye copy user-facing (notas y puntos
  * críticos) en español Colombia, pendiente de migrar a src/config/messages.js.
  * Misma deuda que PoscosechaScreen; se desactiva la regla soft a nivel de archivo. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

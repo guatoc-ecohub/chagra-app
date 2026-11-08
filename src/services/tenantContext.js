@@ -1,7 +1,7 @@
 /**
  * tenantContext — Identidad del "tenant" activo en la sesión PWA.
  *
- * Esto es el camino MVP del ADR-036 multi-finca: la versión completa propone
+ * Esto es el camino MVP del multi-finca: la versión completa propone
  * `did:key` Ed25519 + UCAN delegations + DB-per-finca en OPFS, pero para
  * habilitar HOY entregar la PWA a 3-5 usuarios reales compartiendo un único
  * backend farmOS sin que vean assets ajenos, alcanza con scoping cliente-side
@@ -17,7 +17,7 @@
  * lo que farmOS JSON:API entiende como `filter[uid.name]` / `filter[owner.id]`.
  * `getActiveFincaId()` identifica el grupo seleccionado y nunca reemplaza ese username.
  *
- * TODO(multifinca-backend): cuando ADR-036 Fase 1 active did:key + UCAN,
+ * TODO(multifinca-backend): cuando la Fase 1 active did:key + UCAN,
  * sustituir `tenantId = username` por `tenantId = did:key:zABC...` y delegar
  * a `farm_did_auth` (módulo Drupal a desarrollar) la verificación server-side.
  * Hasta entonces, este scoping es DEFENSE-IN-DEPTH cliente-side: defensa real

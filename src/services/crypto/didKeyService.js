@@ -1,10 +1,10 @@
 /**
  * didKeyService.js — Identidad criptográfica did:key Ed25519 por sub-usuario.
  *
- * PROPÓSITO (Fase 2, ADR-036 sub-i):
+ * PROPÓSITO (Fase 2, identidad did:key):
  *   Cada SubUser (dueño/esposa/trabajador/niña/asesor) tiene un par de llaves
  *   Ed25519. El `did:key` derivado de la llave pública es su identidad
- *   pseudónima y firmable (capa 2, ADR-020) — NO lleva PII. El `nombre` real
+ *   pseudónima y firmable (capa 2) — NO lleva PII. El `nombre` real
  *   sigue viviendo cifrado con DEK (capa 1, `operatorIdentityService`).
  *
  * DECISIÓN DE IMPLEMENTACIÓN — Web Crypto, CERO dependencias npm:

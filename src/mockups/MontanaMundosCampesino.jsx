@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción */
 /**
  * MontanaMundosCampesino.jsx — MOCKUP DEV, PASADA 4 "CAMPESINA" de
  * "La Montaña de los Mundos" (#/mockups/montana-mundos-campesino, sin gate).

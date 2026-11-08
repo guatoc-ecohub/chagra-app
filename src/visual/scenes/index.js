@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /* Los labels del REGISTRO (nombre/clave/origen) son metadata del catálogo de la
    librería, dev-facing (vitrina + descubribilidad), no copy de UI; no van a
-   src/config/messages.js (ADR-050). Mismo patrón que src/data/*. */
+   src/config/messages.js. Mismo patrón que src/data/*. */
 /*
  * Librería visual de ESCENAS BASE de Chagra (scenes). Fuente única y reutilizable
  * de los "decorados" que se repiten en el home vivo y los mockups. Antes de

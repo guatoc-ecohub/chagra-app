@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): mensajes de consola en español Colombia pendientes de
+ * i18n: mensajes de consola en español Colombia pendientes de
  * migrar a src/config/messages.js — mismo criterio que userProfileService.js.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

@@ -41,7 +41,7 @@ import React from 'react';
 
 const STATE_LABEL = {
   idle: 'Chagra IA',
-  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- string preexistente al gate i18n; migración a messages.js (ADR-050) pendiente fuera de este cambio
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- string preexistente al gate i18n; migración a messages.js pendiente fuera de este cambio
   thinking: 'Chagra IA · pensando',
   speaking: 'Chagra IA · hablando',
   listening: 'Chagra IA · escuchando',

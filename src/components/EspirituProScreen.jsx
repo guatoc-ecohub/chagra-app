@@ -2,7 +2,7 @@
    efecto refleja el resultado (síncrono o asíncrono) de consultar/montar la
    capability Pro; mismo patrón que GuildSuggestions.jsx (capa 3 enriquecida). */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- Copy mínimo de fallback en
-   español Colombia, pendiente de migrar a src/config/messages.js (ADR-050). */
+   español Colombia, pendiente de migrar a src/config/messages.js. */
 import React, { useEffect, useState } from 'react';
 import { registry } from '../core/moduleRegistry';
 

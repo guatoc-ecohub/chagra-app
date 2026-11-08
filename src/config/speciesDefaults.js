@@ -122,7 +122,7 @@ export const CATEGORY_FALLBACKS = {
   abonos_verdes_coberturas: { estrato: 'bajo', gremio: 'productor_biomasa', production: 'biomasa' },
 };
 
-// ADR-030 Bloque A Regla 1 — tracking_mode default per category.
+// tracking_mode default per category.
 // Espejo del mapping del script interno de migración v31→v32.
 // Se aplica si el catálogo SQLite no expone tracking_mode (ej. species
 // inserción libre fuera del catálogo). Mantener sincronizado con el
@@ -142,7 +142,7 @@ export const CATEGORY_TRACKING_MODE = {
 import { getSpeciesByIdSync } from '../db/catalogDB';
 
 export const resolveSpeciesDefaults = (speciesId, categoryId = null) => {
-  // 1. Fuente de verdad principal: Catálogo SQLite (ADR-030)
+  // 1. Fuente de verdad principal: Catálogo SQLite
   // El catálogo ya trae tracking_mode, estrato, gremio, etc. curados por agrónomo.
   const catalogSp = getSpeciesByIdSync(speciesId);
   if (catalogSp) {
@@ -155,7 +155,7 @@ export const resolveSpeciesDefaults = (speciesId, categoryId = null) => {
       companions: catalogSp.companions || [],
       antagonists: catalogSp.antagonists || [],
       tracking_mode: catalogSp.tracking_mode || 'individual',
-      // ADR-028: Campos lumínicos si existen (pueden venir null)
+      // Campos lumínicos si existen (pueden venir null)
       dli_optimo_mol_m2_dia: catalogSp.dli_optimo_mol_m2_dia,
       fotoperiodo_horas_optimo: catalogSp.fotoperiodo_horas_optimo,
       tolerancia_sombra_neta_pct: catalogSp.tolerancia_sombra_neta_pct

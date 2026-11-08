@@ -1,14 +1,14 @@
 /**
  * inventoryService — append-only event store + projectStock reconstruible.
  *
- * Implementa ADR-027 (event sourcing híbrido):
+ * Event sourcing híbrido:
  *   - appendEvent(event)          → persiste log inmutable + actualiza stock snapshot
  *   - getStock(itemId)            → lee del snapshot O(1)
  *   - getEventsForItem(itemId)    → bitácora completa
  *   - rebuildSnapshot()           → recomputa el stock desde scratch (post-sync)
  *   - projectStock(events)        → función pura — corazón de la reconciliación
  *
- * Reglas inviolables (ADR-019 + ADR-027):
+ * Reglas inviolables (ADR-019):
  *   1. inventory_events es append-only — NUNCA delete ni update.
  *   2. inventory_stock_snapshot es CACHE — siempre reconstruible desde events.
  *   3. Reconciliación determinista: timestamp ASC + device_id_lex_hash + sequence_number.
@@ -164,7 +164,7 @@ export function compareEventOrder(a, b) {
 }
 
 /**
- * Función PURA — corazón de ADR-027 Alt E.
+ * Función PURA — corazón del event sourcing híbrido.
  * Toma una lista de eventos (de cualquier orden, cualquier item), retorna
  * el snapshot de stock derivado.
  *

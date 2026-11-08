@@ -131,7 +131,7 @@ export function ChivitoTinta({
      cuerpo, misma cara: solo la cresta cambia. No es permanente ni una especie
      aparte — es su modo de acción. Default false = el casco de reposo. */
   punk = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'bajo' apaga el idle continuo. */
+  /* Device-tier: 'bajo' apaga el idle continuo. */
   tier,
   /* ── LÍNEA QUE RESPIRA (line-boil, Cuphead años 30) — OPT-IN. ──────────────*/
   lineBoil = false,

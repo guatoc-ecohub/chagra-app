@@ -42,7 +42,7 @@ export {
   ND_APLANE_MS,
 } from './TransicionNewDonk.jsx';
 
-// Háptica táctil (three-free, DR-3D-HAPTICA): pulsos semánticos por evento del
+// Háptica táctil (three-free): pulsos semánticos por evento del
 // framework — no-op silencioso donde no hay Vibration API (iOS/Safari, FF129+).
 export { default as useHaptics, PATRONES_HAPTICOS } from './useHaptics.js';
 

@@ -4274,7 +4274,7 @@ export function guardInventedName(responseText, { profileName = null } = {}) {
   };
 }
 
-// ── GUARD: claims de salud sobre FERMENTOS (DR-FOOD-3, SAFETY-CRITICAL) ───────
+// ── GUARD: claims de salud sobre FERMENTOS (fermentos, SAFETY-CRITICAL) ───────
 
 /**
  * Gatillos de INTENCIÓN-FERMENTO (espejo del pre-filtro del sidecar,
@@ -4374,7 +4374,7 @@ const FERMENTO_HEALTH_REDIRECT =
   'tratamiento; ningún alimento reemplaza la atención médica.';
 
 /**
- * guardFermentoHealthClaim — DR-FOOD-3, capa 2 de defensa-en-profundidad
+ * guardFermentoHealthClaim — fermentos, capa 2 de defensa-en-profundidad
  * (guard de salida del PWA). SAFETY-CRITICAL · FAIL-SAFE.
  *
  * Si la respuesta del LLM atribuye a un FERMENTO un claim de salud
@@ -4430,7 +4430,7 @@ export function guardFermentoHealthClaim(responseText, { userMessage = null } = 
   };
 }
 
-// ── GUARD: receta de fermento sin caveat de inocuidad (DR-FOOD-3 · #345) ─────
+// ── GUARD: receta de fermento sin caveat de inocuidad (fermentos · #345) ─────
 
 /**
  * Patrones de INTENCIÓN-RECETA / preparación (sobre el texto normalizado sin
@@ -4513,7 +4513,7 @@ function _isFermentoRecipe(textNorm, userNorm) {
 /**
  * Marca textual idempotente + frase líder del caveat de inocuidad. NO cita un
  * nombre propio: la autoridad es SIEMPRE institucional (INVIMA / Res. 810-2021,
- * FDA/EFSA), nunca una persona. Cubre los ejes del DR-FOOD-3: riesgo por
+ * FDA/EFSA), nunca una persona. Cubre los ejes de la investigación de inocuidad de fermentos: riesgo por
  * higiene/agua/temperatura, control de pH/acidez, contaminación, poblaciones que
  * deben abstenerse y derivación al puesto de salud.
  *
@@ -4536,7 +4536,7 @@ const FERMENTO_RECIPE_CAVEAT =
   'una opinión personal.';
 
 /**
- * guardFermentoRecipeSafety — DR-FOOD-3, capa 2b de defensa-en-profundidad
+ * guardFermentoRecipeSafety — fermentos, capa 2b de defensa-en-profundidad
  * (guard de salida del PWA). SAFETY-CRITICAL · FAIL-SAFE · #345.
  *
  * PROBLEMA (prod 2026-06-03): "cómo preparo kombucha" devolvía la receta CRUDA
@@ -4646,7 +4646,7 @@ function _isReforestacionIntent(userMessage) {
 
 /**
  * Especies marcadas `invasora_combustible=true` en el grafo (consolidado
- * DR-RESTAURACION-INCENDIOS-2026-06-02 §"Flag invasora_combustible"). Lista
+ * investigación de restauración tras incendios, "Flag invasora_combustible"). Lista
  * HARDCODEADA a propósito: este es un guard determinístico (como la denylist de
  * agroquímicos sintéticos), no depende del grounding del turno — debe advertir
  * incluso si el resolver de entidades falla. Cada entrada trae:
@@ -4727,7 +4727,7 @@ function _mentionsInvasora(textNorm, aliases) {
 
 /**
  * guardReforestacionInvasora — GUARD fail-safe de RESTAURACIÓN (consolidado
- * DR-RESTAURACION-INCENDIOS-2026-06-02). SAFETY ecológica.
+ * investigación de restauración tras incendios). SAFETY ecológica.
  *
  * Cuando la pregunta del usuario es de REFORESTACIÓN / RESTAURACIÓN ecológica y
  * la respuesta del LLM menciona una especie marcada `invasora_combustible=true`
@@ -4831,7 +4831,7 @@ export function guardReforestacionInvasora(responseText, { userMessage = null, f
 
 /**
  * Catálogo HARDCODEADO de nativas de restauración con su ROL ecológico
- * (consolidado DR-RESTAURACION-INCENDIOS-2026-06-02 §3 y §6). Lado POSITIVO del
+ * (consolidado de la investigación de restauración tras incendios, §3 y §6). Lado POSITIVO del
  * guard de restauración: mientras `guardReforestacionInvasora` ADVIERTE sobre
  * invasoras-combustibles, este SUGIERE qué sembrar.
  *
@@ -4896,7 +4896,7 @@ const ROL_FUNCIONAL_RE =
 
 /**
  * guardReforestacionNativasRol — GUARD POSITIVO de RESTAURACIÓN (consolidado
- * DR-RESTAURACION-INCENDIOS-2026-06-02). Complemento del lado negativo
+ * investigación de restauración tras incendios). Complemento del lado negativo
  * (`guardReforestacionInvasora`, que ADVIERTE sobre invasoras).
  *
  * Cuando la pregunta del usuario es de REFORESTACIÓN / RESTAURACIÓN ecológica y
@@ -10842,11 +10842,11 @@ export function stripInternalsLeak(responseText) {
 // response-safety.ts). A diferencia de `stripInternalsLeak` —que NUKEA toda la
 // respuesta a un redirect genérico cuando detecta modelo/instrucciones— este
 // guard es QUIRÚRGICO: REDACTA in-line los identificadores internos
-// (query_corpus_*, "corpus DR-034", DR-NNN, nombres de tools get_*/query_*,
+// (query_corpus_*, "corpus DR-…", DR-…, nombres de tools get_*/query_*,
 // rutas /home·modules·*.ts) y deja intacto el contenido agronómico legítimo.
 //
 // Motivación (verificación en vivo, agente prod 2026-06-21): el agente a veces
-// responde "...puedo buscar en el corpus DR-034 / usa query_corpus_dr034..."
+// responde "...puedo buscar en el corpus DR-… / usa query_corpus_dr034..."
 // (plomería interna). El usuario campesino JAMÁS debe ver eso. El sidecar lo
 // redacta pero el PWA solo lo usaba para la badge (no reescribía); aquí sí
 // modificamos `guarded.text`.
@@ -10872,7 +10872,7 @@ const TOOLING_LEAK_PATTERNS = [
     re: /\b(?:(?:te\s+)?voy\s+a\s+|puedo\s+|puede[sn]?\s+|podr[íi]a\s+|a\s+)?(?:usar|usa|utilizar|utiliza|invocar|invoca|llamar(?:\s+a)?|llama(?:\s+a)?)\s+(?:la\s+|el\s+|mi\s+|una\s+)?(?:herramienta|funci[óo]n|tool|comando)\s+`?(?:query_corpus[a-z0-9_]*|get_[a-z0-9_]+|query_[a-z0-9_]+)`?(?:\s*\([^)]*\))?/gi,
     repl: 'lo busco en el catálogo',
   },
-  // 2. "puedo/puede buscar(lo)/consultar(lo) en el corpus DR-034 / en query_corpus_x"
+  // 2. "puedo/puede buscar(lo)/consultar(lo) en el corpus DR-… / en query_corpus_x"
   //    → "puedo buscarlo en el catálogo". Cubre el caso exacto de la verificación.
   {
     re: /\b(?:puedo|puede[sn]?|podr[íi]a)\s+(?:buscar(?:lo|la)?|consultar(?:lo|la)?|revisar(?:lo|la)?)\s+(?:en|con)\s+(?:el\s+|la\s+|mi\s+|nuestro\s+)?(?:corpus\s+)?(?:DR[-\s]?[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*|query_corpus[a-z0-9_]*|get_[a-z0-9_]+|query_[a-z0-9_]+)(?:\s*\([^)]*\))?/gi,
@@ -10881,7 +10881,7 @@ const TOOLING_LEAK_PATTERNS = [
   // 3. `query_corpus...` suelto (función/tool RAG que el modelo nombra al razonar),
   //    con o sin backticks, con sufijo `_dr034` y/o `(...)`.
   { re: /`?\bquery_corpus[a-z0-9_]*\b(?:\s*\([^)]*\))?`?/gi, repl: TOOLING_LEAK_REDACTION },
-  // 4. Identificadores DR/corpus internos: "corpus DR-034", "DR-034", "DR-CHAGRA-…".
+  // 4. Identificadores DR/corpus internos: "corpus DR-<código>", "DR-<código>", "DR-<código>-<código>".
   //    El prefijo "corpus" opcional se absorbe para no dejarlo huérfano.
   { re: /`?\b(?:corpus\s+)?DR[-\s][A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*\b`?/gi, repl: TOOLING_LEAK_REDACTION },
   // 5. "el corpus interno / citable / de DRs / corpus DR" como referencia a la
@@ -11989,7 +11989,7 @@ function _applyOutputGuardsCore(
   }
 
   // GUARD REDACCIÓN DE LEAK DE TOOLING: si el modelo nombra plomería interna en
-  // medio de una respuesta por lo demás útil (query_corpus_*, "corpus DR-034",
+  // medio de una respuesta por lo demás útil (query_corpus_*, "corpus DR-…",
   // get_*/query_*, rutas /home·modules·*.ts), NO nukeamos la respuesta —
   // REDACTAMOS in-line los identificadores y conservamos el contenido agronómico.
   // Va justo tras stripInternalsLeak (que sí nukea su set narrow de internos) y
@@ -12401,7 +12401,7 @@ function _applyOutputGuardsCore(
     modified = true;
     if (nameRes.reason) reasons.push(nameRes.reason);
   }
-  // Guard de claims de salud sobre fermentos (DR-FOOD-3, SAFETY): firma propia
+  // Guard de claims de salud sobre fermentos (SAFETY): firma propia
   // (necesita userMessage para el gate de intención-fermento). Corre SIEMPRE
   // (no es guard de siembra) pero solo actúa si la respuesta/pregunta tocan un
   // fermento. Fail-safe: ante un claim de salud, redirige a la frase segura.
@@ -12411,7 +12411,7 @@ function _applyOutputGuardsCore(
     modified = true;
     if (fermRes.reason) reasons.push(fermRes.reason);
   }
-  // Guard de RECETA de fermento sin caveat de inocuidad (DR-FOOD-3, SAFETY · #345):
+  // Guard de RECETA de fermento sin caveat de inocuidad (SAFETY · #345):
   // firma propia (necesita userMessage para el gate de intención-receta-fermento).
   // Corre SIEMPRE pero solo actúa si la query/respuesta es una RECETA de fermento.
   // Red determinística contra el "grounding muerto" del prefilter: ANTEPONE el
@@ -12437,7 +12437,7 @@ function _applyOutputGuardsCore(
     modified = true;
     if (mipRes.reason) reasons.push(mipRes.reason);
   }
-  // Guard de reforestación con invasora-combustible (DR-RESTAURACION-INCENDIOS,
+  // Guard de reforestación con invasora-combustible (restauración tras incendios,
   // SAFETY ecológica): firma propia (necesita userMessage para el gate de
   // intención-restauración). Corre SIEMPRE pero solo actúa si la pregunta es de
   // reforestación/restauración Y la respuesta nombra una especie invasora-
@@ -12449,7 +12449,7 @@ function _applyOutputGuardsCore(
     modified = true;
     if (reforestRes.reason) reasons.push(reforestRes.reason);
   }
-  // Guard POSITIVO de reforestación (DR-RESTAURACION-INCENDIOS): firma propia
+  // Guard POSITIVO de reforestación: firma propia
   // (necesita userMessage para el gate de intención-restauración). Complementa al
   // de invasoras: cuando la pregunta es de reforestación/restauración y la
   // respuesta no da ya nativas con rol, SUGIERE nativas agrupadas por su papel

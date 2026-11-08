@@ -59,7 +59,7 @@ export function LuciernagaTinta({
      El medidor eco completo vive en la Luciernaga entomológica; acá el
      personaje solo necesita su acento de luz. */
   linterna = 'suave',
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'bajo' apaga el idle continuo; la
+  /* Device-tier: 'bajo' apaga el idle continuo; la
      linterna queda encendida FIJA (su alma no se apaga). */
   tier,
   /* ── LÍNEA QUE RESPIRA (line-boil, Cuphead años 30) — OPT-IN. ──────────────*/

@@ -124,7 +124,7 @@ export const REGLA_INSIGNIA = Object.freeze({
  * pone primero la vigilancia de mínimas y la preparación ante helada nocturna.
  * Sin piso confirmado no se atribuye un riesgo térmico concreto.
  */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy UI es-CO, deuda ADR-050 (messages.js) pendiente igual que el resto del módulo */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy UI es-CO, deuda de i18n (messages.js) pendiente igual que el resto del módulo */
 const CHECKLIST_NINO_AGUA = Object.freeze([
   { emoji: '💧', t: 'Cosechar y guardar agua', d: 'Llene reservorios y aljibes mientras aún cae agua: en el pico seco cada caneca cuenta.' },
   { emoji: '🌾', t: 'Mulch (hojarasca o pasto seco) y sombrío', d: 'Cubra el suelo con hojarasca para conservar la humedad.' },

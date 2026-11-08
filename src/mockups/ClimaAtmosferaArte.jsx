@@ -30,8 +30,7 @@
  * responsive hasta 320px, copy en usted cordial.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con datos de
-   muestra (no UI de producto); si se productiza, el copy migra a messages.js
-   (ADR-050). */
+   muestra (no UI de producto); si se productiza, el copy migra a messages.js. */
 import { useState } from 'react';
 import '../components/clima/escenaAtmosfera.css';
 

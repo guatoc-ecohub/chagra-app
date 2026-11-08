@@ -1,10 +1,10 @@
 /**
  * llmTelemetryService.js — Telemetría privacy-safe de calls LLM (v13 2026-05-17).
  *
- * Alimenta el Eco-Oracle Dashboard (ADR-023) sección LLM + GPU. Espejo del
+ * Alimenta el Eco-Oracle Dashboard sección LLM + GPU. Espejo del
  * patrón `voiceTelemetryService.js` para coherencia operativa.
  *
- * Privacy (ADR-030 Regla 9 extendida a LLM):
+ * Privacy (misma regla de la telemetría de voz, extendida a LLM):
  * - NUNCA persiste prompt ni respuesta del modelo (solo longitudes/conteos).
  * - NO operator_id, NO coords, NO transcripciones.
  * - Aggregates solo: modelo, latencias, tokens, processor (gpu/cpu), error_kind.

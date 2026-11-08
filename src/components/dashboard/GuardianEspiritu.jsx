@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy del selector del guardián en español Colombia (tú/usted),
+ * i18n: copy del selector del guardián en español Colombia (tú/usted),
  * pendiente de migrar a src/config/messages.js — mismo criterio que
  * DashboardLive.jsx / MundosDeMiFinca.jsx.
  */

@@ -1,6 +1,6 @@
 /**
  * extensionistaService.js — Lógica del modo EXTENSIONISTA (panel supervisor
- * multi-finca). MVP de ADR-048.
+ * multi-finca). MVP del modo extensionista.
  *
  * Resuelve, para un extensionista dado, la lista de fincas que supervisa y la
  * transforma en un modelo de tablero (ordenado por urgencia + contadores
@@ -10,7 +10,7 @@
  *   - HOY: la lista de fincas delegadas sale de un MOCK estático
  *     (src/data/extensionista-fincas.json). NO es una autorización verificada;
  *     es scaffold de producto para iterar la UX del panel supervisor.
- *   - FOLLOW-UP (ADR-036 sub-i/sub-iv): la delegación real será una capability
+ *   - FOLLOW-UP: la delegación real será una capability
  *     UCAN `supervise`/`read` firmada por el dueño de cada finca y validada por
  *     el módulo Drupal `farm_did_auth`. Cuando exista, `getFincasDelegadas`
  *     consultará esas delegaciones (y el estado/última-sync vendrá de farmOS

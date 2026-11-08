@@ -19,7 +19,7 @@ import { X, Skull, AlertTriangle } from 'lucide-react';
  * Cada razón viene con lección inline para que el operador NO se vaya
  * solo con "perdí mi planta", sino con "perdí mi planta y entendí por qué".
  *
- * Curación preliminar, validar con DR-034 (ciclo de especies). Algunas
+ * Curación preliminar, validar contra el corpus de ciclos de especies. Algunas
  * razones aplican a especies específicas y deben refinarse por piso térmico.
  *
  * Props:

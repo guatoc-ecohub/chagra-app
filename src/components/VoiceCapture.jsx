@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- Copy del flujo de voz pendiente de la migración transversal ADR-050, igual que RegistroVozScreen. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- Copy del flujo de voz pendiente de la migración transversal, igual que RegistroVozScreen. */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Mic, MicOff, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';

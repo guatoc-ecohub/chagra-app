@@ -107,7 +107,7 @@ export async function getSpeciesById(id) {
 }
 
 /**
- * Versión síncrona para simplificar consumo en componentes React/Hooks (ADR-030).
+ * Versión síncrona para simplificar consumo en componentes React/Hooks.
  * Retorna null si la DB no está lista o no existe el ID.
  * App.jsx garantiza el preload; este sync es seguro en el 99% de los casos.
  */

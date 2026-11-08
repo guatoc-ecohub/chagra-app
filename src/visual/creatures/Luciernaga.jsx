@@ -47,7 +47,7 @@ function LuciernagaRig({
      (atenta, lee la noche) | 'degradado' (titila débil: el aviso del cambio
      climático) | 'pacto' (fuerte y serena). Ver LUCIERNAGA_ESTADOS_ECO. */
   eco = null,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + aleteo + antenas) y deja la
      linterna latiendo (su señal no se apaga: es su alma). */
   tier,

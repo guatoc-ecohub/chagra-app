@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- contenido español intencional; ADR-050 i18n pendiente */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- contenido español intencional; i18n pendiente */
 /*
  * cuadernoData — el contenido de muestra de EL CUADERNO VIVO.
  *

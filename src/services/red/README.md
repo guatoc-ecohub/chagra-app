@@ -34,7 +34,7 @@ El dato crudo vive en el dispositivo por default. La compartición es **opt-in d
 `redSharing` es la **única compuerta**: los servicios de grafo/reputación jamás
 leen la lista cruda, solo `filterShareable`. `redactForPeers` recorta lo que los
 pares no necesitan (identidad del comprador, referencias internas, texto libre).
-El nivel 3 es el **puente** con el grafo `DR-SOCIAL-1`
+El nivel 3 es el **puente** con el grafo social
 (`src/data/social-age-schema.json`): `Caso —SE_VUELVE→ ConocimientoComunitario`.
 
 Nada se monetiza en la capa de pares — **el mercado es la única superficie de

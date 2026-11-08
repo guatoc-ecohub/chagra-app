@@ -115,7 +115,7 @@ const MaterialCard = ({ item, onRefill, onRecount, onViewAudit }) => {
         <Plus size={16} /> Abastecer
       </button>
 
-      {/* BUG-08: puertas al event sourcing (ADR-027). "Conteo manual" abre el
+      {/* BUG-08: puertas al event sourcing. "Conteo manual" abre el
           RecountDrawer (inventario_counted) con el stock actual prellenado;
           "Bitácora" lleva a InventoryAuditTrail del ítem. Solo se renderizan
           si InventoryPage cableó los callbacks. */}

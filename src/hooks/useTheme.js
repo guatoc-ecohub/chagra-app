@@ -64,7 +64,7 @@ export const THEMES = Object.freeze([
     label: 'Bio-Punk 2',
     // "Finca Organismo" es el NOMBRE PROPIO de la escena (dispara el patrón
     // \bFinca\b del linter); las demás descs de este catálogo tampoco viven en
-    // messages.js aún (TAREA i18n ADR-050, transversal).
+    // messages.js aún (tarea de i18n, transversal).
     // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre propio de la escena
     desc: 'Oscuro, neón teal — Finca Organismo, corazón vivo.',
   }),

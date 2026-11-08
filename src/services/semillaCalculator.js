@@ -13,7 +13,7 @@
  *
  * Filosofía (inviolable, igual que encaladoCalculator.js / aguaCalculos.js):
  *   - La MATEMÁTICA es determinista y estándar. Se calcula, no se inventa.
- *   - Las cifras de campo salen del grounding (DR-SEMILLA 2026-07-04: Grupo
+ *   - Las cifras de campo salen del grounding (investigación del 2026-07-04: Grupo
  *     Semillas / Red de Semillas Libres / SwissAid / AGROSAVIA / FAO / Seed
  *     Savers Exchange). Lo que depende de cultivo/región y aún no está anclado
  *     se marca SLOT GROUNDED-PENDIENTE, con un valor de referencia documentado.

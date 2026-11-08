@@ -321,7 +321,7 @@ export function Jaguar({
      lo apaga); animated=false, tier 'bajo' y reduced-motion lo apagan entero.
      vida={false} = el bicho de antes, idéntico. */
   vida = true,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + acecho de hombros + cola) y
      deja los estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
   tier,

@@ -2,11 +2,11 @@
  * redService.js — cliente PWA de la RED de trueque campesino↔campesino (Chagra #7, Fase 1).
  *
  * Andamiaje del servicio cliente (SIN pantallas todavía): envuelve los 4 endpoints
- * del sidecar de la RED (Fase 0, ADR-051) para que las pantallas de Fase 1 los
+ * del sidecar de la RED (Fase 0) para que las pantallas de Fase 1 los
  * consuman sin repetir plumbing. Reusa `postJson` de sidecarClient (mismo auth,
  * tier header, timeout y degrade-to-null → offline-friendly).
  *
- * Contrato (ADR-051): el trueque es GRATIS y de vecindario; la geo es DIFUSA
+ * Contrato: el trueque es GRATIS y de vecindario; la geo es DIFUSA
  * (centroide de vereda, NUNCA GPS de la finca); las necesidades predichas se
  * etiquetan como sugerencia; la reputación se registra pero (MVP) no modera.
  *

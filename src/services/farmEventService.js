@@ -183,7 +183,7 @@ export const createFarmProcess = async (process, { awaitSync = false, sourceLogI
     const procStore = tx.objectStore(STORES.FARM_PROCESSES);
     const evStore = tx.objectStore(STORES.FARM_PROCESS_EVENTS);
 
-    // ADR-036 multi-finca: el ciclo queda marcado con la finca activa para que
+    // multi-finca: el ciclo queda marcado con la finca activa para que
     // listFarmProcesses no lo muestre en otra finca (STEV-46).
     const fincaId = process._finca_id || getActiveFincaId();
     procStore.put(fincaId ? { ...process, _finca_id: fincaId } : process);

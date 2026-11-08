@@ -25,7 +25,7 @@ const PSA_MODALIDADES = Array.isArray(PSA_DATA?.modalidades) ? PSA_DATA.modalida
  *      usa el agente). NO duplica el texto: lo lee de los datos.
  *   2. ELEGIBILIDAD PSA: reusa `psaElegibilidad.evaluarPSA` + `psa.json`.
  *   3. ESTIMACION DE CO2 — anti-alucinacion ESTRICTA: muestra el RANGO de
- *      referencia con FUENTE (carbono-captura.json, DR-RESTAURACION-1) marcado
+ *      referencia con FUENTE (carbono-captura.json) marcado
  *      [VALIDAR], y el METODO (que se necesitaria medir). NUNCA un numero
  *      exacto calculado para el predio: sin medicion de campo no hay cifra.
  *

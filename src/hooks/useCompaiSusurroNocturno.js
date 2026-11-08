@@ -6,7 +6,7 @@
  *   - `esDeNoche` (compai/nucleo/susurroNocturno) contra la hora local real.
  *   - `lunarPhase` (utils/skyEphemeris) — astronomía real, cero librería
  *     externa (algoritmo estándar del ciclo sinódico), YA existe en el repo
- *     con su propio candado (ADR-033: no recomienda labores por fase lunar).
+ *     con su propio candado (no recomienda labores por fase lunar).
  *   - `reaccionAlClima` (compai/nucleo/climaVivo, #111) — MISMO dato de
  *     clima de mañana que usa la reacción de clima, para no inventar un
  *     segundo pronóstico ni duplicar el mensaje si ya hay uno urgente.

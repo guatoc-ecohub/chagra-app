@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción */
 // Mockup dev — "EL TELAR DE LA FINCA" (El Espíritu de tu Finca).
 //
 // Exploración visual libre del juego final de Chagra. La finca es un textil

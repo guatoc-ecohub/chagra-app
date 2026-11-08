@@ -8,7 +8,7 @@
  *   - Los FACTORES exactos que dependen de la zona/suelo/producto (densidad
  *     aparente, profundidad, PRNT de la cal, saturación objetivo) NO se
  *     inventan: son SLOTS GROUNDED-PENDIENTE con un valor por defecto documentado
- *     y una fuente pendiente de anclar por región (DR-SUELOS-ENCALADO).
+ *     y una fuente pendiente de anclar por región.
  *   - Nunca se recomienda encalar si la saturación de Al no lo justifica.
  *
  * NO reemplaza un análisis de laboratorio ni la recomendación de un ingeniero
@@ -17,7 +17,7 @@
 
 /* ─────────────────────────── SLOTS GROUNDED-PENDIENTE ───────────────────────
  * Estos factores tienen valor por defecto estándar de literatura, PERO el valor
- * exacto por REGIÓN/PRODUCTO debe anclarse a fuente (DR-SUELOS-ENCALADO). No se
+ * exacto por REGIÓN/PRODUCTO debe anclarse a fuente. No se
  * "inventan" cifras finas; se usa el estándar y se marca la incertidumbre.
  * ────────────────────────────────────────────────────────────────────────── */
 

@@ -26,7 +26,7 @@ const ROLE_LABELS = {
  * una ESTIMACIÓN estacional (NO alerta oficial) útil para informes UNGRD/CAR.
  *
  * CERO fabricación: el PDF solo imprime especies del diagnóstico (catálogo
- * DR-RESTAURACION-1). Si no hay datos para el piso, lo dice y remite al vivero /
+ * de restauración). Si no hay datos para el piso, lo dice y remite al vivero /
  * CAR. El cómputo (jsPDF) se hace por import dinámico para no inflar el bundle.
  */
 export default function RestauracionPlanPDFButton({ className = '' }) {

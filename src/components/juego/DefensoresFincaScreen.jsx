@@ -1,7 +1,7 @@
 /*
  * i18n: este minijuego se sirve solo en español Colombia (tú/usted). El nombre
  * del juego "Defensores de la Finca" y los textos para niños conviven en el
- * componente; la migración a messages.js (ADR-050) está fuera de alcance de
+ * componente; la migración a messages.js está fuera de alcance de
  * esta PR. La regla chagra-i18n es soft (warn), aquí se desactiva por archivo.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

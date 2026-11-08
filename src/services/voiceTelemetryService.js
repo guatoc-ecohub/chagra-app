@@ -1,10 +1,10 @@
 /**
  * voiceTelemetryService.js — Telemetría de voz via IndexedDB.
  *
- * ADR-030 Regla 8: NO localStorage para telemetría voz (bloqueante sincrónico,
+ * NO localStorage para telemetría voz (bloqueante sincrónico,
  * sin SW access, cuotas mínimas). Usa IndexedDB con Background Sync API.
  *
- * Privacy (ADR-030 Regla 9):
+ * Privacy:
  * - Eventos anónimos (sin user_id, sin coords precisas)
  * - NO audio en eventos
  * - NO transcripciones literales

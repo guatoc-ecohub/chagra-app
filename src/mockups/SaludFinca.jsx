@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy de campo en español Colombia (usted). Es un MOCKUP de
+ * i18n: copy de campo en español Colombia (usted). Es un MOCKUP de
  * galería con datos de muestra, sin gate ni auth; TODO el copy es de muestra y
  * migraría en bloque a src/config/messages.js — mismo criterio que los otros
  * mockups de la galería. Por eso se apaga aquí la regla i18n (soft `warn`):

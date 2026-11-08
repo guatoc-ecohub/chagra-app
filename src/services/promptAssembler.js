@@ -135,7 +135,7 @@ export const BLOCK_ORDER = [
   'queryAnalysis', // análisis NN2/NN3 de ESTA query (protegido)
   'suggested', // GUARDA CASO B baja confianza (protegido)
   'priceDecline', // GUARDA precio sin dato (protegido)
-  'fermento', // GUARDA DR-FOOD-3 (protegido, máxima recency)
+  'fermento', // GUARDA de fermentos (protegido, máxima recency)
   'biopreparado', // GROUNDING biopreparados módulos opcionales #248 (protegido, máxima recency — anti-negación)
   'pisoTermico', // GUARDA desajuste de piso térmico módulos opcionales #288 (protegido, máxima recency — cross_thermal, SUPRESIÓN-Y-REEMPLAZO)
   'confusionEspecie', // GUARDA confusión de especie/familia botánica módulos opcionales #292 (protegido, máxima recency — confusion_especie, SUPRESIÓN-Y-REEMPLAZO)

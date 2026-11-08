@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+/* i18n: etiquetas user-facing en español Colombia pendientes de
  * migrar a src/config/messages.js. Misma deuda preexistente que SoilDiagnosticScreen
  * y App.jsx; se desactiva la regla soft a nivel de archivo. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

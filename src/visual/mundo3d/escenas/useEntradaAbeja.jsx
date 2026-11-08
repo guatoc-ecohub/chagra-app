@@ -164,7 +164,7 @@ export function useEntradaCompai(foco, {
     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
     if (sombraRef.current) sombraRef.current.visible = visible;
   };
-  // Háptica de "posarse" (DR-3D-HAPTICA): UNA sola vez por foco, al cruzar el
+  // Háptica de "posarse": UNA sola vez por foco, al cruzar el
   // umbral de llegada. El foco solo cambia por tap del usuario (hotspot) o al
   // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
   const haptics = useHaptics({ reducedMotion });
@@ -348,7 +348,7 @@ export function AbejaEscena({
   // mundo, para que de NOCHE se abrigue con la ruana andina (y JAMÁS se vea
   // sudando/sobrecalentada). El clima real llega por `estadoFinca`.
   vestuario = true,
-  // Device-tier (DR-3D-PERF-GAMABAJA): gradúa el rubber-hose del cuerpo — en
+  // Device-tier: gradúa el rubber-hose del cuerpo — en
   // 'bajo' Angelita apaga el idle continuo (boil + follow-through) y conserva
   // el aleteo + los estados reactivos. La escena lo hereda del host <Mundo>.
   tier = 'alto',

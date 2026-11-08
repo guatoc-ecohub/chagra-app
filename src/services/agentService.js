@@ -146,7 +146,7 @@ export function resolveUserRegion() {
 }
 
 /**
- * DR-LANG-1 (2026-05-28): aplica el filtro post-process anti-voseo
+ * Desde 2026-05-28: aplica el filtro post-process anti-voseo
  * argentino sobre la salida del LLM. Se usa como última etapa antes de
  * exponer el texto al ChatScreen y al TTS, garantizando que ningún
  * marcador voseo argentino llegue al usuario campesino colombiano
@@ -606,7 +606,7 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
  * @param {object | null} snapshot — payload de climaService.getCachedClimaSnapshot
  * @param {object} [opts]
  * @param {string|null} [opts.region] - región natural de la finca (ensoContext).
- *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO (DR-MISSION-2/4): qué
+ *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO: qué
  *   implica la fase actual para esa región (p. ej. heladas paradójicas en el
  *   altiplano bajo El Niño seco). Si no, solo se inyecta el bloque base.
  * @param {string|null} [opts.piso] - piso de la finca (`pisoTermicoFromAltitud`).
@@ -660,7 +660,7 @@ export function buildClimaContext(snapshot, opts = {}) {
     lines.push(`Cielo de hoy en la finca: ${opts.sky.label}${pct} — Open-Meteo.${honesty}`);
   }
 
-  // Lectura regional ENSO (DR-MISSION-2/4) si conocemos la región de la finca.
+  // Lectura regional ENSO si conocemos la región de la finca.
   // Complementa la fase cruda con la implicación accionable por región.
   const ensoRegional = buildEnsoAgentLines({
     phase: enso.phase || 'neutral',

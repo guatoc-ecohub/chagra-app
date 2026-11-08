@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): strings en español Colombia hardcodeadas, pendientes de
+ * i18n: strings en español Colombia hardcodeadas, pendientes de
  * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
  * desactiva a nivel de archivo para no bloquear el pre-commit con deuda
  * preexistente (mismo criterio que App.jsx/DashboardLive.jsx). Los errores

@@ -15,7 +15,7 @@
  * `evaluarRiesgoIncendio()`), así los tests unit no tocan red ni DOM.
  *
  * CERO fabricación: el PDF SOLO imprime especies que vienen del diagnóstico
- * (catálogo DR-RESTAURACION-1 por piso térmico). Si no hay datos para el piso,
+ * (catálogo de restauración por piso térmico). Si no hay datos para el piso,
  * lo dice explícitamente y remite al vivero local / CAR. Las fuentes se citan
  * en el pie. El bloque de riesgo de incendio se marca como ESTIMACIÓN, no
  * alerta oficial.

@@ -4,7 +4,7 @@
  */
 
 /**
- * @typedef {Object} ChagraInventoryEvent  // ADR-027 canonical events
+ * @typedef {Object} ChagraInventoryEvent  // canonical events
  * @property {string} log_id
  * @property {'received' | 'consumed' | 'transformed' | 'counted' | 'lost' | 'transferred' | 'adjusted' | 'reserved'} event_type
  * @property {string} timestamp - ISO 8601

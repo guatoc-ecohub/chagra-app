@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy campesino en español Colombia, pendiente de migrar a
+ * i18n: copy campesino en español Colombia, pendiente de migrar a
  * src/config/messages.js — mismo criterio que DashboardLive.jsx.
  */
 import { useMemo, useState } from 'react';

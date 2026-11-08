@@ -1,7 +1,7 @@
 /**
  * voseoFilter.js — Filtro post-process determinístico anti-voseo argentino.
  *
- * DR-LANG-1 (2026-05-28). Aplica un sweep estructural sobre la salida del
+ * Desde 2026-05-28 aplica un sweep estructural sobre la salida del
  * LLM antes de exponerla al usuario, sustituyendo los nueve marcadores
  * morfológicos del voseo rioplatense por su equivalente en tú/usted
  * colombiano según el modo de formalidad activo.

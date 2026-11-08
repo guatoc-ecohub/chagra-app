@@ -89,7 +89,7 @@ export function decidirTier() {
 export const permite3D = (tier) => tier === 'alto' || tier === 'medio';
 
 /*
- * PERFIL DE RENDER por tier (DR-3D-PERF-GAMABAJA §2): el presupuesto que las
+ * PERFIL DE RENDER por tier : el presupuesto que las
  * escenas 3D consultan para degradarse SIN duplicar condicionales por archivo.
  *
  *   'alto'  → el look actual INTACTO (sombras reales, DPR 1.8, detalle pleno).

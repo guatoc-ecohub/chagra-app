@@ -7,7 +7,7 @@
  * la math del movimiento vive en `ParticulasAmbientales.jsx` (mismo contrato que
  * faunaFuncional: el QUÉ en data, el CÓMO en el componente).
  *
- * FRUGALIDAD (DR-3D-PERF-GAMABAJA): cada nube es UN `THREE.Points` (1 draw call,
+ * FRUGALIDAD: cada nube es UN `THREE.Points` (1 draw call,
  * buffers mutados en sitio, cero GC por frame); las mariposas son 3 InstancedMesh
  * (alas izq/der + cuerpo, ≤4 instancias). Los conteos por tier son el presupuesto
  * DURO: `bajo` recibe una fracción y las mariposas ni montan (coherente con

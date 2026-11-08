@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- deuda i18n preexistente
-   en este archivo (ADR-050, pendiente de migrar a config/messages.js), NO
+   en este archivo (pendiente de migrar a config/messages.js), NO
    introducida por el cambio de roles/permisos de este commit. Disable de
    archivo completo exigido por lefthook eslint --max-warnings=0 al tocar
    cualquier línea de un archivo con warnings ya existentes. */
@@ -255,7 +255,7 @@ const formatNotes = (formData) => {
   return parts.length > 0 ? { value: parts.join(' | ') } : null;
 };
 
-// ADR-030: acepta un assetUUID (string) o un array (para individual qty>1
+// acepta un assetUUID (string) o un array (para individual qty>1
 // donde N assets comparten un único log--seeding).
 const buildSeedingPayload = (seedingId, assetUUIDOrArray, formData) => {
   const qty = parseInt(formData.quantity, 10) || 1;
@@ -298,7 +298,7 @@ const INITIAL_FORM_STATE = {
   geometry: null,   // Fase 17: GeoJSON dibujado o geolocalizado
   landType: 'field', // Fase 17.2: sub_type para asset--land
   speciesId: null,   // Fase 18: id para motor de gremios
-  // ADR-030 Bloque A: tracking_mode resuelto desde catálogo per species.
+  // tracking_mode resuelto desde catálogo per species.
   // El operario puede override per-creación con link sutil.
   // 'individual' = N assets qty=1 (frutales valiosos, trazabilidad por planta).
   // 'aggregate' = 1 asset qty=N (hortalizas en cama corrida, cereales).
@@ -714,7 +714,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     const notesValue = formatNotes(formData);
     const qty = parseInt(formData.quantity, 10) || 1;
 
-    // ADR-030 Bloque A Regla 1: detectar individual+qty>1 → N assets UUID
+    // detectar individual+qty>1 → N assets UUID
     // únicos compartiendo 1 log--seeding. Si aggregate o qty=1, comportamiento
     // legacy (1 asset, qty en log).
     const isIndividualMulti = activeTab === 'plant' && formData.trackingMode === 'individual' && qty > 1;
@@ -1358,7 +1358,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             ...prev,
             estrato: defaults.estrato || prev.estrato,
             gremio: defaults.gremio || prev.gremio,
-            // ADR-030: hereda tracking_mode del catálogo. Operario puede
+            // hereda tracking_mode del catálogo. Operario puede
             // overridear con link sutil más abajo en el form.
             trackingMode: defaults.tracking_mode || prev.trackingMode,
           }));
@@ -1552,7 +1552,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         );
       })()}
 
-      {/* Cantidad de plantas (ADR-030: visible/editable según tracking_mode).
+      {/* Cantidad de plantas (visible/editable según tracking_mode).
           - aggregate: input grande prominente (cama corrida, qty=N en 1 asset)
           - individual: input pequeño (default 1, casi siempre será 1 mata) */}
       {formData.trackingMode === 'aggregate' ? (

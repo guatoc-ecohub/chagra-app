@@ -194,7 +194,7 @@ export default function AssetTimeline({ assetId }) {
   // speciesSlug, plantId, landId } (mismo contrato que ObservationScreen).
   const [caseBridgePayload, setCaseBridgePayload] = useState(null);
 
-  // Generador dev-only de 1000 logs para stress test (ADR-030 Regla 4)
+  // Generador dev-only de 1000 logs para stress test
   useEffect(() => {
     if (import.meta.env.DEV && assetId && logs.length > 0 && logs.length < 100) {
       console.info('[Dev] Simulando 1000 logs para stress test de virtualización...');

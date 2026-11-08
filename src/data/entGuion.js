@@ -37,7 +37,7 @@
  * de amenaza y protección legal de la especie), 'caza' (oso andino y
  * borugo — coexistencia, no violencia).
  *
- * i18n (ADR-050): solo es-CO (mismo criterio que metalSlugCampoData.js).
+ * i18n: solo es-CO (mismo criterio que metalSlugCampoData.js).
  * SIN voseo argentino. SIN nombres propios de stakeholders. SIN secretos.
  */
 

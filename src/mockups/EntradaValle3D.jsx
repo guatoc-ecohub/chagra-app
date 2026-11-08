@@ -1,9 +1,9 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con copy de muestra (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con copy de muestra */
 /*
  * MOCKUP "El valle de mi finca" — ruta #/mockups/entrada-3d.
  *
- * LA ENTRADA DEFINITIVA, dirección #2 (sin límites) del DR
- * DR-ENTRADA-DEFINITIVA-2026-07-10.md: un DIORAMA 3D ISOMÉTRICO del valle real
+ * LA ENTRADA DEFINITIVA, dirección #2 (sin límites) del diseño definitivo
+ * (2026-07-10): un DIORAMA 3D ISOMÉTRICO del valle real
  * de la finca, navegable, donde los 4 sí-o-sí de Chagra viven en el ESPACIO —
  * no un menú, sino un lugar. "Bruno Simon, pero es su finca y sí sirve":
  * spatial UI grounded con PROPÓSITO, no wow vacío.
@@ -27,7 +27,7 @@
  * Offline-first: cero GLTF/HDR/fuentes remotas, todo procedural.
  *
  * Copy de muestra en español Colombia (usted); si se productiza, migra a
- * messages.js (ADR-050).
+ * messages.js.
  */
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '../visual/effects/effects.css';
@@ -100,7 +100,7 @@ const ENTRADA_NEWDONK = true;
 
 /*
  * DEVICE-TIERING REAL — UNA sola fuente de verdad: `decidirTier()` del
- * framework (DR-3D-PERF-GAMABAJA FIX 1.1: antes había aquí un `decidirRender`
+ * framework (corregido: antes había aquí un `decidirRender`
  * binario que duplicaba la lógica y difería del tier — un equipo de gama media
  * recibía la entrada 3D COMPLETA). Ahora el mismo tier decide 3D-vs-2D Y el
  * perfil de render frugal de la entrada y de los mundos:

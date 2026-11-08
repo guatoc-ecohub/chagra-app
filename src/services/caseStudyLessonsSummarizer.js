@@ -1,5 +1,5 @@
 /**
- * caseStudyLessonsSummarizer.js — LLM resume al cerrar caso (DR-044 sub-viii F5)
+ * caseStudyLessonsSummarizer.js — LLM resume al cerrar caso
  * ================================================================
  * Toma el state_history + treatments_applied + outcome de un caso y
  * propone un borrador de `lessons_learned` (3-5 frases, español Colombia).

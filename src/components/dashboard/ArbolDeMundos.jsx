@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy de navegación del home en español Colombia, pendiente
+ * i18n: copy de navegación del home en español Colombia, pendiente
  * de migrar a src/config/messages.js — mismo criterio que MundosDeMiFinca.
  */
  

@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): agentCapabilities.js es el MANIFIESTO de capacidades — labels,
+ * i18n: agentCapabilities.js es el MANIFIESTO de capacidades — labels,
  * descripciones, placeholders y stubMessages user-facing en español Colombia,
  * pendientes de migrar a src/config/messages.js. La regla chagra-i18n es soft
  * (warn); se desactiva a nivel de archivo para no bloquear el pre-commit con

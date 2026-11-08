@@ -27,7 +27,7 @@ const extractAssetId = (log) => {
   return rel?.id || null;
 };
 
-// ADR-036 MVP multi-finca: filtra una lista de logs ya leídos de IDB para
+// MVP multi-finca: filtra una lista de logs ya leídos de IDB para
 // dejar pasar solo los de la persona y finca activa. Recursos sin finca
 // etiquetada siguen visibles en modo legado o con una finca; con varias
 // fincas se ocultan cuando no se puede inferir una asignación segura.
@@ -100,7 +100,7 @@ const normalizeRemoteLog = (remote, fallbackType, included = null, fincaIds = []
       quantity: resolvedQuantity,
     },
     relationships: remote.relationships || {},
-    // ADR-036 MVP: logs descargados pertenecen al tenant activo en el
+    // logs descargados pertenecen al tenant activo en el
     // momento del pull. Si no hay tenant activo (dev sin login), queda
     // null y se trata como legacy pre-multifinca.
     _tenant_id: getActiveTenantId() || null,
@@ -116,7 +116,7 @@ const normalizeRemoteLog = (remote, fallbackType, included = null, fincaIds = []
 export const logCache = {
   /**
    * Obtener un log individual por id.
-   * ADR-036 MVP: si el log pertenece a OTRO tenant, devolvemos null (oculto).
+   * si el log pertenece a OTRO tenant, devolvemos null (oculto).
    * Legacy (sin `_tenant_id`) sigue visible para el tenant activo — mismo
    * criterio que assetCache.
    */
@@ -147,7 +147,7 @@ export const logCache = {
 
   /**
    * Insertar/actualizar un log individual (usado por mutaciones locales con _pending).
-   * ADR-036 MVP: stamp `_tenant_id` con el tenant activo, salvo que el log ya
+   * stamp `_tenant_id` con el tenant activo, salvo que el log ya
    * traiga uno (preserva la propiedad cuando se vuelve a normalizar desde el
    * pull remoto o cuando otro flujo lo marca explícitamente).
    */
@@ -170,7 +170,7 @@ export const logCache = {
    * Fallback a índice asset_id + sort JS si el compuesto no existe
    * (e.g. durante migración parcial).
    *
-   * ADR-036 MVP: filtra por tenant activo post-query (read-path scoping).
+   * filtra por tenant activo post-query (read-path scoping).
    */
   async getLogsByAsset(assetId) {
     const db = await openDB();
@@ -199,7 +199,7 @@ export const logCache = {
   },
 
   /**
-   * Obtener todos los logs del store. ADR-036: scope al tenant activo.
+   * Obtener todos los logs del store. Con scope al tenant activo.
    */
   async getAll() {
     const db = await openDB();
@@ -212,7 +212,7 @@ export const logCache = {
   },
 
   /**
-   * Obtener todos los logs de un tipo (p.ej. log--harvest). ADR-036: scope.
+   * Obtener todos los logs de un tipo (p.ej. log--harvest). Con scope al tenant activo.
    */
   async getByType(type) {
     const db = await openDB();
@@ -264,7 +264,7 @@ export const logCache = {
     }
 
     // GC: purgar logs confirmados de este type que el servidor ya no devuelve.
-    // ADR-036 MVP multi-finca: el GC opera solo dentro del tenant activo —
+    // MVP multi-finca: el GC opera solo dentro del tenant activo —
     // si user A sincroniza, NO debe purgar logs de user B en el mismo device.
     // Logs legacy (sin _tenant_id) se barren con el activo, mismo criterio
     // que filterLogsByActiveTenant. El universo `remoteLogs` está scoped por
@@ -298,7 +298,7 @@ export const logCache = {
   /**
    * Obtener logs sincronizados de las últimas 24h, ordenados por timestamp desc.
    * Para WorkerHistory "Recientes" (bitácora Parte C).
-   * ADR-036 MVP: scope al tenant activo en read-path.
+   * scope al tenant activo en read-path.
    */
   async getRecent24h() {
     const db = await openDB();

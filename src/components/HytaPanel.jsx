@@ -12,7 +12,7 @@ import { getGpuSnapshot } from '../services/gpuTelemetryService';
  *
  * Este componente reemplaza la funcionalidad de LLMTelemetryScreen removida
  * en commit 9070dbd, pero con alcance limitado a solo info de GPU (no telemetría
- * detallada de LLM para respetar ADR-020 anti-leak).
+ * detallada de LLM para respetar la política anti-leak).
  *
  * Privacy: solo muestra modelo y bytes VRAM. NO prompts, NO respuestas,
  * NO métricas detalladas de uso.

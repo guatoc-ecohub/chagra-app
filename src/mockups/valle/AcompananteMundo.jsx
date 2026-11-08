@@ -24,7 +24,7 @@
  *
  * Device-tier: cero costo para gama baja — puro DOM ligero, sin three, sin
  * assets; la voz es un plus que nunca bloquea. Copy en español de Colombia
- * ("usted"); si se productiza, migra a messages.js (ADR-050) y la voz real
+ * ("usted"); si se productiza, migra a messages.js y la voz real
  * es Kokoro vía ttsService.
  */
 /* eslint-disable react-refresh/only-export-components -- capa acompañante:

@@ -13,7 +13,7 @@
  * @module ensoHeladaRegla
  */
 /**
- * Regla dura del proyecto (IDEAM/Cenicafé, DR-MISSION-4; la misma que pintan
+ * Regla dura del proyecto (IDEAM/Cenicafé; la misma que pintan
  * `climaPorPiso.js` y `lecturaClimaAterrizaje.js`): en piso frío o páramo El
  * Niño trae MÁS heladas, no menos. Una sola frase para el clima, el prompt del
  * agente y la guarda de salida.

@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (usos de cocina, pasos de siembra, conservación de la huerta de aromáticas),
  * pendiente de migrar a src/config/messages.js — mismo criterio que
  * aguaFinca.js / sanidadData.js.

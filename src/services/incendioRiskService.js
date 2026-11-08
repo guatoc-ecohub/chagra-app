@@ -21,7 +21,7 @@
  *      climatológico medio.
  *   3. PISO TÉRMICO / REGIÓN del perfil (ensoContext.REGION_IMPACTS ya
  *      documenta que Orinoquía/Amazonía/altiplano seco son fire-prone bajo
- *      El Niño, con cita DR-MISSION-4).
+ *      El Niño, con cita IDEAM/Cenicafé).
  *
  * El nivel resultante ('alto'|'medio'|'bajo') se marca SIEMPRE como
  * `es_estimacion: true` y trae `disclaimer` explícito: el campesino debe

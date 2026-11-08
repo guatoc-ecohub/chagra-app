@@ -38,7 +38,7 @@ const STATE_RING = {
 
 const STATE_LABEL = {
   idle: 'Chagra IA',
-  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- label preexistente marcado al re-tocar el archivo; migracion a messages.js (ADR-050) fuera del alcance de este fix
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- label preexistente marcado al re-tocar el archivo; migracion a messages.js fuera del alcance de este fix
   thinking: 'Chagra IA · pensando',
   speaking: 'Chagra IA · hablando',
   listening: 'Chagra IA · escuchando',

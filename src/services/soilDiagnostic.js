@@ -1,7 +1,7 @@
 /**
- * soilDiagnostic — diagnóstico de suelo sin laboratorio (DR-SUELOS-1).
+ * soilDiagnostic — diagnóstico de suelo sin laboratorio.
  *
- * Fuente: DR-SUELOS-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
+ * Fuente: investigación consolidada de suelos (3/3 DeepSeek+Gemini+Meta, 2026-06-11).
  * Datos: src/data/soil-diagnostics.json
  *
  * Árbol de decisión: escuchar → visual → bio-indicadores → textura →

@@ -177,7 +177,7 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
   const mundo = game.mundo;
 
   return (
-    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO; migración i18n (ADR-050) fuera de alcance.
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- nombre del juego, ES-CO; migración i18n fuera de alcance.
     <ScreenShell title="Mi Finca Viva" icon={Sprout} onBack={onBack} onHome={onHome}>
       <div
         data-testid="mi-finca-viva-screen"

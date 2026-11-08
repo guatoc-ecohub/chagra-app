@@ -98,7 +98,7 @@ export function MaizCompai({
   /* ── VIBRA (su reacción-firma): el penacho tiembla de emoción — al toque de
      hotspot, a la celebración. OPT-IN, la escena lo enciende un instante. */
   vibra = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren la brisa plena;
+  /* Device-tier: 'alto'|'medio' corren la brisa plena;
      'bajo' apaga el idle continuo (brisa + boil) y deja lo reactivo (vibra). */
   tier,
   /* ── LÍNEA QUE RESPIRA (line-boil, Cuphead años 30) — OPT-IN. */

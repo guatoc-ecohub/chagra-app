@@ -404,7 +404,7 @@ const useAssetStore = create((set, get) => ({
     }
   },
 
-  // ADR-030 Bloque A: bulk creation atómica para `tracking_mode: individual`
+  // bulk creation atómica para `tracking_mode: individual`
   // con qty>1 (siembra batch de N plantas individuales con UUIDs únicos).
   // Garantiza atomicidad — si falla cualquier parte, ningún asset queda
   // medio-creado.
@@ -1186,7 +1186,7 @@ const useAssetStore = create((set, get) => ({
   },
 }));
 
-// ADR-036 MVP multi-finca: al cambiar el tenantId activo (re-login con otro
+// MVP multi-finca: al cambiar el tenantId activo (re-login con otro
 // usuario sobre el mismo device), limpiar el state in-memory para no exponer
 // assets del tenant anterior. La IDB no se borra — sigue scoped por
 // `_tenant_id` y un re-hydrate la repuebla con los del nuevo tenant.
@@ -1280,7 +1280,7 @@ if (typeof window !== 'undefined') {
   });
 }
 
-// ADR-030 Regla 4: Stress test de virtualización (056.1).
+// Stress test de virtualización (056.1).
 // Expuesto globalmente solo en modo DEV para inyectar datos masivos desde consola.
 if (/** @type {any} */ (import.meta).env.DEV) {
   /** @type {any} */ (window)._mockGenerateAssets = async (count = 1000) => {

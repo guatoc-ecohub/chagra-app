@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): compaiExplicaPantallas.js contiene copy user-facing en
+ * i18n: compaiExplicaPantallas.js contiene copy user-facing en
  * español Colombia (explicaciones de pantalla) pendiente de migrar a
  * src/config/messages.js. Misma regla que CompaiOverlay.jsx.
  */

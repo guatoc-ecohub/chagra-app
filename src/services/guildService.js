@@ -7,7 +7,7 @@
  *      funcionales (ciclo + sombra + porte).
  *   3. Cognitiva: inferencia via Ollama/Gemma 4 (delegada al caller).
  *
- * Filtros funcionales en Capa 2 (ADR-034 — feedback usuario externo 2026-05-06):
+ * Filtros funcionales en Capa 2 (feedback de usuario externo, 2026-05-06):
  *   - Compatibilidad de ciclo: hortalizas anuales (<12 meses) no aceptan
  *     companions perennes (>=24 meses o cycleMonths null).
  *   - Compatibilidad de sombra: especies sun-loving (estrato bajo + ciclo
@@ -166,7 +166,7 @@ export const getSuggestedCompanions = (speciesId) => {
     const candidateAntagonists = new Set(candidateDefaults.antagonists || []);
     if (candidateAntagonists.has(speciesId)) continue;
 
-    // Filtro funcional ANTES de scoring estructural (ADR-034)
+    // Filtro funcional ANTES de scoring estructural
     const incompatibilityReason = checkFunctionalCompatibility(defaults, candidateId, candidateDefaults);
     if (incompatibilityReason) continue;
 

@@ -16,7 +16,7 @@ const baseStage = (c) => String(c || '').replace(/_confirmed$/, '');
 /**
  * CicloObservacion — anotar una observación de campo en un ciclo (FarmProcess),
  * por texto o por voz. Cablea el track de observaciones del subsistema
- * FarmProcess (PR #1370, ADR-050) que estaba "oscuro": observationService
+ * FarmProcess (PR #1370) que estaba "oscuro": observationService
  * (texto) + voiceObservationService (voz) → recordFarmEvent (evento del ciclo
  * en IndexedDB). ADITIVO: NO reemplaza el ObservationScreen general (que sigue
  * registrando contra FarmOS); esto ata la nota al ciclo.
