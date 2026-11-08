@@ -97,11 +97,13 @@ export default function Typewriter({
   );
   const [terminado, setTerminado] = useState(sinAnimar);
   const onTerminadoRef = useRef(onTerminado);
+  // eslint-disable-next-line react-hooks/refs -- patrón «ref al último callback»: el efecto lee siempre el onTerminado vigente sin re-suscribirse; moverlo a un efecto cambiaría el orden de ejecución
   onTerminadoRef.current = onTerminado;
 
   useEffect(() => {
     const grafemas = segmentarGrafemas(textoStr);
     if (sinAnimar || grafemas.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
       setVisibles(grafemas.length);
       setTerminado(true);
       if (grafemas.length > 0 && typeof onTerminadoRef.current === 'function') {

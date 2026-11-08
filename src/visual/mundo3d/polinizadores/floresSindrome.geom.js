@@ -229,7 +229,7 @@ export function geomNocturna({ q = 1 } = {}, seed = 2) {
  *
  * @param {{q?:number, hembra?:boolean}} opt
  */
-export function geomCampana({ q = 1, hembra = false } = {}, seed = 3) {
+export function geomCampana({ q = 1, hembra = false } = {}, _seed = 3) {
   const S = SINDROMES.cartel_amarillo;
   const piezas = [];
   const alto = 0.2;
@@ -284,7 +284,7 @@ export function geomCampana({ q = 1, hembra = false } = {}, seed = 3) {
  * En visión humana las guías casi no se notan. En visión de abeja: pista de
  * aterrizaje encendida. Esa es toda la demostración.
  */
-export function geomPlato({ q = 1 } = {}, seed = 4) {
+export function geomPlato({ q = 1 } = {}, _seed = 4) {
   const S = SINDROMES.guia_uv;
   const piezas = [];
   const alto = 0.24;
@@ -352,7 +352,7 @@ export function geomMargarita({ q = 1, borde = false } = {}, seed = 5) {
  * COPA — la flor gruesa y olorosa del escarabajo. Carnosa y robusta porque él se
  * le mete encima y la maltrata: una flor delicada no aguantaría ese trato.
  */
-export function geomCopa({ q = 1 } = {}, seed = 6) {
+export function geomCopa({ q = 1 } = {}, _seed = 6) {
   const S = SINDROMES.robusta_olor;
   const piezas = [];
   const alto = 0.16;
@@ -385,7 +385,7 @@ export function geomCopa({ q = 1 } = {}, seed = 6) {
  * toca a la vez la antera y el estigma. La angelita, con todo su cariño, es
  * demasiado chiquita para esta flor: pasa por debajo sin tocar nada.
  */
-export function geomPasiflora({ q = 1 } = {}, seed = 7) {
+export function geomPasiflora({ q = 1 } = {}, _seed = 7) {
   const S = SINDROMES.pasiflora;
   const piezas = [];
   const alto = 0.12;

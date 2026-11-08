@@ -120,4 +120,5 @@ export default function PaginaCuaderno({ pagina, className = '' }) {
 
 /* La tinta del eco es fija (índigo textil): se exporta para quien componga
    variantes sin re-derivarla. */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const TINTA_ECO = TINTAS.eco;

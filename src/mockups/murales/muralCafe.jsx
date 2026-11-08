@@ -8,6 +8,7 @@
  */
 
 /* Un cafeto: mata de hojas oscuras brillantes con racimos de cereza roja. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function Cafeto2D({ x, alto = 78, brillo = false }) {
   return (
     <svg
@@ -43,6 +44,7 @@ function Cafeto2D({ x, alto = 78, brillo = false }) {
 }
 
 /* Un guamo de sombrío: tronco esbelto y copa ancha en pisos. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function ArbolSombrio2D({ x, alto = 140 }) {
   return (
     <svg
@@ -65,6 +67,7 @@ function ArbolSombrio2D({ x, alto = 140 }) {
 }
 
 /* Canasta de cosecha tejida, con cerezas recién cogidas. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function Canasta2D({ x }) {
   return (
     <svg
@@ -85,6 +88,7 @@ function Canasta2D({ x }) {
 }
 
 /* La franja de flora cercana (una copia; el mural la pone dos veces). */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function FloraCafe() {
   return (
     <>

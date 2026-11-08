@@ -28,6 +28,7 @@ export function ModoCampoProvider({ children }) {
  * Consume el motor global de modo campo. Debe usarse dentro de <ModoCampoProvider>.
  * @returns {ModoCampoValue}
  */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export function useModoCampoContext() {
   const ctx = useContext(ModoCampoContext);
   if (!ctx) throw new Error('useModoCampoContext debe usarse dentro de <ModoCampoProvider>');

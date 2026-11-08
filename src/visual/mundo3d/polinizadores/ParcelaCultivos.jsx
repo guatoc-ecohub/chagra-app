@@ -52,7 +52,7 @@ const SUAVIZADO = 0.6;
  * @param {boolean} [props.reducedMotion]
  * @param {'dia'|'noche'} [props.momento]
  */
-export default function ParcelaCultivos({ telar, tier = 'alto', reducedMotion = false, momento = 'dia' }) {
+export default function ParcelaCultivos({ telar, tier = 'alto', reducedMotion = false, momento: _momento = 'dia' }) {
   const perfil = perfilDeTier(tier);
   const q = calidadDe(tier);
   const conf = tierDe(tier);

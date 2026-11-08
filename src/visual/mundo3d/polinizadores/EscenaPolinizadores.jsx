@@ -192,6 +192,7 @@ function Diorama({ tier, reducedMotion, momento, comoAbeja, veneno, meliponarioA
     // Cada vez que se apaga la amenaza, la finca se vuelve a poblar: los bichos
     // vuelven del monte y de las fincas vecinas. La recuperación es real y es
     // lenta, y depende de que quede monte de dónde volver.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
     if (!veneno) setDiezmado(0);
   }, [veneno]);
 

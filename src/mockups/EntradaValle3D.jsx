@@ -74,7 +74,6 @@ import Mundo, {
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
-import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
 import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
 import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
 /* El VELO ODYSSEY (lenguaje de transición aprobado por el operador): cubrir →
@@ -243,7 +242,8 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
      `fincaViva` es anti-fabricación (useFincaViva): sin dato real, sus campos
      quedan undefined y reaccionDeFinca usa su propio neutro — nunca inventa. */
   const fincaViva = useFincaViva();
-  const estadoFinca = useMemo(
+  // Sin consumidor hoy (el husmeo ya no lo lee); se conserva el espejo vivo tal cual.
+  const _estadoFinca = useMemo(
     () => ({
       clima,
       animo: companero.animo,

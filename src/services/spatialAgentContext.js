@@ -11,6 +11,7 @@ const MAX_CONTEXT_CHARS = 1400;
 
 function cleanText(value, maxLength = 160) {
   if (typeof value !== 'string') return null;
+  // eslint-disable-next-line no-control-regex -- quitar los caracteres de control (C0 y DEL) es el propósito; cambiar la clase alteraría el texto saneado
   const normalized = value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
   return normalized ? normalized.slice(0, maxLength) : null;
 }

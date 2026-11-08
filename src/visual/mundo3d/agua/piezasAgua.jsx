@@ -325,6 +325,7 @@ export function Nube({ lista, carga = 1 }) {
     });
     mesh.instanceMatrix.needsUpdate = true;
   }, [lista]);
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useLayoutEffect(() => { mat.opacity = 0.55 + 0.42 * carga; }, [mat, carga]);
   useLayoutEffect(() => () => { geo.dispose(); mat.dispose(); }, [geo, mat]);
   if (!lista.length) return null;

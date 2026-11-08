@@ -20,6 +20,7 @@ import { RH_LINE_BOIL } from './rubberhoseSpec.js';
 /* Los 3 estados de seed que rotan (line-boil de 3 fotogramas). Los VALORES
    canónicos (seeds, frecuencia, escala, compás) viven en `rubberhoseSpec.js`:
    cualquier emulación CSS del boil debe latir a ese mismo compás. */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const BOIL_SEEDS = RH_LINE_BOIL.seeds;
 
 /**

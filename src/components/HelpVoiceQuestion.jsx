@@ -100,6 +100,7 @@ export default function HelpVoiceQuestion({ speciesSlug = null }) {
 
   useEffect(() => {
     const ctrl = new AbortController();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
     setCorpus(null);
     setCorpusError(null);
 

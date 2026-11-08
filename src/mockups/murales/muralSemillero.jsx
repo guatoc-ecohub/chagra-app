@@ -9,6 +9,7 @@
  */
 
 /* Cama de germinación: cajón de madera con surcos y brotecitos en fila. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function CamaGerminacion2D({ x, alto = 68 }) {
   return (
     <svg
@@ -35,6 +36,7 @@ function CamaGerminacion2D({ x, alto = 68 }) {
 }
 
 /* Bandeja de germinación sobre mesita de trabajo. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function BandejaAlta2D({ x, alto = 78 }) {
   return (
     <svg
@@ -61,6 +63,7 @@ function BandejaAlta2D({ x, alto = 78 }) {
 }
 
 /* La regadera de lata, con su arco de gotas frescas. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function Regadera2D({ x, alto = 46 }) {
   return (
     <svg
@@ -82,6 +85,7 @@ function Regadera2D({ x, alto = 46 }) {
 }
 
 /* Brote grande recién nacido; con brillo = aura de vida nueva. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function BroteGrande2D({ x, alto = 58, brillo = false }) {
   return (
     <svg
@@ -103,6 +107,7 @@ function BroteGrande2D({ x, alto = 58, brillo = false }) {
 }
 
 /* La franja del semillero (una copia; el mural la pone dos veces). */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function FloraSemillero() {
   return (
     <>

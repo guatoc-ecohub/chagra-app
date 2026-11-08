@@ -22,7 +22,7 @@ import {
  */
 
 /** useId trae ':' y eso rompe los url(#..) de SVG. Lo limpiamos. */
-function usarId(prefijo) {
+function useIdSvg(prefijo) {
   return `${prefijo}-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 }
 
@@ -54,7 +54,7 @@ export function HojaBase({
   tinteLamina,
   conBrillo = true,
 }) {
-  const uid = usarId('hoja');
+  const uid = useIdSvg('hoja');
   const clip = `${uid}-clip`;
   const mask = `${uid}-mask`;
   const grad = `${uid}-grad`;
@@ -204,7 +204,7 @@ export function HojaBase({
  * Calcado de `public/plaga-images/hemileia_vastatrix.jpg`.
  */
 export function PolvoRoya({ manchas }) {
-  const uid = usarId('roya');
+  const uid = useIdSvg('roya');
   const blur = `${uid}-blur`;
   return (
     <g>
@@ -268,7 +268,7 @@ export function PolvoRoya({ manchas }) {
 /** Lo que se ve por el HAZ de la misma hoja con roya: solo una mancha
  *  amarilla, sin gracia. Por eso hay que VOLTEAR la hoja. */
 export function RoyaPorElHaz({ manchas }) {
-  const uid = usarId('royahaz');
+  const uid = useIdSvg('royahaz');
   const blur = `${uid}-blur`;
   return (
     <g>
@@ -318,7 +318,7 @@ export function RoyaPorElHaz({ manchas }) {
  * de "la enfermedad tiene forma": se puede dibujar su borde con el dedo.
  */
 export function ManchaCercospora({ cx, cy, r, semilla = 5 }) {
-  const uid = usarId('cerco');
+  const uid = useIdSvg('cerco');
   const blur = `${uid}-blur`;
   return (
     <g>
@@ -359,7 +359,7 @@ export function ManchaCercospora({ cx, cy, r, semilla = 5 }) {
  * nervadura. Ningún bicho hace eso. Eso es patrón puro.
  */
 export function ManchaAnillos({ cx, cy, r, semilla = 8 }) {
-  const uid = usarId('anillo');
+  const uid = useIdSvg('anillo');
   const blur = `${uid}-blur`;
   return (
     <g>
@@ -410,7 +410,7 @@ export function ManchaAnillos({ cx, cy, r, semilla = 8 }) {
  * vena. Eso es exactamente lo que pasa en la mata.
  */
 export function ClorosisHierro() {
-  const uid = usarId('fe');
+  const uid = useIdSvg('fe');
   const blur = `${uid}-blur`;
   return (
     <g>
@@ -461,7 +461,7 @@ export function ClorosisHierro() {
  * nematodo en la raíz. Ver `LaminaDuda`.
  */
 export function ClorosisNitrogeno() {
-  const uid = usarId('nitro');
+  const uid = useIdSvg('nitro');
   const grad = `${uid}-g`;
   return (
     <g>
@@ -511,7 +511,7 @@ export function Frass({ cx, cy, n = 9, radio = 5, semilla = 31 }) {
  * pináculas con seta, cápsula cefálica con la "Y" invertida pálida.
  */
 export function Gusano({ x = 0, y = 0, rot = 0, escala = 1, bicho = GUSANO }) {
-  const uid = usarId('gus');
+  const uid = useIdSvg('gus');
   const grad = `${uid}-grad`;
   const clip = `${uid}-clip`;
   const cab = bicho.cabeza;
@@ -710,7 +710,7 @@ export function Vineta({ x, y, color, lineas, tam = 7.6, interlinea = 9.4 }) {
  * acercar la cara a la mata. Así se hace acá.
  */
 export function Lupa({ cx, cy, r, titulo, children, tinta = TINTA.media }) {
-  const uid = usarId('lupa');
+  const uid = useIdSvg('lupa');
   const clip = `${uid}-clip`;
   return (
     <g>

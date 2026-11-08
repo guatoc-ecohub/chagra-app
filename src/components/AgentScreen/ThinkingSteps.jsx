@@ -31,6 +31,7 @@ export default function ThinkingSteps({ phase }) {
 
   useEffect(() => {
     // Fase nueva (evento real del pipeline) → arrancar en su primer paso.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
     setStepIdx(0);
     const count = (phase && MSG.agente.fasesPasos[phase] || []).length;
     if (count <= 1) return undefined;

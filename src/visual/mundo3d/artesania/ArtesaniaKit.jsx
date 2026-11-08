@@ -36,7 +36,7 @@ import { crearMaterialArtesania } from './materialesArtesania.js';
 
 /* Memoiza una geometría y la libera al desmontar. */
 function useGeo(fabrica, deps) {
-  const geo = useMemo(fabrica, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  const geo = useMemo(fabrica, deps); // eslint-disable-line react-hooks/exhaustive-deps, react-hooks/use-memo -- fábrica y dependencias llegan de quien llama; la lista no puede ser un literal aquí
   useEffect(() => () => geo.dispose(), [geo]);
   return geo;
 }
@@ -46,7 +46,7 @@ function useGeo(fabrica, deps) {
 function useMatTaller(nombre, perfil, extra, mapa) {
   const mat = useMemo(
     () => crearMaterialArtesania(nombre, perfil, extra, mapa),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo -- extra y mapa son objetos nuevos en cada render; se comparan por su JSON para no recrear el material
     [nombre, perfil, JSON.stringify(extra), JSON.stringify(mapa)],
   );
   useEffect(() => () => mat.dispose(), [mat]);

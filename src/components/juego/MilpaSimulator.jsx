@@ -85,6 +85,7 @@ function AliadosNaturales() {
         Cuando hay variedad, llegan solos los aliados
       </p>
       <div className="flex items-start justify-around gap-2">
+        {/* eslint-disable-next-line no-unused-vars -- Criatura se usa como componente JSX (<Criatura />); la regla no ve el uso JSX */}
         {ALIADOS_BIOLOGICOS.map(({ Criatura, nombre, hace }) => (
           <div key={nombre} className="flex flex-1 flex-col items-center gap-1 text-center">
             <Criatura size={52} title={nombre} className="milpa-brota" />

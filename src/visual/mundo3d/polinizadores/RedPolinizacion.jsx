@@ -159,6 +159,7 @@ export default function RedPolinizacion({ telar, tier = 'alto', reducedMotion = 
 
         for (const tt of [t0, t1]) {
           bezier(h.a, h.mid, h.b, tt, _p);
+          // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
           pos[v * 3] = _p.x;
           pos[v * 3 + 1] = _p.y;
           pos[v * 3 + 2] = _p.z;
@@ -172,6 +173,7 @@ export default function RedPolinizacion({ telar, tier = 'alto', reducedMotion = 
               a *= 1 + Math.exp(-(d * d) / 0.006) * 1.9; // el bulto de luz
             }
           }
+          // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
           col[v * 4] = r;
           col[v * 4 + 1] = g;
           col[v * 4 + 2] = b;
@@ -182,9 +184,11 @@ export default function RedPolinizacion({ telar, tier = 'alto', reducedMotion = 
     }
 
     geo.setDrawRange(0, v);
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     geo.attributes.position.needsUpdate = true;
     geo.attributes.color.needsUpdate = true;
     // La red no se mueve del sitio: nunca hay que recalcular su bounding.
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     if (!geo.boundingSphere) geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 1, 0), 12);
   });
 

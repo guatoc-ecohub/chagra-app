@@ -176,7 +176,7 @@ function hierbaGigante(rng, op = {}) {
  *  Se dibuja CON su tutor: sin tutor, el dibujo estaría mintiendo sobre el
  *  trabajo que exige. La curuba se asocia con aliso (que además fija N). */
 function trepadora(rng, op = {}) {
-  const { alto = 240, vueltas = 3.2, nodos = 7, filo = 'alterna', tutorAncho = 34 } = op;
+  const { alto = 240, vueltas = 3.2, nodos = 7, tutorAncho = 34 } = op;
   const pts = [];
   const n = 60;
   for (let i = 0; i <= n; i += 1) {

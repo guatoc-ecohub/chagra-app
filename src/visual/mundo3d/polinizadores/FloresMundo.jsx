@@ -92,9 +92,11 @@ export default function FloresMundo({
   /* Cuán abierta está cada flor (0..1). Vive por índice global de flor para que
      ninguna se abra de golpe al cambiar la hora. */
   const apertura = useRef(null);
+  // eslint-disable-next-line react-hooks/refs -- inicialización perezosa del buffer de apertura en el ref (al montar o si cambia el número de flores)
   if (!apertura.current || apertura.current.length !== flores.length) {
     apertura.current = new Float32Array(flores.length).fill(1);
     // Arranque digno: cada flor ya nace en el estado que le toca a esta hora.
+    // eslint-disable-next-line react-hooks/refs -- inicialización perezosa del buffer de apertura en el ref (al montar o si cambia el número de flores)
     for (const f of flores) apertura.current[f.i] = abre(f.sindrome, momento) ? 1 : 0;
   }
 

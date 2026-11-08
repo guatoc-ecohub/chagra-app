@@ -70,6 +70,7 @@ const FOTOS = {
 /* ── Foto real con crédito CC visible. La franja de crédito es opaca para
  *    legibilidad al sol y contraste sobre cualquier imagen; ícono de respaldo
  *    si la imagen no carga. ──────────────────────────────────────────────── */
+// eslint-disable-next-line no-unused-vars -- FallbackIcon se usa como componente JSX (<FallbackIcon />); la regla no ve el uso JSX
 function Foto({ slug, ratio = 'aspect-[16/10]', className = '', objectPos = 'object-center', FallbackIcon = Leaf }) {
   const c = FOTOS[slug];
   const [ok, setOk] = useState(true);

@@ -83,7 +83,7 @@ const _escala = new THREE.Vector3();
  * CURVA. No se escala un bicho gigante para "sentir" más plaga — se ponen más
  * bichos, que es lo que pasa en la mata de verdad.
  */
-function Nube({ geo, mat, sitios, cuantos, anim, reducedMotion, t = 0 }) {
+function Nube({ geo, mat, sitios, cuantos, anim, reducedMotion, t: _t = 0 }) {
   const ref = useRef(null);
   const n = Math.min(sitios.length, Math.max(0, Math.round(cuantos)));
 
@@ -328,10 +328,11 @@ function Parcela({ parcela, estado, tier, mat, perfil, reducedMotion, esNoche, t
      número. */
   const salud = Math.max(0.35, 1 - estado.plaga * 0.75);
   const sitiosMata = useMemo(() => G.sembrarMatas(lado), [lado]);
+  /* la salud se cuantiza en pasos de 1/4: la mata no se re-genera cada frame */
+  const saludEnCuartos = Math.round(salud * 4);
   const geoMata = useMemo(
-    () => G.mataGeom(tier, 42, Math.round(salud * 4) / 4),
-    /* la salud se cuantiza en pasos de 1/4: la mata no se re-genera cada frame */
-    [tier, Math.round(salud * 4)],
+    () => G.mataGeom(tier, 42, saludEnCuartos / 4),
+    [tier, saludEnCuartos],
   );
 
   /* El borde: flores + rastrojo (viva) o alambre pelado (limpia). LA TRIADA

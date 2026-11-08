@@ -134,6 +134,7 @@ export default function useInsightProactivo(textoChat, insightsVistos = []) {
   useEffect(() => {
     let vivo = true;
     if (insightCurado) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
       setCatalogo(null);
       return () => { vivo = false; };
     }

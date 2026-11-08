@@ -16,18 +16,18 @@ export function useAutosave(storageKey, initialState = {}) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       if (submitted.current) return;
-      try { const p = { ...latest.current }; delete /** @type {any} */ (p).__submitted__; localStorage.setItem(key, JSON.stringify(p)); } catch {}
+      try { const p = { ...latest.current }; delete /** @type {any} */ (p).__submitted__; localStorage.setItem(key, JSON.stringify(p)); } catch { /* cuota o almacenamiento no disponible: el autosave es opcional */ }
     }, 2000);
   }, [key]);
   const clear = useCallback(() => {
-    try { localStorage.removeItem(key); } catch {}
+    try { localStorage.removeItem(key); } catch { /* almacenamiento no disponible: nada que borrar */ }
     latest.current = initialState; setState(initialState);
     if (timer.current) clearTimeout(timer.current);
   }, [key, initialState]);
   const markDone = useCallback(() => {
     submitted.current = true;
     if (timer.current) clearTimeout(timer.current);
-    try { localStorage.removeItem(key); } catch {}
+    try { localStorage.removeItem(key); } catch { /* almacenamiento no disponible: nada que borrar */ }
   }, [key]);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   return { savedState: state, save, clearAutosave: clear, markSubmitted: markDone };

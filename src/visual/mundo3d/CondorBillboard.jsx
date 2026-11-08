@@ -149,6 +149,7 @@ export default function CondorBillboard({
       fase: faseInicial,
       hasta: azar(24, 48),          // fin de la fase actual (s de clock)
       ang,                          // ángulo sobre la térmica
+      // eslint-disable-next-line react-hooks/purity -- azar cosmético del estado inicial del vuelo, calculado una sola vez al montar
       dir: Math.random() < 0.5 ? -1 : 1,
       cx: centro[0], cz: centro[2], // centro de la térmica ACTUAL (deriva)
       rOff: 0,                      // corrección de radio al re-enganchar (continuidad)
@@ -407,17 +408,20 @@ export default function CondorBillboard({
   });
 
   const s0 = st.current;
+  // eslint-disable-next-line react-hooks/refs -- la posición y la fase iniciales salen del estado de la simulación guardado en el ref al montar; después lo mueve useFrame
   const posInicial = /** @type {[number,number,number]} */ ([s0.x, s0.y, s0.z]);
   const conSombra = suelo != null && tier !== 'bajo' && animated && modo !== 'cruce';
 
   return (
     <>
+      {/* eslint-disable-next-line react-hooks/refs -- la posición y la fase iniciales salen del estado de la simulación guardado en el ref al montar; después lo mueve useFrame */}
       <group ref={grupo} position={posInicial} visible={modo !== 'cruce' || !animated}>
         <Html center distanceFactor={factor} zIndexRange={[6, 0]} pointerEvents="none">
           <div
             ref={capa}
             aria-hidden="true"
             data-vecino="condor"
+            // eslint-disable-next-line react-hooks/refs -- la posición y la fase iniciales salen del estado de la simulación guardado en el ref al montar; después lo mueve useFrame
             data-condor-fase={animated && modo !== 'cruce' ? s0.fase : undefined}
             style={ESTILO_CONDOR}
           >

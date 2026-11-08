@@ -22,6 +22,7 @@ export const useConsumptionMetrics = (materialName, days = 30) => {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga de datos al montar o al cambiar la entrada: la función invocada marca el estado de carga; moverla a un evento cambiaría la conducta
     setLoading(true);
 
     (async () => {
@@ -61,6 +62,7 @@ export const useConsumptionMetrics = (materialName, days = 30) => {
   }, []);
 
   return useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity -- el corte de la ventana es relativo a «ahora» y el memo solo se recalcula al cambiar sus entradas; fijarlo cambiaría los resultados
     const cutoff = Math.floor(Date.now() / 1000) - days * 86400;
 
     // Filtrar aplicaciones del material específico en la ventana temporal.

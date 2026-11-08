@@ -41,6 +41,7 @@ export default function InventoryAuditDashboard() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- carga de datos al montar o al cambiar la entrada: la función invocada marca el estado de carga; moverla a un evento cambiaría la conducta
         loadData();
     }, []);
 
@@ -84,6 +85,7 @@ export default function InventoryAuditDashboard() {
                 id: auditLogId,
                 attributes: {
                     name: `Auditoría: ${item.name} (Sincronización manual)`,
+                    // eslint-disable-next-line react-hooks/purity -- manejador de evento, no render: la marca de tiempo debe ser la del momento de la acción
                     timestamp: Math.floor(Date.now() / 1000),
                     status: 'done',
                     notes: `Stock verificado y reconciliado manualmente desde el dashboard de auditoría.`

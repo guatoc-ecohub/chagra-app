@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from 'react';
 import { ChivitoPunkRig } from '../../visual/creatures/ChivitoPunk';
 
-const CuerpoChivito = memo(/** @param {{estado: string, pausada: boolean}} props */ function CuerpoChivito({ estado, pausada }) {
+const CuerpoChivito = memo(/** @param {{estado: string, pausada: boolean}} props */ function CuerpoChivito({ estado }) {
   return <ChivitoPunkRig x={-124.8} y={-193.44} size={249.6}
     className="paramo-chivito" estado={estado} pose="posado" />;
 }, (anterior, siguiente) => siguiente.pausada || anterior.estado === siguiente.estado);

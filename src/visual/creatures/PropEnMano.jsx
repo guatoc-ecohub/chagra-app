@@ -28,6 +28,7 @@ const ACENTO = {
 
 /* Cada dibujo vive centrado en (0,0), pensado para ~12u de alto en el viewBox de
    la creature. Reciben `ink` para heredar la tinta de la familia. */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const DIBUJO_PROP = Object.freeze({
   // Manguera: tubo curvo con boquilla + gota (agua).
   manguera: ({ ink }) => (
@@ -46,7 +47,7 @@ export const DIBUJO_PROP = Object.freeze({
     </g>
   ),
   // Lazo: cuerda con lazada (arriar animales).
-  lazo: ({ ink }) => (
+  lazo: () => (
     <g fill="none" stroke={ACENTO.cuerda} strokeWidth="1.4" strokeLinecap="round">
       <ellipse cx="-1" cy="-2.5" rx="3.2" ry="4" stroke={ACENTO.cuerda} />
       <path d="M-3.4,0.6 C-4.5,3 -3.5,5 -2,5.6" />

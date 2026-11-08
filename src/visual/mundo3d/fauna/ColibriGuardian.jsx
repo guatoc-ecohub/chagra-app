@@ -212,6 +212,7 @@ export default function ColibriGuardian({
   const alaDer = useRef(null);
   const lengua = useRef(null);
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((estado) => {
     const t = estado.clock.elapsedTime + semilla * 3.7;
     if (!raiz.current || !cuerpoG.current) return;
@@ -257,6 +258,7 @@ export default function ColibriGuardian({
        barrido: el ala frena y arranca en cada extremo, así que el borrón no es
        parejo. El titileo va a 7 Hz, que no es el aleteo ni pretende serlo. */
     const densidad = quieto ? 0 : 0.2 + Math.abs(Math.sin(t * 7)) * 0.14;
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     matAla.opacity = densidad;
     if (alaIzq.current) {
       alaIzq.current.visible = !quieto;

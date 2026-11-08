@@ -9,6 +9,7 @@
  */
 
 /* Juncos de orilla con espigas. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function Junco2D({ x, alto = 84 }) {
   return (
     <svg
@@ -30,6 +31,7 @@ function Junco2D({ x, alto = 84 }) {
 }
 
 /* Piedras de río pulidas, con brillo húmedo. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function PiedrasRio2D({ x }) {
   return (
     <svg
@@ -49,6 +51,7 @@ function PiedrasRio2D({ x }) {
 }
 
 /* Helecho de orilla: frondas que se arquean. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function Helecho2D({ x, alto = 62 }) {
   return (
     <svg
@@ -73,6 +76,7 @@ function Helecho2D({ x, alto = 62 }) {
 }
 
 /* Gota-destello: el agua viva saludando desde la orilla. */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function GotaBrillo2D({ x, alto = 36 }) {
   return (
     <svg
@@ -90,6 +94,7 @@ function GotaBrillo2D({ x, alto = 36 }) {
 }
 
 /* La franja de orilla (una copia; el mural la pone dos veces). */
+// eslint-disable-next-line react-refresh/only-export-components -- componente local del mural; el módulo exporta además la constante de datos del mural (solo afecta al HMR)
 function FloraAgua() {
   return (
     <>

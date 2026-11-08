@@ -325,6 +325,7 @@ export default function HojaPruebaValle() {
 
   const irAFranja = (h) => {
     const base = window.location.hash.split('?')[0] || '#/mockups/hoja-prueba-valle';
+    // eslint-disable-next-line react-hooks/immutability -- asignar location.hash es la navegación misma y ocurre en un manejador de evento, no en el render
     window.location.hash = `${base}?ciclo=${h}`;
     window.location.reload();
   };

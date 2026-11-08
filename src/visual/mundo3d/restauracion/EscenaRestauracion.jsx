@@ -140,6 +140,7 @@ function Atmosfera({ anioRef, perfil }) {
   );
 
   useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     scene.background = c.fondo;
     if (perfil.fog) scene.fog = new THREE.Fog(CRUDO.niebla, CRUDO.nieblaCerca, CRUDO.nieblaLejos);
     return () => {
@@ -148,6 +149,7 @@ function Atmosfera({ anioRef, perfil }) {
     };
   }, [scene, c, perfil.fog]);
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame(() => {
     const d = dosel(anioRef.current);
 
@@ -155,6 +157,7 @@ function Atmosfera({ anioRef, perfil }) {
     if (scene.fog && 'near' in scene.fog) {
       const f = /** @type {THREE.Fog} */ (scene.fog);
       f.color.copy(c.niebla0).lerp(c.niebla1, d);
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       f.near = mezclar(CRUDO.nieblaCerca, HUMEDO.nieblaCerca, d);
       f.far = mezclar(CRUDO.nieblaLejos, HUMEDO.nieblaLejos, d);
     }
