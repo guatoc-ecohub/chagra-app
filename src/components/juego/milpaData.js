@@ -264,7 +264,7 @@ export const CIFRAS_SISTEMAS = Object.freeze({
     controlPlagaMutuo: true,
     reduccionInfestacionPct: { min: 30, max: 40 },
   },
-  fuente: 'DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DOI 10.1093/aob/mcu191; DOI 10.3389/fagro.2023.1115490; DOI 10.1016/j.fcr.2019.107661',
+  fuente: 'Fuente en revisión; DOI 10.1093/aob/mcu191; DOI 10.3389/fagro.2023.1115490; DOI 10.1016/j.fcr.2019.107661',
 });
 
 /** Cuántas parcelas tiene el tablero (mobile-first: cabe en una pantalla). */

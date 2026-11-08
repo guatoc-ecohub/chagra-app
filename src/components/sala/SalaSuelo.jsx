@@ -35,7 +35,7 @@ const estaciones = [
     caution: item.alerta,
     words: palabrasLectura[index] || [['Suelo', 'Capa viva donde crecen las raíces.']],
     quiz: [{ question: '¿Qué observa en esta estación?', answer: `${item.buena} También compare con la señal de alerta: ${item.alerta}` }],
-    sources: ['DR-SUELOS-1-consolidado, src/data/lecturaSuelo.js. Referencias recopiladas: IGAC, AGROSAVIA, CIPAV, FAO, SENA, USDA-NRCS, Cenicafé y Jaramillo 2002.'],
+    sources: ['Lectura de suelo de Chagra (src/data/lecturaSuelo.js). Referencias recopiladas: IGAC, AGROSAVIA, CIPAV, FAO, SENA, USDA-NRCS, Cenicafé y Jaramillo 2002.'],
   })),
   {
     title: 'Lombrices y vida', body: 'Observe la vida que aparece en la palada. Si desea usar el test de mostaza, siga el protocolo y tenga en cuenta la humedad del suelo.',

@@ -97,7 +97,7 @@ export default function HelpCycleSection() {
             Aprende sembrando: ciclo interactivo
           </h3>
           <p className="text-xs text-slate-400 leading-relaxed mt-1">
-            Toque una especie para abrir el corpus consolidado (DR-034). La voz IA solo usa ese texto, sin inventar.
+            Toque una especie para abrir el texto consolidado de esa especie. La voz IA solo usa ese texto, sin inventar.
           </p>
         </div>
         <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-amber-400/90 uppercase border border-amber-700/40 rounded-full px-2 py-0.5 shrink-0">

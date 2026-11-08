@@ -645,7 +645,7 @@ export const DICTIONARY = [
     definicion_simple: 'Proceso de subir tus datos guardados localmente al servidor cuando hay internet, para que estén respaldados y otros dispositivos los vean.',
     definicion_ampliada: 'Sync (sincronización) en Chagra es el proceso por el que los logs guardados en IndexedDB local se transfieren al servidor FarmOS cuando hay conectividad. Características:\n\n1. **Offline-first**: el operador puede registrar siempre, sin esperar respuesta del servidor.\n2. **Idempotencia**: si un POST falla por timeout pero llegó al servidor, no se duplica al reintentarse (idempotency_key).\n3. **HLC (Hybrid Logical Clock)**: timestamp lógico para resolver orden de eventos en sync multi-dispositivo.\n4. **Sin cancelación**: append-only — sync no muta logs, solo los confirma como "uploaded".\n5. **Retry con backoff**: ante fallo, espera exponencial antes de reintentar.\n\nIndicador visual NetworkStatusBar muestra estado: SYNCING/OFFLINE/SYNCED/ERROR.',
     ver_tambien: ['offline-first', 'indexeddb', 'farmos', 'append-only'],
-    fuentes: ['Chagra ADR-019/ADR-027 sub-shapes'],
+    fuentes: ['Chagra ADR-019 sub-shapes'],
   },
 
   {
@@ -679,7 +679,7 @@ export const DICTIONARY = [
     categoria: 'ia',
     emoji: '🛡️',
     definicion_simple: 'Reglas que se le ponen a la IA para que NO diga ciertas cosas. Como las barandillas de una carretera para que el carro no se salga.',
-    definicion_ampliada: 'Guardrails son mecanismos técnicos y semánticos que restringen qué puede decir o hacer un modelo de IA. En Chagra HelpVoiceQuestion, los guardrails RAG son estrictos:\n\n1. **Corpus único**: la IA solo puede citar el corpus consolidado DR-034 de la especie consultada\n2. **Detección anti-alucinación**: si la pregunta cae fuera del corpus, debe decir "no sé / fuera de corpus"\n3. **Validación de dosis**: dosis de biopreparados sugeridas deben coincidir literalmente con el corpus, no extrapolación\n4. **Citas obligatorias**: respuestas referenciables a entradas específicas del corpus\n\nRazón: una IA libre puede sugerir dosis inventadas de un biopreparado que dañe cultivos reales del operador. Guardrails alinea la IA con responsabilidad agroecológica.',
+    definicion_ampliada: 'Guardrails son mecanismos técnicos y semánticos que restringen qué puede decir o hacer un modelo de IA. En Chagra HelpVoiceQuestion, los guardrails RAG son estrictos:\n\n1. **Corpus único**: la IA solo puede citar el corpus consolidado de la especie consultada\n2. **Detección anti-alucinación**: si la pregunta cae fuera del corpus, debe decir "no sé / fuera de corpus"\n3. **Validación de dosis**: dosis de biopreparados sugeridas deben coincidir literalmente con el corpus, no extrapolación\n4. **Citas obligatorias**: respuestas referenciables a entradas específicas del corpus\n\nRazón: una IA libre puede sugerir dosis inventadas de un biopreparado que dañe cultivos reales del operador. Guardrails alinea la IA con responsabilidad agroecológica.',
     ver_tambien: ['rag', 'llm', 'anti-alucinacion', 'corpus'],
     fuentes: ['NeMo Guardrails NVIDIA', 'Anthropic Constitutional AI'],
   },
@@ -690,9 +690,9 @@ export const DICTIONARY = [
     categoria: 'ia',
     emoji: '📚',
     definicion_simple: 'Conjunto de textos curados que se le da a la IA como única fuente de información. Si la pregunta no está en el corpus, la IA no debe inventar.',
-    definicion_ampliada: 'Corpus (latín "cuerpo") en contexto IA es colección estructurada de documentos que sirve de fuente referencial para sistemas RAG. En Chagra:\n\n- **Corpus DR-034**: cycle-content lechuga / fresa / tomate chonto consolidado por convergencia 3/3 de Claude web + Gemini DR + DeepSeek V3 + curaduría humana pendiente. Datos calibrados anti-overpromise, rangos colombianos sin biocidas.\n- **Corpus 100 especies colombianas (en curaduría)**: fitonimia indígena + regionalismos + saberes tradicionales\n\nCorpus debe ser: auditable (fuentes verificables), versionable (cambios trackeados), abierto (revisable por la comunidad), curado (sin contradicciones internas).',
+    definicion_ampliada: 'Corpus (latín "cuerpo") en contexto IA es colección estructurada de documentos que sirve de fuente referencial para sistemas RAG. En Chagra:\n\n- **Corpus de ciclos de cultivo**: cycle-content lechuga / fresa / tomate chonto consolidado por convergencia 3/3 de Claude web + Gemini DR + DeepSeek V3 + curaduría humana pendiente. Datos calibrados anti-overpromise, rangos colombianos sin biocidas.\n- **Corpus 100 especies colombianas (en curaduría)**: fitonimia indígena + regionalismos + saberes tradicionales\n\nCorpus debe ser: auditable (fuentes verificables), versionable (cambios trackeados), abierto (revisable por la comunidad), curado (sin contradicciones internas).',
     ver_tambien: ['rag', 'guardrails', 'llm'],
-    fuentes: ['Chagra DR-034 + ADR-032 + ADR-033'],
+    fuentes: ['Corpus de ciclos de cultivo de Chagra'],
   },
 
   // ===========================================================================
@@ -1240,7 +1240,7 @@ export const DICTIONARY = [
     categoria: 'ia',
     emoji: '📚',
     definicion_simple: 'Truco para que la IA use SOLO la información que le damos nosotros (un libro, un corpus) en vez de inventar cosas. Así no se equivoca.',
-    definicion_ampliada: 'RAG (Retrieval-Augmented Generation) es técnica que combina búsqueda en una base de conocimiento curada con generación LLM. En lugar de dejar que el modelo responda solo con lo que aprendió en pre-training (puede alucinar), se le inyecta como contexto el material relevante recuperado de un corpus específico.\n\nChagra HelpVoiceQuestion usa RAG estricto: cuando haces una pregunta sobre lechuga, fresa o tomate chonto, la IA solo puede responder usando el corpus consolidado DR-034 (validado 3/3 LLMs + curaduría humana pendiente). Si la pregunta cae fuera del corpus, la IA debe decir "no sé, fuera de corpus" en lugar de inventar dosis o recomendaciones peligrosas.',
+    definicion_ampliada: 'RAG (Retrieval-Augmented Generation) es técnica que combina búsqueda en una base de conocimiento curada con generación LLM. En lugar de dejar que el modelo responda solo con lo que aprendió en pre-training (puede alucinar), se le inyecta como contexto el material relevante recuperado de un corpus específico.\n\nChagra HelpVoiceQuestion usa RAG estricto: cuando haces una pregunta sobre lechuga, fresa o tomate chonto, la IA solo puede responder usando el corpus consolidado de la especie (validado 3/3 LLMs + curaduría humana pendiente). Si la pregunta cae fuera del corpus, la IA debe decir "no sé, fuera de corpus" en lugar de inventar dosis o recomendaciones peligrosas.',
     contexto_cultural: 'Anti-alucinación es load-bearing en agroecología: una IA que recomienda dosis inventada de un biopreparado puede dañar cultivos reales del operador. RAG estricto es tecnología que ALINEA con responsabilidad campesina.',
     ver_tambien: ['llm', 'guardrails', 'corpus', 'anti-alucinacion'],
     fuentes: ['Lewis et al. 2020 — Retrieval-Augmented Generation (Facebook AI)'],

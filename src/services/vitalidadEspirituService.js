@@ -76,7 +76,7 @@ export const FUENTES = Object.freeze({
   vitalidad: 'Avance real de sus ciclos de cultivo + diversidad de especies (fincaSceneService)',
   especies: 'Ciclos de cultivo y plantas registradas en su finca',
   clima: 'Señal de clima guardada para su vereda (pronóstico Open-Meteo, offline)',
-  suelo: 'Diagnóstico de suelo sin laboratorio (DR-SUELOS-1) — descríbale su suelo al agente',
+  suelo: 'Diagnóstico de suelo sin laboratorio — descríbale su suelo al agente',
   biodiversidad: 'Especies distintas vivas en su finca (saturación a 6, como la vitalidad)',
   energia: 'Registros de este mes: cosechas anotadas + siembras abiertas',
   cosechas: 'Cosechas anotadas en «Mi cosecha» (registros reales de su finca)',

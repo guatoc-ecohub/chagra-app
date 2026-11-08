@@ -95,7 +95,7 @@ export function calcularCarbonoSeguimiento(proceso = {}) {
     : (Math.max(count, 1) * FALLBACK_KG_CO2_POR_ARBOL_ANIO) / 1000;
 
   const source = species
-    ? `DR-RESTAURACION-1 / ${species.cientifico}`
+    ? `Catálogo de restauración Chagra (IAvH, MinAmbiente) / ${species.cientifico}`
     : `IDEAM-MADS fallback ${FALLBACK_KG_CO2_POR_ARBOL_ANIO} kg CO2/arbol/anio`;
 
   const referenceRanges = Array.isArray(CARBONO_CAPTURA?.rangos_referencia)
@@ -143,7 +143,7 @@ export function calcularCarbonoSeguimiento(proceso = {}) {
         'Si hay área registrada, la captura se expresa por hectárea y total del lote.',
         'Si la especie no se reconoce, se usa el fallback conservador de 22 kg CO2 por árbol al año.',
       ],
-      citation: CARBONO_CAPTURA?.fuente || RESTAURACION?.fuente || 'DR-RESTAURACION-1',
+      citation: CARBONO_CAPTURA?.fuente || RESTAURACION?.fuente || 'Fuente en revisión',
     },
   };
 }
