@@ -129,6 +129,7 @@ const CLIMAS = {
 };
 
 /** Claves de clima disponibles (para datos y tests). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const CLIMA_TIPOS = Object.keys(CLIMAS);
 
 /**
@@ -222,6 +223,7 @@ const MIRADAS_GLIFO = {
 };
 
 /** Claves de mirada disponibles (mismo vocabulario de cuadernoData.MIRADAS). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const MIRADA_TIPOS = Object.keys(MIRADAS_GLIFO);
 
 /**

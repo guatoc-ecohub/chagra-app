@@ -264,8 +264,10 @@ function RedMicelio({ geo, frenteRef, reducedMotion }) {
     [],
   );
   useLayoutEffect(() => () => mat.dispose(), [mat]);
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((st) => {
     const u = mat.uniforms;
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     u.uFrente.value = frenteRef.current;
     /* la red respira apenas: está viva, no es un diagrama */
     u.uOpacidad.value = reducedMotion

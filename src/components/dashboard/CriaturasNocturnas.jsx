@@ -32,6 +32,7 @@ const CN_REDUCED =
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ─── ROSTER GROUNDED — 7 nocturnas + el cóndor del valle ─────────────────── */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const CRIATURAS_NOCTURNAS = [
   {
     id: 'zariguya',
@@ -1058,4 +1059,5 @@ export function CriaturaNocturnaAvatar({ id, size = 64 }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export { byId as criaturaNocturnaById };

@@ -195,6 +195,7 @@ export default function EnjambrePolinizadores({
   );
 
   /* ── EL VUELO ──────────────────────────────────────────────────────────── */
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((state, dtCrudo) => {
     const dt = Math.min(dtCrudo, 0.05);
     const t = state.clock.elapsedTime;
@@ -242,6 +243,7 @@ export default function EnjambrePolinizadores({
             const d = _v.set(f.pos[0], f.pos[1], f.pos[2]).distanceToSquared(b.pos);
             if (d < mejorD) { mejorD = d; mejor = f; }
           }
+          // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
           b.objetivo = mejor || candidatas[0];
         } else {
           b.objetivo = null; // no hay flor de lo suyo: a rondar la casa

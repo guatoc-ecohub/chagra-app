@@ -101,10 +101,6 @@ const ARCO_TOTAL = ARCO.reduce((a, b) => a + b, 0);
  */
 const CORTE_X0 = CORTE_POS[0] - ANCHO_CUT / 2 - 0.6;
 const CORTE_X1 = CORTE_POS[0] + ANCHO_CUT / 2 + 0.6;
-/** @type {(pos: number[]) => boolean} */
-const floraEstorba = ([x, , z]) => (
-  z > 2.5 || (x > CORTE_X0 && x < CORTE_X1 && z > CORTE_POS[2] - CARA - 0.45)
-);
 
 /* PRNG determinista local (mismo corte siempre). */
 function rng(seed) {

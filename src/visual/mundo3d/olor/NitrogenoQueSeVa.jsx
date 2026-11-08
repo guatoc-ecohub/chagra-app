@@ -150,6 +150,7 @@ export default function NitrogenoQueSeVa({ aireRef, n = 420, camaRef, reducedMot
     [tex, geo, mat],
   );
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((state) => {
     const p = puntos.current;
     const a = aireRef.current;
@@ -192,6 +193,7 @@ export default function NitrogenoQueSeVa({ aireRef, n = 420, camaRef, reducedMot
 
       /* Mezcla de los dos destinos: eso hace la transición continua. */
       const j = i * 3;
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       pos[j] = xQ + (xV - xQ) * fuga;
       pos[j + 1] = yQ + (yV - yQ) * fuga;
       pos[j + 2] = zQ + (zV - zQ) * fuga;
@@ -216,6 +218,7 @@ export default function NitrogenoQueSeVa({ aireRef, n = 420, camaRef, reducedMot
 
     /* Las motas del aire se desvanecen al llegar arriba; las de la cama no.
        Un solo material, así que la opacidad global se mueve con la fuga. */
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     mat.size = 0.04 + a.nitrogeno.aire * 0.022;
   });
 
@@ -223,4 +226,5 @@ export default function NitrogenoQueSeVa({ aireRef, n = 420, camaRef, reducedMot
 }
 
 /* Altura de referencia del caballete, para quien quiera encuadrar la fuga. */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const ALTURA_FUGA = ALTURAS.caballete;

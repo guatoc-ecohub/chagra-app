@@ -28,6 +28,7 @@ export default function ExtensionistaDashboard() {
 
   useEffect(() => {
     const hoy = new Date().toISOString().split('T')[0];
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- calcula las estadísticas al montar a partir de la fecha de hoy; derivarlas en render cambiaría la conducta
     setStats({
       total: fincas.length,
       conAlertas: fincas.filter(f => f.alertas.length > 0).length,

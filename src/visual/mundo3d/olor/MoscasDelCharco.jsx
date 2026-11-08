@@ -107,6 +107,7 @@ export default function MoscasDelCharco({ aireRef, n = 26, reducedMotion = false
     [geo, mat],
   );
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((state) => {
     const p = puntos.current;
     const a = aireRef.current;
@@ -131,6 +132,7 @@ export default function MoscasDelCharco({ aireRef, n = 26, reducedMotion = false
       const j = i * 3;
       const ph = moscas.fase[i];
       /* Tres senos desalineados: el lazo que nunca cierra. */
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       pos[j] = moscas.cx[i] + Math.sin(t * moscas.f1[i] + ph) * moscas.radio[i];
       pos[j + 1] =
         moscas.cy[i] + Math.sin(t * moscas.f3[i] + ph * 1.7) * moscas.radio[i] * 0.55;

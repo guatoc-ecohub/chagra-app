@@ -163,6 +163,7 @@ function Atmosfera({ aireRef, perfil }) {
   }, []);
 
   useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
     scene.background = c.fondo;
     if (perfil.fog) scene.fog = new THREE.Fog(c.nieblaLimpia.getHex(), 14, 60);
     return () => {
@@ -171,6 +172,7 @@ function Atmosfera({ aireRef, perfil }) {
     };
   }, [scene, c, perfil.fog]);
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame(() => {
     const a = aireRef.current;
     if (!a) return;
@@ -182,6 +184,7 @@ function Atmosfera({ aireRef, perfil }) {
       f.color.copy(c.nieblaLimpia).lerp(c.nieblaSucia, a.amoniaco * 0.72);
       /* Con olor, el aire se cierra: se ve hasta la cerca y no más. Sin olor,
          se ve hasta el otro lado del valle. La finca se agranda al respirar. */
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       f.near = 14 - a.amoniaco * 11;
       f.far = 60 - a.amoniaco * 34;
     }
@@ -200,7 +203,7 @@ function Atmosfera({ aireRef, perfil }) {
  * patrón de floraParamo/fincaRealista, calcado. La gama baja también tiene
  * cochera.
  */
-function Cochera({ perfil, aireRef, camaRef }) {
+function Cochera({ perfil, aireRef }) {
   const mat = useMemo(() => crearMaterialVertexColors(perfil), [perfil]);
 
   /* Las siluetas son MeshBasic: tinta plana, sin luz. Son sombras con altura,

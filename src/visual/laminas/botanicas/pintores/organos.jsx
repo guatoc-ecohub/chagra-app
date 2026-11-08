@@ -38,6 +38,7 @@ import { SINTOMAS } from '../geometria/sintoma.js';
  *  visual de la casa) y ahí el `:` en un `url(#…)` es pólvora mojada. Se los
  *  quitamos: la unicidad la sigue dando React, y el id queda rsvg-safe — que
  *  es requisito de la librería, no un lujo (ver ../README.md). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const idSvg = (id) => `lb${id.replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
 /** Un trazo que se calla cuando no tiene nada que decir.
@@ -314,7 +315,7 @@ export function PintaRaiz({ spec, semilla, mostrarTierra = true }) {
 /** PintaFlor — el arquetipo de la familia. Ver `../geometria/flor.js`: la
  *  flor delata el parentesco y el parentesco predice el manejo. */
 export function PintaFlor({ spec, semilla, escala = 1 }) {
-  const uid = idSvg(useId());
+  useId();
   const geo = useMemo(() => {
     const r = generador(`${semilla}-flor`);
     const f = FLORES[spec.tipo] || FLORES.solanacea;

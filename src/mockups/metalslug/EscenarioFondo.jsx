@@ -16,6 +16,7 @@
 import { memo } from 'react';
 
 /* Paletas por piso térmico (misma familia térmica del repo). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const PALETAS_PISO = Object.freeze({
   templado: {
     cielo: '#bfe3ef', cieloBajo: '#eaf3d9',
@@ -47,6 +48,7 @@ export const PALETAS_PISO = Object.freeze({
   },
 });
 
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export function paletaPiso(piso) {
   return PALETAS_PISO[piso] || PALETAS_PISO.templado;
 }

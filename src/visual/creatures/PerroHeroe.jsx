@@ -69,6 +69,7 @@ export function PerroHeroe({
   const [boca, setBoca] = useState(/** @type {string|null} */ (null));
   useEffect(() => {
     if (gesto !== 'ladra' || reducedMotion || tier === 'bajo') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
       setBoca(null);
       return undefined;
     }

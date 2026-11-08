@@ -998,7 +998,7 @@ export function curvaQuebrada() {
  * Devuelve dos mallas: `clara` (la base, siempre) y `pluma` (la turbia, cuya
  * opacidad la maneja la escena con la erosión: sin aguacero no hay pluma).
  */
-export function geometriaQuebrada(P) {
+export function geometriaQuebrada(_P) {
   const eje = curvaQuebrada();
   const n = 30;
   const ancho = 0.42;

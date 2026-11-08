@@ -68,7 +68,7 @@ export function iniciarSonidoMundo(mundoId, volumen = 0.2) {
 
 /** Detiene cualquier sonido ambiental activo. */
 export function detenerSonidoMundo() {
-  try { osc?.stop(); } catch {}
-  try { ctx?.close(); } catch {}
+  try { osc?.stop(); } catch { /* el oscilador ya estaba detenido */ }
+  try { ctx?.close(); } catch { /* el contexto de audio ya estaba cerrado */ }
   osc = null; ctx = null; gain = null;
 }

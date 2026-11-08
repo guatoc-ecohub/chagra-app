@@ -38,6 +38,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { curvaCruce, FACTOR_TIER_BAJO } from './velosData.js';
 
 /** Pose de cámara desde arrays planos (el host no necesita importar three). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export function poseDesdeArrays({ pos, mira, fov = 44 }) {
   return {
     pos: new THREE.Vector3(pos[0], pos[1], pos[2]),

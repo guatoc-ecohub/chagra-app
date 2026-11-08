@@ -29,7 +29,7 @@ import { generador } from './nucleo/rng.js';
 import { puntillismo, puntosAPath, borron } from './nucleo/trama.js';
 import { suave } from './nucleo/trazo.js';
 import { NOMBRE_SISTEMA } from './geometria/raiz.js';
-import { PintaHoja, PintaRaiz, PintaFlor, PintaFruto, idSvg } from './pintores/organos.jsx';
+import { PintaHoja, PintaRaiz, PintaFlor, PintaFruto } from './pintores/organos.jsx';
 import { PintaHabito, Cota } from './pintores/PintaHabito.jsx';
 import { Texto, Fig, Binomio, BarraEscala, Seccion, Parrafo, SelloFuente } from './pintores/tipografia.jsx';
 
@@ -44,7 +44,7 @@ const M = 54; // margen del pliego
 /** El pliego: crema, con su grano y sus motas. El papel NO es blanco — un
  *  fondo blanco delata la pantalla y, en campo, encandila bajo el sol. */
 function Papel({ semilla }) {
-  const uid = idSvg(useId());
+  useId();
   const r = generador(`${semilla}-papel`);
   /* foxing: las motas pardas del papel viejo. Poquitas y pálidas: son un
      susurro de materialidad, no una textura de filtro de Instagram. */
@@ -291,7 +291,6 @@ export default function LaminaBotanica({ especie, numero, className = '' }) {
   /* columnas */
   const izq = M;
   const der = 520;
-  const anchoDer = W - M - der;
 
   return (
     <svg

@@ -41,6 +41,7 @@ import {
    el potrero queda al centro-izquierda y el monte a la derecha). El host
    puede pasar las suyas — idealmente la PROYECCIÓN a viewport de cada perro
    3D en el instante del cruce, para que el relevo sea invisible. */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const POSICIONES_GUARDIANES = Object.freeze({
   dalmata: Object.freeze({ x: '42%', y: '58%' }),
   beagle: Object.freeze({ x: '58%', y: '65%' }),
@@ -55,6 +56,7 @@ function useGuionGuardia(perro, activo, reducedMotion) {
   const pasos = GUION_GUARDIA[perro] || [];
   const [idx, setIdx] = useState(0);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
     setIdx(0);
     if (!activo || reducedMotion || pasos.length <= 1) return undefined;
     const timers = pasos.slice(1).map((p, k) => setTimeout(() => setIdx(k + 1), p.ms));

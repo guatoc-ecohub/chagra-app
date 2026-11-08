@@ -274,7 +274,7 @@ function BackgroundPreviewModal({ option, onConfirm, onClose }) {
   const src = getBackgroundSrc(option.id);
   // aspect-ratio (ancho/alto) real de la imagen; arranca en 3/4 (vertical,
   // como la referencia) y se corrige una sola vez al cargar. NO es per-frame.
-  const [ratio, setRatio] = useState(3 / 4);
+  const [ratio] = useState(3 / 4);
 
   useEffect(() => {
     function onKey(e) {

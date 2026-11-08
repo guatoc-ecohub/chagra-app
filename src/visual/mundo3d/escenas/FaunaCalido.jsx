@@ -52,6 +52,7 @@ const COMPS = {
  * @param {number} [fase]
  * @returns {[number, number, number]}
  */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export function coreoCalido(patron, t, fase = 0) {
   switch (patron) {
     case 'vuela': {

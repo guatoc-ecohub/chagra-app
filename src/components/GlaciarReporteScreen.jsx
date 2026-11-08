@@ -176,6 +176,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null, on
   // Capturar coords cuando llega la posición del GPS.
   useEffect(() => {
     if (position && !geoError) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza las coordenadas con la posición del GPS cuando llega; derivarlas en render cambiaría la conducta
       setCoords({
         lat: position.lat,
         lng: position.lon,
@@ -198,6 +199,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null, on
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga de datos al montar o al cambiar la entrada: la función invocada marca el estado de carga; moverla a un evento cambiaría la conducta
     if (tab === 'lista') cargarReportes();
   }, [tab, cargarReportes]);
 

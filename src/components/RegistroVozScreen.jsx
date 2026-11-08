@@ -145,6 +145,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null, onN
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
+  const onboardingExtendido = initialData?.onboardingExtendido;
   const handleConfirm = useCallback(async (edited, ctx) => {
     setView(ST.SAVING);
     try {
@@ -153,7 +154,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null, onN
       // @ts-ignore saveType is string union from buildVoicePayload
       const result = await savePayload(saveType, payload);
       if (result.success || result.savedLocally) {
-        if (initialData?.onboardingExtendido && ['registrar_planta', 'registrar_siembra'].includes(edited.intent)) {
+        if (onboardingExtendido && ['registrar_planta', 'registrar_siembra'].includes(edited.intent)) {
           completarPasoExtendido('planta');
         }
         setSavedKind(INTENT_META[edited.intent]?.label || 'Registro');
@@ -168,7 +169,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null, onN
       setErrorMsg(`No se pudo guardar: ${err.message}`);
       setView(ST.ERROR);
     }
-  }, [initialData?.onboardingExtendido, onSave]);
+  }, [onboardingExtendido, onSave]);
 
   const remainingMs = Math.max(0, (hardLimitMs || 30000) - durationMs);
 

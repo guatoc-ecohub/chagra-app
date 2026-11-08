@@ -20,7 +20,7 @@ export function persistirEnLocalStorage(config, key) {
         const parsed = JSON.parse(saved);
         set({ ...get(), ...parsed });
       }
-    } catch {}
+    } catch { /* estado persistido ilegible: se arranca con el inicial */ }
 
     const wrappedSet = (partial, replace) => {
       set(partial, replace);
@@ -34,7 +34,7 @@ export function persistirEnLocalStorage(config, key) {
           }
         }
         localStorage.setItem(key, JSON.stringify(toSave));
-      } catch {}
+      } catch { /* cuota o almacenamiento no disponible: persistir es opcional */ }
     };
 
     return config(wrappedSet, get, api);

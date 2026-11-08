@@ -29,6 +29,7 @@ import { auraDeBicho } from './transformacion.js';
 const VIEWBOX = '-15 -20 30 39';
 
 /* Identidad de especie como datos (self-contained: no toca la del trío andino). */
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const PEREZOSO_PALETA = {
   cuerpo: '#93876a',        // pelaje pardo-grisáceo templado
   cuerpoGlow: 'rgba(122,138,92,0.62)', // el halo tira a VERDOSO (algas)
@@ -43,6 +44,7 @@ export const PEREZOSO_PALETA = {
   rama: '#6b4a30',          // la rama de la que cuelga
   hoja: '#5f9e46',          // brotes de la rama
 };
+// eslint-disable-next-line react-refresh/only-export-components -- export no-componente que otros módulos importan desde aquí; separarlo cambiaría esas rutas y solo afecta al HMR
 export const PEREZOSO_PROPORCION = {
   troncoRx: 8.4,
   troncoRy: 8.2,

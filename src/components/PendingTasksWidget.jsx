@@ -74,6 +74,7 @@ export default function PendingTasksWidget({ onEdit }) {
       clearPendingTasksRequestCache();
       previousFincaSlug.current = activeFincaSlug;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- carga de datos al montar o al cambiar la entrada: la función invocada marca el estado de carga; moverla a un evento cambiaría la conducta
     fetchTasks();
 
     const updateOnlineStatus = () => setIsOnline(navigator.onLine);

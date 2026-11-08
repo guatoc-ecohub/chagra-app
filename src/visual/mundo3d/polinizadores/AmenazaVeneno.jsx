@@ -128,6 +128,7 @@ export default function AmenazaVeneno({
     [tex, mat, geo],
   );
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((state, dtCrudo) => {
     const g = grupo.current;
     if (!g) return;
@@ -135,6 +136,7 @@ export default function AmenazaVeneno({
     const t = state.clock.elapsedTime;
 
     if (!activa && paso.current >= 1) {
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       mat.opacity = 0;
       return;
     }

@@ -182,6 +182,8 @@ export default [
       'scripts/grafo-pisos-banda-helada-2026-09-26.mjs',
       'scripts/grafo-nival-4800-2026-09-27.mjs',
       'scripts/grafo-sync-especies-2026-09-27.mjs',
+      'scripts/gen-chagra-stats.mjs',
+      'scripts/generate-cycle-content-manifest.mjs',
     ],
     languageOptions: {
       globals: { ...globals.node },

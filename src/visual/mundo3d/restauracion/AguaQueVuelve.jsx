@@ -163,6 +163,7 @@ export default function AguaQueVuelve({ anioRef, tier = 'alto', reducedMotion = 
     [geoQuebrada, geoOjo, geoPiedras, texAgua, texLodo, matPiedras, matAgua, matLodo, matQuebrada],
   );
 
+  // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
   useFrame((_, dt) => {
     const a = agua(anioRef.current);
 
@@ -184,6 +185,7 @@ export default function AguaQueVuelve({ anioRef, tier = 'alto', reducedMotion = 
 
     // Y el agua BAJA (las vetas corren hacia la parte de abajo del cauce).
     if (!reducedMotion && texAgua && a > 0.01) {
+      // eslint-disable-next-line react-hooks/immutability -- se actualiza a mano un objeto de three.js (geometría, material o buffer) fuera del ciclo de render de React; reescribirlo como estado cambiaría la conducta
       texAgua.offset.y -= dt * 0.28;
     }
   });

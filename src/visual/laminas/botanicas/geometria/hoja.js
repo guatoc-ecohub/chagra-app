@@ -20,7 +20,7 @@
  * Convención: la hoja nace en (0,0) y crece hacia +X; el ancho se reparte en
  * ±Y. Quien la coloca, la rota (ver `trazo.js`).
  */
-import { entre, tembleque } from '../nucleo/rng.js';
+import { tembleque } from '../nucleo/rng.js';
 import { suave, quebrado, espejar, lerp, sujeta, vena } from '../nucleo/trazo.js';
 
 /* ------------------------------------------------------------------ */

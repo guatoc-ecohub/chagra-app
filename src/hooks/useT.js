@@ -7,7 +7,6 @@
  * Detecta idioma del navegador, fallback a español.
  * Para agregar un idioma: crear messages_en.js y registrarlo en IDIOMAS.
  */
-import { useCallback } from 'react';
 import messages_es from '../config/messages.js';
 
 /** @type {Record<string, any>} */
@@ -52,7 +51,7 @@ function traducir(key, params) {
  * @returns {(key: string, params?: Record<string, string>) => string}
  */
 export function useT() {
-  return useCallback(traducir, []);
+  return traducir;
 }
 
 /** Versión directa (sin hook) para usar fuera de componentes React */

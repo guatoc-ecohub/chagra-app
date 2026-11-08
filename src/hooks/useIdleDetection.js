@@ -25,6 +25,7 @@ export default function useIdleDetection(delayMs = 12000, enabled = true) {
 
     useEffect(() => {
         if (!enabled) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- reinicia el estado al cambiar la entrada del efecto; derivarlo en render cambiaría la conducta
             setIdle(false);
             return;
         }
