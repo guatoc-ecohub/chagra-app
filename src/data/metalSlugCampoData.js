@@ -27,7 +27,7 @@
  *     con enlaces a `src/data/climaBoletines.js` (ENSO/sequía) y al contexto
  *     agroecológico del repo.
  *
- * i18n (ADR-050): juego servido solo en es-CO (mismo criterio que doomFincaData
+ * i18n: juego servido solo en es-CO (mismo criterio que doomFincaData
  * y defensoresFincaData). Regla chagra-i18n es soft (warn); aquí se mantiene el
  * mismo estándar de la carpeta de juego: datos en español colombiano tú/usted.
  *

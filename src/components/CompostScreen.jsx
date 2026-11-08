@@ -1,4 +1,4 @@
-/* i18n (ADR-050): el copy user-facing va en español Colombia (voz campesina
+/* i18n: el copy user-facing va en español Colombia (voz campesina
  * paisa), pendiente de migrar a src/config/messages.js — misma deuda
  * preexistente que AguaScreen / PoscosechaScreen / EstiercolScreen. */
 import React, { useState } from 'react';

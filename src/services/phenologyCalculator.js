@@ -4,7 +4,7 @@
  * Task 22: Calcula ventanas (no fechas únicas). Degrada honestamente
  * cuando faltan datos. Incluye corrección por altitud.
  *
- * Invariante ADR-049: nunca devuelve observed_stage ni modifica
+ * Invariante: nunca devuelve observed_stage ni modifica
  * el proceso. Solo computa estimated_stage.
  */
 import { getTemplate } from '../data/phenologyTemplates';

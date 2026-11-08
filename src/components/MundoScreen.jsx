@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy de navegación en español Colombia, pendiente de migrar a
+ * i18n: copy de navegación en español Colombia, pendiente de migrar a
  * src/config/messages.js — mismo criterio que DashboardLive.jsx.
  */
 import { Globe2 } from 'lucide-react';

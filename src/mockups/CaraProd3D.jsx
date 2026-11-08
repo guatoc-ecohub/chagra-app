@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con copy de muestra (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con copy de muestra */
 /*
  * CaraProd3D — LA CARA 3D-FIRST de prod.chagra.app (#/mockups/cara-prod).
  *
@@ -35,7 +35,7 @@
  * sin la prop entra en modo vitrina (cualquier usuario no vacío pasa).
  *
  * Copy de muestra en español de Colombia (usted); si se productiza migra a
- * messages.js (ADR-050).
+ * messages.js.
  */
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CLIMAS } from './valle/valleData';

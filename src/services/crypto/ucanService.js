@@ -1,7 +1,7 @@
 /**
  * ucanService.js — Delegación de capabilities (UCAN mínimo) sobre did:key.
  *
- * PROPÓSITO (Fase 2, ADR-036 sub-iv, DISENO-FEDERACION-USUARIOS.md §5.2/§6.6):
+ * PROPÓSITO (Fase 2, delegación UCAN):
  *   El dueño (issuer, Responsable del Tratamiento) firma una capability que
  *   autoriza a un `did` destino (sub-usuario propio o asesor externo) a
  *   ejecutar una acción (`can`) sobre un recurso (`with`), con TTL y

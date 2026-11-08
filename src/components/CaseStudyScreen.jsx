@@ -19,9 +19,9 @@ import { loadCaseStudyDemos } from '../services/caseStudyDemoLoader';
  *  - Filtro por finca (default = finca activa del fincaActiveStore).
  *  - Click row → navega a detalle.
  *
- * Post-DR-044: incluir export PDF, cross-case similarity.
- * Post-DR-040: typeahead pest_id en lugar de free text.
- * Post-DR-041: linkear cohort_id formal.
+ * Pendiente: incluir export PDF, cross-case similarity.
+ * Pendiente: typeahead pest_id en lugar de free text.
+ * Pendiente: linkear cohort_id formal.
  */
 
 const SEVERITY_META = {
@@ -128,7 +128,7 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
     count_total: '',
     count_affected: '',
   });
-  // DR-044 sub-viii feature 1: Voice/text → Caso extraction via Ollama
+  // Voice/text → Caso extraction via Ollama
   const [showExtractor, setShowExtractor] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [extracting, setExtracting] = useState(false);
@@ -216,7 +216,7 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
     }
   };
 
-  // DR-044 sub-viii Feature 1 (voice path real): mic → recorder → Whisper transcribe → fill textarea
+  // Ruta de voz real: mic → recorder → Whisper transcribe → fill textarea
   const handleMicToggle = async () => {
     setExtractError(null);
     if (recorder.isRecording) {
@@ -246,7 +246,7 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
 
   return (
     <form onSubmit={submit} className="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
-      {/* DR-044 sub-viii Feature 1: extracción asistida por IA local */}
+      {/* extracción asistida por IA local */}
       {!showExtractor && (
         <button
           type="button"
@@ -262,7 +262,7 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
           <p className="text-purple-200 text-[10px] uppercase font-black tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3 h-3" /> Dicta o escribe lo que observaste
           </p>
-          {/* Mic button (DR-044 F1 voice real) */}
+          {/* Mic button */}
           <div className="flex items-center gap-2">
             <button
               type="button"

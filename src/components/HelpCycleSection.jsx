@@ -62,7 +62,7 @@ const ALL_CYCLES = [
 /**
  * Sección educativa interactiva (queue/039 + rediseño 2026-05-08).
  * Accordion por especie: cada card abre INLINE el corpus consolidado
- * (DR-034) + voz IA con guardrails RAG. Especies pendientes muestran
+ * + voz IA con guardrails RAG. Especies pendientes muestran
  * nota educativa al expandir en lugar de corpus.
  */
 export default function HelpCycleSection() {

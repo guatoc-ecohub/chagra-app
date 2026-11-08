@@ -20,7 +20,7 @@ import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
 
 /**
- * TopBar, header persistente con identidad del operador (DR-030 QW2).
+ * TopBar, header persistente con identidad del operador.
  *
  * Reemplaza el header inline del DashboardView que mostraba info ambiental
  * (msnm/luna/sol) sin identidad del operador. La info ambiental NO se

@@ -1,5 +1,5 @@
 /**
- * sidecarClient.js — Cliente HTTP del sidecar chagra-agro-mcp (ADR-045 Fase 2).
+ * sidecarClient.js — Cliente HTTP del sidecar chagra-agro-mcp.
  *
  * Wirea el AgentScreen del PWA con el endpoint `/api/mcp/agro/` (nginx
  * proxia al sidecar). Detrás de un feature flag — mientras el deploy del
@@ -757,7 +757,7 @@ export async function resolveEntities(userMessage, opts = {}) {
 
 /**
  * Pre-filtro determinista de FERMENTOS (capa 1 SAFETY-CRITICAL, módulos opcionales
- * #159 — DR-FOOD-3). Llama `POST ${BASE}/fermento-prefilter` con la query del
+ * #159). Llama `POST ${BASE}/fermento-prefilter` con la query del
  * usuario; el sidecar detecta intención-fermento (kombucha, hidromiel, yuca
  * amarga, etc.), resuelve el nodo :Fermento en Apache AGE y devuelve un bloque
  * de instrucción listo para inyectar al system prompt (refusal/veto si aplica,

@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (usos tradicionales, cultivo y cosecha de la botica medicinal), pendiente de
  * migrar a src/config/messages.js — mismo criterio que aromaticasHuerta.js /
  * cafeFinca.js / aguaFinca.js.

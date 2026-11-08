@@ -23,7 +23,7 @@
  *     mismo orden del umbral LLUVIA_MM=10 de atmosphereService). Sin
  *     snapshot → pendiente.
  *   · 🪱 El suelo → el diagnóstico REAL de soilDiagnostic.diagnosticarSuelo
- *     (DR-SUELOS-1) hecho sobre la descripción del usuario. Ese diagnóstico
+ * hecho sobre la descripción del usuario. Ese diagnóstico
  *     hoy se calcula bajo demanda (agente/pantalla de suelo) y NO se
  *     persiste, así que el slot queda pendiente hasta que llegue un
  *     diagnóstico (`diagSuelo`). Con diagnóstico: valor = 100 − 18 por cada

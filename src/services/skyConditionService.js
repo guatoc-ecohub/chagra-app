@@ -41,7 +41,7 @@
  *     frío 2000-3000, páramo >3000) — mismos cortes que pisoTermicoFromAltitud.
  *   - Régimen bimodal andino + nubosidad orográfica/inversión térmica (IDEAM,
  *     Atlas Climatológico de Colombia).
- *   - ENSO Andes: El Niño seco/soleado, La Niña nublado/lluvioso (DR-MISSION-2/4).
+ *   - ENSO Andes: El Niño seco/soleado, La Niña nublado/lluvioso.
  */
 
 import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';

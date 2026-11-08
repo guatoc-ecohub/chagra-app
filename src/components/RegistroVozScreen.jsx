@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * Los textos de UI de esta pantalla de registro por voz (microcopy de estados,
  * frases-ejemplo, rótulos de botones) son strings de interfaz. Su migración a
- * src/config/messages.js es la TAREA i18n de ADR-050 (transversal a la app),
+ * src/config/messages.js es la tarea de i18n (transversal a la app),
  * fuera del alcance de #23 — mismo criterio que RegistroVozConfirm.jsx, su
  * pantalla hermana. Los errores reales de ESLint siguen activos. */
 import React, { useCallback, useState } from 'react';

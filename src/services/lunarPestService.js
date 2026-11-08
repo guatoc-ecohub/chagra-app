@@ -18,13 +18,11 @@
  *
  *   Operadores SIN trampa de luz: la información es neutra, no obliga.
  *
- * POLÍTICA — ADR-033 Opción C estricta:
+ * POLÍTICA — luna solo como cielo, estricta:
  *   - Esta es la ÚNICA feature lunar habilitada en Chagra
  *   - Solo Nivel 2 evidencia (entomológica, no agroecológica genérica)
  *   - NO sugiere "siembre/coseche/podar en X fase" (eso es Nivel 3 folclore)
  *   - NO emite badge "🌙 saber tradicional"
- *
- * REFS: ADR-033, dr-033-mistral-tiebreak.md
  */
 
 const NEW_MOON_WINDOW_DAYS = 3; // ±3 días alrededor de luna nueva

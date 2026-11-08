@@ -1,6 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- vitrina de discovery con
-   copy curatorial en español a propósito (mismo caso AngelitaViva/CaraProd3D,
-   ADR-050) */
+   copy curatorial en español a propósito (mismo caso AngelitaViva/CaraProd3D) */
 import { useEffect, useState } from 'react';
 import { GuacamayaEntrada } from '../visual/agente/GuacamayaEntrada.jsx';
 import { GuacamayaSalida } from '../visual/agente/GuacamayaSalida.jsx';

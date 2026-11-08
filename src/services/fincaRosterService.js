@@ -192,8 +192,8 @@ function saveRoster(roster) {
 /**
  * Bootstrap del primer usuario: si el roster de la finca NO tiene todavía
  * ningún usuario activo, el tenant logueado (quien hizo login en farmOS,
- * dueño de facto de la finca — ADR-036 sub-viii "Responsable del
- * Tratamiento") se auto-provisiona como `dueno` la primera vez que se
+ * dueño de facto de la finca — el "Responsable del
+ * Tratamiento" de Habeas Data) se auto-provisiona como `dueno` la primera vez que se
  * consulta el actor. Sin esto, `addSubUser`/`revokeSubUser` fallan siempre
  * con "roster actor not available" — nadie podría crear el primer usuario.
  * Es una escritura idempotente y solo ocurre cuando `usuarios` está vacío.

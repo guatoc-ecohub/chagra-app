@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+/* i18n: etiquetas user-facing en español Colombia pendientes de
  * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
  * desactiva a nivel de archivo para no bloquear el pre-commit (mismo criterio
  * que App.jsx y los demás screens). Los errores reales siguen activos. */

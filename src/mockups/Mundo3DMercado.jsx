@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- vitrina de diseño: copy de muestra, no cadenas de UI de producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- vitrina de diseño: copy de muestra, no cadenas de UI de producción */
 /*
  * Mundo3DMercado — vitrina pública del MUNDO DEL MERCADO (ruta
  * #/mockups/mundo3d-mercado).

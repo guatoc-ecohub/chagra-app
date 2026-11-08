@@ -102,7 +102,7 @@ function Contenido({
   // `rebote`: cada toque de hotspot lo incrementa → Angelita da un microrrebote
   // (carácter de compañera, ref. el zorro de Ori / el ganso de Untitled Goose).
   const [rebote, setRebote] = useState(0);
-  // Háptica del tap (DR-3D-HAPTICA): un tick seco al tocar un hotspot —
+  // Háptica del tap: un tick seco al tocar un hotspot —
   // "toqué algo vivo, respondió". Gate triple interno; no-op en iOS.
   const haptics = useHaptics({ reducedMotion });
   // Anti-colisión de hotspots (ver bloque de arriba): refs de los botones +
@@ -436,7 +436,7 @@ export default function EscenaBase3D({
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
   const tierInicial = useMemo(() => detectarTierInicial({ tier: /** @type {'alto' | 'medio' | 'bajo'} */ (tier) }), [tier]);
   const presupuestoInicial = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
-  /* Device-tiering (DR-3D-PERF-GAMABAJA §2): el andamiaje ya es frugal por
+  /* Device-tiering: el andamiaje ya es frugal por
      contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
   const frugal = tierInicial === 'bajo';

@@ -11,7 +11,7 @@
  * para no repetirlos (anti-molestia).
  *
  * Reglas:
- *   - 100% offline: localStorage, cero red (soberanía ADR-007).
+ *   - 100% offline: localStorage, cero red (soberanía de datos).
  *   - NUNCA lanza: storage corrupto o inexistente degrada a "no visto".
  *   - El contenido de los tips vive en los componentes (reusa los textos
  *     del Manual Help*Screen); aquí solo la persistencia.

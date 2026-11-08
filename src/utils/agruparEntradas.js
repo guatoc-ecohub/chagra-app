@@ -4,7 +4,7 @@
  *
  * Motivación (operador, 2026-07): al sembrar N matas iguales el mismo día en el
  * mismo lote (p. ej. 20 fresas), AssetsDashboard crea N `asset--plant` con
- * nombres "Fresa #01", "Fresa #02"… (modo individual, ADR-030). Esos N assets
+ * nombres "Fresa #01", "Fresa #02"… (modo individual). Esos N assets
  * se propagan a los listados (Mis matas, Ciclo del cultivo, Calendario) como N
  * filas casi idénticas → ruido. Aquí NO se tocan los datos crudos: solo se
  * agrupan para mostrar "🍓 Fresa ×20 · sembradas 4 mar · Cama 1" con opción de

@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy de navegación campesino en español Colombia, pendiente de
+ * i18n: copy de navegación campesino en español Colombia, pendiente de
  * migrar a src/config/messages.js — mismo criterio que DashboardLive.jsx.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

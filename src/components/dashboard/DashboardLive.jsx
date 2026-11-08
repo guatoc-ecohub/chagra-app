@@ -1,6 +1,6 @@
 import HomeJornada from './HomeJornada';
 /*
- * i18n (ADR-050): DashboardLive.jsx contiene etiquetas de navegación de la home
+ * i18n: DashboardLive.jsx contiene etiquetas de navegación de la home
  * en español Colombia (títulos de tiles/bloques: Suelo, Semilleros, Cosechar,
  * Insumos aplicados, "Registrar en la finca"…) pendientes de migrar a
  * src/config/messages.js. La regla chagra-i18n es soft (warn); se desactiva a
@@ -959,7 +959,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <CicloVivoWidget onNavigate={onNavigate} />
                 </div>
 
-                {/* Top problemas activos (casos de estudio, DR-044). Se auto-oculta
+                {/* Top problemas activos (casos de estudio). Se auto-oculta
                     si no hay casos → zero footprint. */}
                 <div className="px-4 pt-3 fvh-resto-block">
                     <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />

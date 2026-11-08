@@ -136,8 +136,8 @@ function normalizeSubUser(subUser) {
 /**
  * Fallback del modo legacy single-user (MVP sin roster todavía): si hay un
  * tenant logueado pero ningún roster/SubUser resuelto para la finca activa,
- * ese usuario es dueño de su propia finca (ADR-036 sub-viii, "Responsable
- * del Tratamiento"). Ver nota extensa en `currentSecurityRole`.
+ * ese usuario es dueño de su propia finca (el "Responsable
+ * del Tratamiento" de Habeas Data). Ver nota extensa en `currentSecurityRole`.
  * @returns {{ rol: 'dueno' } | null}
  */
 function legacyOwnerFallback() {

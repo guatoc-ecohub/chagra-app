@@ -2,7 +2,7 @@
  * MOCKUP DEV (#/mockups/dia-en-finca): copy de muestra en español de
  * Colombia (usted) para decidir la superficie completa del "qué hacer hoy".
  * No es UI de producción; si se adopta, sus textos migran a
- * src/config/messages.js (ADR-050).
+ * src/config/messages.js.
  */
 /**
  * DiaEnFinca.jsx — MOCKUP DEV · "EL DÍA EN SU FINCA"

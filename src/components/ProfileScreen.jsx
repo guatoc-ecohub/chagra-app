@@ -821,7 +821,7 @@ export default function ProfileScreen({ onBack, onHome, onLogout = null }) {
                 src/config/modoCampoFlag.js. Vive junto a los ajustes de voz. */}
             {modoCampoDisponible() ? <ModoCampoPanel /> : <EnrollmentVoiceAccess />}
 
-            {/* DR-3D-HAPTICA: vibración táctil de los mundos 3D (tri-estado). */}
+            {/* vibración táctil de los mundos 3D (tri-estado). */}
             <HapticsSection />
 
             {/* Spec S3: sonido ambiental 0-KB de los mundos (tri-estado). */}
@@ -1131,7 +1131,7 @@ export default function ProfileScreen({ onBack, onHome, onLogout = null }) {
               </label>
             </div>
 
-            {/* Modo extensionista (ADR-048 MVP): SOLO se renderiza si el
+            {/* Modo extensionista: SOLO se renderiza si el
                 usuario tiene el rol (flag + whitelist). */}
             {esExtensionistaActual() && (
               <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
@@ -1273,7 +1273,7 @@ function AgentVoiceSection() {
 }
 
 /**
- * HapticsSection — DR-3D-HAPTICA (2026-07-11).
+ * HapticsSection — vibración táctil de los mundos 3D (2026-07-11).
  *
  * Toggle tri-estado "Vibración" persistido en usePrefsStore (key
  * `chagra:prefs:haptics`). Controla los pulsos táctiles del framework de

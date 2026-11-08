@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+/* i18n: etiquetas user-facing en español Colombia pendientes de
  * migrar a src/config/messages.js. La regla chagra-i18n es soft (warn); se
  * desactiva a nivel de archivo para no bloquear el pre-commit con deuda
  * preexistente (mismo criterio que App.jsx). Los errores reales siguen activos. */
@@ -17,7 +17,7 @@ import DescensoLaunch from './DescensoLaunch.jsx';
 
 /**
  * SoilDiagnosticScreen — diagnóstico de suelo GUIADO sin laboratorio
- * (DR-SUELOS-1). Pensado para baja alfabetización: íconos concretos,
+ *. Pensado para baja alfabetización: íconos concretos,
  * pasos numerados grandes, colores del tema y cero texto innecesario.
  *
  * Flujo: el campesino describe su tierra (voz/texto) o toca síntomas con

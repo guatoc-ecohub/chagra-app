@@ -78,7 +78,7 @@ export function AbejaLaminaRig({
   /* Ruana puesta por el host aunque el clima no la pida (el gesto de reposo
      'ruana' de Angelita: se la echa encima y se la quita). Default false. */
   ruana = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
      pleno. El CSS gatea por [data-tier='bajo']; RM lo congela por encima. */

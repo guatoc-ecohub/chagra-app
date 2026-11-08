@@ -3,7 +3,7 @@
  *
  * TAREA 100 — Extraccion completa de strings en espanol hardcodeados.
  *
- * PATRON DE USO (ADR-050):
+ * PATRON DE USO:
  *   import { MSG } from '../config/messages.js';
  *   <button>{MSG.cosecha.registrar}</button>
  *   <h1>{MSG.nav.plantas}</h1>
@@ -412,7 +412,7 @@ const messages = {
     confirmarAbastecer: 'Confirmar',
     registrando: 'Registrando…',
   },
-  // Strings de la pantalla de Perfil (ADR-050 i18n). Extraídos al añadir el
+  // Strings de la pantalla de Perfil (i18n). Extraídos al añadir el
   // selector de perfil + override del operador (2026-06-19) para mantener el
   // archivo libre de hardcodeos (chagra-i18n/no-hardcoded-spanish).
   perfilScreen: {

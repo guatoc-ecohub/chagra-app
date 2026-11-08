@@ -3,7 +3,7 @@
  * (localStorage) + sincronización opcional a FarmOS (cross-device).
  *
  * Separado de `userProfileService` a propósito: ese módulo es, por contrato,
- * 100% client-side ("NADA se envía a ningún backend", soberanía ADR-007). La
+ * 100% client-side ("NADA se envía a ningún backend", soberanía de datos). La
  * foto de perfil SÍ se sincroniza al servidor cuando hay sesión, así que vive
  * en su propio módulo para no romper esa garantía.
  *
@@ -21,7 +21,7 @@
  *   `QuotaExceededError`, se tragaba en silencio (console.warn) → la foto NO se
  *   guardaba y al recargar `getOperatorPhoto()` devolvía '' (la foto "desaparecía").
  *   Rompía además la regla del propio repo ("Blobs grandes → IndexedDB, NO
- *   localStorage", dbCore v16/v17, ADR-030 Regla 8). Fix: la fuente de verdad
+ *   localStorage", dbCore v16/v17). Fix: la fuente de verdad
  *   pasó a localforage/IndexedDB; localStorage queda como ESPEJO best-effort
  *   opcional (solo pinta sin flash en la recarga; si revienta la cuota, no pasa
  *   nada porque la durabilidad la garantiza IndexedDB).

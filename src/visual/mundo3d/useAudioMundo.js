@@ -8,7 +8,7 @@
  * aves, grillos, la campana del mercado). Volumen bajo, cálido, no molesto:
  * el sonido ACOMPAÑA la escena, nunca compite con la voz del agente.
  *
- * Reglas inviolables (mismas del patrón DR-3D-HAPTICA):
+ * Reglas inviolables (mismas del patrón de la háptica):
  *  - Toggle en usePrefsStore (clave `chagra:prefs:sonido`), DEFAULT 'off':
  *      'off'   → nunca suena (default — el sonido es opt-in).
  *      'suave' → ambiente muy tenue (media del volumen normal).

@@ -700,8 +700,8 @@ self.addEventListener('fetch', (event) => {
     // pantalla en blanco — el documento navegable NUNCA debe quedar sin
     // respuesta (raíz del "failed to fetch" engañoso del prod-down 2026-06-18).
     // Shell de último recurso (solo si NI hay red NI shell cacheado). El SW es
-    // un worker standalone: NO puede importar src/config/messages.js (ADR-050
-    // i18n), así que este copy degradado va inline. La app real ya usa
+    // un worker standalone: NO puede importar src/config/messages.js
+    // (i18n), así que este copy degradado va inline. La app real ya usa
     // messages.js; este HTML solo se ve en el primer arranque sin señal.
     /* eslint-disable chagra-i18n/no-hardcoded-spanish */
     const OFFLINE_SHELL_HTML =
@@ -872,7 +872,7 @@ self.addEventListener('sync', (event) => {
     );
   }
 
-  // ADR-030 Regla 8: Background Sync para voice telemetry
+  // Background Sync para voice telemetry
   // Lee IDB pending → POST a FarmOS como log--observation con category: voice_metrics
   if (event.tag === 'voice-telemetry-flush') {
     event.waitUntil(handleVoiceTelemetrySync());
@@ -1010,7 +1010,7 @@ self.addEventListener('message', (event) => {
     }
   }
 
-  // ADR-030 Regla 8: registrar Background Sync para voice-telemetry-flush
+  // registrar Background Sync para voice-telemetry-flush
   if (event.data && event.data.type === 'REGISTER_VOICE_TELEMETRY_SYNC') {
     if (self.registration.sync) {
       self.registration.sync.register('voice-telemetry-flush');

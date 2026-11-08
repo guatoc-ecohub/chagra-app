@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * MOCKUP DEV (#/mockups/home-campesino): copy de muestra en español de
  * Colombia para decidir dirección visual. No es UI de producción; si el
- * rediseño se adopta, sus textos migran a src/config/messages.js (ADR-050). */
+ * rediseño se adopta, sus textos migran a src/config/messages.js. */
 /**
  * HomeCampesino.jsx — MOCKUP DEV del HOME CON OJOS DE CAMPESINO
  * (#/mockups/home-campesino, sin gate ni sesión — datos de muestra).

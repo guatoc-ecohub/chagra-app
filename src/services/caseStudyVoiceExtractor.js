@@ -4,7 +4,7 @@
  * Toma una transcripción en español (Whisper output) y devuelve campos
  * estructurados para pre-fill del CaseStudyScreen NewCaseForm.
  *
- * Pipeline (referenced en DR-044 sub-viii Feature 1):
+ * Pipeline (extracción por voz):
  *   1. Operator dicta caso → Whisper transcribe.
  *   2. extractCaseFromText(transcript) → Ollama, structured JSON.
  *   3. UI pre-fill form, operator confirma.
@@ -15,7 +15,7 @@
  *
  * Privacy: el prompt + transcripción NUNCA salen del host local. Si
  * Ollama no responde (down, timeout), retorna `null` y la UI cae a modo
- * manual (offline-first compliant DR-044 restricciones).
+ * manual (compatible con offline-first).
  *
  * Audit trail: cada call retorna también { model, prompt_hash, timestamp }
  * para que CaseStudy log en event_log_ids referenciado.

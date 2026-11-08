@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (clima, siembra, tutorado, plagas, cosecha y poscosecha de la uchuva),
  * pendiente de migrar a src/config/messages.js — mismo criterio que
  * cafeFinca.js / aguaFinca.js / sanidadData.js.

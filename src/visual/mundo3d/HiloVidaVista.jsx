@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI español intencional; ADR-050 i18n pendiente */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI español intencional; i18n pendiente */
 /*
  * HiloVidaVista — el hilo textual de la "vida vista" del valle.
  *

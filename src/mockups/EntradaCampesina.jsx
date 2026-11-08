@@ -2,7 +2,7 @@ import AbejaLamina from '../visual/creatures/AbejaLamina.jsx';
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * MOCKUP DEV (#/mockups/entrada-campesina): copy de muestra en español de
  * Colombia (usted) para decidir la ENTRADA DEFINITIVA. No es UI de producción;
- * si se adopta, sus textos migran a src/config/messages.js (ADR-050). */
+ * si se adopta, sus textos migran a src/config/messages.js. */
 /**
  * EntradaCampesina.jsx — MOCKUP DEV · LA ENTRADA DEFINITIVA "campesina"
  * (#/mockups/entrada-campesina, sin gate ni sesión — datos de muestra).
@@ -16,7 +16,7 @@ import AbejaLamina from '../visual/creatures/AbejaLamina.jsx';
  *   que hacer hoy. Todo lo demás es paisaje calmo.
  *
  * Jerarquía para un usuario rural (los 4 sí-o-sí, con un solo pulgar, de
- * arriba a abajo), fiel al DR-ENTRADA-DEFINITIVA-2026-07-10 (§3):
+ * arriba a abajo), fiel al diseño definitivo de la entrada (2026-07-10):
  *   0. HORIZONTE VIVO — ancla emocional "esa es mi finca": cielo real de la
  *      hora + saludo + PULSO VITAL de un vistazo (matas, agua, clima) =
  *      SÍ-O-SÍ #4 (estado de cultivos/clima), sin dashboard, sin cifras frías.

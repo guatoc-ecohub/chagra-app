@@ -203,7 +203,7 @@ declare global {
   }
 
   /**
-   * Species shape del catálogo Chagra v3.x. Se evolutionará con ADR-031 (v3.3).
+   * Species shape del catálogo Chagra v3.x. Evolucionará con el schema v3.3.
    */
   interface Species {
     id: string;
@@ -221,9 +221,9 @@ declare global {
     sources_ids?: string[];
     /** Solo para invasoras: IDs de sustitutos nativos curados. */
     especies_nativas_sustitutas?: string[];
-    /** ADR-030 (schema v3.2). */
+    /** Schema v3.2. */
     tracking_mode?: 'individual' | 'aggregate';
-    /** ADR-031 (schema v3.3) — pendiente. */
+    /** Schema v3.3 — pendiente. */
     difficulty?: 'starter' | 'intermediate' | 'advanced';
     tiempo_a_cosecha_dias?: CycleDays;
     failure_modes?: FailureMode[];

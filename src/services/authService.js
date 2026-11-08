@@ -553,7 +553,7 @@ export const logoutUser = async () => {
             window.dispatchEvent(new CustomEvent(LOGOUT_INCOMPLETE_EVENT));
         } catch (_) { /* CustomEvent existe en browsers soportados */ }
     }
-    // ADR-036 MVP multi-finca: limpiar tenantId asegura que un re-login con
+    // MVP multi-finca: limpiar tenantId asegura que un re-login con
     // otro usuario no herede el scope del anterior. NO purgamos IDB aquí —
     // useAssetStore decide qué hacer al detectar el cambio de tenantId.
     try {

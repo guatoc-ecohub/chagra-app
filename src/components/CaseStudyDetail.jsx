@@ -22,7 +22,7 @@ import { recommendTreatments } from '../services/caseStudyTreatmentRecommender';
  *  - Transition manual (monitoring, escalated, closed).
  *  - Anotar lessons_learned al cerrar.
  *
- * Post-DR-044: añadir export PDF, photo gallery, log linking UI.
+ * Pendiente: añadir export PDF, photo gallery, log linking UI.
  */
 
 const SEVERITY_META = {
@@ -91,7 +91,7 @@ const formatRelative = (iso) => {
   return `hace ${Math.floor(days / 365)}a`;
 };
 
-// Form para agregar evento al timeline (DR-044 sub-ix Feature 6).
+// Form para agregar evento al timeline.
 const TimelineEventForm = ({ onSubmit, onCancel }) => {
   const [eventType, setEventType] = useState('observation');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 16));
@@ -553,7 +553,7 @@ const RecommendationsSection = ({ recs, onAdd, onValidate }) => {
 };
 /* eslint-enable chagra-i18n/no-hardcoded-spanish */
 
-// Sección timeline narrativa (DR-044 sub-ix F6).
+// Sección timeline narrativa.
 const NarrativeTimeline = ({ events, onAdd }) => {
   const [showAdd, setShowAdd] = useState(false);
   const [fullPhoto, setFullPhoto] = useState(null);
@@ -641,7 +641,7 @@ const NarrativeTimeline = ({ events, onAdd }) => {
 const TreatmentForm = ({ onSubmit, onCancel, caseObj }) => {
   // Lista canónica del catálogo Chagra v3.1 + Track C (2026-05-17:
   // bacillus_thuringiensis, trichogramma_spp, extracto_neem agregados).
-  // Post-DR-040 esto será un typeahead vivo contra catalog.biopreparados[].
+  // Más adelante esto será un typeahead vivo contra catalog.biopreparados[].
   const KNOWN = [
     'bacillus_thuringiensis', 'trichogramma_spp', 'extracto_neem',
     'caldo_bordeles', 'caldo_sulfocalcico', 'bacillus_subtilis_foliar',
@@ -651,9 +651,9 @@ const TreatmentForm = ({ onSubmit, onCancel, caseObj }) => {
     'cal_dolomita', 'roca_fosforica', 'ceniza_madera',
   ];
 
-  // DR-044 sub-viii Feature 4: sugerencias contextuales del recommender
+  // sugerencias contextuales del recommender
   // basadas en el problema del caso. KISS offline-first: keyword matching
-  // contra catalog. Post-DR-040 será RAG embeddings nomic-embed-text + LLM.
+  // contra catalog. Más adelante será RAG embeddings nomic-embed-text + LLM.
   const suggestions = caseObj?.problem?.name_freetext
     ? recommendTreatments(caseObj.problem.name_freetext)
     : [];
@@ -670,7 +670,7 @@ const TreatmentForm = ({ onSubmit, onCancel, caseObj }) => {
       }}
       className="space-y-2 p-3 rounded-lg bg-slate-900 border border-slate-700"
     >
-      {/* Sugerencias contextuales (DR-044 F4) */}
+      {/* Sugerencias contextuales */}
       {suggestions.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-[10px] uppercase font-black tracking-wider text-purple-300 flex items-center gap-1">
@@ -740,7 +740,7 @@ const CloseCaseForm = ({ onSubmit, onCancel, currentAffected, caseObj }) => {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState(null);
 
-  // DR-044 sub-viii Feature 5: lessons_learned summarization via Ollama
+  // lessons_learned summarization via Ollama
   const handleGenerate = async () => {
     setGenerating(true);
     setGenError(null);
@@ -830,9 +830,9 @@ const CloseCaseForm = ({ onSubmit, onCancel, currentAffected, caseObj }) => {
 };
 
 /**
- * PhotoGallery — visualiza fotos linkadas al caso (DR-044 sub-viii F2 partial).
+ * PhotoGallery — visualiza fotos linkadas al caso.
  * MVP: photos guardadas como data URLs en photo_asset_ids[].
- * Post-DR-044 sub-i: migración a FarmOS media asset IDs reales.
+ * Pendiente: migración a FarmOS media asset IDs reales.
  */
 const PhotoGallery = ({ photos, onAdd, onRemove }) => {
   const [showCapture, setShowCapture] = useState(false);
@@ -843,7 +843,7 @@ const PhotoGallery = ({ photos, onAdd, onRemove }) => {
     setBusy(true);
     try {
       // KISS: convertir blob a data URL para storage local en case.photo_asset_ids[]
-      // Migración a FarmOS media post-DR-044 sub-i.
+      // Migración a FarmOS media: pendiente.
       const reader = new FileReader();
       reader.onloadend = () => {
         onAdd(reader.result); // data:image/jpeg;base64,...
@@ -1085,7 +1085,7 @@ export default function CaseStudyDetail({ caseId, onBack, onHome }) {
           </section>
         )}
 
-        {/* Photo gallery (DR-044 sub-viii F2 partial) */}
+        {/* Photo gallery */}
         <PhotoGallery
           photos={c.photo_asset_ids}
           onAdd={(dataUrl) => linkPhoto(c.id, dataUrl)}

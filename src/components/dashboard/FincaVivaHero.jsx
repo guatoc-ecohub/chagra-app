@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * Los textos de UI de este hero (saludo del agente, etiquetas de los portales,
  * aria-labels) son strings de interfaz. Su migración a src/config/messages.js es
- * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de esta
+ * la tarea de i18n (transversal a toda la app), fuera del alcance de esta
  * feature visual — mismo criterio que MiFincaVivaHomeCard.jsx, FincaCards.jsx y
  * FincaRedInstitucional.jsx en este mismo directorio. */
 import { useEffect, useMemo, useRef, useState } from 'react';

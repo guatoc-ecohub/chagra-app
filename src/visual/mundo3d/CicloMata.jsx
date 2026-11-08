@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup 3D con UI en español intencional; migración ADR-050 i18n pendiente para todo el árbol mundo3d */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup 3D con UI en español intencional; migración i18n pendiente para todo el árbol mundo3d */
 /*
  * CicloMata — el CICLO DE VIDA de una mata, tocable (sembrar → brotar → crecer →
  * florecer → cosechar) como un time-lapse que el usuario avanza CON EL DEDO.

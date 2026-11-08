@@ -80,7 +80,7 @@ export function Danta({
      motitas, el camuflaje de sotobosque). Solo pelaje — el tamaño lo pone el
      host con `size`. Default false → la adulta de siempre. */
   cria = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + trompa + orejas + cola) y
      deja los estados reactivos (husmea/ramonea). Sin prop (standalone:
      avatares, catálogo) = pleno. */

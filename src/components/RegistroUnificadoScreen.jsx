@@ -1,6 +1,6 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * Microcopy de UI de la puerta única de registro (#23): rótulos de estados y
- * botones. Migración a src/config/messages.js = tarea i18n de ADR-050
+ * botones. Migración a src/config/messages.js = tarea de i18n
  * (transversal), fuera de alcance — mismo criterio que sus hermanas
  * RegistroVozScreen.jsx / RegistroVozConfirm.jsx. Los errores reales de ESLint
  * siguen activos. */

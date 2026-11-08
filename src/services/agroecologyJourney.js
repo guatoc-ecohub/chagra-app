@@ -6,7 +6,7 @@
  * sobre los 5 niveles de Gliessman + los 10 elementos FAO + la metodología de
  * Planificación Predial Participativa (CIPAV) y Campesino a Campesino (CAC).
  *
- * Fuente: deepresearch/DR-TRANSICION-AGROECOLOGICA.md (18 fuentes verificadas:
+ * Fuente: investigación documental sobre transición agroecológica (18 fuentes verificadas:
  * Gliessman, FAO, MESMIS, CIPAV, Agrosavia IPPTA, Via Campesina, Restrepo Rivera).
  *
  * DECISIONES DE PRODUCTO PENDIENTES (esperan al operador; NO se asumen aquí):

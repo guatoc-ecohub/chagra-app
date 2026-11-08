@@ -91,7 +91,7 @@ export const useLogStore = create((set, get) => ({
   }
 }));
 
-// ADR-036 MVP multi-finca: al cambiar el tenantId activo (re-login con otro
+// MVP multi-finca: al cambiar el tenantId activo (re-login con otro
 // usuario sobre el mismo device), limpiar el state in-memory para no exponer
 // logs del tenant anterior. La IDB no se borra — logCache filtra por
 // `_tenant_id` en read-path y el próximo pullRecentLogs los repuebla scoped.

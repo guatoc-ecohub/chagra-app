@@ -1,6 +1,6 @@
 /**
  * extensionistaAccess.js — Gate del ROL "extensionista" (modo supervisor
- * multi-finca). MVP de ADR-048.
+ * multi-finca). MVP del modo extensionista.
  *
  * QUÉ ES UN EXTENSIONISTA
  *   Un usuario que SUPERVISA fincas de OTROS agricultores: el asesor de
@@ -8,23 +8,23 @@
  *   asociación campesina que acompaña a sus asociados. Ve un panel con las
  *   fincas que le delegaron, NO opera la suya propia.
  *
- * DIFERENCIA CON ADR-036 (multi-finca de 1 usuario)
- *   - `tenantContext` (ADR-036 MVP) resuelve "quién soy yo" (un agricultor con
+ * DIFERENCIA CON `tenantContext` (multi-finca de 1 usuario)
+ *   - `tenantContext` resuelve "quién soy yo" (un agricultor con
  *     una o más fincas PROPIAS) para scopear sus assets en farmOS.
- *   - `extensionistaAccess` (este módulo, ADR-048) resuelve "¿soy un supervisor
+ *   - `extensionistaAccess` (este módulo) resuelve "¿soy un supervisor
  *     que puede VER fincas ajenas?". Es una capa de ROL por encima del tenant.
  *
  * POR QUÉ ES SOLO MVP (lo duro queda como follow-up backend)
  *   La delegación real "el agricultor X autoriza al extensionista Y a ver su
  *   finca" requiere UCAN delegations + el módulo Drupal `farm_did_auth`
- *   (ADR-036 sub-i / sub-iv). HOY no existe ese backend. Por eso este MVP:
+ *. HOY no existe ese backend. Por eso este MVP:
  *     (1) detecta el rol con una whitelist client-side (igual patrón que
  *         glaciarAccess.js / La Cordada), y
  *     (2) lee la lista de fincas delegadas de un MOCK/config estático
  *         (src/data/extensionista-fincas.json), NO de una autorización
  *         verificada server-side.
  *   Es DEFENSE-IN-DEPTH de UX + scaffold de producto, NO autorización dura. El
- *   día que ADR-036 active UCAN, `esExtensionista` se sustituye por la
+ *   día que se active la delegación UCAN, `esExtensionista` se sustituye por la
  *   verificación de una capability `supervise` firmada por el dueño de la finca.
  *
  * DOBLE CANDADO

@@ -301,7 +301,7 @@ function EstacionCultivo() {
       {/* Cómo secar y guardar (común a toda la botica) */}
       <div className="rounded-2xl border border-amber-800/40 bg-surface-card/50 p-4 space-y-2" data-testid="botica-secado">
         <p className="flex items-center gap-2 text-sm font-black text-amber-200 uppercase tracking-wide">
-          {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- título de contenido campesino, migración i18n pendiente para todo el mundo (ADR-050, ver header de boticaCampesina.js) */}
+          {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- título de contenido campesino, migración i18n pendiente para todo el mundo (ver header de boticaCampesina.js) */}
           <Scissors size={16} aria-hidden="true" /> Cosechar, secar y guardar
         </p>
         <ul className="space-y-2 text-xs leading-snug text-slate-300">

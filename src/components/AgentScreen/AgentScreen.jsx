@@ -69,7 +69,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // FIX prod P0 (2026-06-02): deadline stream-aware (idle-timeout + techo). Un
 // stream que avanza NO se aborta; ver streamDeadline.js.
 import { createStreamDeadline } from '../../services/streamDeadline';
-// Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
+// Sidecar agro-mcp. Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { anchorToolArgsToEntities, anchorToolChainToEntities } from '../../services/agentEntityFocus';
@@ -1177,7 +1177,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
       ? null
       : (climaLocation ? cachedClimaSnapshot || await fetchClimaSnapshot(climaLocation) : null);
     // Pasamos la región natural de la finca para que el bloque clima incluya la
-    // LECTURA REGIONAL ENSO (DR-MISSION-2/4), no solo la fase cruda.
+    // LECTURA REGIONAL ENSO, no solo la fase cruda.
     const ensoRegion = (() => {
       try { return regionFromProfile(turnProfile); } catch (_) { return null; }
     })();
@@ -1338,7 +1338,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
     // precio o el tool de precio sí trajo dato.
     const priceDeclineBlock = buildPriceDeclineContext({ userMessage: query, toolEvidence });
 
-    // FERMENTOS (capa 1 SAFETY-CRITICAL, módulos opcionales #159 — DR-FOOD-3). El
+    // FERMENTOS (capa 1 SAFETY-CRITICAL, módulos opcionales #159). El
     // sidecar /fermento-prefilter ya detectó intención-fermento y armó un
     // bloque conservador (refusal/veto + disclaimer fuerte + veto de claims de
     // salud + autoridad institucional). Llega pre-formateado desde el sidecar
@@ -1496,7 +1496,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
     // antes detenían el watchdog.
     stallTimerRef.current = deadline;
 
-    // SEC-001 (DR-CHAGRA-AUDIT-IA-001): guard del canal de STREAMING. El guard
+    // SEC-001: guard del canal de STREAMING. El guard
     // final (applyOutputGuards sobre el texto completo) NO cambia — esto es una
     // capa ADICIONAL sobre el display EN VIVO: el sniff local (mismos guards de
     // peligro de outputGuards, cero latencia, throttle incremental + latch)
@@ -1864,7 +1864,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
       // seguir cargándose mientras el sidecar resuelve entidades y guardas.
       const contextMemory = await contextMemoryPromise;
 
-      // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
+      // sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
       // Si sidecar falla / no aplica, sigue al chat con RAG-only (no
       // degrada UX). El planNlu/callTool wrappers son no-throw: devuelven
@@ -1880,7 +1880,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
       // este bucket para presentarlas como SUGERENCIA (CASO B) en vez de
       // afirmarlas como hecho.
       let suggestedEntities = null;
-      // FERMENTOS (capa 1 SAFETY-CRITICAL, módulos opcionales #159 — DR-FOOD-3). Bloque
+      // FERMENTOS (capa 1 SAFETY-CRITICAL, módulos opcionales #159). Bloque
       // de instrucción ya formateado por el sidecar (/fermento-prefilter). ''
       // por default → no-op en el system prompt si no hubo intención-fermento o
       // el sidecar no respondió (degradación graceful).
@@ -2750,7 +2750,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext, initia
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
       const fallbackContent = buildFallbackResponse(rawResponse, toolEvidence, resolvedEntities);
-      // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
+      // filtro post-process anti-voseo argentino. Es la última
       // línea de defensa estructural — garantiza que el léxico rioplatense
       // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,
       // independientemente de lo que el modelo decida emitir. La función es

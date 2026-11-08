@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia. La regla
+/* i18n: etiquetas user-facing en español Colombia. La regla
  * chagra-i18n es soft (warn); se desactiva a nivel de archivo siguiendo el
  * mismo criterio que SoilDiagnosticScreen/CromatografiaScreen para no bloquear
  * el pre-commit (max-warnings=0). Los errores reales siguen activos. */

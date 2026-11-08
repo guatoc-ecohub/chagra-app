@@ -5,8 +5,8 @@
  *
  * ── POR QUÉ SE REHIZO (el veredicto: "parece una caricatura mal hecha") ───────
  * La versión anterior era el "árbol de navidad" de manual: un cono/elipsoide de
- * blobs de follaje encima de un cilindro de tronco. El DR de realismo
- * (deepresearch/DR-FANOUT/realismo-3d-vegetacion-*-2026-06-19.md) diagnostica
+ * blobs de follaje encima de un cilindro de tronco. El estudio de realismo
+ * de vegetación 3D (2026-06-19) diagnostica
  * exactamente ese fallo y ordena las recetas por RETORNO VISUAL POR COSTO. Este
  * módulo las aplica, en ese orden:
  *

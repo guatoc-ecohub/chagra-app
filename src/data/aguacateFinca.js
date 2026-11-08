@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): este archivo es CONTENIDO/copy campesino en español Colombia
+ * i18n: este archivo es CONTENIDO/copy campesino en español Colombia
  * (variedades, piso térmico, suelo, plagas, floración y cosecha del aguacate),
  * pendiente de migrar a src/config/messages.js — mismo criterio que
  * cafeFinca.js / aguaFinca.js / frutalesFinca.js.

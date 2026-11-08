@@ -19,7 +19,7 @@
  *   · Sin WebAudio en el equipo, no pregunta lo que no puede cumplir.
  *
  * Copy en español Colombia (usted); si se productiza, migra a messages.js
- * (ADR-050). Autocontenido y three-free (DOM + CSS propio, cero assets).
+ *. Autocontenido y three-free (DOM + CSS propio, cero assets).
  */
 import { useEffect, useState } from 'react';
 import usePrefsStore from '../../store/usePrefsStore.js';

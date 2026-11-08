@@ -28,8 +28,8 @@
  *      funciona offline (este módulo NO hace red).
  *
  * DEUDA CONOCIDA (2º pase): al arrancar no había salida del DR de UX de
- * asistentes-IA y notificaciones contextuales en deepresearch/DR-FANOUT. Los
- * cooldowns y las plantillas se fijaron con criterio; cuando llegue el DR,
+ * asistentes-IA y notificaciones contextuales en la investigación disponible. Los
+ * cooldowns y las plantillas se fijaron con criterio; cuando llegue esa investigación,
  * revisar cadencias y copy aquí.
  *
  * SOLO datos + funciones puras (testeables sin montar nada). El estado en vivo

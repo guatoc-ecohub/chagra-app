@@ -1,5 +1,5 @@
 import DescensoLaunch from '../DescensoLaunch.jsx';
-/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de
+/* i18n: etiquetas user-facing en español Colombia pendientes de
  * migrar a src/config/messages.js. Misma deuda preexistente que SaludSueloScreen
  * y App.jsx; se desactiva la regla soft a nivel de archivo. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
@@ -23,7 +23,7 @@ import {
  * variables de tema (rgb(var(--t-accent-rgb))), micro-animaciones que respetan
  * prefers-reduced-motion. Solo visual + calculadoras DETERMINISTAS.
  *
- * Tres pilares (grounding DR-SEMILLA 2026-07-04):
+ * Tres pilares (grounding 2026-07-04):
  *   1. SELECCIONAR — de plantas sanas/típicas, roguing antes de floración;
  *      calculadora de nº mínimo de plantas madre por sistema reproductivo.
  *   2. GUARDAR — la rama decisiva ORTODOXA vs RECALCITRANTE (nunca "seca y

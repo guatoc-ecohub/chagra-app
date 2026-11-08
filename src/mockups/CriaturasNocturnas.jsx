@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción */
 /**
  * CriaturasNocturnas — VITRINA de la fauna NOCTURNA colombiana (+ el cóndor
  * diurno del valle) en el lenguaje biopunk aprobado de GuardianEspiritu:

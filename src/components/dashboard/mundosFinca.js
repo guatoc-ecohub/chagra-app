@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): igual que DashboardLive.jsx, este manifiesto contiene el copy
+ * i18n: igual que DashboardLive.jsx, este manifiesto contiene el copy
  * de navegación del home en español Colombia, pendiente de migrar a
  * src/config/messages.js. La regla chagra-i18n es soft (warn); se desactiva a
  * nivel de archivo para no bloquear el pre-commit con deuda preexistente.

@@ -16,8 +16,7 @@
  *    del climatólogo (§7.2) y no es un matiz de redacción: es la diferencia
  *    entre un consejo útil y un consejo PELIGROSO para una finca a 2 200 m. El
  *    cielo despejado del Niño aumenta la pérdida de calor nocturna y dispara la
- *    helada; el Niño 2015-16 costó ~25 000 t de papa por esto (IDEAM/Cenicafé,
- *    DR-MISSION-4). Lo visualmente obvio —"más sol, más calor"— es lo
+ *    helada; el Niño 2015-16 costó ~25 000 t de papa por esto (IDEAM/Cenicafé). Lo visualmente obvio —"más sol, más calor"— es lo
  *    incorrecto. La ciencia de respaldo NO se inventa acá: sale literal de
  *    `REGION_IMPACTS` vía `ensoRegionalLine()`, y este módulo solo elige QUÉ
  *    consejo corresponde al piso del usuario.

@@ -1,5 +1,5 @@
 import DescensoLaunch from './DescensoLaunch.jsx';
-/* i18n (ADR-050): etiquetas user-facing en español Colombia pendientes de migrar
+/* i18n: etiquetas user-facing en español Colombia pendientes de migrar
  * a src/config/messages.js. Misma deuda preexistente que HortalizasScreen y
  * App.jsx; se desactiva la regla soft a nivel de archivo. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

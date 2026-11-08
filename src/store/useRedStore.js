@@ -1,4 +1,4 @@
-/* i18n (ADR-050): mensajes de error user-facing en español Colombia. La regla
+/* i18n: mensajes de error user-facing en español Colombia. La regla
  * chagra-i18n es soft (warn); se desactiva a nivel de archivo siguiendo el
  * mismo criterio que MercadosScreen para no bloquear el pre-commit
  * (max-warnings=0). */

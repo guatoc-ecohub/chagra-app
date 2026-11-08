@@ -11,7 +11,7 @@ import { resolveUserRegion } from './agentService.js';
 import { getCompanionVoice } from '../config/compaiVoices.js';
 
 /**
- * DR-LANG-1: guarda defensiva anti-voseo aplicada a la entrada de los
+ * guarda defensiva anti-voseo aplicada a la entrada de los
  * speakers. AgentScreen ya filtra antes de pasar el texto, pero el TTS
  * también es invocado desde ChatBubble (re-speak), AgentFab (replayLast)
  * y posibles surfaces futuras. filterVoseo es idempotente — un doble
@@ -741,7 +741,7 @@ function avisarUnaSolaFrase(avisarFrase, texto) {
  *   con éxito (Kokoro o Web Speech fallback), false si todo falló.
  */
 export async function speakSentences(text, options = {}) {
-  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente; no afecta texto
+  // guarda defensiva anti-voseo. Idempotente; no afecta texto
   // ya filtrado por agentService.applyVoseoFilter.
   text = applyVoseoGuard(text);
 
@@ -935,7 +935,7 @@ export function speak(text, options = {}) {
 
   stop();
 
-  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente.
+  // guarda defensiva anti-voseo. Idempotente.
   text = applyVoseoGuard(text);
 
   // Strip markdown antes de sintetizar. Sin esto, SpeechSynthesis lee
@@ -1052,7 +1052,7 @@ export async function speakKokoro(text, options = {}) {
 
   stop();
 
-  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente; texto ya
+  // guarda defensiva anti-voseo. Idempotente; texto ya
   // filtrado por agentService.applyVoseoFilter pasa por aquí sin cambios.
   text = applyVoseoGuard(text);
 
@@ -1143,7 +1143,7 @@ export async function speakXTTS(text, options = {}) {
   } = options;
 
   stop();
-  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente.
+  // guarda defensiva anti-voseo. Idempotente.
   text = applyVoseoGuard(text);
   const cleanText = sanitizeForTTS(text);
 

@@ -1,7 +1,7 @@
 /**
  * streamGuards — SEC-001: guardas de seguridad sobre el canal de STREAMING.
  *
- * PROBLEMA (auditoría DR-CHAGRA-AUDIT-IA-001, SEC-001, ALTO): el agente pinta
+ * PROBLEMA (auditoría de seguridad de IA, SEC-001, ALTO): el agente pinta
  * cada token en vivo (markToken en AgentScreen) pero `applyOutputGuards` corre
  * SOLO sobre el texto FINAL. El usuario alcanza a LEER la dosis/receta
  * peligrosa en pantalla ANTES de que el guard final la reemplace. En campo eso
@@ -22,7 +22,7 @@
  *   - guardInventedBrand               (marca comercial inventada recomendada)
  *   - guardToxicResidueOnFood          (higuerilla sobre papa almacenada)
  *   - guardFermentoRecipeSafety        (receta de fermento sin caveat — el
- *     caveat debe LIDERAR, DR-FOOD-3: el crudo en vivo lo mostraría después)
+ *     caveat debe LIDERAR: el crudo en vivo lo mostraría después)
  *
  * ANTI-SOBRE-SUPRESIÓN (crítico): NO corren aquí los guards que disparan sobre
  * contenido inocuo o incompleto — guardDoseWithoutSource (anexa caveat a

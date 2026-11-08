@@ -5,7 +5,7 @@ import { pestMonitoringMessage } from '../services/lunarPestService';
 import { getContextoGeoFinca } from '../services/perfilFincaService';
 
 /**
- * PestMonitoringWindow, Feature C.1 ADR-033.
+ * PestMonitoringWindow, Feature C.1.
  *
  * Aparece SOLO en ventana de luna nueva ± 3 días con texto informativo
  * sobre muestreo nocturno con trampa de luz (Yela & Holyoak 1997, capturas
@@ -16,7 +16,7 @@ import { getContextoGeoFinca } from '../services/perfilFincaService';
  *   - NO badge "saber tradicional", NO toggle, NO modal preventivo
  *   - Mensaje neutro opt-in: si no tiene trampa, ignora
  *
- * Refs: ADR-033, dr-033-mistral-tiebreak.md, services/lunarPestService.js
+ * Refs: services/lunarPestService.js
  */
 export default function PestMonitoringWindow() {
   const [message, setMessage] = useState(() => computeMessage());

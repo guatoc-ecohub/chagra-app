@@ -305,7 +305,7 @@ function etiquetaFuenteFase(clave, copiaDel) {
         openmeteo: 'Open-Meteo',
         archive: 'Archivo histórico del clima',
         default: 'Fase no disponible',
-        // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy UI es-CO, deuda ADR-050 (messages.js) pendiente igual que el resto del módulo
+        // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy UI es-CO, deuda de i18n (messages.js) pendiente igual que el resto del módulo
         offline: 'Sin conexión',
     };
     return etiquetas[clave] ?? etiquetas.default;

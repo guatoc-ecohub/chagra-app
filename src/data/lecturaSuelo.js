@@ -1,4 +1,4 @@
-/* i18n (ADR-050): contenido user-facing en español Colombia. Mismo criterio
+/* i18n: contenido user-facing en español Colombia. Mismo criterio
  * de deuda que vidaSuelo.js y SaludSueloScreen.jsx (regla soft desactivada allí). */
 
 /**

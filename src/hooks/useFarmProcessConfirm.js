@@ -2,7 +2,7 @@
  * useFarmProcessConfirm — hook de integración para Task 19.
  *
  * Conecta FarmProcessConfirmCard.onConfirm → createFarmProcess (escritura
- * atómica local). Sigue ADR-050 contrato conversacional de escritura.
+ * atómica local). Sigue el contrato conversacional de escritura.
  *
  * Estados:
  *   - idle: reposo, no ha intentado guardar

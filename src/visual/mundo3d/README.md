@@ -2,7 +2,7 @@
 
 Un solo host **`<Mundo>`** construye cualquier mundo de la finca eligiendo un
 **arquetipo** por datos y cruzándolo con el **device-tier** del equipo. El
-objetivo (DR-MUNDOS-3D-FRAMEWORK): **sumar un mundo = una entrada de datos +
+objetivo: **sumar un mundo = una entrada de datos +
 assets de la librería visual; nunca código de escena desde cero.**
 
 Un principio, dos dimensiones de PRIMERA CLASE:

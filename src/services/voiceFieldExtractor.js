@@ -3,7 +3,7 @@
  * textos de dominio del registro por voz (#23) que produce este extractor —
  * fenología/síntomas/labores canónicos — NO son UI de pantalla: son valores del
  * modelo que el confirm muestra editables y que se escriben en las notas FarmOS.
- * Su migración a src/config/messages.js (ADR-050 i18n) es transversal y fuera del
+ * Su migración a src/config/messages.js (i18n) es transversal y fuera del
  * alcance de #23 — mismo criterio que sus hermanos del flujo (voiceRecordPayload.js,
  * RegistroVozConfirm.jsx). Los errores reales de ESLint siguen activos. */
 /**

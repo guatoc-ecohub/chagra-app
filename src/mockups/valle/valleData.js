@@ -13,8 +13,7 @@
  *   4. ESTADO / CLIMA          → `CLIMAS`: tiñe el ambiente (grades de effects).
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con datos de
-   muestra (no UI de producto); si se productiza, el copy migra a messages.js
-   (ADR-050). */
+   muestra (no UI de producto); si se productiza, el copy migra a messages.js. */
 
 import { MUNDO_BY_ID } from '../../components/dashboard/mundosFinca';
 /* La franja del día sale de UNA fuente (cielosHoraData): el mismo mapa de

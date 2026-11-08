@@ -11,7 +11,7 @@ import { getActiveTenantId } from '../services/tenantContext';
 import useFincaActiveStore from '../services/fincaActiveStore';
 
 /**
- * ExtensionistaScreen — Panel SUPERVISOR del modo extensionista (ADR-048 MVP).
+ * ExtensionistaScreen — Panel SUPERVISOR del modo extensionista.
  *
  * Un extensionista (asesor de extensión rural EPSEA/SENA, técnico
  * Agrosavia/IPPTA, líder de asociación campesina) ve aquí las fincas que
@@ -23,7 +23,7 @@ import useFincaActiveStore from '../services/fincaActiveStore';
  *     autorización verificada server-side.
  *   - La delegación real (el agricultor autoriza al extensionista) y los datos
  *     en vivo por finca son FOLLOW-UP backend: UCAN delegations + módulo Drupal
- *     `farm_did_auth` (ADR-036 sub-i/sub-iv). Por eso el panel muestra un aviso
+ *     `farm_did_auth`. Por eso el panel muestra un aviso
  *     claro de "vista previa".
  *
  * Ruta: #extensionista. Gateado por feature flag VITE_FEATURE_EXTENSIONISTA +
@@ -191,7 +191,7 @@ export default function ExtensionistaScreen({ onBack, onHome }) {
         {fincasDelegadas.length > 0 && (
           <div className="rounded-2xl border border-emerald-700/30 bg-emerald-950/20 p-4 space-y-3">
             <div>
-              {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- i18n progresiva (ADR-050): esta pantalla aún no está migrada a messages.js; el resto de sus strings tampoco. Migración fuera del alcance de este fix. */}
+              {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- i18n progresiva: esta pantalla aún no está migrada a messages.js; el resto de sus strings tampoco. Migración fuera del alcance de este fix. */}
               <p className="text-sm font-semibold text-emerald-200">Finca activa</p>
               <p className="text-xs text-emerald-300/80">
                 Elige cuál de las fincas delegadas quieres gestionar ahora.

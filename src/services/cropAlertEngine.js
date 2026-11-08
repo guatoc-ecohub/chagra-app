@@ -1,7 +1,7 @@
 /**
  * cropAlertEngine — productor de ALERTAS DEL CULTIVO (plaga/etapa + precio).
  *
- * Cablea el track de alertas del subsistema FarmProcess (PR #1370, ADR-049) que
+ * Cablea el track de alertas del subsistema FarmProcess (PR #1370) que
  * estaba "oscuro". Lee los ciclos activos de IndexedDB (farmProcessCache) y, por
  * la etapa fenológica actual + la especie, deriva el riesgo de plaga dominante
  * (climateCycleService.getPestRisksByStage) y lo empuja al MISMO canal que las

@@ -1,7 +1,7 @@
 /**
- * restauracionDiagnostic — diagnostico de restauracion ecologica (DR-RESTAURACION-1).
+ * restauracionDiagnostic — diagnostico de restauracion ecologica.
  *
- * Fuente: DR-RESTAURACION-1 (2/3 Gemini+Meta, 2026-06-11).
+ * Fuente: investigación consolidada de restauración (2/3 Gemini+Meta, 2026-06-11).
  * Datos: src/data/restauracion.json
  *
  * Guardas: pino/eucalipto NO restauracion, alerta bonos carbono,

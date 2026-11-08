@@ -8,12 +8,12 @@ import { getActiveTenantId } from '../services/tenantContext';
  * MVP 2026-05-17 (driver: caso David invernadero trozador). Diseña un
  * caso como wrapper UX sobre primitives Asset+Log existentes. Los
  * campos con sufijo `_freetext` se refactorizarán a refs formales
- * cuando cierren DR-040 (pest catalog entity) y DR-041 (cohort entity).
+ * cuando existan las entidades de catálogo de plagas y de cohortes.
  *
  * 2026-05-18 extensión "modo foro + validación profesional + timeline":
  *   - visibility: private | finca | public — preparado para Capa 2 de
  *     federación RAG (cases compartidos cross-finca). Hoy es solo flag
- *     local; el sync federado llega en DR-044 sub-iii.
+ *     local; el sync federado llega después.
  *   - validation: bloque que certifica el caso (status, validator, creds).
  *     Una recomendación pasa de "self-reported" a "certified" solo cuando
  *     un agrónomo/profesional la firma. Pre-requisito antes de exportar
@@ -32,15 +32,15 @@ import { getActiveTenantId } from '../services/tenantContext';
  *   id: ULID,
  *   title: string,                 // ej. "Trozador invernadero David 2026-05-17"
  *   finca_slug: string,            // ref public/fincas-publicas.json
- *   zone_freetext: string,         // DR-041 lo formaliza
+ *   zone_freetext: string,         // se formaliza con la entidad de cohorte
  *   subject: {
  *     species_ids: string[],       // refs catalog.species[]
- *     count_total: number | null,  // pre-DR-041 cohort
+ *     count_total: number | null,  // cohorte aún sin formalizar
  *     count_affected: number | null,
  *   },
  *   problem: {
  *     name_freetext: string,       // ej. "Trozador (Agrotis ipsilon)"
- *     pest_id: string | null,      // DR-040 lo llena
+ *     pest_id: string | null,      // lo llena el catálogo de plagas
  *     severity: 'low'|'medium'|'high'|'critical',
  *     detected_at: ISO_8601,
  *   },
@@ -87,13 +87,13 @@ import { getActiveTenantId } from '../services/tenantContext';
  *     validated_at?: ISO_8601,
  *   }],
  *   created_at: ISO_8601,
- *   created_by_did: string | null,  // ADR-036 multi-finca did:key
+ *   created_by_did: string | null,  // multi-finca did:key
  *   updated_at: ISO_8601,
  * }
  * ```
  *
  * Storage MVP: localStorage via zustand persist. Sin sync FarmOS aún
- * (DR-044 sub-i decide entity model formal, luego sync layer).
+ * (el modelo de entidad formal se decide luego, y después la capa de sync).
  *
  * ADR-019 compliance: cada update es append-only en `state_history`,
  * `treatments_applied`, `timeline` y `recommendations`. Las
@@ -148,7 +148,7 @@ export const withExtendedDefaults = (c) => {
   };
 };
 
-// ADR-036 MVP multi-finca: predicate de visibilidad por tenant. Mismo
+// MVP multi-finca: predicate de visibilidad por tenant. Mismo
 // criterio que assetCache/logCache: cases sin `_tenant_id` (creados antes
 // de 2026-05-20 o sin login) son tratados como legacy single-tenant y
 // quedan visibles al tenant activo. Cuando NO hay tenant activo (dev sin
@@ -179,11 +179,11 @@ export const useCaseStudyStore = create(
       // Selectors normalizan defaults extendidos (foro/validación/timeline)
       // para cases legacy almacenados antes de 2026-05-18.
       //
-      // ADR-036 MVP multi-finca: selector aplica `belongsToActiveTenant`
+      // MVP multi-finca: selector aplica `belongsToActiveTenant`
       // ANTES del normalize/map para que el operador solo vea sus propios
       // cases. Los cases de otros tenants quedan en localStorage pero
       // ocultos del read-path — comparable al filtrado en read de
-      // assetCache. Cuando did:key + UCAN cierre ADR-036, este filtro
+      // assetCache. Cuando did:key + UCAN esté activo, este filtro
       // pasará a ser redundante con la cap-based access.
       getById: (id) => {
         const c = get().cases.find((x) => x.id === id);
@@ -298,8 +298,8 @@ export const useCaseStudyStore = create(
           timeline: [],
           recommendations: [],
           created_at: ts,
-          created_by_did: null, // ADR-036 lo llenará en multi-finca real
-          // ADR-036 MVP multi-finca: stamp el tenant activo al crear. Si no
+          created_by_did: null, // se llenará en multi-finca real
+          // MVP multi-finca: stamp el tenant activo al crear. Si no
           // hay login (dev sin tenant), queda null y se trata como legacy.
           _tenant_id: getActiveTenantId() || null,
           updated_at: ts,
@@ -573,7 +573,7 @@ export const useCaseStudyStore = create(
       // Hidrata casos demo desde un payload externo (público demo seed).
       // Idempotente: solo agrega cases cuyo id NO existe ya.
       //
-      // ADR-036 MVP multi-finca: los demo cases se stampean con el tenant
+      // MVP multi-finca: los demo cases se stampean con el tenant
       // activo si lo hay. Si el seed JSON ya trae `_tenant_id` se preserva
       // (permite seeds compartidos públicos sin owner). Si no hay login,
       // queda null → legacy (visible a todos hasta que alguien lo "adopte").
@@ -619,7 +619,7 @@ export const CASE_VISIBILITIES = VISIBILITY_VALID;
 export const CASE_VALIDATION_STATUSES = VALIDATION_STATUS_VALID;
 export const CASE_TIMELINE_EVENT_TYPES = TIMELINE_EVENT_TYPES;
 
-// ADR-036 MVP multi-finca: al cambiar el tenant activo (re-login con otro
+// MVP multi-finca: al cambiar el tenant activo (re-login con otro
 // usuario sobre el mismo device), forzar re-evaluación de los selectors
 // que filtran por tenant. No purga el array `cases` (los datos del tenant
 // anterior siguen en localStorage para que vuelvan a aparecer cuando ese

@@ -1,7 +1,7 @@
 /*
  * i18n: este subjuego se sirve solo en español Colombia (tú/usted). El nombre
  * "La Milpa" y los textos para niños conviven en el componente; la migración a
- * messages.js (ADR-050) está fuera de alcance de esta PR.
+ * messages.js está fuera de alcance de esta PR.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';

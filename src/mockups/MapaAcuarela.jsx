@@ -1,4 +1,4 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción (ADR-050) */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción */
 // Mockup dev "El croquis de la finca como acuarela viva" — MOONSHOT #5.
 //
 // Reemplaza la idea de mapa "de ingeniero" (cuadrículas frías, tiles, capas

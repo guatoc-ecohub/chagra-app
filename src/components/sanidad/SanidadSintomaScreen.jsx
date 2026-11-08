@@ -1,4 +1,4 @@
-/* i18n (ADR-050): copy campesino en español Colombia, pendiente de migrar a
+/* i18n: copy campesino en español Colombia, pendiente de migrar a
  * src/config/messages.js — mismo criterio que MundoScreen.jsx / SoilDiagnostic. */
 import { useMemo, useState } from 'react';
 import { Stethoscope, Search, ArrowLeft, MessageCircle, Leaf, ShieldCheck, Bug } from 'lucide-react';

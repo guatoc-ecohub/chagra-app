@@ -1,4 +1,4 @@
-/* i18n (ADR-050): etiquetas user-facing en español Colombia. La regla
+/* i18n: etiquetas user-facing en español Colombia. La regla
  * chagra-i18n es soft (warn); se desactiva a nivel de archivo siguiendo el
  * mismo criterio que MercadosScreen/GerminacionScreen para no bloquear el
  * pre-commit (max-warnings=0). Los errores reales siguen activos. */
@@ -8,9 +8,9 @@ import { Sprout, AlertTriangle, Users, Beaker, Mountain, BookOpen, Loader2, File
 import ErrorStateCampo from './common/ErrorStateCampo.jsx';
 
 /**
- * Sanitiza strings de fuente para ocultar jerga interna DR-034 al usuario
+ * Sanitiza strings de fuente para ocultar jerga interna de la investigación al usuario
  * (audiencia incluye niños 11+ usando Chagra como herramienta educativa).
- * Elimina patterns como "(gap G-X DR-034)" / " DR-034" / "(extrapolación a X)"
+ * Elimina patterns como "(gap G-X DR-…)" / " DR-…" / "(extrapolación a X)"
  * preservando el resto. Si queda vacío post-cleanup, retorna null.
  */
 function cleanSource(src) {
@@ -50,11 +50,11 @@ const DIFFICULTY_BADGE = {
 /**
  * CycleContentRenderer, Lazy loader + renderer del corpus curado por especie.
  *
- * Lee `/public/cycle-content/<slug>.json` (consolidado DR-034 3/3 LLMs +
+ * Lee `/public/cycle-content/<slug>.json` (consolidado de la investigación de ciclos, 3 de 3 modelos +
  * curación pendiente Guatoc / Agrosavia / Cenicafé).
  *
- * Datos vienen del DR-034 cerrado 2026-05-06 (ADR-032). NO mezclar con
- * folclore/biodinámica, política ADR-033 Opción C estricta.
+ * Datos de la investigación de ciclos cerrada el 2026-05-06. NO mezclar con
+ * folclore/biodinámica, política estricta: la luna solo como cielo, sin recomendar labores.
  */
 export default function CycleContentRenderer({ slug, onClose }) {
   const [state, setState] = useState({ slug: null, data: null, error: null });

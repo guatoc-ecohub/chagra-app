@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * Los textos de UI de este paso de confirmación (rótulos de campos, botones
  * "Cancelar"/"Guardar registro", avisos de GPS) son strings de interfaz. Su
- * migración a src/config/messages.js es la TAREA i18n de ADR-050 (transversal a
+ * migración a src/config/messages.js es la tarea de i18n (transversal a
  * toda la app), fuera del alcance de este fix — mismo criterio que los hermanos
  * de este flujo (DashboardLive.jsx, FincaVivaHero.jsx, FincaCards.jsx,
  * MiFincaVivaHomeCard.jsx). Los errores reales de ESLint siguen activos. */

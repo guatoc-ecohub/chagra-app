@@ -7,7 +7,7 @@
  * claymation. Coherencia valle↔mundo: un solo bloom, una sola receta, la luz
  * se lee del mismo atardecer en todas las escenas.
  *
- * CONTRATO DE COSTO (DR-3D-PERF-GAMABAJA): este archivo es un chunk LAZY que
+ * CONTRATO DE COSTO: este archivo es un chunk LAZY que
  * EscenaBase3D solo importa con `tier === 'alto' && !reducedMotion` — medio y
  * bajo ni lo descargan. Aquí dentro no hay gate propio: quien monta, paga.
  * Cero dependencias nuevas: EffectComposer/UnrealBloomPass/OutputPass vienen

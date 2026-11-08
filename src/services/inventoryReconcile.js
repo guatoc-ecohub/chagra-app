@@ -1,6 +1,6 @@
 /**
  * Inventory Reconciliation Service
- * ADR-027.i+ii — Reducción de eventos a estado de stock + detección de anomalías.
+ * Reducción de eventos a estado de stock + detección de anomalías.
  */
 
 /**

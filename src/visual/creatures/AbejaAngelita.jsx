@@ -67,7 +67,7 @@ export function AbejaAngelita({
      nuevos (solo el tinte de piel de cuerpoDeClima). tempC afina frío/calor. */
   vestuario = false,
   tempC = undefined,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
      pleno. El CSS gatea por [data-tier='bajo']; RM lo congela por encima. */

@@ -54,7 +54,7 @@ export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null 
   // El mundo que aún no abre su puerta (para el aviso "pronto" del host).
   const [pronto, setPronto] = useState(null);
   const prontoTimer = useRef(null);
-  // Háptica del viaje (DR-3D-HAPTICA): entrar absorbe, volver aterriza,
+  // Háptica del viaje: entrar absorbe, volver aterriza,
   // "pronto" marca el borde. Gate triple interno (soporte + pref + rm);
   // el reducedMotion del host manda para que el gate sea coherente con
   // el resto del árbol de mundos.

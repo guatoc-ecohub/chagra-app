@@ -1,6 +1,6 @@
 /**
  * inventoryEvents — runtime validators + factory para los 8 tipos canónicos
- * de eventos de inventario (ADR-027.i + ADR-027.ii).
+ * de eventos de inventario (eventos de inventario).
  *
  * NO usa Zod (dependencia externa) — validación inline minimal pero estricta.
  * El log es append-only inmutable: una vez escrito, NUNCA se modifica.
@@ -160,7 +160,7 @@ function validatePayload(eventType, payload) {
 // ─── Shape principal del log entry ────────────────────────────────────
 
 /**
- * Valida un log entry completo conforme ADR-027.ii.
+ * Valida un log entry completo conforme al esquema de eventos de inventario.
  * Lanza ValidationError si algo no cumple. Útil ANTES de persistir.
  */
 export function validateLogEntry(entry) {

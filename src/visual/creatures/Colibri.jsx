@@ -120,7 +120,7 @@ export function Colibri({
      El cerebro CEDE ante el host; animated=false, tier 'bajo' y
      reduced-motion lo apagan entero. vida={false} = el colibrí de antes. */
   vida = true,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga lo continuo (dardo + estelas + boil) y deja aleteo y
      estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
   tier = undefined,

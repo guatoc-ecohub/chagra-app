@@ -1,5 +1,5 @@
 /*
- * i18n (ADR-050): copy del home en español Colombia, pendiente de migrar a
+ * i18n: copy del home en español Colombia, pendiente de migrar a
  * src/config/messages.js — mismo criterio que MundosDeMiFinca / DashboardLive.
  */
  

@@ -3286,7 +3286,7 @@ export default function Valle3D({
     const opcionesTier = { tier: esTierValido(tier) ? tier : undefined };
     return detectarTierInicial(opcionesTier);
   }, [tier, reducedMotion]);
-  /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
+  /* El PERFIL DE RENDER del tier: 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
   const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);

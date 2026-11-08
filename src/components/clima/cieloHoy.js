@@ -1752,7 +1752,7 @@ export function densidadNiebla(agrometeo) {
 /* ── Luna ───────────────────────────────────────────────────────────── */
 
 /**
- * La luna de una fecha, solo como cielo (ADR-033, opción C estricta): la fase
+ * La luna de una fecha, solo como cielo (sin recomendar labores por fase lunar): la fase
  * astronómica de `lunarPhase`. Nada de labores asociadas a la fase.
  */
 export function lunaDeHoy(fecha = new Date()) {

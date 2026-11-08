@@ -150,7 +150,7 @@ export const MapPicker = ({
 
     // Pre-cargar geometría inicial si existe. setState aquí es un sync de una
     // sola vez al montar (espejo de la geometría externa pre-cargada hacia el
-    // estado de React, ADR-015 pattern). No genera cascada porque corre una
+    // estado de React). No genera cascada porque corre una
     // única vez en el init effect — disable puntual justificado.
     if (initial) {
       if (initial.type === 'Point') {

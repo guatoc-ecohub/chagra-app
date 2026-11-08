@@ -124,7 +124,7 @@ export function Condor({
      carroñero: nada se le escapa desde arriba) y el collar se esponja. Default
      false → planeo sereno de siempre. */
   otea = false,
-  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+  /* Device-tier: 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (planeo + primarias + cola) y deja
      los estados reactivos. Sin prop (standalone) = pleno. */
   tier,

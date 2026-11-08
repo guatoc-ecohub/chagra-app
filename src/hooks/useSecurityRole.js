@@ -12,7 +12,7 @@ import useFincaActiveStore from '../services/fincaActiveStore.js';
  * "¿qué puedo hacer YO dentro de ESTA finca" — dueño/esposa/trabajador/niña/
  * asesor — y expone `can(permiso, resourceOwnerDid?)` para gatear botones
  * en toda la app (defense-in-depth cliente-side; el server manda cuando
- * exista `farm_did_auth`, ADR-036 Fase 2).
+ * exista `farm_did_auth`).
  *
  * Se re-evalúa cuando:
  *  - cambia el tenant activo (login/logout, evento `tenantChanged`),

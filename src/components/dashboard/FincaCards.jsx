@@ -2,7 +2,7 @@
  * Las etiquetas de las tarjetas ("Insumos", "Bitácora", "Informes" — o su copy F2) y los
  * textos de carga/aria ("Cargando…", "Cargando contador") son strings de UI
  * preexistentes de este componente. Su migración a src/config/messages.js es
- * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
+ * la tarea de i18n (transversal a toda la app), fuera del alcance de
  * este refinamiento visual. Se silencia el warning soft aquí para no bloquear
  * el commit sin arrastrar ese refactor i18n. */
 import { useEffect, useState } from 'react';

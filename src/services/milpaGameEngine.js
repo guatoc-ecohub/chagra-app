@@ -13,7 +13,7 @@
  *   - Cobertura reduce arvenses 24–55 %.
  *   - Control de plagas: hasta 40 % por diversidad.
  *   - Sombra cafetera: 30–50 % con buffer 2–4°C.
- * Fuentes: DR-ASOCIACIONES-CULTIVO-COLOMBIA-2026-06-18; DOI 10.1093/aob/mcu191;
+ * Fuentes: DOI 10.1093/aob/mcu191;
  * DOI 10.3389/fagro.2023.1115490; DOI 10.1016/j.fcr.2019.107661.
  *
  * Sistemas modelados (todos con cifras reales):

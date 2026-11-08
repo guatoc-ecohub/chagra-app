@@ -1,5 +1,5 @@
 /*
- * useHaptics — LA CAPA TÁCTIL del framework de mundos (spec S4, DR-3D-HAPTICA).
+ * useHaptics — LA CAPA TÁCTIL del framework de mundos (spec S4).
  *
  * Un pulso háptico sutil que ACOMPAÑA momentos que ya son visibles/audibles
  * (tap en hotspot, la abeja posándose, el velo de viaje valle↔mundo). Nunca

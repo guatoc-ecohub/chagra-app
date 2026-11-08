@@ -260,7 +260,7 @@ function dedupeValid(ids, valid) {
  * API de alto nivel: del PERFIL completo → módulos del home + tarjetas de
  * seguimiento que le corresponden a este usuario POR DEFECTO.
  *
- * Reglas (el brief, ancladas a ADR-017/ADR-011/ADR-034):
+ * Reglas (el brief, ancladas a ADR-011):
  *   - URBANO (vocacion 'urbano' O finca_tipo balcon/terraza): OVERRIDE DURO →
  *     SOLO {plantas, plagas, bitacora, clima, hoyfinca}. NUNCA cerdos/
  *     silvopastoreo/reforestacion/paramo/zonas/insumos. Gana aunque el rol

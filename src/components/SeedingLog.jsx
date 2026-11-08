@@ -1,5 +1,5 @@
 import { localDateInputValue, localDateTimestamp } from '../utils/dateFormatter';
-/* i18n (ADR-050): este formulario es 100% user-facing en español Colombia
+/* i18n: este formulario es 100% user-facing en español Colombia
  * (etiquetas, ayudas, toasts). La regla chagra-i18n es soft (warn); se desactiva
  * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
  * para no bloquear el pre-commit (max-warnings=0). La migración i18n es trabajo

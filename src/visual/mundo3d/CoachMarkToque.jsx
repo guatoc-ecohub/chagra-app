@@ -14,7 +14,7 @@
  *   · Autocontenido y three-free: DOM + CSS propio, cero assets remotos.
  *
  * Copy en español Colombia (usted); si se productiza, migra a messages.js
- * (ADR-050).
+ *.
  */
 import { useEffect, useState } from 'react';
 import './coachMark.css';

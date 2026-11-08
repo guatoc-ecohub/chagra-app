@@ -14,18 +14,18 @@
  *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type,
  *                           asset_id_timestamp) — v9: índice compuesto para
  *                           queries timeline ordenadas sin sort en memoria)
- *                           (v8 ADR-027.viii: incluye log--split para modo individual/aggregate)
+ *                           (v8: incluye log--split para modo individual/aggregate)
  *   - media_cache          (v11: keyPath: id, autoIncrement; indexes: logId,
  *                           createdAt, lastAccessedAt; LRU eviction support)
  *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement)
- *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
+ *   - inventory_events     (v7: keyPath: id ULID; indexes:
  *                           item_id, timestamp, event_type, idempotency_key)
  *   - inventory_stock_snapshot (v7: materialized view, keyPath: item_id)
- *   - voice_telemetry      (v10 ADR-030 Regla 8: IDB para telemetría voz)
+ *   - voice_telemetry      (v10: IDB para telemetría voz)
  *   - conversation_memory (v12 057.3: IDB para memoria conversacional persistente)
  *                           keyPath: id; indexes: operator_id, timestamp)
  *   - llm_telemetry        (v13 2026-05-17: telemetría privacy-safe de calls LLM
- *                           para Eco-Oracle Dashboard ADR-023. Captura solo
+ *                           para Eco-Oracle Dashboard. Captura solo
  *                           metadata — modelo, latencia, tokens, processor
  *                           gpu/cpu — NUNCA prompt ni respuesta. keyPath: id;
  *                           indexes: model, flujo, created_at, status, synced)
@@ -58,7 +58,7 @@ export const STORES = {
   RAG_TELEMETRY: 'rag_telemetry',
   FAILED_TX: 'failed_transactions',
   VISION_QUEUE: 'vision_queue',
-  FARM_PROCESSES: 'farm_processes', // v18: ADR-047 agregado de ciclo de cultivo
+  FARM_PROCESSES: 'farm_processes', // v18: agregado de ciclo de cultivo
   FARM_PROCESS_EVENTS: 'farm_process_events', // v18: eventos del ciclo de cultivo
   // v17 (compositor multimodal del home): outbox DURABLE de consultas al
   // agente disparadas desde el dashboard. El item (texto / blob de audio /
@@ -192,7 +192,7 @@ export const openDB = async () => {
         store.createIndex('status', 'status', { unique: false });
       }
 
-      // v7: inventory_events — log append-only ADR-019 + ADR-027.i+ii.
+      // v7: inventory_events — log append-only (ADR-019).
       // Append-only inmutable. Reconciliación post-sync por timestamp +
       // device_id_lex_hash + sequence_number.
       if (!db.objectStoreNames.contains(STORES.INVENTORY_EVENTS)) {
@@ -227,7 +227,7 @@ export const openDB = async () => {
         }
       }
 
-      // v10: voice_telemetry — ADR-030 Regla 8 (NO localStorage).
+      // v10: voice_telemetry — IDB, NO localStorage.
       // Instrumentación para analizar uso de voz vs touch por flujo.
       if (event.oldVersion < 10) {
         if (!db.objectStoreNames.contains(STORES.VOICE_TELEMETRY)) {
@@ -260,7 +260,7 @@ export const openDB = async () => {
       // v13: llm_telemetry — metadata privacy-safe de cada call LLM
       // (ollamaStream + openaiStream). Captura solo modelo, latencia, tokens,
       // processor gpu/cpu — NUNCA prompt ni respuesta. Alimenta Eco-Oracle
-      // Dashboard (ADR-023) sección LLM + GPU.
+      // Dashboard sección LLM + GPU.
       if (event.oldVersion < 13) {
         if (!db.objectStoreNames.contains(STORES.LLM_TELEMETRY)) {
           const store = db.createObjectStore(STORES.LLM_TELEMETRY, { keyPath: 'id' });
@@ -335,7 +335,7 @@ export const openDB = async () => {
         }
       }
 
-      // v18: ADR-047 farm_process aggregate — ciclos de cultivo + eventos
+      // v18: farm_process aggregate — ciclos de cultivo + eventos
       if (event.oldVersion < 18) {
         if (!db.objectStoreNames.contains(STORES.FARM_PROCESSES)) {
           const fpStore = db.createObjectStore(STORES.FARM_PROCESSES, { keyPath: 'process_id' });

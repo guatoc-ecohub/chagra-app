@@ -1,4 +1,4 @@
-/* i18n (ADR-050): igual que hortalizasData.js y PoscosechaScreen, este módulo
+/* i18n: igual que hortalizasData.js y PoscosechaScreen, este módulo
  * lleva copy campesino en español Colombia pendiente de migrar a
  * src/config/messages.js. Se desactiva la regla soft a nivel de archivo. */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */

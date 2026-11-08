@@ -1,5 +1,5 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- UI ES-CO; migración a
- * src/config/messages.js (ADR-050 i18n) fuera del alcance de este fix. */
+ * src/config/messages.js (i18n) fuera del alcance de este fix. */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sprout, FlaskConical, AlertTriangle } from 'lucide-react';
 import FarmProcessSummary from './FarmProcessSummary';

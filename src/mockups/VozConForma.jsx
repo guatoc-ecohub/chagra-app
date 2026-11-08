@@ -18,8 +18,7 @@
  *    prefers-reduced-motion = fotograma digno, responsive hasta 320px.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con datos de
-   muestra (no UI de producto); si se productiza, el copy migra a messages.js
-   (ADR-050). */
+   muestra (no UI de producto); si se productiza, el copy migra a messages.js. */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import IrisVoz from '../visual/voz';
 import '../visual/effects/effects.css';

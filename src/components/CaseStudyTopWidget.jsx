@@ -7,7 +7,7 @@ import { useCaseStudyStore } from '../store/useCaseStudyStore';
  * DashboardView principal de Chagra. Permite navegar directo al
  * detalle del caso.
  *
- * MVP DR-044 sub-iv: ranking severidad × afectados × tiempo
+ * MVP: ranking severidad × afectados × tiempo
  * (lógica en useCaseStudyStore.getTopActiveProblems).
  *
  * KISS: cuando no hay casos activos, NO se renderiza (ocupa cero

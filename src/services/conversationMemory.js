@@ -9,7 +9,7 @@ import { isScientificNameCandidate } from './agentTurnGuards.js';
  * - Operator-scoped: cada operador tiene su propia memoria
  * - NUNCA syncea a servidor sin opt-in explícito
  *
- * ADR-030 Regla 9: privacidad - memoria local solo
+ * privacidad - memoria local solo
  */
 
 import { openDB, STORES } from '../db/dbCore';

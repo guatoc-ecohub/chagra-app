@@ -13,13 +13,13 @@
  * heladas, no menos). Ese conocimiento está documentado y citado en la
  * investigación de Chagra:
  *
- *   - DR-MISSION-2 — Fenómeno del Niño Colombia 2026-27 (ENSO global, ONI,
+ *   - Fenómeno del Niño Colombia 2026-27 (ENSO global, ONI,
  *     probabilidades IRI/CPC, impactos por Niños históricos 1982-2024).
- *   - DR-MISSION-3 — ENSO ciclo completo Colombia.
- *   - DR-MISSION-4 — Impactos regionales del cambio climático (5 regiones ×
+ *   - ENSO ciclo completo Colombia.
+ *   - Impactos regionales del cambio climático (5 regiones ×
  *     cultivos × piso térmico, cifras IDEAM/UPRA/Agrosavia/Cenicafé).
  *
- * Este módulo es ESTÁTICO y AUDITABLE: cada afirmación trazable a esos DR y a
+ * Este módulo es ESTÁTICO y AUDITABLE: cada afirmación trazable a esas investigaciones y a
  * sus fuentes primarias (NOAA CPC, IDEAM, Cenicafé, Fedepapa, UPRA). No inventa
  * cifras ni predice el clima — solo traduce la fase ENSO (que viene del feed en
  * vivo) a implicaciones agronómicas accionables por región.
@@ -48,8 +48,8 @@ import { ENSO_HELADA_PISO_FRIO, UMBRAL_HELADA_TEXTO, esPisoDeHelada } from './en
 export { ENSO_HELADA_PISO_FRIO, UMBRAL_HELADA_TEXTO, esPisoDeHelada };
 
 /**
- * Vigilancia ENSO oficial al momento de redacción (fuente: DR-MISSION-2 sec.
- * 1.1-1.2, NOAA CPC 8-may-2026 + plume IRI/CPC 16-may-2026). Se usa SOLO como
+ * Vigilancia ENSO oficial al momento de redacción (fuente: investigación sobre El Niño 2026-27,
+ * sec. 1.1-1.2, NOAA CPC 8-may-2026 + plume IRI/CPC 16-may-2026). Se usa SOLO como
  * respaldo cuando el feed en vivo no trae probabilidades; el feed en vivo manda.
  */
 export const ENSO_WATCH_2026 = Object.freeze({
@@ -74,8 +74,8 @@ const REGION_IMPACTS = Object.freeze({
     andina: {
         label: 'Región Andina',
         // Nota interna (no visible): la paradoja y la cifra de 25.000 t vienen
-        // del DR-MISSION-4 (fuentes primarias IDEAM/Cenicafé, evento 2015-16).
-        // En UI se cita la fuente real y la fecha del evento, nunca el código DR.
+        // de la investigación de impactos regionales (fuentes primarias IDEAM/Cenicafé, evento 2015-16).
+        // En UI se cita la fuente real y la fecha del evento, nunca un código interno.
         nino: 'El Niño en los Andes trae menos lluvia y más días calurosos. En el altiplano frío (papa de Boyacá/Cundinamarca), las noches despejadas pueden favorecer heladas, y en temporadas de El Niño puede haber más noches secas; la fase no dice si helará esta noche, eso lo dice la mínima local. En el Niño 2015-16 eso costó cerca de 25.000 t de papa (IDEAM/Cenicafé, cifras del Niño 2015-16).',
         nina: 'La Niña en los Andes trae más lluvia, suelos sobresaturados y mayor riesgo de deslizamientos en ladera (UPRA/UNGRD) y de hongos (mildiu/gota) en papa y café.',
         vigilancia: 'Con vigilancia de Niño: en piso frío vigila la mínima local de cada noche y revisa con un técnico si tu sistema y tu reserva de agua sirven para protección contra heladas; en café/cacao templado prepara sombrío y mulch para amortiguar el calor que se espera si entra el Niño.',

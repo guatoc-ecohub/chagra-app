@@ -139,7 +139,7 @@ export function solarTimes(date, latitude, longitude) {
  * La FASE es astronomía real (±12h con el ciclo sinódico medio) — mostrarla es
  * válido. Lo que NO hace este módulo (ni debe hacer la UI) es recomendar
  * labores agrícolas por fase lunar: eso es folclore sin base física
- * (ADR-033 / DR-AGUA 2026 — fuerza de marea ~10⁻⁷ de g).
+ * (fuerza de marea ~10⁻⁷ de g).
  *
  * @param {number} fraction  posición en el ciclo 0..1 (0 = luna nueva, 0.5 = llena)
  * @param {number} cx @param {number} cy @param {number} r

@@ -1,7 +1,7 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish --
  * Los textos de UI de esta tarjeta (título "Red de fincas", resúmenes,
  * aria-labels) son strings de interfaz. Su migración a src/config/messages.js
- * es la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
+ * es la tarea de i18n (transversal a toda la app), fuera del alcance de
  * esta feature visual — mismo criterio que MiFincaVivaHomeCard.jsx y
  * ExtensionistaScreen.jsx en este repo. */
 import { useMemo } from 'react';
@@ -17,14 +17,14 @@ import '../juego/juego-finca.css';
 
 /**
  * FincaRedInstitucional — la VISTA INSTITUCIONAL del home para el modo
- * extensionista/supervisor (ADR-048). En vez de la escena de UNA finca propia,
+ * extensionista/supervisor. En vez de la escena de UNA finca propia,
  * muestra la RED de fincas que el usuario acompaña: agregados arriba (total /
  * con alertas / con pendientes) + cada finca como una mini-escena "Finca Viva"
  * enriquecida (estado de un vistazo, lo urgente arriba). Coherente con la
  * estética del mockup F2 ("Finca Viva Evolutiva"): cada finca es un mundo vivo.
  *
  * DATOS: `construirTableroExtensionista(username)` (extensionistaService) sobre
- * el mock `extensionista-fincas.json` (ADR-048 MVP — la delegación real es
+ * el mock `extensionista-fincas.json` (MVP: la delegación real es
  * follow-up backend UCAN/farm_did_auth). NO inventa datos: si no hay fincas
  * para el tenant y el usuario es operador (demo/ministerial), cae al mock de
  * ejemplo `demo-extensionista`, igual que ExtensionistaScreen.

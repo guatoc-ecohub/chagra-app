@@ -1,6 +1,6 @@
 import { pisoTermicoFromAltitud } from './data/cropSuggestions.js';
 /*
- * i18n (ADR-050): App.jsx contiene etiquetas de navegación en español Colombia
+ * i18n: App.jsx contiene etiquetas de navegación en español Colombia
  * (Plantas, Mapa, Insumos, Perfil, títulos de módulos…) pendientes de migrar a
  * src/config/messages.js. La regla chagra-i18n es soft (warn); se desactiva a
  * nivel de archivo para no bloquear el pre-commit con deuda preexistente. Los
@@ -695,7 +695,7 @@ const MonoVsPoliSimulator = lazy(() => import('./components/juego/MonoVsPoliSimu
 // consume el dataset fundamentado de síntomas/plaguicidas vetados/
 // alternativas agroecológicas (Tarea #38) — juego construido en Tarea #93.
 const AhorcadoContaminado = lazy(() => import('./components/juego/AhorcadoContaminado'));
-// Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
+// Modo extensionista (panel supervisor multi-finca, MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
 // Entrada Pro GATED por capability `avatar-espiritu` (módulo del repo privado
@@ -1584,7 +1584,7 @@ export default function App() {
         navigate('dashboard');
         return;
       }
-      // Gate del modo extensionista (ADR-048): si un usuario sin rol aterriza
+      // Gate del modo extensionista: si un usuario sin rol aterriza
       // en #extensionista (flag off o fuera de whitelist), va al dashboard.
       if (targetView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1631,7 +1631,7 @@ export default function App() {
         navigate(resolveDestinoPostLogin());
         return;
       }
-      // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
+      // Gate extensionista: no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
         return;
@@ -4486,7 +4486,7 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'extensionista':
-        // Panel SUPERVISOR del modo extensionista (ADR-048 MVP). ACCESO por
+        // Panel SUPERVISOR del modo extensionista. ACCESO por
         // feature flag VITE_FEATURE_EXTENSIONISTA + rol (config/extensionistaAccess).
         // Las rutas a #extensionista ya redirigen al dashboard antes de llegar
         // aquí si el usuario no tiene rol; guarda defensiva por si se monta directo.
