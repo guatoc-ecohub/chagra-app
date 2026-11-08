@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../utils/leafletIconoDefecto.js';
 import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square, Loader2, AlertTriangle, Shield } from 'lucide-react';
 import {
   latLngToPoint,
