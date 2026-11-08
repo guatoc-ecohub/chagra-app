@@ -2,11 +2,12 @@
  * userDataPurge — borra del dispositivo los datos de la cuenta al salir.
  *
  * Se llama SOLO desde el «Salir» explícito. Una sesión vencida (401) pasa por
- * `logoutUser` y NO purga: el usuario no eligió irse y al volver a entrar
- * conserva su sesión local (contrato del E2E offline S2).
+ * `logoutUser` y NO purga IndexedDB: el usuario no eligió irse y al volver a
+ * entrar conserva su sesión local (contrato del E2E offline S2). La excepción
+ * es el bucket NDVI: `logoutUser` lo borra siempre (ver ndviCacheStore).
  *
  * Qué se borra:
- *  - CacheStorage: el bucket NDVI (respuestas autenticadas por tenant) y toda
+ *  - CacheStorage: el bucket NDVI (respuestas autenticadas por cuenta) y toda
  *    entrada `/api/` que un service worker anterior haya guardado en los
  *    buckets `chagra-*`.
  *  - IndexedDB: espejos de datos del servidor y conversación (`assets`, `logs`,
@@ -26,8 +27,9 @@
  */
 
 import { openDB, STORES } from '../db/dbCore.js';
+import { NDVI_CACHE_NAME } from './ndviCacheStore.js';
 
-export const USER_CACHE_NAMES = Object.freeze(['chagra-ndvi-v1']);
+export const USER_CACHE_NAMES = Object.freeze([NDVI_CACHE_NAME]);
 
 export const PURGED_STORES = Object.freeze([
   STORES.ASSETS,

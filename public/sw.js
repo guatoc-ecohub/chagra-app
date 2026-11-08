@@ -81,10 +81,13 @@ function withGroundingTimeout(promise) {
 // vio online, para que el mapa funcione offline en zonas ya visitadas.
 const MAP_TILES_PREFIX = 'chagra-map-tiles-';
 const MAP_TILES_CACHE = `${MAP_TILES_PREFIX}v1`;
-// Series NDVI: respuestas POST de solo lectura, aisladas por tenant y huella
-// del cuerpo. La geometría nunca queda en la URL ni en el nombre de la clave.
+// Series NDVI: respuestas POST de solo lectura, aisladas por cuenta y huella
+// del cuerpo (`<prefijo><scope de la cuenta>/<huella>`, igual que
+// src/services/ndviCacheStore.js). Sin scope de cuenta no se guarda ni se
+// sirve nada. La geometría nunca queda en la URL ni en el nombre de la clave.
 const NDVI_CACHE_NAME = 'chagra-ndvi-v1';
 const NDVI_CACHE_KEY_PREFIX = '/__chagra_ndvi_cache__/';
+const NDVI_CACHE_SCOPE_RE = /^[0-9a-f]{64}$/;
 const NDVI_CACHE_MAX = 100;
 // Tope defensivo de tiles cacheados (LRU aproximado por orden de inserción):
 // evita que el cache de tiles crezca sin límite en un teléfono rural. ~400
@@ -376,7 +379,8 @@ self.addEventListener('fetch', (event) => {
 
   // POST autenticado de solo lectura del vigor por lote. Es network-first:
   // guarda únicamente respuestas JSON 200 y, si fetch falla, reproduce el
-  // último resultado para el mismo tenant y el mismo cuerpo exacto.
+  // último resultado para la misma cuenta y el mismo cuerpo exacto. Respeta
+  // Cache-Control private/no-store como el resto del worker.
   if (
     url.origin === self.location.origin &&
     event.request.method === 'POST' &&
@@ -785,13 +789,17 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-async function ndviCacheRequestUrl(request) {
+function ndviCacheScope(request) {
+  const scope = request.headers.get('x-chagra-ndvi-cache-scope') || '';
+  return NDVI_CACHE_SCOPE_RE.test(scope) ? scope : null;
+}
+
+async function ndviCacheRequestUrl(request, scope) {
   if (!globalThis.crypto?.subtle || typeof TextEncoder === 'undefined') return null;
   const body = await request.clone().text();
-  const scope = request.headers.get('x-chagra-ndvi-cache-scope') || 'anonymous';
   const digest = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${scope}\u0000${body}`));
   const hash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-  return new URL(`${NDVI_CACHE_KEY_PREFIX}${hash}`, self.location.origin).toString();
+  return new URL(`${NDVI_CACHE_KEY_PREFIX}${scope}/${hash}`, self.location.origin).toString();
 }
 
 function markNdviCacheResponse(response) {
@@ -804,32 +812,51 @@ function markNdviCacheResponse(response) {
   }));
 }
 
-async function trimNdviCache(cache) {
-  const keys = await cache.keys();
-  for (const request of keys.slice(0, Math.max(0, keys.length - NDVI_CACHE_MAX))) {
+// Al guardar para una cuenta, borra lo que quede de otras (cambio de cuenta en
+// el mismo teléfono) y recorta al tope.
+async function trimNdviCache(cache, scope) {
+  const ownPrefix = `${NDVI_CACHE_KEY_PREFIX}${scope}/`;
+  const own = [];
+  for (const request of await cache.keys()) {
+    let pathname = '';
+    try { pathname = new URL(request.url).pathname; } catch { /* clave inválida: se borra */ }
+    if (pathname.startsWith(ownPrefix)) own.push(request);
+    else await cache.delete(request);
+  }
+  for (const request of own.slice(0, Math.max(0, own.length - NDVI_CACHE_MAX))) {
     await cache.delete(request);
   }
 }
 
+function ndviCacheMiss() {
+  return new Response(JSON.stringify({ error: 'ndvi_cache_miss' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
+
 async function handleNdviSeriesRequest(request) {
-  const cacheUrl = await ndviCacheRequestUrl(request).catch(() => null);
-  if (!cacheUrl) return fetch(request);
+  const scope = ndviCacheScope(request);
+  const cacheUrl = scope ? await ndviCacheRequestUrl(request, scope).catch(() => null) : null;
+  if (!cacheUrl) return fetch(request).catch(ndviCacheMiss);
   const cache = await caches.open(NDVI_CACHE_NAME);
   try {
     const response = await fetch(request);
     const contentType = response.headers.get('content-type') || '';
-    if (response.status === 200 && response.ok && /^application\/(?:[a-z0-9.+-]*\+)?json\b/i.test(contentType)) {
+    if (
+      response.status === 200 &&
+      response.ok &&
+      /^application\/(?:[a-z0-9.+-]*\+)?json\b/i.test(contentType) &&
+      isStorableResponse(response)
+    ) {
       await cache.put(cacheUrl, response.clone());
-      await trimNdviCache(cache);
+      await trimNdviCache(cache, scope);
     }
     return response;
   } catch {
     const cached = await cache.match(cacheUrl);
     if (cached?.status === 200) return markNdviCacheResponse(cached);
-    return new Response(JSON.stringify({ error: 'ndvi_cache_miss' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    });
+    return ndviCacheMiss();
   }
 }
 
