@@ -484,6 +484,8 @@ const messages = {
     callbackReturn: 'No se pudo completar el inicio de sesión. Te llevamos de vuelta al login.',
     callbackIdentityMissing: 'No pudimos confirmar su usuario. Vuelva a ingresar.',
     callbackFincaFailed: 'No pudimos abrir esa finca. Vuelva a intentarlo.',
+    almacenamientoNoDisponible: 'Este navegador no permite guardar la sesión de forma segura (IndexedDB no disponible). Pruebe sin modo privado o con otro navegador.',
+    cierreSesionIncompleto: 'La sesión se cerró, pero no se pudieron borrar los datos de acceso de este aparato. Borre los datos del sitio en el navegador o vuelva a intentar salir.',
   },
   // Pantalla del tiempo (ClimaBoletinScreen), bloque de trazabilidad.
   clima: {
