@@ -18,9 +18,9 @@ export const TENANT_READY_EVENT = 'chagra:tenant-ready';
  */
 export async function hasStoredAccessToken() {
   try {
-    // Import diferido: tenantContext usa este módulo y no necesita localforage.
-    const { default: localforage } = await import('localforage');
-    return !!(await localforage.getItem('farmos_access_token'));
+    // Import diferido: tenantContext usa este módulo y no necesita el almacén.
+    const { readToken } = await import('./tokenStore');
+    return !!(await readToken('farmos_access_token'));
   } catch (_) {
     return null;
   }
