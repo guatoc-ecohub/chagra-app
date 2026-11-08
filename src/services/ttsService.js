@@ -110,7 +110,9 @@ export const KOKORO_VOICES = Object.freeze([
 // cuelgan de aquí; este es también el gancho para una futura voz clonada
 // personalizada — cambiar la voz por defecto se hace SOLO aquí.
 export const DEFAULT_KOKORO_VOICE = 'em_santa';
-export const PIPER_TTS_BASE_URL = 'http://127.0.0.1:10304';
+// Síntesis local opcional: solo existe si el build recibe VITE_TTS_LOCAL_URL.
+// Sin la variable no queda ninguna dirección en el bundle y la voz usa Kokoro.
+export const PIPER_TTS_BASE_URL = import.meta.env.VITE_TTS_LOCAL_URL || '';
 const PIPER_HEALTH_TIMEOUT_MS = 3000;
 const PIPER_TTS_TIMEOUT_MS = 30000;
 class PiperUnavailableError extends Error {
@@ -532,7 +534,17 @@ async function fetchKokoroBlob(cleanText, voice, format, lang, signal) {
   throw lastErr || new Error('kokoro TTS falló');
 }
 
+function elegirMotor({ voice, compai, forceEngine }) {
+  const companionVoice = getCompanionVoice(compai);
+  const engine = forceEngine || (voice ? 'kokoro' : companionVoice.engine);
+  if (engine === 'piper' && !PIPER_TTS_BASE_URL) {
+    return { engine: 'kokoro', voice: voice || DEFAULT_KOKORO_VOICE };
+  }
+  return { engine, voice: voice || companionVoice.voice };
+}
+
 async function fetchPiperBlob(cleanText, voice, format, lang, signal) {
+  if (!PIPER_TTS_BASE_URL) throw new PiperUnavailableError('Síntesis local desactivada');
   const healthController = new AbortController();
   const healthTimer = setTimeout(() => healthController.abort(), PIPER_HEALTH_TIMEOUT_MS);
   const abortHealth = () => healthController.abort();
@@ -744,9 +756,9 @@ export async function speakSentences(text, options = {}) {
   } = options;
   const avisarFrase = crearAvisoDeFrase(onFrase);
 
-  const companionVoice = getCompanionVoice(compai);
-  let engine = forceEngine || (voice ? 'kokoro' : companionVoice.engine);
-  let servableVoice = voice || companionVoice.voice;
+  const elegido = elegirMotor({ voice, compai, forceEngine });
+  let engine = elegido.engine;
+  let servableVoice = elegido.voice;
 
   stop();
   sentenceQueueCancelled = false;
@@ -792,8 +804,8 @@ export async function speakSentences(text, options = {}) {
     prefetched = null;
   }
 
-  // Piper no responde (PIPER_TTS_BASE_URL es 127.0.0.1: en el teléfono es el
-  // propio teléfono). La cadena sigue POR FRASES con Kokoro y la misma voz de
+  // Piper no responde (con la síntesis local activa, su dirección es de
+  // loopback: en el teléfono es el propio teléfono). La cadena sigue POR FRASES con Kokoro y la misma voz de
   // respaldo que ya usa speakKokoro, en vez de caer al texto entero: medido
   // 2026-09-23 en el Pixel, angelita decía 386 caracteres como una sola frase.
   if (!prefetched && !sentenceQueueCancelled && engine === 'piper' && forceEngine !== 'piper') {
@@ -1034,9 +1046,9 @@ export async function speakKokoro(text, options = {}) {
     lang = 'es',
     rate = getPreferredRate(),
   } = options;
-  const companionVoice = getCompanionVoice(compai);
-  const engine = forceEngine || (voice ? 'kokoro' : companionVoice.engine);
-  const requestedVoice = voice || (forceEngine === 'kokoro' ? getPreferredVoice() : companionVoice.voice);
+  const elegido = elegirMotor({ voice, compai, forceEngine });
+  const engine = elegido.engine;
+  const requestedVoice = voice || (forceEngine === 'kokoro' ? getPreferredVoice() : elegido.voice);
 
   stop();
 
