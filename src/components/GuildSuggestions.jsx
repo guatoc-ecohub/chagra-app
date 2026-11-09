@@ -216,7 +216,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               ))}
             </ul>
             <p className="mt-1.5 text-[10px] italic text-slate-600">
-              Filtros funcionales aplicados: estrato, ciclo, sombra (ADR-034). Especies de gran porte se excluyen para hortalizas anuales.
+              Filtros funcionales aplicados: estrato, ciclo, sombra. Especies de gran porte se excluyen para hortalizas anuales.
             </p>
           </details>
         </div>

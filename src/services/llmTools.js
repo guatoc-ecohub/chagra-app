@@ -375,7 +375,7 @@ registerTool({
  */
 registerTool({
   name: 'query_corpus_dr034',
-  description: 'Buscar información en el corpus DR-034 de ciclo de especies agroecológicas',
+  description: 'Buscar información en el corpus consolidado de ciclo de especies agroecológicas',
   parameters: {
     type: 'object',
     properties: {

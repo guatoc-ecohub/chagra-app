@@ -36,7 +36,7 @@ Estructura sugerida:
 
 Reglas:
 - NO inventes datos no presentes en el historial.
-- NO incluyas nombres de personas (privacy ADR-020 Ley 1581).
+- NO incluyas nombres de personas (privacidad, Ley 1581).
 - NO incluyas coordenadas exactas si la finca/zona aparece.
 - Foco en aprendizaje accionable: "Próxima vez aplicar BT 1g/L al primer signo".
 - Si el caso falló (closed_failed), explicita por qué probablemente.

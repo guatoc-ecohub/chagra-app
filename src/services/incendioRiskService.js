@@ -212,7 +212,7 @@ export function evaluarRiesgoIncendio(opts = {}) {
     fuentes: [
       'Fase ENSO: NOAA CPC (ONI) + IDEAM',
       'Temporadas secas: climatología IDEAM (régimen de lluvias de Colombia)',
-      'Impacto de El Niño en incendios: IDEAM / UNGRD (DR-MISSION-4)',
+      'Impacto de El Niño en incendios: IDEAM / UNGRD',
     ],
   });
 }

@@ -85,7 +85,7 @@ export default function InventoryPage() {
             <div>
               <h1 style={{ margin: 0, fontSize: '1.2rem' }}>Inventario</h1>
               <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--fg-dim, #8b949e)' }}>
-                Stock en vivo · ADR-027 event sourcing · Local-first
+                Stock en vivo · Historial de eventos · Local-first
               </p>
             </div>
             <button

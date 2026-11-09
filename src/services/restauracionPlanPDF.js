@@ -346,7 +346,7 @@ export const generateRestauracionPlanPDF = (planData) => {
   const fuentes = [];
   if (diag.fuente) fuentes.push(diag.fuente);
   if (riesgo && Array.isArray(riesgo.fuentes)) fuentes.push(...riesgo.fuentes);
-  if (fuentes.length === 0) fuentes.push('Catálogo de restauración Chagra (DR-RESTAURACION-1: IAvH, MinAmbiente, CIPAV).');
+  if (fuentes.length === 0) fuentes.push('Catálogo de restauración Chagra (IAvH, MinAmbiente, CIPAV).');
   for (const f of fuentes) {
     y = ensureSpace(doc, y, 10, subtitle);
     y = drawParagraph(doc, y, `• ${f}`, { fontSize: 9, color: COLOR_SLATE, gap: 1.5 });

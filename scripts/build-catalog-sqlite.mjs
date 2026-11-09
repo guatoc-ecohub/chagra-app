@@ -68,8 +68,8 @@ db.exec(`
     altitud_max_absoluto INTEGER,
     altitud_optimo_min INTEGER,
     altitud_optimo_max INTEGER,
-    tracking_mode TEXT,  -- ADR-030: "individual" | "aggregate" | NULL (invasoras)
-    dli_optimo_mol_m2_dia REAL, -- ADR-028
+    tracking_mode TEXT,  -- "individual" | "aggregate" | NULL (invasoras)
+    dli_optimo_mol_m2_dia REAL, -- luz diaria óptima (DLI)
     fotoperiodo_min REAL,
     fotoperiodo_optimo REAL,
     fotoperiodo_max REAL,

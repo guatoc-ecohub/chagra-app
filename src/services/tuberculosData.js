@@ -120,11 +120,11 @@ export const TUBERCULOS = [
     // Grafo: pest_controllers (AFFECTS plaga→papa + CONTROLS biocontrol→plaga).
     plagas: [
       { nombre: 'Gota / tizón tardío (Phytophthora)', controles: ['Bacteria antagonista (biofungicida)', 'Trichoderma spp.', 'Hongo antagonista del suelo'] },
-      { nombre: 'Polilla guatemalteca de la papa', controles: ['Bt (bacteria bioinsecticida)', 'Parasitoide de control biológico', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Polilla guatemalteca de la papa', controles: ['Bt (bacteria bioinsecticida)', 'Parasitoide de control biológico', 'Microorganismo de control biológico'] },
       { nombre: 'Gusano blanco de la papa', controles: ['Hongo entomopatógeno (beauveria)', 'Hongo verde entomopatógeno (metarhizium)', 'Nematodos entomopatógenos (Steinernema)'] },
       { nombre: 'Nematodo quiste de la papa', controles: ['Hongo nematófago (paecilomyces)', 'Pochonia chlamydosporia'] },
       { nombre: 'Pulguilla negra de la papa', controles: ['Hongo entomopatógeno (beauveria)', 'Hongo verde entomopatógeno (metarhizium)'] },
-      { nombre: 'Marchitez bacteriana (dormidera)', controles: ['Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Marchitez bacteriana (dormidera)', controles: ['Microorganismo de control biológico'] },
     ],
     // Grafo: biopreparados de especificidad alta/muy alta vinculados a la papa.
     biopreparados: ['Caldo bordelés', 'Caldo bordelés enriquecido con Trichoderma (anti-gota)', 'Trichoderma harzianum al suelo', 'Beauveria bassiana', 'Trampa de feromona sexual para la polilla', 'Metarhizium anisopliae'],
@@ -161,7 +161,7 @@ export const TUBERCULOS = [
     // Grafo: pest_controllers (comparte las de la papa común).
     plagas: [
       { nombre: 'Gota / tizón tardío (Phytophthora)', controles: ['Bacteria antagonista (biofungicida)', 'Trichoderma spp.', 'Hongo antagonista del suelo'] },
-      { nombre: 'Polilla guatemalteca de la papa', controles: ['Bt (bacteria bioinsecticida)', 'Parasitoide de control biológico', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Polilla guatemalteca de la papa', controles: ['Bt (bacteria bioinsecticida)', 'Parasitoide de control biológico', 'Microorganismo de control biológico'] },
       { nombre: 'Gusano blanco de la papa', controles: ['Hongo entomopatógeno (beauveria)', 'Hongo verde entomopatógeno (metarhizium)', 'Nematodos entomopatógenos (Steinernema)'] },
     ],
     biopreparados: [], // grafo sin biopreparado de alta especificidad vinculado
@@ -200,8 +200,8 @@ export const TUBERCULOS = [
       { nombre: 'Ácaro verde de la yuca', controles: ['Ácaro depredador (neoseiulus)', 'Typhlodromalus aripo'] },
       { nombre: 'Piojo harinoso de la yuca', controles: ['Hongo entomopatógeno (beauveria)', 'Parasitoide de control biológico'] },
       { nombre: 'Gusano cachón de la yuca', controles: ['Bt (bacteria bioinsecticida)', 'Avispita parasitoide de huevos', 'Hongo verde entomopatógeno (metarhizium)'] },
-      { nombre: 'Bacteriosis de la yuca (añublo bacteriano)', controles: ['Microorganismo de control biológico (DR-MIP-1)'] },
-      { nombre: 'Pudrición basal por Fusarium', controles: ['Hongo antagonista del suelo', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Bacteriosis de la yuca (añublo bacteriano)', controles: ['Microorganismo de control biológico'] },
+      { nombre: 'Pudrición basal por Fusarium', controles: ['Hongo antagonista del suelo', 'Microorganismo de control biológico'] },
     ],
     biopreparados: [], // grafo sin biopreparado de alta especificidad vinculado
     fuentes: { cultivo: FUENTES.pancoger, relaciones: FUENTES.grafo },
@@ -235,7 +235,7 @@ export const TUBERCULOS = [
     vecinasMalas: [], // grafo sin arista de antagonismo
     // Grafo: pest_controllers.
     plagas: [
-      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Trichoderma spp.', 'Pochonia chlamydosporia', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Trichoderma spp.', 'Pochonia chlamydosporia', 'Microorganismo de control biológico'] },
     ],
     biopreparados: [],
     fuentes: { cultivo: FUENTES.pancoger, relaciones: FUENTES.grafo },
@@ -268,7 +268,7 @@ export const TUBERCULOS = [
     vecinasMalas: [],
     // Grafo: pest_controllers (antracnosis del follaje, familia Colletotrichum).
     plagas: [
-      { nombre: 'Antracnosis del ñame (Colletotrichum)', controles: ['Hongo antagonista del suelo', 'Trichoderma spp.', 'Bacteria antagonista (biofungicida)', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Antracnosis del ñame (Colletotrichum)', controles: ['Hongo antagonista del suelo', 'Trichoderma spp.', 'Bacteria antagonista (biofungicida)', 'Microorganismo de control biológico'] },
     ],
     biopreparados: [],
     fuentes: { cultivo: FUENTES.pancoger, relaciones: FUENTES.grafo },
@@ -336,7 +336,7 @@ export const TUBERCULOS = [
     vecinasMalas: [], // grafo sin arista de antagonismo
     // Grafo: pest_controllers.
     plagas: [
-      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Microorganismo de control biológico'] },
     ],
     biopreparados: [],
     fuentes: { cultivo: FUENTES.pancoger, relaciones: FUENTES.grafo },
@@ -400,7 +400,7 @@ export const TUBERCULOS = [
     vecinasMalas: [],
     // Grafo: pest_controllers.
     plagas: [
-      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Microorganismo de control biológico (DR-MIP-1)'] },
+      { nombre: 'Nematodo agallador', controles: ['Hongo antagonista del suelo', 'Hongo nematófago (paecilomyces)', 'Microorganismo de control biológico'] },
     ],
     biopreparados: [],
     fuentes: { cultivo: FUENTES.pancoger, relaciones: FUENTES.grafo },

@@ -988,7 +988,7 @@ export default function ProfileScreen({ onBack, onHome, onLogout = null }) {
 
               <p className="text-xs text-slate-400 px-1 leading-relaxed">
                 La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
-                El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
+                El dashboard de visualización se trasladó a un panel privado del operador, fuera de esta app.
               </p>
             </div>
 

@@ -190,7 +190,7 @@ export default function HytaPanel() {
 
       {/* Nota sobre privacidad */}
       <p className="text-xs text-slate-500 text-center leading-tight">
-        La telemetría LLM detallada vive en el panel privado del operador (ADR-020 / ADR-029).
+        La telemetría LLM detallada vive en un panel privado del operador, fuera de esta app.
       </p>
     </div>
   );
