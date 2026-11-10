@@ -144,6 +144,9 @@ const ASSETS_TO_CACHE = [
   '/manual/mv-voz-registro.html',
   '/manual/mv-milpa.html',
   '/manual/mv-sipsa.html',
+  // Licencia OFL de las fuentes que incrustan los manuales (rel="license").
+  '/fonts/OFL-baloo2.txt',
+  '/fonts/OFL-nunito.txt',
   // Descensos autocontenidos: deben estar disponibles desde la primera apertura offline.
   '/descensos/control-biologico/index.html',
   '/descensos/frijol-nodulo/index.html',
