@@ -27,6 +27,11 @@ import React, { useState } from 'react';
 // /public/avatar/colibri-transition.webm. Si el navegador no soporta WebM
 // o el fetch falla, onError dispara fallback al still hero (foto#2 pose
 // icónica) sin breaking change visual.
+// 2026-11-08: /public/avatar/ no está en este repositorio y estas dos rutas
+// apuntaban a nada. Se usan los recursos del Barbudito (public/colibri/), los
+// mismos que monta el avatar activo, en vez de un hueco.
+const VIDEO_TRANSICION = '/colibri/barbudito-transition.webm';
+const FOTO_FIJA = '/colibri/barbudito-poster.webp';
 const HAS_TRANSITION_VIDEO = true;
 
 const STATE_RING = {
@@ -117,11 +122,11 @@ export default function ChagraAgentAvatarColibriPhoto({
             }}
             aria-hidden="true"
           >
-            <source src="/avatar/colibri-transition.webm" type="video/webm" />
+            <source src={VIDEO_TRANSICION} type="video/webm" />
           </video>
         ) : (
           <img
-            src="/avatar/colibri-hero-still.jpg"
+            src={FOTO_FIJA}
             alt=""
             style={{
               width: '100%',

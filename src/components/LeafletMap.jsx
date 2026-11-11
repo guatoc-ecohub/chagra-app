@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useImperativeHandle, useState } f
 import { createPortal } from 'react-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../utils/leafletIconoDefecto.js';
 
 /** @type {import('react').Context<any>} */
 const MapContext = createContext(null);
