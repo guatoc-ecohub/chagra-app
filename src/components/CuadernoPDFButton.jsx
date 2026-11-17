@@ -11,6 +11,7 @@ import { FileText, Download, Loader2, CheckCircle2, AlertCircle, Info } from 'lu
 import { assetCache } from '../db/assetCache';
 import { logCache } from '../db/logCache';
 import useFincaActiveStore from '../services/fincaActiveStore';
+import { useAccionConAviso } from '../hooks/useAccionConAviso';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 // PERF-1 (medido 2026-07): `cuadernoPDF.js` importa `jspdf`, que por sí solo
 // infla este chunk a ~416KB. Como CuadernoPDFButton se monta estáticamente en
@@ -55,8 +56,8 @@ const ROLE_LABELS = {
 export default function CuadernoPDFButton({ compact = false, className = '' }) {
   const activeFinca = useFincaActiveStore((s) => s.getActiveFinca());
   const [counts, setCounts] = useState(null);
-  const [state, setState] = useState('idle'); // idle | generating | success | error
-  const [resultMsg, setResultMsg] = useState('');
+  // idle | generating | success | error — tabla en hooks/useAccionConAviso.js
+  const { fase: state, mensaje: resultMsg, ejecutar } = useAccionConAviso({ msExito: 5000, msError: 6000 });
 
   // Resumen offline-first leído al montar para mostrar "Vas a exportar X" y
   // decidir si advertir sobre tiempo de generación.
@@ -89,11 +90,7 @@ export default function CuadernoPDFButton({ compact = false, className = '' }) {
     };
   }, []);
 
-  const handleClick = async () => {
-    if (state === 'generating') return;
-    setState('generating');
-    setResultMsg('');
-    try {
+  const handleClick = () => ejecutar(async () => {
       const operatorName = typeof window !== 'undefined'
         ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
         : PRIMARY_WORKER_NAME;
@@ -116,16 +113,11 @@ export default function CuadernoPDFButton({ compact = false, className = '' }) {
 
       const result = await downloadCuadernoPDF(fincaData);
       const kb = Math.round(result.sizeBytes / 102.4) / 10; // kB con 1 decimal
-      setResultMsg(`Cuaderno generado (${kb} kB). Revise su carpeta de descargas.`);
-      setState('success');
-      setTimeout(() => setState('idle'), 5000);
-    } catch (err) {
+      return `Cuaderno generado (${kb} kB). Revise su carpeta de descargas.`;
+  }, (err) => {
       console.error('[CuadernoPDFButton] Error generando PDF:', err);
-      setResultMsg(err?.message || 'No se pudo generar el cuaderno.');
-      setState('error');
-      setTimeout(() => setState('idle'), 6000);
-    }
-  };
+      return err?.message || 'No se pudo generar el cuaderno.';
+  });
 
   // Aviso de tiempo solo si la finca es grande.
   const showLongWarning = counts && counts.plants > 50;

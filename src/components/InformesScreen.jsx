@@ -1,11 +1,12 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy de la pantalla ya existente, pendiente de migrar a messages.js. */
-import React, { useState } from 'react';
+import React from 'react';
 import { FileText, Download, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { HojaHomeA } from './esquema/HojaHomeA';
 import './homea-data-screens.css';
 import { exportTraceabilityCsv } from '../services/exportService';
 import CuadernoPDFButton from './CuadernoPDFButton';
 import RestauracionPlanPDFButton from './RestauracionPlanPDFButton';
+import { useAccionConAviso } from '../hooks/useAccionConAviso';
 
 /**
  * InformesScreen, sección dedicada para descargar reportes de la finca
@@ -30,28 +31,19 @@ import RestauracionPlanPDFButton from './RestauracionPlanPDFButton';
 
 // eslint-disable-next-line no-unused-vars -- IconComponent SE USA en JSX línea 55, eslint react-jsx detection falla en mi config
 function ReportCard({ icon: IconComponent, title, description, onExport, helpText }) {
-  const [state, setState] = useState('idle'); // idle | generating | success | error
-  const [resultMsg, setResultMsg] = useState('');
+  // idle | generating | success | error — tabla en hooks/useAccionConAviso.js
+  const { fase: state, mensaje: resultMsg, ejecutar } = useAccionConAviso({ msExito: 4000, msError: 6000 });
 
-  const handleClick = async () => {
-    if (state === 'generating') return;
-    setState('generating');
-    setResultMsg('');
-    try {
+  const handleClick = () => ejecutar(async () => {
       const result = await onExport();
       const msg = result?.rowCount !== undefined
         ? `${result.rowCount} registros exportados${result.pendingCount > 0 ? ` (${result.pendingCount} pendientes de sincronización)` : ''}`
         : 'Reporte generado correctamente';
-      setResultMsg(msg);
-      setState('success');
-      setTimeout(() => setState('idle'), 4000);
-    } catch (err) {
+      return msg;
+  }, (err) => {
       console.error('[InformesScreen] Error generando reporte:', err);
-      setResultMsg(err?.message || 'Error generando reporte');
-      setState('error');
-      setTimeout(() => setState('idle'), 6000);
-    }
-  };
+      return err?.message || 'Error generando reporte';
+  });
 
   return (
     <article className="ha-data-card bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
