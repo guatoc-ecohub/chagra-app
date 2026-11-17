@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Trees, Download, Loader2, CheckCircle2, AlertCircle, Flame } from 'lucide-react';
 import useFincaActiveStore from '../services/fincaActiveStore';
+import { useAccionConAviso } from '../hooks/useAccionConAviso';
 import { getProfile } from '../services/userProfileService';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 
@@ -33,14 +34,10 @@ export default function RestauracionPlanPDFButton({ className = '' }) {
   const activeFinca = useFincaActiveStore((s) => s.getActiveFinca());
   const [descripcion, setDescripcion] = useState('');
   const [incluirIncendio, setIncluirIncendio] = useState(true);
-  const [state, setState] = useState('idle'); // idle | generating | success | error
-  const [resultMsg, setResultMsg] = useState('');
+  // idle | generating | success | error — tabla en hooks/useAccionConAviso.js
+  const { fase: state, mensaje: resultMsg, ejecutar } = useAccionConAviso({ msExito: 5000, msError: 6000 });
 
-  const handleClick = async () => {
-    if (state === 'generating') return;
-    setState('generating');
-    setResultMsg('');
-    try {
+  const handleClick = () => ejecutar(async () => {
       const profile = (() => { try { return getProfile(); } catch (_) { return null; } })();
       const altitud = activeFinca?.altitud ?? profile?.finca_altitud ?? profile?.altitud ?? null;
 
@@ -77,16 +74,11 @@ export default function RestauracionPlanPDFButton({ className = '' }) {
       });
 
       const kb = Math.round(result.sizeBytes / 102.4) / 10;
-      setResultMsg(`Plan generado (${kb} kB). Revise su carpeta de descargas.`);
-      setState('success');
-      setTimeout(() => setState('idle'), 5000);
-    } catch (err) {
+      return `Plan generado (${kb} kB). Revise su carpeta de descargas.`;
+  }, (err) => {
       console.error('[RestauracionPlanPDFButton] Error generando PDF:', err);
-      setResultMsg(err?.message || 'No se pudo generar el plan.');
-      setState('error');
-      setTimeout(() => setState('idle'), 6000);
-    }
-  };
+      return err?.message || 'No se pudo generar el plan.';
+  });
 
   return (
     <div className={`bg-slate-900/40 border border-slate-800 rounded-2xl p-5 flex flex-col gap-3 ${className}`}>
