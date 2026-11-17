@@ -80,7 +80,8 @@ Defectos y límites que veo en las capturas, por regiones:
 - Arriba y abajo hay un rótulo del arnés («Arnés de captura…», «Fin del arnés.») que no existe en la app.
 - En Informes el botón «Descargar cuaderno (PDF)» se ve sin fondo, mientras «Descargar plan (PDF)» sale verde. Pasa igual en `main` y en la rama; no sé si es así en la app real o es efecto de montar la pantalla sin la piel de la sesión.
 - En la de copia, la mitad inferior es fondo vacío.
-- Solo está el reposo. No hay captura de «generando», «listo» ni «error».
+- Además del reposo hay un par con el desenlace de éxito, tocando el botón desde el arnés: `informes-desenlace-*` («Cuaderno descargado» y «Cuaderno generado (8.7 kB)…»; idénticos byte a byte) y `copia-listo-*` («Descarga iniciada»; difieren en 215 píxeles de 1.824.000, ninguno sobre un 2 % de tolerancia). **No medí el piso** (dos capturas del mismo árbol), así que no sé si esos 215 son la transición de color del botón o algo del cambio.
+- No hay captura de «generando» ni de «error».
 
 No digo que se vean bien; juzga el operador.
 
