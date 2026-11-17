@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Save, Download, Check } from 'lucide-react';
 import { downloadBackupJSON, getBackupSummary } from '../services/dataBackup';
+import { FASE, useAccionConAviso } from '../hooks/useAccionConAviso';
 
 /**
  * BackupExportButton — botón "Exportar copia" reutilizable.
@@ -17,9 +18,13 @@ import { downloadBackupJSON, getBackupSummary } from '../services/dataBackup';
  */
 export default function BackupExportButton({ compact = false, className = '' }) {
   const [summary, setSummary] = useState(null);
-  const [downloading, setDownloading] = useState(false);
-  const [doneFlash, setDoneFlash] = useState(false);
-  const [error, setError] = useState(null);
+  // Una sola fase (tabla en hooks/useAccionConAviso.js): exportando, aviso
+  // de «listo» durante 2,5 s, o error que se queda hasta el próximo intento.
+  // Los tres indicadores se derivan de ella, así que no pueden contradecirse.
+  const { fase, mensaje, ejecutar } = useAccionConAviso({ msExito: 2500 });
+  const downloading = fase === FASE.EN_CURSO;
+  const doneFlash = fase === FASE.EXITO;
+  const error = fase === FASE.ERROR ? mensaje : null;
 
   useEffect(() => {
     let mounted = true;
@@ -38,20 +43,12 @@ export default function BackupExportButton({ compact = false, className = '' }) 
     };
   }, []);
 
-  const handleClick = async () => {
-    setDownloading(true);
-    setError(null);
-    try {
-      await downloadBackupJSON();
-      setDoneFlash(true);
-      setTimeout(() => setDoneFlash(false), 2500);
-    } catch (err) {
-      console.error('[BackupExportButton] Falló la exportación:', err);
-      setError(err?.message || 'No se pudo exportar.');
-    } finally {
-      setDownloading(false);
-    }
-  };
+  const handleClick = () => ejecutar(async () => {
+    await downloadBackupJSON();
+  }, (err) => {
+    console.error('[BackupExportButton] Falló la exportación:', err);
+    return err?.message || 'No se pudo exportar.';
+  });
 
   if (compact) {
     return (
