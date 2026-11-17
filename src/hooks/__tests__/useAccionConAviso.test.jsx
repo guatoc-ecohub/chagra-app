@@ -62,19 +62,26 @@ describe('transicion (tabla pura)', () => {
 
   it('imposible: mensaje fuera de success/error, sea cual sea la secuencia', () => {
     // Recorre todas las secuencias de hasta 5 eventos desde el estado inicial.
+    // Se juntan las violaciones y se afirma una sola vez: miles de `expect`
+    // dentro del bucle hacían expirar la prueba con la máquina cargada.
+    const violaciones = [];
+    let recorridos = 0;
     let frontera = [ESTADO_INICIAL];
     for (let paso = 0; paso < 5; paso += 1) {
       const siguiente = [];
       for (const estado of frontera) {
         for (const evento of EVENTOS) {
           const s = transicion(estado, evento);
-          expect(FASES).toContain(s.fase);
-          if (s.fase === FASE.REPOSO || s.fase === FASE.EN_CURSO) expect(s.mensaje).toBe('');
+          recorridos += 1;
+          const sinMensaje = s.fase === FASE.REPOSO || s.fase === FASE.EN_CURSO;
+          if (!FASES.includes(s.fase) || (sinMensaje && s.mensaje !== '')) violaciones.push(s);
           siguiente.push(s);
         }
       }
       frontera = siguiente;
     }
+    expect(recorridos).toBe(5 + 25 + 125 + 625 + 3125);
+    expect(violaciones).toEqual([]);
   });
 
   it('imposible: un VENCE viejo no saca de generating', () => {
