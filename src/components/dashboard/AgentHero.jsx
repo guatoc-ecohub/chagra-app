@@ -453,7 +453,10 @@ export default function AgentHero({ onNavigate }) {
         const reduce = prefersReducedMotion();
         setPhase('sending');
         try { agentSounds.start(); } catch { /* sonido opcional */ }
-        const go = () => onNavigate?.('agente');
+        const go = () => {
+            setPhase('idle');
+            onNavigate?.('agente');
+        };
         if (reduce) {
             go();
         } else {
