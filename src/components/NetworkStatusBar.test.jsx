@@ -34,7 +34,7 @@ describe('NetworkStatusBar', () => {
     vi.restoreAllMocks();
   });
 
-  it('keeps the current online state visible after an earlier error timer expires', async () => {
+  it('does not keep an idle online bar visible after an earlier error', async () => {
     render(<NetworkStatusBar />);
     await settlePromises();
 
@@ -52,7 +52,58 @@ describe('NetworkStatusBar', () => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(8000);
     });
-    expect(screen.getByText('Conectado.')).toBeTruthy();
+    expect(screen.queryByText('Temporary sync issue')).toBeNull();
+    expect(screen.queryByText('Conectado.')).toBeNull();
+  });
+
+  it('keeps a newer error visible when an earlier error timeout expires', async () => {
+    render(<NetworkStatusBar />);
+    await settlePromises();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('syncError', { detail: { message: 'First sync issue' } }));
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4000);
+    });
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('syncError', { detail: { message: 'Current sync issue' } }));
+    });
+    expect(screen.getByText('Current sync issue')).toBeTruthy();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4000);
+    });
+    expect(screen.getByText('Current sync issue')).toBeTruthy();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4000);
+    });
+    expect(screen.queryByText('Current sync issue')).toBeNull();
+  });
+
+  it.each([
+    ['offline', { pendingCount: 2, isOnline: false, isSyncing: false }, false],
+    ['syncing', { pendingCount: 2, isOnline: true, isSyncing: true }, true],
+  ])('hides after polling online and idle from %s', async (_priorState, initialStats, dispatchOnline) => {
+    mocks.getSyncStats.mockResolvedValue(initialStats);
+    const { container } = render(<NetworkStatusBar />);
+    await settlePromises();
+
+    if (dispatchOnline) {
+      act(() => window.dispatchEvent(new Event('online')));
+      await settlePromises();
+    }
+
+    expect(container.querySelector('[aria-live="polite"]')).toBeTruthy();
+
+    mocks.getSyncStats.mockResolvedValue({ pendingCount: 2, isOnline: true, isSyncing: false });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
+
+    expect(container.querySelector('[aria-live="polite"]')).toBeNull();
   });
 
   it.each([

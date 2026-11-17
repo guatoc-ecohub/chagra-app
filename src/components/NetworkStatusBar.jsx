@@ -67,7 +67,7 @@ const transitionStatus = (state, event) => {
         return { ...next, status: STATUS.SYNCING, visible: false, errorMessage: '' };
       }
       if (state.status === STATUS.OFFLINE || state.status === STATUS.SYNCING) {
-        return { ...next, status: STATUS.ONLINE, visible: true, errorMessage: '' };
+        return { ...next, status: STATUS.ONLINE, visible: false, errorMessage: '' };
       }
       if (pendingCount === state.pendingCount && isOnline === state.isOnline) return state;
       return next;
