@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useReducer } from 'react';
 import { MSG } from '../config/messages.js';
 import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
@@ -22,32 +22,178 @@ const STATUS = {
   ERROR: 'error',
 };
 
+const createInitialState = (isOnline) => ({
+  status: isOnline ? STATUS.ONLINE : STATUS.OFFLINE,
+  isOnline,
+  pendingCount: 0,
+  syncedCount: 0,
+  errorMessage: '',
+  visible: !isOnline,
+  errorRevision: 0,
+  syncedRevision: 0,
+});
+
+// Cada evento produce una única transición; los efectos solo se ocupan de
+// consultar datos o programar la expiración del estado que la máquina eligió.
+const transitionStatus = (state, event) => {
+  switch (event.type) {
+    case 'POLL': {
+      const { stats } = event;
+      const pendingCount = stats.pendingCount ?? state.pendingCount;
+      const isOnline = stats.isOnline !== false;
+      const next = { ...state, pendingCount, isOnline };
+
+      if (!isOnline) {
+        if (
+          state.status === STATUS.OFFLINE
+          && state.pendingCount === pendingCount
+          && state.visible === event.offlineVisible
+          && state.errorMessage === ''
+        ) return state;
+        return {
+          ...next,
+          status: STATUS.OFFLINE,
+          visible: event.offlineVisible,
+          errorMessage: '',
+        };
+      }
+      if (stats.isSyncing) {
+        if (
+          state.status === STATUS.SYNCING
+          && state.pendingCount === pendingCount
+          && !state.visible
+          && state.errorMessage === ''
+        ) return state;
+        return { ...next, status: STATUS.SYNCING, visible: false, errorMessage: '' };
+      }
+      if (state.status === STATUS.OFFLINE || state.status === STATUS.SYNCING) {
+        return { ...next, status: STATUS.ONLINE, visible: false, errorMessage: '' };
+      }
+      if (pendingCount === state.pendingCount && isOnline === state.isOnline) return state;
+      return next;
+    }
+    case 'ONLINE':
+      return {
+        ...state,
+        status: STATUS.SYNCING,
+        isOnline: true,
+        visible: true,
+        errorMessage: '',
+      };
+    case 'ONLINE_STATS':
+      return state.syncedCount === event.pendingCount
+        ? state
+        : { ...state, syncedCount: event.pendingCount };
+    case 'OFFLINE':
+      return {
+        ...state,
+        status: STATUS.OFFLINE,
+        isOnline: false,
+        visible: true,
+        errorMessage: '',
+      };
+    case 'SYNC_ERROR':
+      if (!event.isOnline || !state.isOnline) {
+        return {
+          ...state,
+          status: STATUS.OFFLINE,
+          isOnline: false,
+          visible: true,
+          errorMessage: '',
+        };
+      }
+      return {
+        ...state,
+        status: STATUS.ERROR,
+        visible: true,
+        errorMessage: event.message || 'Error sincronizando con FarmOS',
+        errorRevision: state.errorRevision + 1,
+      };
+    case 'ERROR_TIMEOUT':
+      if (state.status !== STATUS.ERROR || state.errorRevision !== event.revision) return state;
+      if (!event.isOnline) {
+        return {
+          ...state,
+          status: STATUS.OFFLINE,
+          isOnline: false,
+          visible: true,
+          errorMessage: '',
+        };
+      }
+      return {
+        ...state,
+        status: STATUS.ONLINE,
+        isOnline: true,
+        visible: false,
+        errorMessage: '',
+      };
+    case 'SYNC_COMPLETE': {
+      if (!event.isOnline) {
+        return {
+          ...state,
+          status: STATUS.OFFLINE,
+          isOnline: false,
+          visible: true,
+          errorMessage: '',
+        };
+      }
+      if (!event.stats || event.failedCount === null) {
+        return {
+          ...state,
+          status: STATUS.ERROR,
+          isOnline: true,
+          visible: true,
+          errorMessage: MSG.status.errorSincronizar,
+          errorRevision: state.errorRevision + 1,
+        };
+      }
+
+      const pendingCount = event.stats.pendingCount ?? state.pendingCount;
+      if (pendingCount > 0 || event.failedCount > 0) {
+        return {
+          ...state,
+          status: STATUS.ERROR,
+          isOnline: true,
+          pendingCount,
+          visible: true,
+          errorMessage: MSG.status.errorSincronizar,
+          errorRevision: state.errorRevision + 1,
+        };
+      }
+
+      return {
+        ...state,
+        status: STATUS.SYNCED,
+        isOnline: true,
+        pendingCount,
+        syncedCount: event.synced ?? state.syncedCount,
+        visible: true,
+        errorMessage: '',
+        syncedRevision: state.syncedRevision + 1,
+      };
+    }
+    case 'SYNCED_TIMEOUT':
+      if (state.status !== STATUS.SYNCED || state.syncedRevision !== event.revision) return state;
+      return { ...state, visible: false };
+    case 'DISMISS':
+      return { ...state, visible: false };
+    default:
+      return state;
+  }
+};
+
 export default function NetworkStatusBar() {
-  const [status, setStatus] = useState(navigator.onLine ? STATUS.ONLINE : STATUS.OFFLINE);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [syncedCount, setSyncedCount] = useState(0);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [visible, setVisible] = useState(!navigator.onLine);
-  const offlineRef = useRef(!navigator.onLine);
+  const [state, dispatch] = useReducer(transitionStatus, navigator.onLine, createInitialState);
+  const { status, pendingCount, syncedCount, errorMessage, visible } = state;
 
   const refreshStats = useCallback(async () => {
     try {
       const stats = await syncManager.getSyncStats();
-      setPendingCount((prev) => prev !== stats.pendingCount ? stats.pendingCount : prev);
-
-      if (stats.isSyncing) {
-        setStatus(STATUS.SYNCING);
-        // Bug 2026-05-18 operator: NO mostrar el bar de "Sincronizando X registros..."
-        // como overlay visible — es ruido visual. El indicador rotatorio del TopBar
-        // ya muestra el sync en curso. Si el operador quiere ver detalle, toca el
-        // SyncProgressIndicator (z-9100 bottom-right). El bar SYNCING queda
-        // disponible vía dispatch event syncStarted pero no auto-visible.
-        setVisible(false);
-      } else if (!stats.isOnline) {
-        setStatus(STATUS.OFFLINE);
-        if (!isDismissedInSession(STATUS.OFFLINE, stats.pendingCount)) setVisible(true);
-
-      }
+      dispatch({
+        type: 'POLL',
+        stats,
+        offlineVisible: !isDismissedInSession(STATUS.OFFLINE, stats.pendingCount),
+      });
     } catch (_err) {
       // DB no inicializada aún, ignorar
     }
@@ -56,68 +202,65 @@ export default function NetworkStatusBar() {
   useEffect(() => {
     // Polling ligero del estado de sincronización. La llamada inmediata es
     // intencional: sin ella el estado visible queda 1.5s desfasado al montar.
-    // El polling NO causa cascading renders porque cada setState dentro de
-    // refreshStats está guardado por comparación previa.
+    // El reductor devuelve el mismo estado cuando nada cambió.
     const interval = setInterval(refreshStats, 1500);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshStats();
     return () => clearInterval(interval);
   }, [refreshStats]);
 
   useEffect(() => {
+    if (status === STATUS.ERROR) {
+      const revision = state.errorRevision;
+      const timeout = setTimeout(() => {
+        dispatch({ type: 'ERROR_TIMEOUT', revision, isOnline: navigator.onLine });
+      }, 8000);
+      return () => clearTimeout(timeout);
+    }
+    if (status === STATUS.SYNCED) {
+      const revision = state.syncedRevision;
+      const timeout = setTimeout(() => dispatch({ type: 'SYNCED_TIMEOUT', revision }), 3000);
+      return () => clearTimeout(timeout);
+    }
+    return undefined;
+  }, [status, state.errorRevision, state.syncedRevision]);
+
+  useEffect(() => {
     const handleOnline = async () => {
-      offlineRef.current = false;
-      setStatus(STATUS.SYNCING);
-      setVisible(true);
-      setErrorMessage('');
+      dispatch({ type: 'ONLINE' });
 
       // Contar pendientes antes de sync para reportar cuántos se sincronizaron
       try {
         const stats = await syncManager.getSyncStats();
-        const countBefore = stats.pendingCount;
-        setSyncedCount(countBefore);
+        dispatch({ type: 'ONLINE_STATS', pendingCount: stats.pendingCount });
       } catch (_e) { /* noop */ }
     };
 
     const handleOffline = () => {
-      offlineRef.current = true;
-      setStatus(STATUS.OFFLINE);
-      setVisible(true);
-      setErrorMessage('');
+      dispatch({ type: 'OFFLINE' });
     };
 
     const handleSyncError = (e) => {
       // Una petición puede terminar después de que el navegador ya notificó
       // `offline`. En ese caso el error de red no reemplaza la señal estable
       // de modo offline-first por un mensaje técnico de reintento.
-      if (navigator.onLine === false || offlineRef.current) {
-        setStatus(STATUS.OFFLINE);
-        setErrorMessage('');
-        setVisible(true);
-        return;
-      }
-      setStatus(STATUS.ERROR);
-      setErrorMessage(e.detail?.message || 'Error sincronizando con FarmOS');
-      setVisible(true);
-      // Auto-ocultar error tras 8 segundos
-      setTimeout(() => {
-        if (navigator.onLine) {
-          setStatus(STATUS.ONLINE);
-          setVisible(false);
-        } else {
-          setStatus(STATUS.OFFLINE);
-        }
-      }, 8000);
+      dispatch({
+        type: 'SYNC_ERROR',
+        isOnline: navigator.onLine,
+        message: e.detail?.message,
+      });
     };
 
-    const handleSyncComplete = async () => {
+    const handleSyncComplete = async (event) => {
       const [stats, failed] = await Promise.all([
         syncManager.getSyncStats(), syncManager.getFailedTransactions(),
       ]).catch(() => [null, null]);
-      if (!stats || !failed || stats.pendingCount > 0 || failed.length > 0) return;
-      setStatus(STATUS.SYNCED);
-      setVisible(true);
-      setTimeout(() => setVisible(false), 3000);
+      dispatch({
+        type: 'SYNC_COMPLETE',
+        stats,
+        failedCount: failed?.length ?? null,
+        synced: Number.isFinite(event.detail?.synced) ? event.detail.synced : undefined,
+        isOnline: navigator.onLine && stats?.isOnline !== false,
+      });
     };
 
     window.addEventListener('online', handleOnline);
@@ -133,6 +276,12 @@ export default function NetworkStatusBar() {
     };
   }, []);
 
+  const dismiss = (e) => {
+    e.stopPropagation();
+    markDismissedInSession(status, pendingCount);
+    dispatch({ type: 'DISMISS' });
+  };
+
   if (!visible) return null;
 
   const isClickable = pendingCount > 0 || status === STATUS.OFFLINE || status === STATUS.SYNCING || status === STATUS.ERROR;
@@ -141,12 +290,6 @@ export default function NetworkStatusBar() {
       window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }));
     }
   };
-  const dismiss = (e) => {
-    e.stopPropagation();
-    markDismissedInSession(status, pendingCount);
-    setVisible(false);
-  };
-
   const configs = {
     [STATUS.OFFLINE]: {
       bg: 'bg-frog/10',
